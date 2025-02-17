@@ -1,48 +1,52 @@
 #pragma once
-#include "GL\glew.h"
 
-// GLM Headers
 #include <glm\glm.hpp>
-#include <glm\gtc\matrix_transform.hpp>
-#include <glm\gtc\type_ptr.hpp>
-#include <glm\gtc\matrix_inverse.hpp>
+#include <vector>
+#include "PhysicsObject.h"
 
-//Include GLFW
-#include <GLFW/glfw3.h>
-#include <iostream>
-
-
-//global collision detection functions
-//bool OverlapCircle2Circle(const Vector3& pos1, float r1, const Vector3& pos2, float r2);
-
-//bool OverlapAABB2AABB(const Vector3& min1, const Vector3& max1, const Vector3& min2, const Vector3& max2);
+struct CollisionData {
+	float pd{};
+	glm::vec3 normal; //relative to object 1 
+	PhysicsObject* pObj1{};
+	PhysicsObject* pObj2{};
+	glm::vec3 spinvec{ 0,0,0 };
+};
 
 
-//bool OverlapCircle2Line(const Vector3& circlePos, float radius,
-//						const Vector3& lineStart, 
-//						const Vector3& lineEnd);
-//
-//bool OverlapCircle2Line(PhysicsObject& ball, float radius, const Vector3& lineStart, const Vector3& lineEnd, CollisionData& cd);
+//Resolve 2 moving objects 
+void ResolveCollision(CollisionData& cd);
 
-//collision resolution function
-//void ResolveCircle2StaticLine(PhysicsObject& ball, float radius, const Vector3& lineStart, const Vector3& lineEnd);
-//
-//bool ResolveCircle2Line(PhysicsObject& ball, float radius, const Vector3& lineStart, const Vector3& lineEnd, CollisionData& cd);
-//
-//bool OverlapCircle2AABB(Vector3 circlePos, float radius, Vector3 boxMin, Vector3 boxMax);
-//
-//bool OverlapCircle2OBB(PhysicsObject& circle, float radius, PhysicsObject& Box, const float Width, const float Height, CollisionData& cd);
-//
-//void ResolveCircle2StaticCircle(PhysicsObject& ball1, float radius1, PhysicsObject& ball2, float radius2);
-//
+bool OverlapAABB2AABB(PhysicsObject& obj1, const glm::vec3& obj1extent, PhysicsObject& obj2, const glm::vec3& obj2extent, CollisionData& cd);
+
 //bool OverlapCircle2Circle(PhysicsObject& obj1, float r1, PhysicsObject& obj2, float r2, CollisionData& cd);
 //
-//bool SeparatingAxisTheorem(PhysicsObject& Poly1,const std::vector<Vector3>& polygon1,PhysicsObject& Poly2, const std::vector<Vector3>& polygon2, CollisionData& cd);
+//bool OverlapCircle2AABB(PhysicsObject& circle, float radius, PhysicsObject& box, glm::vec3 boxMin, glm::vec3 boxMax, CollisionData& cd);
+
 //
-//void ResolveCollision(CollisionData& Collide);
+//bool SAT2Circle(PhysicsObject& circle, const float& circleRadius, PhysicsObject& SAT, const std::vector<glm::vec3>& polA, glm::vec3& contactpt, const glm::vec3& offset, CollisionData& cd);
 //
-//bool OverlapCircle2Line(PhysicsObject& circle, float radius,
-//	const Vector3& lineStart,
-//	const Vector3& lineEnd, CollisionData& cd);
+//bool OverlapCircle2Line(PhysicsObject& circle, float radius, std::vector<glm::vec3> line);
 //
-//bool OverlapCircle2Line(PhysicsObject& obj1, float radius, const Vector3& lineA, const Vector3& lineB, CollisionData& cd);
+//
+//
+//bool SAT(PhysicsObject& obj1, const std::vector<glm::vec3>& polA, PhysicsObject& obj2, const std::vector<glm::vec3>& polB, CollisionData& cd);
+//
+////collision resolution function
+//void ResolveCircle2StaticLine(PhysicsObject& ball, float radius, const glm::vec3& lineStart, const glm::vec3& lineEnd);
+//
+//bool OverlapPt2Polygon(const glm::vec3& pt, const std::vector<glm::vec3>& polygon);
+//
+
+
+//Vector3 SAT2Line(const std::vector<Vector3>& polA, const std::vector<Vector3>& line, const Vector3& polA_pos);
+
+////Circle2Circle 
+//bool OverlapCircle2Circle(const Vector3& pos1, float r1, const Vector3& pos2, float r2, Vector3& vector);
+//void ResolveCircle2Circle(PhysicsObject& ball1, float radius1, PhysicsObject& ball2, float radius2, Vector3& vector);
+//Circle2AABB
+//void ResolveCircle2AABB(PhysicsObject& box, PhysicsObject& circle, float radius,Vector3 & vector);
+//global collision detection functions
+//float OverlapAABB2AABB(const Vector3& min1, const Vector3& max1,
+//	const Vector3& min2, const Vector3& max2);
+//bool SAT(const std::vector<Vector3>& polA, const std::vector<Vector3>& polB, Vector3& vector, float& pen);
+//void ResolveSAT(PhysicsObject& SAT1, PhysicsObject& SAT2, Vector3& vector, float pen);
