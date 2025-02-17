@@ -65,7 +65,7 @@ bool OverlapAABB2AABB(PhysicsObject& obj1, const glm::vec3& obj1extent, PhysicsO
 		return true;
 	}
 }
-e
+
 //////////////////////////////////////////// CIRCLE 2 CIRCLE /////////////////////////////////////
 //bool OverlapCircle2Circle(PhysicsObject& obj1, float r1, PhysicsObject& obj2, float r2, CollisionData& cd)
 //{
