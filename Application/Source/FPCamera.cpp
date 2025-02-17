@@ -13,6 +13,7 @@ float FPCamera::currentPitch = 0.f;
 FPCamera::FPCamera() : isDirty(false)
 {
 	this->position = position;
+	this->position.y += 7.0f;
 	this->target = target;
 	this->forward = glm::vec3(0, 0, 0);
 	this->up = up;
@@ -41,6 +42,7 @@ FPCamera::~FPCamera()
 void FPCamera::Init(glm::vec3 position, glm::vec3 target, glm::vec3 up) //use this one
 {
 	this->position = position;
+	this->position.y += 7.0f;
 	this->target = target;
 	this->forward = glm::vec3(0, 0, 0);
 	this->up = up;
