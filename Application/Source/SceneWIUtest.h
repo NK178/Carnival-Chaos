@@ -8,6 +8,7 @@
 #include "MatrixStack.h"
 #include "Light.h"
 #include "CollisionDetection.h"
+#include "GameObject.h"
 
 class SceneWIUtest : public Scene
 {
@@ -17,6 +18,7 @@ public:
 		GEO_AXES,
 		//shapes
 		GEO_SPHERE,
+		GEO_CUBE,
 		GEO_QUAD,
 		GEO_PLANE,
 
@@ -124,13 +126,20 @@ private:
 
 	Application app;
 
-	bool OverlapAABB2AABB(glm::vec3 Obj1, const int Width1, const int Height1, glm::vec3 Obj2, const int Width2, const int Height2);
-
 	void RenderMeshOnScreen(Mesh* mesh, float x, float y, float sizex, float sizey);
 	void RenderText(Mesh* mesh, std::string text, glm::vec3 color);
 	void RenderTextOnScreen(Mesh* mesh, std::string text, glm::vec3 color, float size, float x, float y);
 	void Material(GEOMETRY_TYPE obj, float AmR, float AmG, float AmB, float DifA, float DifG, float DifB, float SpA, float SpG, float SpB, float Shiny);
 	void RenderSkyBox();
+
+	//struct Cube : public GameObject {
+	//	glm::vec3 boxextent{ 1.5f,1.5f,1.5f};
+	//	Cube(int id) {
+	//		SetID(id);
+	//	}
+	//};
+
+	//std::vector<Cube> cubelist;
 
 
 };

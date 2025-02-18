@@ -18,6 +18,7 @@
 #include "MouseController.h"
 #include "LoadTGA.h"
 
+
 SceneWIUtest::SceneWIUtest()
 {
 }
@@ -124,6 +125,7 @@ void SceneWIUtest::Init()
 	meshList[GEO_PLANE] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 2.f);
 	meshList[GEO_PLANE]->textureID = LoadTGA("Images//grass.tga");
 	meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("STAMINA_BAR", glm::vec3(1, 1, 1), 1.f);
+	meshList[GEO_CUBE] = MeshBuilder::GenerateCube("Cube", glm::vec3(1, 1, 1), 1.f);
 
 	meshList[GEO_LEFT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
 	meshList[GEO_LEFT]->textureID = LoadTGA("Images//nightsky_lfD.tga");
@@ -215,28 +217,34 @@ void SceneWIUtest::Init()
 
 	enableLight = true;
 
-
+	//cubelist.push_back(Cube(1));
+	//cubelist.push_back(Cube(2));
+	//cubelist[0].pos = glm::vec3{ 0,3,0 };
+	//cubelist[1].pos = glm::vec3{ 15,3,0 };
 }
 
 void SceneWIUtest::Update(double dt)
 {
+	CollisionData cd;
 	HandleKeyPress();
+	const float SPEED = 15.f;
+	//if (KeyboardController::GetInstance()->IsKeyDown('I'))
+	//	cubelist[1].pos.z -= static_cast<float>(dt) * SPEED;
+	//if (KeyboardController::GetInstance()->IsKeyDown('K'))
+	//	cubelist[1].pos.z += static_cast<float>(dt) * SPEED;
+	//if (KeyboardController::GetInstance()->IsKeyDown('J'))
+	//	cubelist[1].pos.x -= static_cast<float>(dt) * SPEED;
+	//if (KeyboardController::GetInstance()->IsKeyDown('L'))
+	//	cubelist[1].pos.x += static_cast<float>(dt) * SPEED;
+	//if (KeyboardController::GetInstance()->IsKeyDown('O'))
+	//	cubelist[1].pos.y -= static_cast<float>(dt) * SPEED;
+	//if (KeyboardController::GetInstance()->IsKeyDown('P'))
+	//	cubelist[1].pos.y += static_cast<float>(dt) * SPEED;
 
-	if (KeyboardController::GetInstance()->IsKeyDown('I'))
-		light[0].position.z -= static_cast<float>(dt) * 5.f;
-	if (KeyboardController::GetInstance()->IsKeyDown('K'))
-		light[0].position.z += static_cast<float>(dt) * 5.f;
-	if (KeyboardController::GetInstance()->IsKeyDown('J'))
-		light[0].position.x -= static_cast<float>(dt) * 5.f;
-	if (KeyboardController::GetInstance()->IsKeyDown('L'))
-		light[0].position.x += static_cast<float>(dt) * 5.f;
-	if (KeyboardController::GetInstance()->IsKeyDown('O'))
-		light[0].position.y -= static_cast<float>(dt) * 5.f;
-	if (KeyboardController::GetInstance()->IsKeyDown('P'))
-		light[0].position.y += static_cast<float>(dt) * 5.f;
+	//if (OverlapAABB2AABB(cubelist[0], cubelist[0].boxextent, cubelist[1], cubelist[1].boxextent, cd)) {
+	//	std::cout << "Overlapp" << std::endl;
+	//}
 
-	//light[0].spotDirection = -glm::normalize (camera.target - camera.position);
-	//light[0].position = camera.position;
 
 	camera.Update(dt);
 
@@ -307,6 +315,31 @@ void SceneWIUtest::Render()
 	meshList[GEO_PLANE]->material.kShininess = 1.0f;
 	RenderMesh(meshList[GEO_PLANE], true);
 	modelStack.PopMatrix();
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	//for (int i = 0; i < cubelist.size(); i++) {
+	//	modelStack.PushMatrix();
+	//	modelStack.Translate(cubelist[i].pos.x, cubelist[i].pos.y, cubelist[i].pos.z);
+	//	modelStack.Scale(2*cubelist[i].boxextent.x, 2*cubelist[i].boxextent.y, 2*cubelist[i].boxextent.z);
+	//	meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+	//	meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	//	meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	//	meshList[GEO_CUBE]->material.kShininess = 1.0f;
+	//	RenderMesh(meshList[GEO_CUBE], true);
+	//	modelStack.PopMatrix();
+	//}
+
+	//modelStack.PushMatrix();
+	//modelStack.Translate(cube2.pos.x, cube2.pos.y, cube2.pos.z);
+	//modelStack.Scale(cube2.boxextent.x, cube2.boxextent.y, cube2.boxextent.z);
+	//meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+	//meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	//meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	//meshList[GEO_CUBE]->material.kShininess = 1.0f;
+	//RenderMesh(meshList[GEO_CUBE], true);
+	//modelStack.PopMatrix();
 
 
 
@@ -433,21 +466,6 @@ void SceneWIUtest::HandleKeyPress()
 		glUniform1i(m_parameters[U_LIGHT0_TYPE], light[0].type);
 	}
 
-}
-
-
-bool SceneWIUtest::OverlapAABB2AABB(glm::vec3 Obj1, const int Width1, const int Height1,
-glm::vec3 Obj2, const int Width2, const int Height2)
-{
-
-	float MinX1, MaxX1, MinY1, MaxY1, MinX2, MaxX2, MinY2, MaxY2;
-	MinX1 = Obj1.x - Width1 / 2; MaxX1 = Obj1.x + Width1 / 2;
-	MinY1 = Obj1.z - Height1 / 2; MaxY1 = Obj1.z + Height1 / 2;
-
-	MinX2 = Obj2.x - Width2 / 2; MaxX2 = Obj2.x + Width2 / 2;
-	MinY2 = Obj2.z - Height2 / 2; MaxY2 = Obj2.z + Height2 / 2;
-
-	return false;
 }
 
 void SceneWIUtest::RenderMeshOnScreen(Mesh* mesh, float x, float y, float sizex, float sizey)

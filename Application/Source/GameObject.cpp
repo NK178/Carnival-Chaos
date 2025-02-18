@@ -1,10 +1,10 @@
 #include "GameObject.h"
 
-GameObject::GameObject(int ID)
+GameObject::GameObject(void)
 {
-	this->ID = ID;
-
+	ID = 0;
 }
+
 GameObject::~GameObject()
 {
 }
@@ -12,4 +12,9 @@ GameObject::~GameObject()
 int GameObject::GetID(void)
 {
 	return ID;
+}
+
+void GameObject::SetID(int id)
+{
+	ID = id;
 }

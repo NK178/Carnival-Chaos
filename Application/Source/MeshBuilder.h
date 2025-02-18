@@ -22,6 +22,7 @@ public:
 		int numStack = 360);
 	static Mesh* GenerateCyclinder(const std::string& meshName, glm::vec3 color, unsigned numSlice, float radius, float height);
 	static Mesh* GenerateHemisphere(const std::string& meshName, glm::vec3 color, int numStack, int numSlice, float radius);
+	static Mesh* GenerateCube(const std::string& meshName, glm::vec3 color, float length = 1.f);
 
 	// Step 7
 	static Mesh* GenerateOBJ(const std::string& meshName, const
