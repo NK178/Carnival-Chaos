@@ -13,7 +13,7 @@ public:
     glm::vec3 target;
     glm::vec3 forward;
     glm::vec3 up;
-    const float camheight = 8;
+    const float camheight = 15;
 
     FPCamera();
     ~FPCamera();
@@ -40,10 +40,13 @@ private:
     float time;
     float jumpduration;
     float crouchduration;
+    float proneduration;
     bool jumpflag;
     bool crouchflag;
     bool jumpphase1;
     bool crouchphase1;
+    bool proneflag;
+    bool pronephase1;
 
     float swaytimer;
     float swayduration;
@@ -58,6 +61,16 @@ private:
     bool staminaflag;
     bool runflag;
     bool heightresetflag = false;
+
+    //bools for camera mechanics
+
+    bool allowMovement = true; // 
+    bool allowJump = true; // 
+    bool allowSprint = true; // 
+    bool allowCrouch = true; // 
+    bool allowProne = true; // 
+    bool allowLocomotiveTilt = true;
+    bool allowLocomotiveBop = true;
 
     
 };

@@ -13,6 +13,7 @@ float FPCamera::currentPitch = 0.f;
 FPCamera::FPCamera() : isDirty(false)
 {
 	this->position = position;
+	this->position.y += 15.0f;
 	this->target = target;
 	this->forward = glm::vec3(0, 0, 0);
 	this->up = up;
@@ -23,8 +24,11 @@ FPCamera::FPCamera() : isDirty(false)
 	jumpflag = false;
 	crouchflag = false;
 	crouchduration = 0.2f;
+	proneflag = false;
+	proneduration = 0.5f;
 	jumpphase1 = true;
 	crouchphase1 = true;
+	pronephase1 = true;
 	swaytimer = 0.f;
 	swayduration = 2.f;
 	swayphase1 = true;
@@ -41,6 +45,7 @@ FPCamera::~FPCamera()
 void FPCamera::Init(glm::vec3 position, glm::vec3 target, glm::vec3 up) //use this one
 {
 	this->position = position;
+	this->position.y += 15.0f;
 	this->target = target;
 	this->forward = glm::vec3(0, 0, 0);
 	this->up = up;
@@ -99,115 +104,160 @@ void FPCamera::Update(double dt)
 
 	bool isMoving = false;
 	//Movement
-	if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_W)) {
-		position += front * ZOOM_SPEED * static_cast<float>(dt);
-		target += view * ZOOM_SPEED * static_cast<float>(dt);
-		if (bop != 0.f && bopflag)
-			position.y += bop;
-		isDirty = isMoving = true;
-	}
-	if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_S)) {
-		position -= front * ZOOM_SPEED * static_cast<float>(dt);
-		target -= view * ZOOM_SPEED * static_cast<float>(dt);
-		if (bop != 0.f && bopflag)
-			position.y += bop;
-		isDirty = isMoving = true;
-	}
-	if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_A)) {
-		position -= right * ZOOM_SPEED * static_cast<float>(dt);
-		target -= right * ZOOM_SPEED * static_cast<float>(dt);
-		isDirty = isMoving = true;
-	}
-	if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_D)) {
-		position += right * ZOOM_SPEED * static_cast<float>(dt);
-		target += right * ZOOM_SPEED * static_cast<float>(dt);
-		isDirty = isMoving = true;
+	if (allowMovement)
+	{
+		if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_W)) {
+			position += front * ZOOM_SPEED * static_cast<float>(dt);
+			target += view * ZOOM_SPEED * static_cast<float>(dt);
+			if (bop != 0.f && bopflag)
+				position.y += bop;
+			isDirty = isMoving = true;
+		}
+		if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_S)) {
+			position -= front * ZOOM_SPEED * static_cast<float>(dt);
+			target -= view * ZOOM_SPEED * static_cast<float>(dt);
+			if (bop != 0.f && bopflag)
+				position.y += bop;
+			isDirty = isMoving = true;
+		}
+		if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_A)) {
+			position -= right * ZOOM_SPEED * static_cast<float>(dt);
+			target -= right * ZOOM_SPEED * static_cast<float>(dt);
+			isDirty = isMoving = true;
+		}
+		if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_D)) {
+			position += right * ZOOM_SPEED * static_cast<float>(dt);
+			target += right * ZOOM_SPEED * static_cast<float>(dt);
+			isDirty = isMoving = true;
+		}
 	}
 
 	/////////////////////////////////////// bad implentation 
-	////Jump 
-	//if (KeyboardController::GetInstance()->IsKeyPressed(VK_SPACE)) { 
-	//	if (!crouchflag && !jumpflag) {
-	//		position.y = camheight;
-	//		jumpflag = jumpphase1 = true;
-	//		bopflag = false;
-	//		time = 0.f;
-	//	}
-	//}
-	//if (jumpphase1 && jumpflag) {
-	//	time += dt;
-	//	amplitude = glm::sin(time * frequency) * JUMP_POWER;
-	//	position += glm::vec3(0, 1, 0) * amplitude;
-	//	if (time > 0.9f)
-	//		jumpflag = false;
-	//}
-	//else if (!jumpflag && !crouchflag && !bopflag) {
-	//	time += dt;
-	//	position.y = camheight;
-	//	time = amplitude = 0.f;
-	//	bopflag = true;
-	//}
+	//Jump 
+	if (KeyboardController::GetInstance()->IsKeyPressed(VK_SPACE) && allowJump) { 
+		if (!crouchflag && !proneflag && !jumpflag) {
+			position.y = camheight;
+			jumpflag = jumpphase1 = true;
+			bopflag = false;
+			time = 0.f;
+		}
+	}
+	if (jumpphase1 && jumpflag) {
+		time += dt;
+		amplitude = glm::sin(time * frequency) * JUMP_POWER;
+		position += glm::vec3(0, 1, 0) * amplitude;
+		if (time > 0.9f)
+			jumpflag = false;
+	}
+	else if (!jumpflag && !crouchflag && !bopflag) {
+		time += dt;
+		position.y = camheight;
+		time = amplitude = 0.f;
+		bopflag = true;
+	}
 
-	////Crouch
-	//if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_C)) { 
-	//	if (!jumpflag && !crouchflag) {
-	//		position.y = camheight;
-	//		crouchflag = true;
-	//		time = amplitude = 0.f;
-	//	}
-	//	else if (crouchflag && crouchphase1) {
-	//		time = 0.f;
-	//		crouchphase1 = false;
-	//	}
-	//}
-	//if (crouchflag && crouchphase1) {
-	//	time += dt;
-	//	ZOOM_SPEED = 15.f;
-	//	if (time < crouchduration)
-	//		position.y = glm::lerp(camheight, camheight - 3.f, time / crouchduration);
-	//}
-	//if (!crouchphase1) {
-	//	time += dt;
-	//	ZOOM_SPEED = 15.f;
-	//	if (time < crouchduration)
-	//		position.y = glm::lerp(camheight - 3.f, camheight, time / crouchduration);
-	//	else {
-	//		position.y = camheight;
-	//		crouchphase1 = true;
-	//		crouchflag = false;
-	//		ZOOM_SPEED = DEFAULT_SPEED;
-	//	}
-	//}	
-	//if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_LEFT_SHIFT) && staminaflag && !crouchflag) {
-	//	ZOOM_SPEED = 100.f;
-	//	sprintstamina -= 2.f;
-	//	heightresetflag = false;
-	//	runflag = true;
-	//	if (sprintstamina < 0) {
-	//		sprintstamina = 0.f;
-	//		staminaflag = false;
-	//	}
-	//	BOP_SPEED = 23.f;
-	//	BOP_AMPLITUDE = 0.2f;
-	//}
-	//else {
-	//	BOP_SPEED = DEFAULT_BOP;
-	//	BOP_AMPLITUDE = 0.1f;
-	//	if (sprintstamina < 100) {
-	//		sprintstamina += 0.5f;
-	//		if (!heightresetflag && runflag) {
-	//			position.y = camheight;
-	//			heightresetflag = true;
-	//			runflag = false;
-	//		}
-	//		if (sprintstamina > 40.f) 
-	//			staminaflag = true;		
-	//	}
-	//	if (!crouchflag)
-	//		ZOOM_SPEED = DEFAULT_SPEED;
-	//}
+	//Crouch
+	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_C) && allowCrouch) { 
+		if (!jumpflag && !crouchflag && !proneflag) {
+			position.y = camheight;
+			crouchflag = true;
+			time = amplitude = 0.f;
+		}
+		else if (!jumpflag && !crouchflag && proneflag) {
+			position.y = camheight - 6;
+			crouchflag = true;
+			proneflag = false;
+			time = amplitude = 0.f;
+		}
+		else if (crouchflag && crouchphase1) {
+			time = 0.f;
+			crouchphase1 = false;
+		}
+	}
+	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_X) && allowProne) {
+		if (!jumpflag && !proneflag && !crouchflag) {
+			position.y = camheight;
+			proneflag = true;
+			time = amplitude = 0.f;
+		}
+		else if (!jumpflag && !proneflag && crouchflag) {
+			position.y = camheight - 3;
+			proneflag = true;
+			crouchflag = false;
+			time = amplitude = 0.f;
+		}
+		else if (proneflag && pronephase1) {
+			time = 0.f;
+			crouchphase1 = true;
+			pronephase1 = false;
+		}
+	}
+	if (crouchflag && crouchphase1) {
+		time += dt;
+		ZOOM_SPEED = 15.f;
+		if (time < crouchduration)
+			position.y = glm::lerp(camheight, camheight - 3.f, time / crouchduration);
+	}
+	if (!crouchphase1) {
+		time += dt;
+		ZOOM_SPEED = 15.f;
+		if (time < crouchduration)
+			position.y = glm::lerp(camheight - 3.f, camheight, time / crouchduration);
+		else {
+			position.y = camheight;
+			crouchphase1 = true;
+			crouchflag = false;
+			ZOOM_SPEED = DEFAULT_SPEED;
+		}
+	}	
+	if (proneflag && pronephase1) {
+		time += dt;
+		ZOOM_SPEED = 15.f;
+		if (time < proneduration)
+			position.y = glm::lerp(camheight, camheight - 6.f, time / proneduration);
+	}
+	if (!pronephase1) {
+		time += dt;
+		ZOOM_SPEED = 15.f;
+		if (time < proneduration)
+			position.y = glm::lerp(camheight - 6.f, camheight, time / proneduration);
+		else {
+			position.y = camheight;
+			pronephase1 = true;
+			proneflag = false;
+			ZOOM_SPEED = DEFAULT_SPEED;
+		}
+	}
+	if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_LEFT_SHIFT) && staminaflag && !crouchflag && allowSprint) {
+		ZOOM_SPEED = 100.f;
+		sprintstamina -= 2.f;
+		heightresetflag = false;
+		runflag = true;
+		if (sprintstamina < 0) {
+			sprintstamina = 0.f;
+			staminaflag = false;
+		}
+		BOP_SPEED = 23.f;
+		BOP_AMPLITUDE = 0.2f;
+	}
+	else {
+		BOP_SPEED = DEFAULT_BOP;
+		BOP_AMPLITUDE = 0.1f;
+		if (sprintstamina < 100) {
+			sprintstamina += 0.5f;
+			if (!heightresetflag && runflag) {
+				position.y = camheight;
+				heightresetflag = true;
+				runflag = false;
+			}
+			if (sprintstamina > 40.f) 
+				staminaflag = true;		
+		}
+		if (!crouchflag)
+			ZOOM_SPEED = DEFAULT_SPEED;
+	}
 
-	////std::cout << position.y << std::endl;
+	//std::cout << position.y << std::endl;
 
 	////Sway camera 
 	//swaytimer += static_cast<float>(dt);
@@ -218,7 +268,65 @@ void FPCamera::Update(double dt)
 	//boptimer += static_cast<float>(dt);
 	//bop = glm::sin(boptimer * BOP_SPEED) * BOP_AMPLITUDE;
 
-	double deltaX = MouseController::GetInstance() -> GetMouseDeltaX();
+	//double deltaX = MouseController::GetInstance() -> GetMouseDeltaX();
+	//float angleX = -deltaX * ROTATE_SPEED * 0.05 * static_cast<float>(dt);
+	//glm::mat4 yaw = glm::rotate(
+	//	glm::mat4(1.f), // matrix to modify
+	//	glm::radians(angleX), // rotation angle in degree and
+	//	glm::vec3(up.x, up.y, up.z)// the axis to rotate along
+	//);
+	//glm::vec3 yawView = yaw * glm::vec4(view, 0.f);
+
+	//double deltaY = MouseController::GetInstance()->GetMouseDeltaY();
+	//float angleY = deltaY * ROTATE_SPEED * 0.05 * static_cast<float>(dt);
+	//glm::mat4 pitch = glm::rotate(
+	//	glm::mat4(1.f), // matrix to modify
+	//	glm::clamp(glm::radians(angleY),-1.5f,1.5f), // rotation angle in degree and
+	//	glm::vec3(right.x, right.y, right.z)// the axis to rotate along
+	//);
+	//glm::vec3 pitchView = pitch * glm::vec4(view, 0.f);
+	//target = position + pitchView + yawView;
+	//isDirty = true;
+	//this->Refresh();
+
+	/*if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_A)) {
+		up.x += ((1 - up.x) * 0.05);
+		up.z += ((1 - up.z) * 0.05);
+	}
+	if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_D)) {
+		up.x -= ((up.x + 1) * 0.05);
+		up.z -= ((up.z + 1) * 0.05);
+	}
+	if (!KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_D) && !KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_A)) {
+		up.x *= 0.9;
+		up.z *= 0.9;
+	}*/
+
+	if (allowLocomotiveTilt)
+	{
+		if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_A)) {
+			sway += ((1 - sway) * 0.05);
+
+		}
+		if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_D)) {
+			sway -= ((sway + 1) * 0.05);
+		}
+		if (!KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_D) && !KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_A)) {
+			sway *= 0.9;
+		}
+
+		up.x = sin(sway) * 0.25;
+		up.z = sin(sway) * 0.25;
+	}
+
+	if (allowLocomotiveBop)
+	{
+		//Up down bobbing 
+		boptimer += static_cast<float>(dt);
+		bop = glm::sin(boptimer * BOP_SPEED) * BOP_AMPLITUDE;
+	}
+
+	double deltaX = MouseController::GetInstance()->GetMouseDeltaX();
 	float angleX = -deltaX * ROTATE_SPEED * 0.05 * static_cast<float>(dt);
 	glm::mat4 yaw = glm::rotate(
 		glm::mat4(1.f), // matrix to modify
@@ -231,7 +339,7 @@ void FPCamera::Update(double dt)
 	float angleY = deltaY * ROTATE_SPEED * 0.05 * static_cast<float>(dt);
 	glm::mat4 pitch = glm::rotate(
 		glm::mat4(1.f), // matrix to modify
-		glm::clamp(glm::radians(angleY),-1.5f,1.5f), // rotation angle in degree and
+		glm::clamp(glm::radians(angleY), -1.5f, 1.5f), // rotation angle in degree and
 		glm::vec3(right.x, right.y, right.z)// the axis to rotate along
 	);
 	glm::vec3 pitchView = pitch * glm::vec4(view, 0.f);
