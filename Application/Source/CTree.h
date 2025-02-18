@@ -1,5 +1,6 @@
 #pragma once
 #include "CQuad.h"
+#include "CollisionDetection.h"
 #include <iostream>
 
 class CTree

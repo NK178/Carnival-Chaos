@@ -67,57 +67,28 @@ bool OverlapAABB2AABB(PhysicsObject& obj1, const glm::vec3& obj1extent, PhysicsO
 			else
 				cd.normal = glm::vec3{ 0,0,1 };
 		}
-
-		////check which overlap is smaller 
-		//if (overlapX > overlapY) {
-		//	if (overlapY < )
-		//}
-		//else {
-		//	if (overlapX > overlapZ) {
-
-		//	}
-		//	else {
-
-		//	}
-
-		//}
-		////check which overlap is smaller 
-		//if (overlapX > overlapY) {
-		//	cd.pd = overlapY;
-		//	if (max1.y < max2.y)
-		//		cd.normal = glm::vec3{ 0,-1,0};
-		//	else
-		//		cd.normal = glm::vec3{ 0,1,0 };
-		//}
-		//else {
-		//	cd.pd = overlapX;
-		//	if (max1.x < max2.x)
-		//		cd.normal = glm::vec3{ -1,0,0 };
-		//	else
-		//		cd.normal = glm::vec3{ 1,0,0};
-		//}
-
 		cd.pObj1 = &obj1;
 		cd.pObj2 = &obj2;
 		return true;
 	}
 }
 
-//////////////////////////////////////////// CIRCLE 2 CIRCLE /////////////////////////////////////
-//bool OverlapCircle2Circle(PhysicsObject& obj1, float r1, PhysicsObject& obj2, float r2, CollisionData& cd)
-//{
-//	glm::vec3 dispvec = obj1.pos - obj2.pos;
-//	if (dispvec.LengthSquared() <= (r2 + r1) * (r2 + r1)) {
-//		//calculate collision data 
-//		cd.pObj1 = &obj1;
-//		cd.pObj2 = &obj2;
-//		cd.pd = (r1 + r2) - dispvec.Length();
-//		cd.normal = dispvec.Normalized();
-//		return true;
-//	}
-//	return false;
-//}
-//
+////////////////////////////////////////// CIRCLE 2 CIRCLE /////////////////////////////////////
+bool OverlapSphere2Sphere(PhysicsObject& obj1, float r1, PhysicsObject& obj2, float r2, CollisionData& cd)
+{
+	glm::vec3 dispvec = obj1.pos - obj2.pos;
+	float length = glm::length(dispvec);
+	if (length <= (r2 + r1)) {
+		//calculate collision data 
+		cd.pObj1 = &obj1;
+		cd.pObj2 = &obj2;
+		cd.pd = (r1 + r2) - length;
+		cd.normal = glm::normalize(dispvec);
+		return true;
+	}
+	return false;
+}
+
 //////////////////////////////////////////// CIRCLE 2 AABB /////////////////////////////////////
 //bool OverlapCircle2AABB(PhysicsObject& circle, float radius, PhysicsObject& box, glm::vec3 boxMin, glm::vec3 boxMax, CollisionData& cd)
 //{

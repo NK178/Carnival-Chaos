@@ -7,7 +7,7 @@
 #include "FPCamera.h"
 #include "MatrixStack.h"
 #include "Light.h"
-#include "CollisionDetection.h"
+#include "CTree.h"
 #include "GameObject.h"
 
 class SceneWIUtest : public Scene
@@ -17,9 +17,9 @@ public:
 	{
 		GEO_AXES,
 		//shapes
-		GEO_SPHERE,
 		GEO_CUBE,
 		GEO_QUAD,
+		GEO_SPHERE,
 		GEO_PLANE,
 
 		//Text
@@ -132,14 +132,23 @@ private:
 	void Material(GEOMETRY_TYPE obj, float AmR, float AmG, float AmB, float DifA, float DifG, float DifB, float SpA, float SpG, float SpB, float Shiny);
 	void RenderSkyBox();
 
-	//struct Cube : public GameObject {
-	//	glm::vec3 boxextent{ 1.5f,1.5f,1.5f};
-	//	Cube(int id) {
-	//		SetID(id);
-	//	}
-	//};
-
-	//std::vector<Cube> cubelist;
+	struct Cube : public GameObject {
+		glm::vec3 boxextent{ 1.5f,1.5f,1.5f};
+		Cube(int id) {
+			SetID(id);
+		}
+	};
+	struct Sphere : public GameObject {
+		float radius;
+		Sphere(int id,float r) {
+			SetID(id);
+			radius = r;
+		}
+	};
+	bool activate = false;
+	std::vector<Cube> cubelist;
+	std::vector<Sphere> spherelist;
+	CTree tree;
 
 
 };
