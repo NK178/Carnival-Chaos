@@ -42,7 +42,6 @@ public:
 	void SetCount(int c);
 	void IncrementDepth(void);
 
-
 	CQuad* FindGO(int id);
 
 	void PrintStats();

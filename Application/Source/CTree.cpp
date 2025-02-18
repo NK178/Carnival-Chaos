@@ -26,12 +26,8 @@ CTree::~CTree(void)
 
 void CTree::AddGO(GameObject go)
 {
-	int id, x, y;
-	id = x = y = 0;
-	x = go.pos.x;
-	y = go.pos.y;
-	id = go.GetID();
-	limit.emplace_back(id, x, y);
+
+	limit.push_back(go);
 	count++;
 }
 
