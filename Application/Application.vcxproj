@@ -149,7 +149,10 @@
     <ClCompile Include="Source\AltAzCamera.cpp" />
     <ClCompile Include="Source\Application.cpp" />
     <ClCompile Include="Source\CollisionDetection.cpp" />
+    <ClCompile Include="Source\CQuad.cpp" />
+    <ClCompile Include="Source\CTree.cpp" />
     <ClCompile Include="Source\FPCamera.cpp" />
+    <ClCompile Include="Source\GameObject.cpp" />
     <ClCompile Include="Source\LoadOBJ.cpp" />
     <ClCompile Include="Source\LoadTGA.cpp" />
     <ClCompile Include="Source\main.cpp" />
@@ -164,7 +167,10 @@
     <ClInclude Include="Source\AltAzCamera.h" />
     <ClInclude Include="Source\Application.h" />
     <ClInclude Include="Source\CollisionDetection.h" />
+    <ClInclude Include="Source\CQuad.h" />
+    <ClInclude Include="Source\CTree.h" />
     <ClInclude Include="Source\FPCamera.h" />
+    <ClInclude Include="Source\GameObject.h" />
     <ClInclude Include="Source\Light.h" />
     <ClInclude Include="Source\LoadOBJ.h" />
     <ClInclude Include="Source\LoadTGA.h" />

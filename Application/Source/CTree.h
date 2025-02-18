@@ -1,0 +1,44 @@
+#pragma once
+#include "CQuad.h"
+#include <iostream>
+
+class CTree
+{
+private:
+	CQuad* root, *current;
+	std::vector<GameObject> limit;
+	int count;
+	int totalbreadth;
+	int totalwidth; 
+	bool GOinRange(int maxX, int minX, int maxZ, int minZ, glm::vec3 pos);
+	void PreOrderStats(CQuad* p);
+	void PreOrderDelete(CQuad* p);
+
+	enum ENUM_QUADTYPE {
+		ROOT_TYPE,
+		UPL_TYPE,
+		UPM_TYPE,
+		UPR_TYPE,
+		MIDL_TYPE,
+		MIDM_TYPE,
+		MIDR_TYPE,
+		BOTL_TYPE,
+		BOTM_TYPE,
+		BOTR_TYPE,
+		NUM_TYPE
+	};
+
+
+public:
+	CTree(void);
+	CTree(int maxwidth, int maxbreadth);
+	~CTree(void);
+	void AddGO(GameObject go);
+	//void AddGO(std::string ID, std::string X, std::string Y);
+	void Split(CQuad* &Q);
+	void CreateQuads(void);
+	void PrintTree(void);
+	void PrintNearbyGO(int go_id);
+
+};
+
