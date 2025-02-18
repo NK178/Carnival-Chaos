@@ -160,6 +160,7 @@
     <ClCompile Include="Source\Mesh.cpp" />
     <ClCompile Include="Source\MeshBuilder.cpp" />
     <ClCompile Include="Source\PhysicsObject.cpp" />
+    <ClCompile Include="Source\SceneHole.cpp" />
     <ClCompile Include="Source\SceneWIUtest.cpp" />
     <ClCompile Include="Source\shader.cpp" />
   </ItemGroup>
@@ -180,6 +181,7 @@
     <ClInclude Include="Source\MeshBuilder.h" />
     <ClInclude Include="Source\PhysicsObject.h" />
     <ClInclude Include="Source\Scene.h" />
+    <ClInclude Include="Source\SceneHole.h" />
     <ClInclude Include="Source\SceneWIUtest.h" />
     <ClInclude Include="Source\shader.hpp" />
     <ClInclude Include="Source\Vertex.h" />
