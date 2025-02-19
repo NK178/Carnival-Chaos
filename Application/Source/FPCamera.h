@@ -62,6 +62,8 @@ private:
     bool runflag;
     bool heightresetflag = false;
 
+    signed short int multDebugX, multDebugZ;
+
     //bools for camera mechanics
 
     bool allowMovement = true; // 
