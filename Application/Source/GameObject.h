@@ -8,13 +8,15 @@ class GameObject : public PhysicsObject
 {
 public:
 	enum COLLISIONTYPE {
-		QUAD = 1,
+		CUBE = 1,
 		SPHERE = 2,
 	};
 	GameObject(int ID, int type);
 	~GameObject();
 	int GetID(void);
+	int GetCollideType(void);
 	void SetID(int id);
+
 
 private:
 	//SET ID FOR ALL GOS !!!!!

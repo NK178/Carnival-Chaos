@@ -7,7 +7,7 @@ class CTree
 {
 private:
 	CQuad* root, *current;
-	std::vector<GameObject> limit;
+	int xpos, zpos;
 	int count;
 	int totalbreadth;
 	int totalwidth; 
@@ -31,15 +31,15 @@ private:
 
 
 public:
-	CTree(void);
-	CTree(int maxwidth, int maxbreadth);
+	int targettype = 0;
+	std::vector<GameObject> limit;
+	CTree(int maxwidth, int maxbreadth,int xpos, int zpos);
 	~CTree(void);
 	void AddGO(GameObject go);
 	//void AddGO(std::string ID, std::string X, std::string Y);
 	void Split(CQuad* &Q);
 	void CreateQuads(void);
 	void PrintTree(void);
-	void CheckCollisionWNearbyGOs(int go_id);
-
+	void CheckCollisionWNearbyGOs(int go_id, std::vector<int>& idlist);
 };
 

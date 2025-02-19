@@ -90,6 +90,46 @@ bool OverlapSphere2Sphere(PhysicsObject& obj1, float r1, PhysicsObject& obj2, fl
 }
 
 //////////////////////////////////////////// CIRCLE 2 AABB /////////////////////////////////////
+bool OverlapAABB2Sphere(PhysicsObject& circle, float radius, PhysicsObject& box, glm::vec3 boxMin, glm::vec3 boxMax, CollisionData& cd)
+{
+	float nearestPoint, nearestPoint2,nearestPoint3, distance;
+	if (circle.pos.x > boxMax.x)
+		nearestPoint = boxMax.x;
+	else if (circle.pos.x < boxMin.x)
+		nearestPoint = boxMin.x;
+	else
+		nearestPoint = circle.pos.x;
+
+	if (circle.pos.y > boxMax.y)
+		nearestPoint2 = boxMax.y;
+	else if (circle.pos.y < boxMin.y)
+		nearestPoint2 = boxMin.y;
+	else
+		nearestPoint2 = circle.pos.y;
+
+	if (circle.pos.z > boxMax.z)
+		nearestPoint3 = boxMax.z;
+	else if (circle.pos.z < boxMin.z)
+		nearestPoint3 = boxMin.z;
+	else
+		nearestPoint3 = circle.pos.z;
+
+	glm::vec3 nearpos(nearestPoint, nearestPoint2, nearestPoint3);
+	glm::vec3 dispvector = circle.pos - nearpos;
+	distance = glm::length(dispvector);
+
+	if (distance < radius) {
+		cd.pObj1 = &circle;
+		cd.pObj2 = &box;
+		cd.pd = radius - distance;
+		cd.normal = glm::normalize(dispvector);
+		return true;
+	}
+	else
+		return false;
+}
+
+//////////////////////////////////////////// CIRCLE 2 AABB /////////////////////////////////////
 //bool OverlapCircle2AABB(PhysicsObject& circle, float radius, PhysicsObject& box, glm::vec3 boxMin, glm::vec3 boxMax, CollisionData& cd)
 //{
 //	float nearestPoint, nearestPoint2, distancesquared;

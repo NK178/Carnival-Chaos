@@ -61,7 +61,7 @@ void CQuad::PrintStats()
 
 }
 
-CQuad* CQuad::FindGOAndCollisionCheck(int id)
+CQuad* CQuad::FindGO(int id)
 {
 	bool condition = false;
 	if (count > 0) {
@@ -77,12 +77,23 @@ CQuad* CQuad::FindGOAndCollisionCheck(int id)
 
 		if (UpL != nullptr && !flag)
 			UpL->FindGO(id);
+		if (UpM != nullptr && !flag)
+			UpM->FindGO(id);
 		if (UpR != nullptr && !flag)
 			UpR->FindGO(id);
+		if (MidL != nullptr && !flag)
+			MidL->FindGO(id);
+		if (MidM != nullptr && !flag)
+			MidM->FindGO(id);
+		if (MidR != nullptr && !flag)
+			MidR->FindGO(id);
 		if (BotL != nullptr && !flag)
 			BotL->FindGO(id);
+		if (BotM != nullptr && !flag)
+			BotM->FindGO(id);
 		if (BotR != nullptr && !flag)
 			BotR->FindGO(id);
+
 		//will not come here until GO is found 
 		if (!flag) {
 			targetquad = this;
@@ -146,6 +157,11 @@ int CQuad::GetXpos(void)
 int CQuad::GetYpos(void)
 {
 	return ypos;
+}
+
+int CQuad::GetQuadType(void)
+{
+	return quadtype;
 }
 
 void CQuad::SetCount(int c)

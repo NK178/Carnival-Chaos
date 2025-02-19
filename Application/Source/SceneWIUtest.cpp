@@ -218,10 +218,10 @@ void SceneWIUtest::Init()
 
 	enableLight = true;
 
-	cubelist.push_back(Cube(1,GameObject::QUAD));
-	cubelist.push_back(Cube(2,GameObject::QUAD));
-	cubelist[0].pos = glm::vec3{ 0,3,0 };
-	cubelist[1].pos = glm::vec3{ 15,3,0 };
+	cubelist.push_back(Cube(1,GameObject::CUBE));
+	cubelist.push_back(Cube(2,GameObject::CUBE));
+	cubelist[0].pos = glm::vec3{ 3,3,4 };
+	cubelist[1].pos = glm::vec3{ 15,3,4 };
 	cubelist[0].mass = 0.f;
 
 	spherelist.push_back(Sphere(3,2.f,GameObject::SPHERE));
@@ -229,15 +229,30 @@ void SceneWIUtest::Init()
 	spherelist[0].pos = glm::vec3{ -15,3,15 };
 	spherelist[1].pos = glm::vec3{ -15,3,0 };
 
-	tree.AddGO(cubelist[0]);
-	tree.AddGO(cubelist[1]);
-	tree.CreateQuads();
-	tree.PrintTree();
 }
 
 void SceneWIUtest::Update(double dt)
 {
-	CollisionData cd;
+	////imagine size 25 by 25, with position 0,0
+	//CTree tree(50,50,0,0);
+
+	////input all ur GOs
+	//for (int i = 0; i < cubelist.size(); i++) {
+	//	tree.AddGO(cubelist[i]);
+	//}
+	////for (int i = 0; i < spherelist.size(); i++) {
+	////	tree.AddGO(spherelist[i]);
+	////}
+	////Do the quad splitting
+	//if (tree.limit.size() > 1)
+	//	tree.CreateQuads();
+	//CollisionData cd;
+	//std::vector<int> idlist;
+	////eg check collision with cube 1
+	//tree.CheckCollisionWNearbyGOs(cubelist[1].GetID(), idlist);
+	//CubeCollisions(idlist,cubelist, cd);
+	//std::cout << tree.targettype << std::endl;
+
 	HandleKeyPress();
 	const float SPEED = 15.f;
 	if (KeyboardController::GetInstance()->IsKeyDown('I'))
@@ -253,14 +268,15 @@ void SceneWIUtest::Update(double dt)
 	if (KeyboardController::GetInstance()->IsKeyDown('P'))
 		cubelist[1].pos.y += static_cast<float>(dt) * SPEED;
 
-	if (OverlapAABB2AABB(cubelist[1], cubelist[1].boxextent, cubelist[0], cubelist[0].boxextent, cd)) {
-		std::cout << "Overlapp" << std::endl;
+	CollisionData cd;
+	if (OverlapAABB2AABB(cubelist[1], cubelist[1].boxextent, cubelist[0], cubelist[0].boxextent, cd)) 
 		ResolveCollision(cd);
-	}
-	if (OverlapSphere2Sphere(spherelist[1], spherelist[1].radius, spherelist[0], spherelist[0].radius, cd)) {
-		std::cout << "Overlapp" << std::endl;
+	
+	if (OverlapSphere2Sphere(spherelist[1], spherelist[1].radius, spherelist[0], spherelist[0].radius, cd)) 
 		ResolveCollision(cd);
-	}
+	
+	if (OverlapAABB2Sphere(spherelist[1], spherelist[1].radius, cubelist[1], cubelist[1].pos - cubelist[1].boxextent, cubelist[1].pos + cubelist[1].boxextent, cd))
+		ResolveCollision(cd);
 
 
 	if (KeyboardController::GetInstance()->IsKeyPressed('G')) {
@@ -374,7 +390,25 @@ void SceneWIUtest::Render()
 	}
 
 
+	modelStack.PushMatrix();
+	modelStack.Translate(25,3,25);
+	modelStack.Scale(1,1,1);
+	meshList[GEO_SPHERE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+	meshList[GEO_SPHERE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_SPHERE]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_SPHERE], true);
+	modelStack.PopMatrix();
 
+	modelStack.PushMatrix();
+	modelStack.Translate(0, 3, 0);
+	modelStack.Scale(1, 1, 1);
+	meshList[GEO_SPHERE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+	meshList[GEO_SPHERE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_SPHERE]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_SPHERE], true);
+	modelStack.PopMatrix();
 
 
 
@@ -658,3 +692,54 @@ void SceneWIUtest::RenderSkyBox() {
 	RenderMesh(meshList[GEO_BOTTOM], false);
 	modelStack.PopMatrix();
 }
+
+void SceneWIUtest::CubeCollisions(std::vector<int> idlist, std::vector<Cube>& Cubelist, CollisionData cd)
+{
+	//std::cout << idlist[0] << std::endl;
+	//std::cout << idlist[1] << std::endl;
+	for (int i = 0; i < idlist.size() - 1; i++) {	
+		for (int j = i + 1; j < idlist.size(); j++) {
+			int idA = idlist[i];
+			int idB = idlist[j];
+			Cube* cubeA = nullptr;
+			Cube* cubeB = nullptr;
+
+			for (int k = 0; k < Cubelist.size(); k++) {
+				if (Cubelist[k].GetID() == idA) 
+					cubeA = &Cubelist[k];
+				if (Cubelist[k].GetID() == idB) 
+					cubeB = &Cubelist[k];
+			}
+
+			if (cubeA != nullptr && cubeB != nullptr) {
+				if (OverlapAABB2AABB(*cubeA, cubeA->boxextent, *cubeB, cubeB->boxextent, cd)) 
+					ResolveCollision(cd);
+			}
+
+		}
+	}
+}
+
+void SceneWIUtest::SortCube2Collide(std::vector<GameObject> GOlist, std::vector<Cube> maincubelist, std::vector<Cube>& newcubelist)
+{
+	for (int i = 0; i < maincubelist.size(); i++) {
+		for (int j = 0; j < GOlist.size(); j++) {
+			if (maincubelist[i].GetID() == GOlist[j].GetID()) 
+				newcubelist.push_back(maincubelist[i]);
+		}
+	}
+}
+
+//void SceneWIUtest::CubeCollisions(std::vector<Cube>& Cubelist, CollisionData cd)
+//{
+//	//Filter out the correct GOs (includes filtering the correct GO types)
+//	for (int i = 0; i < Cubelist.size() - 1; ++i) {
+//		for (int j = i + 1; j < Cubelist.size(); ++j) {
+//			if (OverlapAABB2AABB(Cubelist[i], Cubelist[i].boxextent, Cubelist[j], Cubelist[j].boxextent, cd)) {
+//				ResolveCollision(cd);
+//			}
+//		}
+//	}
+
+//}
+

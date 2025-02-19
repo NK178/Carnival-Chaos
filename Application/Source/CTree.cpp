@@ -1,19 +1,15 @@
 #include "CTree.h"
 
 
-CTree::CTree(void)
-{
-	count = 0;
-	totalbreadth = totalwidth = 25;
-	root = current = nullptr;
-}
 
-CTree::CTree(int maxwidth, int maxbreadth)
+CTree::CTree(int maxwidth, int maxbreadth,int xpos, int zpos)
 {
 	count = 0;
 	root = current = nullptr;
 	totalbreadth = maxbreadth;
 	totalwidth = maxwidth;
+	this->xpos = xpos;
+	this->zpos = zpos;
 }
 
 CTree::~CTree(void)
@@ -26,9 +22,10 @@ CTree::~CTree(void)
 
 void CTree::AddGO(GameObject go)
 {
-
-	limit.push_back(go);
-	count++;
+	if (go.pos.x >= xpos && go.pos.x <= xpos+totalwidth && go.pos.z >= zpos && go.pos.z <= zpos+totalbreadth)
+		limit.push_back(go);
+	if (limit.size() > 0)
+		count++;
 }
 
 void CTree::Split(CQuad*& Q)
@@ -186,13 +183,14 @@ void CTree::Split(CQuad*& Q)
 
 void CTree::CreateQuads(void)
 {
-	//CQuad::CQuad(int w, int h, int xpos, int ypos, int level, int quadtype, CPosition pos)
-	root = new CQuad(totalwidth, totalbreadth, 0, 0, 0, ROOT_TYPE); //big quad 
-	for (int i = 0; i < count; i++) {
-		root->InputGO(limit[i]);
+	if (limit.size() > 1) {
+		root = new CQuad(totalwidth, totalbreadth, 0, 0, 0, ROOT_TYPE); //big quad 
+		for (int i = 0; i < count; i++) {
+			root->InputGO(limit[i]);
+		}
+		root->SetCount(count);
+		Split(root);
 	}
-	root->SetCount(count);
-	Split(root);
 }
 
 
@@ -204,26 +202,32 @@ void CTree::PrintTree(void)
 	std::cout << std::endl;
 }
 
-void CTree::CheckCollisionWNearbyGOs(int go_id)
+void CTree::CheckCollisionWNearbyGOs(int go_id, std::vector<int>& idlist)
 {
 	if (root != nullptr) {
 		CQuad* point = root->FindGO(go_id);
 		if (point == nullptr)
 			std::cout << "Invalid Input " << std::endl;
-		else
-			point->PrintOtherGOs(go_id);
+		else {
+			for (int i = 0; i < point->GetCount(); i++) {
+				//ALL GOS EXCEPT ITSELF WILL GO IN
+				//if (point->GetGO(i).GetID() != go_id)
+				idlist.push_back(point->GetGO(i).GetID());
+			}
+		}
 	}
 }
 
 bool CTree::GOinRange(int maxX, int minX, int maxZ, int minZ, glm::vec3 pos)
 {
 	if ((pos.x - minX) <= (maxX - minX)) {
-		if ((pos.y - minZ) <= (maxZ - minZ)) {
+		if ((pos.z - minZ) <= (maxZ - minZ)) {
 			return true;
 		}
 	}
 	return false;
 }
+
 
 void CTree::PreOrderStats(CQuad* p) //rename 24/1/25
 {

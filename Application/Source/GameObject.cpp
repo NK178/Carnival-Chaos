@@ -15,6 +15,11 @@ int GameObject::GetID(void)
 	return ID;
 }
 
+int GameObject::GetCollideType(void)
+{
+	return collidetype;
+}
+
 void GameObject::SetID(int id)
 {
 	ID = id;

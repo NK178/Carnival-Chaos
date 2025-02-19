@@ -19,8 +19,8 @@ void ResolveCollision(CollisionData& cd);
 bool OverlapAABB2AABB(PhysicsObject& obj1, const glm::vec3& obj1extent, PhysicsObject& obj2, const glm::vec3& obj2extent, CollisionData& cd);
 
 bool OverlapSphere2Sphere(PhysicsObject& obj1, float r1, PhysicsObject& obj2, float r2, CollisionData& cd);
-//
-//bool OverlapCircle2AABB(PhysicsObject& circle, float radius, PhysicsObject& box, glm::vec3 boxMin, glm::vec3 boxMax, CollisionData& cd);
+
+bool OverlapAABB2Sphere(PhysicsObject& circle, float radius, PhysicsObject& box, glm::vec3 boxMin, glm::vec3 boxMax, CollisionData& cd);
 
 //
 //bool SAT2Circle(PhysicsObject& circle, const float& circleRadius, PhysicsObject& SAT, const std::vector<glm::vec3>& polA, glm::vec3& contactpt, const glm::vec3& offset, CollisionData& cd);
