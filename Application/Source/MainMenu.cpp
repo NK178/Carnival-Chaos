@@ -145,6 +145,9 @@ void MainMenu::Init()
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16,16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Images//calibri.tga");
 
+	meshList[GEO_IMAGE] = MeshBuilder::GenerateQuad("Image", glm::vec3(1.f, 1.f, 1.f), 100.f);
+	meshList[GEO_IMAGE]->textureID = LoadTGA("Images//carnival_chaos.tga");
+
 	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 1000.0f);
 	projectionStack.LoadMatrix(projection);
 
@@ -217,67 +220,13 @@ void MainMenu::Init()
 	glUniform1f(m_parameters[U_LIGHT2_EXPONENT], light[2].exponent);
 
 	enableLight = true;
-
-	cubelist.push_back(Cube(1));
-	cubelist.push_back(Cube(2));
-	cubelist[0].pos = glm::vec3{ 0,3,0 };
-	cubelist[1].pos = glm::vec3{ 15,3,0 };
-	cubelist[0].mass = 0.f;
-
-	spherelist.push_back(Sphere(3,2.f));
-	spherelist.push_back(Sphere(4,2.f));
-	spherelist[0].pos = glm::vec3{ -15,3,15 };
-	spherelist[1].pos = glm::vec3{ -15,3,0 };
-
-	tree.AddGO(cubelist[0]);
-	tree.AddGO(cubelist[1]);
-	tree.CreateQuads();
-	tree.PrintTree();
 }
 
 void MainMenu::Update(double dt)
 {
-	CollisionData cd;
 	HandleKeyPress();
-	const float SPEED = 15.f;
-	if (KeyboardController::GetInstance()->IsKeyDown('I'))
-		spherelist[1].pos.z -= static_cast<float>(dt) * SPEED;
-	if (KeyboardController::GetInstance()->IsKeyDown('K'))
-		spherelist[1].pos.z += static_cast<float>(dt) * SPEED;
-	if (KeyboardController::GetInstance()->IsKeyDown('J'))
-		spherelist[1].pos.x -= static_cast<float>(dt) * SPEED;
-	if (KeyboardController::GetInstance()->IsKeyDown('L'))
-		spherelist[1].pos.x += static_cast<float>(dt) * SPEED;
-	if (KeyboardController::GetInstance()->IsKeyDown('O'))
-		spherelist[1].pos.y -= static_cast<float>(dt) * SPEED;
-	if (KeyboardController::GetInstance()->IsKeyDown('P'))
-		spherelist[1].pos.y += static_cast<float>(dt) * SPEED;
 
-	if (OverlapAABB2AABB(cubelist[1], cubelist[1].boxextent, cubelist[0], cubelist[0].boxextent, cd)) {
-		std::cout << "Overlapp" << std::endl;
-		ResolveCollision(cd);
-	}
-	if (OverlapSphere2Sphere(spherelist[1], spherelist[1].radius, spherelist[0], spherelist[0].radius, cd)) {
-		std::cout << "Overlapp" << std::endl;
-		ResolveCollision(cd);
-	}
-
-
-	if (KeyboardController::GetInstance()->IsKeyPressed('G')) {
-		if (!activate)
-			activate = true;
-		else
-			activate = false;
-	}
-	if (activate)
-		cubelist[1].AddForce(glm::vec3{ 0,-1,0 } *10.f);
-
-
-	for (int i = 0; i < cubelist.size(); i++) {
-		cubelist[i].UpdatePhysics(dt);
-	}
 	camera.Update(dt);
-
 }
 
 void MainMenu::Render()
@@ -325,62 +274,20 @@ void MainMenu::Render()
 		}
 	}
 
+	//modelStack.PushMatrix();
+	//modelStack.Scale(100.f, 1.f, 100.f);
+	//modelStack.Rotate(-90.f, 1, 0, 0);
+	//meshList[GEO_PLANE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+	//meshList[GEO_PLANE]->material.kDiffuse = glm::vec3(0.5f,0.5f, 0.5f);
+	//meshList[GEO_PLANE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	//meshList[GEO_PLANE]->material.kShininess = 1.0f;
+	//RenderMesh(meshList[GEO_PLANE], true);
+	//modelStack.PopMatrix();
 
-	modelStack.PushMatrix();
-	RenderMesh(meshList[GEO_AXES], false);
-	modelStack.PopMatrix();
-
-	modelStack.PushMatrix();
-	modelStack.Translate(light[0].position.x, light[0].position.y, light[0].position.z);
-	modelStack.Scale(0.1f, 0.1f, 0.1f);
-	RenderMesh(meshList[GEO_SPHERE], false);
-	modelStack.PopMatrix();
-
-	modelStack.PushMatrix();
-	modelStack.Scale(100.f, 1.f, 100.f);
-	modelStack.Rotate(-90.f, 1, 0, 0);
-	meshList[GEO_PLANE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-	meshList[GEO_PLANE]->material.kDiffuse = glm::vec3(0.5f,0.5f, 0.5f);
-	meshList[GEO_PLANE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	meshList[GEO_PLANE]->material.kShininess = 1.0f;
-	RenderMesh(meshList[GEO_PLANE], true);
-	modelStack.PopMatrix();
+	RenderMeshOnScreen(meshList[GEO_IMAGE], 40, 120, 20, 20);
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-	for (int i = 0; i < cubelist.size(); i++) {
-		modelStack.PushMatrix();
-		modelStack.Translate(cubelist[i].pos.x, cubelist[i].pos.y, cubelist[i].pos.z);
-		modelStack.Scale(2*cubelist[i].boxextent.x, 2*cubelist[i].boxextent.y, 2*cubelist[i].boxextent.z);
-		meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-		meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-		meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-		meshList[GEO_CUBE]->material.kShininess = 1.0f;
-		RenderMesh(meshList[GEO_CUBE], true);
-		modelStack.PopMatrix();
-	}
-
-	for (int i = 0; i < spherelist.size(); i++) {
-		modelStack.PushMatrix();
-		modelStack.Translate(spherelist[i].pos.x, spherelist[i].pos.y, spherelist[i].pos.z);
-		modelStack.Scale(spherelist[i].radius, spherelist[i].radius, spherelist[i].radius);
-		meshList[GEO_SPHERE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-		meshList[GEO_SPHERE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-		meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-		meshList[GEO_SPHERE]->material.kShininess = 1.0f;
-		RenderMesh(meshList[GEO_SPHERE], true);
-		modelStack.PopMatrix();
-	}
-
-
-
-
-
-
-	RenderTextOnScreen(meshList[GEO_TEXT], "Stamina", glm::vec3(0, 1, 0), 40, 0, 0);
-
-	RenderSkyBox();
 }
 
 void MainMenu::RenderMesh(Mesh* mesh, bool enableLight)
@@ -611,50 +518,4 @@ void MainMenu::Material(GEOMETRY_TYPE obj, float AmR, float AmG, float AmB, floa
 	meshList[obj]->material.kDiffuse = glm::vec3(DifA, DifG, DifB);
 	meshList[obj]->material.kSpecular = glm::vec3(SpA, SpG, SpB);
 	meshList[obj]->material.kShininess = Shiny;
-}
-
-void MainMenu::RenderSkyBox() {
-	modelStack.PushMatrix();
-
-	modelStack.PushMatrix();
-	modelStack.Translate(0.f, 0.f, 250.f);
-	modelStack.Rotate(180, 0, 1, 0);
-	modelStack.Scale(5.f, 5.f, 5.f);
-	RenderMesh(meshList[GEO_FRONT], false);
-	modelStack.PopMatrix();
-
-	modelStack.PushMatrix();
-	modelStack.Translate(0.f, 0.f, -250.f);
-	modelStack.Scale(5.f, 5.f, 5.f);
-	RenderMesh(meshList[GEO_BACK], false);
-	modelStack.PopMatrix();
-
-	modelStack.PushMatrix();
-	modelStack.Translate(250.f, 0.f, 0.f);
-	modelStack.Rotate(270, 0, 1, 0);
-	modelStack.Scale(5.f, 5.f, 5.f);
-	RenderMesh(meshList[GEO_LEFT], false);
-	modelStack.PopMatrix();
-
-	modelStack.PushMatrix();
-	modelStack.Translate(-250.f, 0.f, 0.f);
-	modelStack.Rotate(90, 0, 1, 0);
-	modelStack.Scale(5.f, 5.f, 5.f);
-	RenderMesh(meshList[GEO_RIGHT], false);
-	modelStack.PopMatrix();
-
-	modelStack.PushMatrix();
-	modelStack.Rotate(90, 0, 1, 0);
-	modelStack.Translate(0.f, 250.f, 0.f);
-	modelStack.Rotate(90, 1, 0, 0);
-	modelStack.Scale(5.f, 5.f, 5.f);
-	RenderMesh(meshList[GEO_TOP], false);
-	modelStack.PopMatrix();
-
-	modelStack.PushMatrix();
-	modelStack.Translate(0.f, -250.f, 0.f);
-	modelStack.Rotate(270, 1, 0, 0);
-	modelStack.Scale(5.f, 5.f, 5.f);
-	RenderMesh(meshList[GEO_BOTTOM], false);
-	modelStack.PopMatrix();
 }

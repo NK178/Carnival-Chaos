@@ -7,7 +7,6 @@
 #include "FPCamera.h"
 #include "MatrixStack.h"
 #include "Light.h"
-#include "CTree.h"
 #include "GameObject.h"
 
 class MainMenu : public Scene
@@ -24,6 +23,9 @@ public:
 
 		//Text
 		GEO_TEXT,
+
+		//GUI
+		GEO_IMAGE,
 
 		//SKybox
 		GEO_LEFT,
@@ -130,27 +132,6 @@ private:
 	void RenderText(Mesh* mesh, std::string text, glm::vec3 color);
 	void RenderTextOnScreen(Mesh* mesh, std::string text, glm::vec3 color, float size, float x, float y);
 	void Material(GEOMETRY_TYPE obj, float AmR, float AmG, float AmB, float DifA, float DifG, float DifB, float SpA, float SpG, float SpB, float Shiny);
-	void RenderSkyBox();
-
-	struct Cube : public GameObject {
-		glm::vec3 boxextent{ 1.5f,1.5f,1.5f};
-		Cube(int id) {
-			SetID(id);
-		}
-	};
-	struct Sphere : public GameObject {
-		float radius;
-		Sphere(int id,float r) {
-			SetID(id);
-			radius = r;
-		}
-	};
-	bool activate = false;
-	std::vector<Cube> cubelist;
-	std::vector<Sphere> spherelist;
-	CTree tree;
-
-
 };
 
 #endif
