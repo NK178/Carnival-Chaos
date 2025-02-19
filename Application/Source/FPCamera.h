@@ -13,7 +13,7 @@ public:
     glm::vec3 target;
     glm::vec3 forward;
     glm::vec3 up;
-    const float camheight = 15;
+    float camheight;
 
     FPCamera();
     ~FPCamera();

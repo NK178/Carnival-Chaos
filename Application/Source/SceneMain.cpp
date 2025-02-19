@@ -16,6 +16,7 @@
 #include "KeyboardController.h"
 #include "MouseController.h"
 #include "LoadTGA.h"
+#include <iostream>
 
 SceneMain::SceneMain()
 {
@@ -110,7 +111,7 @@ void SceneMain::Init()
 		m_parameters[U_MATERIAL_SHININESS]);
 
 	// Initialise camera properties
-	camera.Init(glm::vec3(-10,3,-10), glm::vec3(0,0,0), glm::vec3(0,1,0));
+	camera.Init(glm::vec3(-10,7,-10), glm::vec3(0,0,0), glm::vec3(0,1,0));
 
 	// Init VBO here
 	for (int i = 0; i < NUM_GEOMETRY; ++i)
