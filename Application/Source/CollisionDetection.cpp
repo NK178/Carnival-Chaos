@@ -20,6 +20,10 @@ void ResolveCollision(CollisionData& cd)
 		obj1.pos += cd.pd * cd.normal;	
 		obj1.vel -= (bounciness + 1) * deltaVel;
 	}
+	else if (obj1.mass == 0 && obj2.mass > 0) {
+		obj2.pos -= cd.pd * cd.normal;	
+		obj2.vel += (bounciness + 1) * deltaVel;
+	}
 	else {
 		obj1.pos += obj2.mass * totalInvMass * cd.pd * cd.normal;
 		obj2.pos -= obj1.mass * totalInvMass * cd.pd * cd.normal;

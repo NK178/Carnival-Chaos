@@ -228,6 +228,8 @@ void SceneWIUtest::Init()
 	spherelist.push_back(Sphere(4,2.f,GameObject::SPHERE));
 	spherelist[0].pos = glm::vec3{ -15,3,15 };
 	spherelist[1].pos = glm::vec3{ -15,3,0 };
+	spherelist[1].mass = 0.f;
+
 
 }
 
@@ -268,6 +270,20 @@ void SceneWIUtest::Update(double dt)
 	if (KeyboardController::GetInstance()->IsKeyDown('P'))
 		cubelist[1].pos.y += static_cast<float>(dt) * SPEED;
 
+	//if (KeyboardController::GetInstance()->IsKeyDown('I'))
+	//	spherelist[1].pos.z -= static_cast<float>(dt) * SPEED;
+	//if (KeyboardController::GetInstance()->IsKeyDown('K'))
+	//	spherelist[1].pos.z += static_cast<float>(dt) * SPEED;
+	//if (KeyboardController::GetInstance()->IsKeyDown('J'))
+	//	spherelist[1].pos.x -= static_cast<float>(dt) * SPEED;
+	//if (KeyboardController::GetInstance()->IsKeyDown('L'))
+	//	spherelist[1].pos.x += static_cast<float>(dt) * SPEED;
+	//if (KeyboardController::GetInstance()->IsKeyDown('O'))
+	//	spherelist[1].pos.y -= static_cast<float>(dt) * SPEED;
+	//if (KeyboardController::GetInstance()->IsKeyDown('P'))
+	//	spherelist[1].pos.y += static_cast<float>(dt) * SPEED;
+
+
 	CollisionData cd;
 	if (OverlapAABB2AABB(cubelist[1], cubelist[1].boxextent, cubelist[0], cubelist[0].boxextent, cd)) 
 		ResolveCollision(cd);
@@ -291,6 +307,9 @@ void SceneWIUtest::Update(double dt)
 
 	for (int i = 0; i < cubelist.size(); i++) {
 		cubelist[i].UpdatePhysics(dt);
+	}
+	for (int i = 0; i < spherelist.size(); i++) {
+		spherelist[i].UpdatePhysics(dt);
 	}
 	camera.Update(dt);
 
