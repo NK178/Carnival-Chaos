@@ -45,7 +45,7 @@ FPCamera::~FPCamera()
 void FPCamera::Init(glm::vec3 position, glm::vec3 target, glm::vec3 up) //use this one
 {
 	this->position = position;
-	this->position.y += 15.0f;
+	this->position.y += 8.f;
 	this->target = target;
 	this->forward = glm::vec3(0, 0, 0);
 	this->up = up;

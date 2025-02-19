@@ -36,51 +36,59 @@ bool OverlapAABB2AABB(PhysicsObject& obj1, const glm::vec3& obj1extent, PhysicsO
 	glm::vec3 max2 = obj2.pos + obj2extent;
 	glm::vec3 min2 = obj2.pos - obj2extent;
 	//the condition is checking for IF NOT COLLIDE, so as long as one fail it not collide 
-	if (max1.x < min2.x || min1.x > max2.x || max1.y < min2.y || min1.y > max2.y)
+	if (max1.x < min2.x || min1.x > max2.x || max1.y < min2.y || min1.y > max2.y || max1.z < min2.z || min1.z > max2.z)
 		return false;
 	else {
-		float overlapX, overlapY;
-		overlapY = overlapX = 0;
+		float overlapX, overlapY, overlapZ;
+		overlapY = overlapX = overlapZ = 0;
 		overlapX = std::min(max1.x, max2.x) - std::max(min1.x, min2.x);
 		overlapY = std::min(max1.y, max2.y) - std::max(min1.y, min2.y);
+		overlapZ = std::min(max1.z, max2.z) - std::max(min1.z, min2.z);
 
-		//check which overlap is smaller 
-		if (overlapX > overlapY) {
-			cd.pd = overlapY;
-			if (max1.y < max2.y)
-				cd.normal = glm::vec3{ 0,-1,0};
-			else
-				cd.normal = glm::vec3{ 0,1,0 };
-		}
-		else {
+		float minpen = std::min({ overlapX, overlapY,overlapZ });
+		if (minpen == overlapX) {
 			cd.pd = overlapX;
 			if (max1.x < max2.x)
 				cd.normal = glm::vec3{ -1,0,0 };
 			else
-				cd.normal = glm::vec3{ 1,0,0};
+				cd.normal = glm::vec3{ 1,0,0 };
 		}
-
+		else if (minpen == overlapY) {
+			cd.pd = overlapY;
+			if (max1.y < max2.y)
+				cd.normal = glm::vec3{ 0,-1,0 };
+			else
+				cd.normal = glm::vec3{ 0,1,0 };
+		}
+		else {
+			cd.pd = overlapZ;
+			if (max1.z < max2.z)
+				cd.normal = glm::vec3{ 0,0,-1 };
+			else
+				cd.normal = glm::vec3{ 0,0,1 };
+		}
 		cd.pObj1 = &obj1;
 		cd.pObj2 = &obj2;
 		return true;
 	}
 }
 
-//////////////////////////////////////////// CIRCLE 2 CIRCLE /////////////////////////////////////
-//bool OverlapCircle2Circle(PhysicsObject& obj1, float r1, PhysicsObject& obj2, float r2, CollisionData& cd)
-//{
-//	glm::vec3 dispvec = obj1.pos - obj2.pos;
-//	if (dispvec.LengthSquared() <= (r2 + r1) * (r2 + r1)) {
-//		//calculate collision data 
-//		cd.pObj1 = &obj1;
-//		cd.pObj2 = &obj2;
-//		cd.pd = (r1 + r2) - dispvec.Length();
-//		cd.normal = dispvec.Normalized();
-//		return true;
-//	}
-//	return false;
-//}
-//
+////////////////////////////////////////// CIRCLE 2 CIRCLE /////////////////////////////////////
+bool OverlapSphere2Sphere(PhysicsObject& obj1, float r1, PhysicsObject& obj2, float r2, CollisionData& cd)
+{
+	glm::vec3 dispvec = obj1.pos - obj2.pos;
+	float length = glm::length(dispvec);
+	if (length <= (r2 + r1)) {
+		//calculate collision data 
+		cd.pObj1 = &obj1;
+		cd.pObj2 = &obj2;
+		cd.pd = (r1 + r2) - length;
+		cd.normal = glm::normalize(dispvec);
+		return true;
+	}
+	return false;
+}
+
 //////////////////////////////////////////// CIRCLE 2 AABB /////////////////////////////////////
 //bool OverlapCircle2AABB(PhysicsObject& circle, float radius, PhysicsObject& box, glm::vec3 boxMin, glm::vec3 boxMax, CollisionData& cd)
 //{
