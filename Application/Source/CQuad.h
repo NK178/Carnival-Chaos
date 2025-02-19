@@ -42,7 +42,7 @@ public:
 	void SetCount(int c);
 	void IncrementDepth(void);
 
-	CQuad* FindGO(int id);
+	CQuad* FindGOAndCollisionCheck(int id);
 
 	void PrintStats();
 	void PrintOtherGOs(int id);

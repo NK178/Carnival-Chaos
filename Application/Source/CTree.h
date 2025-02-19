@@ -39,7 +39,7 @@ public:
 	void Split(CQuad* &Q);
 	void CreateQuads(void);
 	void PrintTree(void);
-	void PrintNearbyGO(int go_id);
+	void CheckCollisionWNearbyGOs(int go_id);
 
 };
 

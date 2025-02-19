@@ -61,7 +61,7 @@ void CQuad::PrintStats()
 
 }
 
-CQuad* CQuad::FindGO(int id)
+CQuad* CQuad::FindGOAndCollisionCheck(int id)
 {
 	bool condition = false;
 	if (count > 0) {

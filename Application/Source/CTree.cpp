@@ -31,27 +31,6 @@ void CTree::AddGO(GameObject go)
 	count++;
 }
 
-//void CTree::AddGO(std::string ID, std::string X, std::string Y)
-//{
-//	int id, x, y;
-//	id = x = y = 0;
-//
-//	for (int i = 0; i < ID.size(); i++) {
-//		int num = (ID[i] - '0');
-//		id = id * 10 + num;
-//	}
-//	for (int i = 0; i < X.size(); i++) {
-//		int num = (X[i] - '0');
-//		x = x * 10 + num;
-//	}
-//	for (int i = 0; i < Y.size(); i++) {
-//		int num = (Y[i] - '0');
-//		y = y * 10 + num;
-//	}
-//	limit.emplace_back(id, x, y); 
-//	count++;
-//}
-
 void CTree::Split(CQuad*& Q)
 {
     //Check if quad needs to be split 
@@ -69,10 +48,6 @@ void CTree::Split(CQuad*& Q)
 		GOlist.push_back(Q->GetGO(i));
 	}
 
-	//for (int i = 0; i < numofGO; i++) {
-	//	std::cout << GOlist[i].GetID() << std::endl;
-	//}
-	//std::cout << Q->GetCount() << std::endl;
 	//Alot of stuff 
 	int UPL, UPM, UPR, MIDL,MIDM, MIDR, BOTL, BOTM, BOTR;
 	UPL = UPM = UPR = MIDL = MIDM = MIDR = BOTL = BOTM = BOTR = 0;
@@ -212,13 +187,14 @@ void CTree::Split(CQuad*& Q)
 void CTree::CreateQuads(void)
 {
 	//CQuad::CQuad(int w, int h, int xpos, int ypos, int level, int quadtype, CPosition pos)
-	root = new CQuad(totalwidth, totalbreadth, 0,0,0, ROOT_TYPE); //big quad 
+	root = new CQuad(totalwidth, totalbreadth, 0, 0, 0, ROOT_TYPE); //big quad 
 	for (int i = 0; i < count; i++) {
 		root->InputGO(limit[i]);
 	}
 	root->SetCount(count);
 	Split(root);
 }
+
 
 void CTree::PrintTree(void)
 {
@@ -228,7 +204,7 @@ void CTree::PrintTree(void)
 	std::cout << std::endl;
 }
 
-void CTree::PrintNearbyGO(int go_id)
+void CTree::CheckCollisionWNearbyGOs(int go_id)
 {
 	if (root != nullptr) {
 		CQuad* point = root->FindGO(go_id);
