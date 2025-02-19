@@ -120,9 +120,9 @@ void SceneHole::Init()
 	}
 
 	meshList[GEO_AXES] = MeshBuilder::GenerateAxes("Axes", 10000.f, 10000.f, 10000.f);
-	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Sun", glm::vec3(1.f, 1.f, 1.f), 1.f, 16, 16);
-	meshList[GEO_PLANE] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 2.f);
-	meshList[GEO_PLANE]->textureID = LoadTGA("Images//grass.tga");
+	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Sun", glm::vec3(1.f, 1.f, 1.f), 12.f, 16, 16);
+	meshList[GEO_PLANE] = MeshBuilder::GenerateQuad("Plane", glm::vec3(.9f, .9f, 1.f), 4.f);
+	meshList[GEO_PLANE]->textureID = LoadTGA("Images//asphalt.tga.tga");
 	meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("STAMINA_BAR", glm::vec3(1, 1, 1), 1.f);
 
 	meshList[GEO_LEFT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
@@ -150,7 +150,7 @@ void SceneHole::Init()
 	light[0].position = glm::vec3(30, 30, 0);
 	light[0].color = glm::vec3(1, 1, 1);
 	light[0].type = Light::LIGHT_DIRECTIONAL;
-	light[0].power = 1.f;
+	light[0].power = 2.f;
 	light[0].kC = 1.f;
 	light[0].kL = 0.01f;
 	light[0].kQ = 0.001f;
@@ -299,7 +299,7 @@ void SceneHole::Render()
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Scale(100.f, 1.f, 100.f);
+	modelStack.Scale(100.f, 1.f, 10.f);
 	modelStack.Rotate(-90.f, 1, 0, 0);
 	meshList[GEO_PLANE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
 	meshList[GEO_PLANE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
