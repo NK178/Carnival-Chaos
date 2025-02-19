@@ -45,8 +45,8 @@ FPCamera::~FPCamera()
 void FPCamera::Init(glm::vec3 position, glm::vec3 target, glm::vec3 up) //use this one
 {
 	this->position = position;
-	this->position.y += 8.f;
 	this->target = target;
+	camheight = position.y;
 	this->forward = glm::vec3(0, 0, 0);
 	this->up = up;
 	this->isDirty = true;
@@ -257,7 +257,7 @@ void FPCamera::Update(double dt)
 			ZOOM_SPEED = DEFAULT_SPEED;
 	}
 
-	//std::cout << position.y << std::endl;
+	std::cout << camheight << std::endl;
 
 	////Sway camera 
 	//swaytimer += static_cast<float>(dt);

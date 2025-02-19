@@ -13,6 +13,7 @@
 
 
 #include "SceneWIUtest.h"
+#include "SceneMain.h"
 #include "KeyboardController.h"
 #include "MouseController.h"
 
@@ -136,7 +137,7 @@ void Application::Init()
 void Application::Run()
 {
 	//Main Loop
-	Scene *scene = new SceneWIUtest();
+	Scene *scene = new SceneMain();
 	scene->Init();
 
 	m_timer.startTimer();    // Start timer to calculate how long it takes to render this frame
