@@ -1,8 +1,9 @@
 #include "GameObject.h"
 
-GameObject::GameObject(void)
+GameObject::GameObject(int ID, int type)
 {
-	ID = 0;
+	this->ID = ID;
+	this->collidetype = type;
 }
 
 GameObject::~GameObject()

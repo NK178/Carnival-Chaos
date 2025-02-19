@@ -7,11 +7,17 @@
 class GameObject : public PhysicsObject
 {
 public:
-	GameObject(void);
+	enum COLLISIONTYPE {
+		QUAD = 1,
+		SPHERE = 2,
+	};
+	GameObject(int ID, int type);
 	~GameObject();
 	int GetID(void);
 	void SetID(int id);
+
 private:
 	//SET ID FOR ALL GOS !!!!!
 	int ID;
+	int collidetype;
 };

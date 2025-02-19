@@ -134,16 +134,11 @@ private:
 
 	struct Cube : public GameObject {
 		glm::vec3 boxextent{ 1.5f,1.5f,1.5f};
-		Cube(int id) {
-			SetID(id);
-		}
+		Cube(int id, int type) : GameObject(id,type) {}
 	};
 	struct Sphere : public GameObject {
 		float radius;
-		Sphere(int id,float r) {
-			SetID(id);
-			radius = r;
-		}
+		Sphere(int id, int r, int type) : radius(r), GameObject(id, type) {}
 	};
 	bool activate = false;
 	std::vector<Cube> cubelist;

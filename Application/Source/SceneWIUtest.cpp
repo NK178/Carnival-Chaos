@@ -218,14 +218,14 @@ void SceneWIUtest::Init()
 
 	enableLight = true;
 
-	cubelist.push_back(Cube(1));
-	cubelist.push_back(Cube(2));
+	cubelist.push_back(Cube(1,GameObject::QUAD));
+	cubelist.push_back(Cube(2,GameObject::QUAD));
 	cubelist[0].pos = glm::vec3{ 0,3,0 };
 	cubelist[1].pos = glm::vec3{ 15,3,0 };
 	cubelist[0].mass = 0.f;
 
-	spherelist.push_back(Sphere(3,2.f));
-	spherelist.push_back(Sphere(4,2.f));
+	spherelist.push_back(Sphere(3,2.f,GameObject::SPHERE));
+	spherelist.push_back(Sphere(4,2.f,GameObject::SPHERE));
 	spherelist[0].pos = glm::vec3{ -15,3,15 };
 	spherelist[1].pos = glm::vec3{ -15,3,0 };
 
@@ -241,17 +241,17 @@ void SceneWIUtest::Update(double dt)
 	HandleKeyPress();
 	const float SPEED = 15.f;
 	if (KeyboardController::GetInstance()->IsKeyDown('I'))
-		spherelist[1].pos.z -= static_cast<float>(dt) * SPEED;
+		cubelist[1].pos.z -= static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('K'))
-		spherelist[1].pos.z += static_cast<float>(dt) * SPEED;
+		cubelist[1].pos.z += static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('J'))
-		spherelist[1].pos.x -= static_cast<float>(dt) * SPEED;
+		cubelist[1].pos.x -= static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('L'))
-		spherelist[1].pos.x += static_cast<float>(dt) * SPEED;
+		cubelist[1].pos.x += static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('O'))
-		spherelist[1].pos.y -= static_cast<float>(dt) * SPEED;
+		cubelist[1].pos.y -= static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('P'))
-		spherelist[1].pos.y += static_cast<float>(dt) * SPEED;
+		cubelist[1].pos.y += static_cast<float>(dt) * SPEED;
 
 	if (OverlapAABB2AABB(cubelist[1], cubelist[1].boxextent, cubelist[0], cubelist[0].boxextent, cd)) {
 		std::cout << "Overlapp" << std::endl;
