@@ -18,7 +18,6 @@
 #include "MouseController.h"
 #include "LoadTGA.h"
 
-
 MainMenu::MainMenu()
 {
 }
@@ -220,11 +219,40 @@ void MainMenu::Init()
 	glUniform1f(m_parameters[U_LIGHT2_EXPONENT], light[2].exponent);
 
 	enableLight = true;
+	isCreditsEntered = false;
+	isControlsEntered = false;
+	isScrollUp = true;
+	isScrollDown = false;
 }
 
 void MainMenu::Update(double dt)
 {
-	Application::enablePointer = true;
+	Application::SetPointerStatus(true);
+	double x = MouseController::GetInstance()->GetMousePositionX();
+	double y = 1080 - MouseController::GetInstance()->GetMousePositionY();
+
+	selectedOption = -1;
+
+	if ((!isCreditsEntered && !isControlsEntered) && (x >= 1248 && x <= 1725))
+	{
+		if (y >= 659 && y <= 801) {
+			selectedOption = 0;
+		}
+		else if (y >= 482 && y <= 625)
+		{
+			selectedOption = 1;  
+		}
+		else if (y >= 304 && y <= 453) 
+		{
+			selectedOption = 2;
+		}
+		else if (y >= 130 && y <= 275)
+		{
+			selectedOption = 3;
+		}
+	}
+
+	HandleMouseClick();
 	HandleKeyPress();
 }
 
@@ -273,26 +301,83 @@ void MainMenu::Render()
 		}
 	}
 
-	//modelStack.PushMatrix();
-	//modelStack.Scale(100.f, 1.f, 100.f);
-	//modelStack.Rotate(-90.f, 1, 0, 0);
-	//meshList[GEO_PLANE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-	//meshList[GEO_PLANE]->material.kDiffuse = glm::vec3(0.5f,0.5f, 0.5f);
-	//meshList[GEO_PLANE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	//meshList[GEO_PLANE]->material.kShininess = 1.0f;
-	//RenderMesh(meshList[GEO_PLANE], true);
-	//modelStack.PopMatrix();
-
 	RenderMeshOnScreen(meshList[GEO_IMAGE], 400, 350, 10, 10); // adjust if neccessary
-	RenderTextOnScreen(meshList[GEO_TITLE], "CARNIVAL CHAOS", glm::vec3(1, 0, 0), 30, 20, 82);
-	RenderTextOnScreen(meshList[GEO_TITLE], "presented by: x86 Assembly", glm::vec3(1, 1, 1), 15, 20, 60);
 
-	RenderMeshOnScreen(meshList[GEO_UI], 620, 300, 20, 8);
-	RenderTextOnScreen(meshList[GEO_TITLE], "PLAY", glm::vec3(1, 1, 1), 40, 550, 280);
-	RenderMeshOnScreen(meshList[GEO_UI], 620, 200, 20, 8);
-	RenderTextOnScreen(meshList[GEO_TITLE], "CREDITS", glm::vec3(1, 1, 1), 28, 530, 185);
-	RenderMeshOnScreen(meshList[GEO_UI], 620, 100, 20, 8);
-	RenderTextOnScreen(meshList[GEO_TITLE], "EXIT", glm::vec3(1, 1, 1), 40, 550, 80);
+	if (!isCreditsEntered && !isControlsEntered) {
+		RenderTextOnScreen(meshList[GEO_TITLE], "CARNIVAL CHAOS", glm::vec3(1, 0, 0), 30, 20, 82);
+		RenderTextOnScreen(meshList[GEO_TITLE], "presented by: x86 Assembly", glm::vec3(1, 1, 1), 15, 20, 60);
+
+		RenderMeshOnScreen(meshList[GEO_UI], 620, 400, 20, 8);
+		RenderTextOnScreen(meshList[GEO_TITLE], "PLAY", glm::vec3(1, 1, 1), 40, 550, 380);
+		RenderMeshOnScreen(meshList[GEO_UI], 620, 300, 20, 8);
+		RenderTextOnScreen(meshList[GEO_TITLE], "CREDITS", glm::vec3(1, 1, 1), 28, 530, 280);
+		RenderMeshOnScreen(meshList[GEO_UI], 620, 200, 20, 8);
+		RenderTextOnScreen(meshList[GEO_TITLE], "CONTROLS", glm::vec3(1, 1, 1), 25, 530, 185);
+		RenderMeshOnScreen(meshList[GEO_UI], 620, 100, 20, 8);
+		RenderTextOnScreen(meshList[GEO_TITLE], "EXIT", glm::vec3(1, 1, 1), 40, 550, 80);
+	}
+
+	if (isCreditsEntered) {
+		RenderMeshOnScreen(meshList[GEO_UI], 120, 100, 20, 8);
+		RenderTextOnScreen(meshList[GEO_TITLE], "BACK", glm::vec3(1, 1, 1), 40, 50, 80);
+		RenderMeshOnScreen(meshList[GEO_UI], 120, 520, 20, 8);
+		RenderTextOnScreen(meshList[GEO_TITLE], "CREDITS", glm::vec3(1, 1, 0), 28, 30, 505);
+		RenderMeshOnScreen(meshList[GEO_UI], 195, 420, 5, 10);
+		RenderMeshOnScreen(meshList[GEO_UI], 520, 310, 50, 50);
+
+		if (isScrollUp) {
+			// Ainsley
+			RenderTextOnScreen(meshList[GEO_TITLE], "Ainsley", glm::vec3(1, 0, 0), 15, 280, 530);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Collision Detection ", glm::vec3(1, 1, 1), 15, 280, 500);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Binary Tree ", glm::vec3(1, 1, 1), 15, 280, 470);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Whack-A-Mole Minigame ", glm::vec3(1, 1, 1), 15, 280, 440);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Bumper Balls Minigame ", glm::vec3(1, 1, 1), 15, 280, 410);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Final Minigame (Ray Tracing) ", glm::vec3(1, 1, 1), 15, 280, 380);
+
+			// Mathea
+			RenderTextOnScreen(meshList[GEO_TITLE], "Mathea", glm::vec3(1, 0, 0), 15, 280, 330);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Archery Minigame ", glm::vec3(1, 1, 1), 15, 280, 300);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Balloon Pop Minigame ", glm::vec3(1, 1, 1), 15, 280, 270);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Final Minigame ", glm::vec3(1, 1, 1), 15, 280, 240);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Scene Manager ", glm::vec3(1, 1, 1), 15, 280, 210);
+
+			// Yong Quan
+			RenderTextOnScreen(meshList[GEO_TITLE], "Yong Quan", glm::vec3(1, 0, 0), 15, 280, 160);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Carnival Scene ", glm::vec3(1, 1, 1), 15, 280, 130);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Main Menu & Loading Screen", glm::vec3(1, 1, 1), 15, 280, 100);
+
+			// Scroll Down Text
+			RenderTextOnScreen(meshList[GEO_TITLE], "Press 'S' to scroll down", glm::vec3(1, 1, 0), 15, 400, 70); 
+		}
+
+		if (isScrollDown) {
+			// Yong Quan (cont.)
+			RenderTextOnScreen(meshList[GEO_TITLE], "Yong Quan (cont.) ", glm::vec3(1, 0, 0), 15, 280, 530);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Spinning Ring Minigame ", glm::vec3(1, 1, 1), 15, 280, 500);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Linking Scenes Together ", glm::vec3(1, 1, 1), 15, 280, 470);
+
+			// Wilson
+			RenderTextOnScreen(meshList[GEO_TITLE], "Wilson ", glm::vec3(1, 0, 0), 15, 280, 420);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Camera ", glm::vec3(1, 1, 1), 15, 280, 390);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Hole in the Wall Minigame ", glm::vec3(1, 1, 1), 15, 280, 360);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Scene Bumper Balls (Boss AI) ", glm::vec3(1, 1, 1), 15, 280, 330);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Scene Final", glm::vec3(1, 1, 1), 15, 280, 300);
+			RenderTextOnScreen(meshList[GEO_TITLE], "  (Player Controls and Boss AI) ", glm::vec3(1, 1, 1), 15, 280, 270);
+
+			RenderTextOnScreen(meshList[GEO_TITLE], "And You!", glm::vec3(1, 1, 0), 20, 450, 170);
+
+			RenderTextOnScreen(meshList[GEO_TITLE], "Press 'W' to scroll up", glm::vec3(1, 1, 0), 15, 430, 70);
+		}
+	}
+
+	if (isControlsEntered) {
+		RenderMeshOnScreen(meshList[GEO_UI], 120, 100, 20, 8);
+		RenderTextOnScreen(meshList[GEO_TITLE], "BACK", glm::vec3(1, 1, 1), 40, 50, 80);
+		RenderMeshOnScreen(meshList[GEO_UI], 120, 520, 20, 8);
+		RenderTextOnScreen(meshList[GEO_TITLE], "CONTROLS", glm::vec3(1, 1, 0), 25, 25, 505);
+		RenderMeshOnScreen(meshList[GEO_UI], 520, 310, 50, 50);
+
+	}
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -343,7 +428,6 @@ void MainMenu::RenderMesh(Mesh* mesh, bool enableLight)
 	}
 
 }
-
 
 void MainMenu::Exit()
 {
@@ -415,6 +499,53 @@ void MainMenu::HandleKeyPress()
 		glUniform1i(m_parameters[U_LIGHT0_TYPE], light[0].type);
 	}
 
+	if (isCreditsEntered) {
+		if (KeyboardController::GetInstance()->IsKeyPressed('S')) {
+			isScrollUp = false;
+			isScrollDown = true;
+		}
+		else if (KeyboardController::GetInstance()->IsKeyPressed('W')) {
+			isScrollUp = true;
+			isScrollDown = false;
+		}
+	}
+}
+
+void MainMenu::HandleMouseClick()
+{
+	double x = MouseController::GetInstance()->GetMousePositionX();
+	double y = 1080 - MouseController::GetInstance()->GetMousePositionY();
+
+	if (MouseController::GetInstance()->IsButtonPressed(GLFW_MOUSE_BUTTON_LEFT))
+	{
+		if (isCreditsEntered || isControlsEntered) // BACK
+		{
+			if (x >= 41 && x <= 533 && y >= 129 && y <= 273)
+			{
+				isCreditsEntered = false;
+				isControlsEntered = false;
+			}
+		}
+		else
+		{
+			if (selectedOption == 0) // PLAY
+			{
+				CSceneManager::GetInstance().ChangeScene(CSceneManager::SCENE_CARNIVAL);
+			}
+			else if (selectedOption == 1) // CREDITS
+			{
+				isCreditsEntered = true;
+			}
+			else if (selectedOption == 2) // CONTROLS
+			{
+				isControlsEntered = true;
+			}
+			else if (selectedOption == 3) // EXIT
+			{
+				glfwSetWindowShouldClose(glfwGetCurrentContext(), GL_TRUE);
+			}
+		}
+	}
 }
 
 void MainMenu::RenderMeshOnScreen(Mesh* mesh, float x, float y, float sizex, float sizey)

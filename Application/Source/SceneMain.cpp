@@ -263,6 +263,7 @@ void SceneMain::Init()
 
 void SceneMain::Update(double dt)
 {
+	Application::SetPointerStatus(false);
 	HandleKeyPress();
 
 	if (KeyboardController::GetInstance()->IsKeyDown('I'))

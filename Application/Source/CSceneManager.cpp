@@ -2,12 +2,14 @@
 #include "SceneBalloonPop.h"
 #include "SceneWIUtest.h"
 #include "SceneArchery.h"
+#include "SceneMain.h"
+#include "MainMenu.h"
 // Include other scene headers
 
 void CSceneManager::Init() {
     // Initialize with first scene
-    activeScene = new SceneArchery();
-    currentSceneType = SCENE_ARCHERY;
+    activeScene = new MainMenu();
+    currentSceneType = SCENE_MAIN_MENU;
     activeScene->Init();
 }
 
@@ -47,7 +49,7 @@ void CSceneManager::Exit() {
         nextScene = nullptr;
     }
 }
-//fghdfh
+
 void CSceneManager::ChangeScene(SCENE_TYPE newScene) {
     // Create the new scene
     Scene* scene = nullptr;
@@ -63,6 +65,9 @@ void CSceneManager::ChangeScene(SCENE_TYPE newScene) {
     case SCENE_ARCHERY:
         scene = new SceneArchery();
         std::cout << "In Archery!" << std::endl;
+        break;
+    case SCENE_CARNIVAL:
+        scene = new SceneMain();
         break;
     default:
         return;

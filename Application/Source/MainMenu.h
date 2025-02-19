@@ -8,6 +8,7 @@
 #include "MatrixStack.h"
 #include "Light.h"
 #include "GameObject.h"
+#include "CSceneManager.h"
 
 class MainMenu : public Scene
 {
@@ -109,6 +110,7 @@ public:
 
 private:
 	void HandleKeyPress();
+	void HandleMouseClick();
 	void RenderMesh(Mesh* mesh, bool enableLight);
 
 	unsigned m_vertexArrayID;
@@ -122,6 +124,12 @@ private:
 	int projType = 1; // fix to 0 for orthographic, 1 for projection
 
 	MatrixStack modelStack, viewStack, projectionStack;	
+
+	bool isCreditsEntered;
+	bool isControlsEntered;
+	bool isScrollDown;
+	bool isScrollUp;
+	int selectedOption;
 
 	static const int NUM_LIGHTS = 3;
 	Light light[NUM_LIGHTS];

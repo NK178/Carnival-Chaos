@@ -9,6 +9,7 @@ public:
         SCENE_BALLOONPOP,
         SCENE_ARCHERY,
         SCENE_MAIN_MENU,
+        SCENE_CARNIVAL,
         SCENE_TOTAL
     };
 

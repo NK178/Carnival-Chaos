@@ -1,8 +1,8 @@
-
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
 #include "timer.h"
+#include "CSceneManager.h"
 
 class Application
 {
@@ -12,6 +12,7 @@ public:
 	void Init();
 	void Run();
 	void Exit();
+	static void SetPointerStatus(bool status);
 	static bool IsKeyPressed(unsigned short key);
 
 	//TEST
