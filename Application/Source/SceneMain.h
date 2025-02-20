@@ -143,25 +143,25 @@ private:
 
 	std::vector<DialogueLine> enterMainSceneLines = {
 		{{"Hmm... What's this?"}, false},
-		{{"A carnival? In the middle of the town?!"}, false},
+		{{"A carnival? In the middle of town?!"}, false},
 		{{"It wasn't here before",
-		  "if I recall before..."}, true},
+		  "if I recall correctly..."}, true},
 		{{"I see a sign there!"}, false},
 		{{"I guess it wouldn't hurt",
-		  "to take a look..."}, true},
+		  "to have a look..."}, true},
 	};
 
 	std::vector<DialogueLine> signDialogueLines = {
 		{{"Let me see..."}, false},
-		{{"If you complete all 6 games..."}, false},
-		{{"Along with the final challenge..."}, false},
+		{{"If you complete all six games..."}, false},
+		{{"And the final challenge..."}, false},
 		{{"You get to bring home",
 		  "a grand prize of..."}, true},
-		{{"A MILLION DOLLARS?!"}, false},
+		{{"A million dollars?!"}, false},
 		{{"Sounds too good to be true..."}, false},
-		{{"Whatever, since I am already here,",
-		  "why not do it anyways?"}, true},
-		{{"Looks like I have to complete all 6",
+		{{"Whatever, since I'm already here,",
+		  "why not do it anyway?"}, true},
+		{{"Looks like I have to complete all six",
 		  "games in their respective tents first."}, true},
 	};
 

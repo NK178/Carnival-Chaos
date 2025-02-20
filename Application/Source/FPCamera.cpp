@@ -257,7 +257,7 @@ void FPCamera::Update(double dt)
 			ZOOM_SPEED = DEFAULT_SPEED;
 	}
 
-	std::cout << camheight << std::endl;
+	//std::cout << camheight << std::endl;
 
 	////Sway camera 
 	//swaytimer += static_cast<float>(dt);

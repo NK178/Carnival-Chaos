@@ -176,7 +176,7 @@ void SceneMain::Init()
 	light[1].position = glm::vec3(0, 3, 0);
 	light[1].color = glm::vec3(1, 1, 1);
 	light[1].type = Light::LIGHT_SPOT;
-	light[1].power = 0.4f;
+	light[1].power = 0.f;
 	light[1].kC = 1.f;
 	light[1].kL = 0.01f;
 	light[1].kQ = 0.001f;
@@ -263,6 +263,7 @@ void SceneMain::Init()
 
 void SceneMain::Update(double dt)
 {
+	Application::SetPointerStatus(false);
 	HandleKeyPress();
 
 	if (KeyboardController::GetInstance()->IsKeyDown('I'))
@@ -393,11 +394,11 @@ void SceneMain::Render()
 	//RenderMesh(meshList[GEO_AXES], false);
 	//modelStack.PopMatrix();
 
-	modelStack.PushMatrix();
-	modelStack.Translate(light[0].position.x, light[0].position.y, light[0].position.z);
-	modelStack.Scale(0.1f, 0.1f, 0.1f);
-	RenderMesh(meshList[GEO_SPHERE], false);
-	modelStack.PopMatrix();
+	//modelStack.PushMatrix();
+	//modelStack.Translate(light[0].position.x, light[0].position.y, light[0].position.z);
+	//modelStack.Scale(0.1f, 0.1f, 0.1f);
+	//RenderMesh(meshList[GEO_SPHERE], false);
+	//modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
 	modelStack.Scale(100.f, 1.f, 100.f);
