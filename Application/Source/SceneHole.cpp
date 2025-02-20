@@ -262,20 +262,20 @@ void SceneHole::Update(double dt)
 
 		wallDisp -= dt * 60;
 		//std::cout << wallDisp << "\n\n\n";
-		if (!((camera.position.x > -170 && camera.position.x < -130) && (camera.position.z < 20 && camera.position.z > -20)))
+		if (!((camera.pos.x > -170 && camera.pos.x < -130) && (camera.pos.z < 20 && camera.pos.z > -20)))
 		{
-			if (camera.position.y < 0)
+			if (camera.pos.y < 0)
 			{
 				failedGrav *= 1.01;
 			}
-			else if (camera.position.y < 3.5)
+			else if (camera.pos.y < 3.5)
 			{
 				failedGrav += 0.05;
 			}
 		}
-		camera.position.y -= failedGrav;
+		camera.pos.y -= failedGrav;
 
-		if (camera.position.y <= -100)
+		if (camera.pos.y <= -100)
 		{
 			std::cout << "FAILED\n";
 			gameResult = -1;
@@ -290,8 +290,8 @@ void SceneHole::Update(double dt)
 		}
 
 
-		//light[0].spotDirection = -glm::normalize (camera.target - camera.position);
-		//light[0].position = camera.position;
+		//light[0].spotDirection = -glm::normalize (camera.target - camera.pos);
+		//light[0].position = camera.pos;
 
 		camera.Update(dt);
 	}
