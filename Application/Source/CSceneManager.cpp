@@ -8,8 +8,8 @@
 
 void CSceneManager::Init() {
     // Initialize with first scene
-    activeScene = new MainMenu();
-    currentSceneType = SCENE_MAIN_MENU;
+    activeScene = new SceneArchery();
+    currentSceneType = SCENE_ARCHERY;
     activeScene->Init();
 }
 
