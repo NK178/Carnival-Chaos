@@ -27,6 +27,16 @@ public:
     void RotateCamera(float dt);
     void RotateAboutCamera(glm::vec3 rotpt, float angle);
 
+    //bools for camera mechanics
+
+    bool allowMovement = true; // 
+    bool allowJump = true; // 
+    bool allowSprint = true; // 
+    bool allowCrouch = true; // 
+    bool allowProne = true; // 
+    bool allowLocomotiveTilt = true;
+    bool allowLocomotiveBop = true;
+
 private:
 
     bool isDirty;   // indicate if there is a need to recalculate the camera attributes
@@ -64,17 +74,6 @@ private:
 
     signed short int multDebugX, multDebugZ;
 
-    //bools for camera mechanics
-
-    bool allowMovement = true; // 
-    bool allowJump = true; // 
-    bool allowSprint = true; // 
-    bool allowCrouch = true; // 
-    bool allowProne = true; // 
-    bool allowLocomotiveTilt = true;
-    bool allowLocomotiveBop = true;
-
-    
 };
 
 #endif
