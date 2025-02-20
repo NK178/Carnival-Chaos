@@ -197,11 +197,11 @@ private:
 	};
 
 	struct tentBoxes : public GameObject {
-		glm::vec3 tentDimensions{ 1.5f,1.5f,1.5f };
+		glm::vec3 tentDimensions{ 30.f,30.f,30.f };
 		tentBoxes(int id, int type) : GameObject(id, type) {}
 	};
 
-	playerBox* playerPointer;
+	std::vector<playerBox> player;
 	std::vector<tentBoxes> cubeList;
 
 	Application app;

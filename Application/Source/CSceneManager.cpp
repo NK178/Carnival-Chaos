@@ -3,12 +3,13 @@
 #include "SceneWIUtest.h"
 #include "SceneArchery.h"
 #include "SceneMain.h"
+#include "SceneSpinningRing.h"
 #include "MainMenu.h"
 // Include other scene headers
 
 void CSceneManager::Init() {
     // Initialize with first scene
-    activeScene = new MainMenu();
+    activeScene = new SceneSpinningRing();
     currentSceneType = SCENE_MAIN_MENU;
     activeScene->Init();
 }
@@ -65,6 +66,9 @@ void CSceneManager::ChangeScene(SCENE_TYPE newScene) {
     case SCENE_ARCHERY:
         scene = new SceneArchery();
         std::cout << "In Archery!" << std::endl;
+        break;
+    case SCENE_SPINNING_RING:
+        scene = new SceneSpinningRing();
         break;
     case SCENE_CARNIVAL:
         scene = new SceneMain();

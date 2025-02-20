@@ -232,7 +232,7 @@ void SceneMain::Init()
 	enableLight = true;
 
 	// collisions
-	playerPointer = new playerBox(1, GameObject::CUBE);
+	player.push_back(playerBox(1, GameObject::CUBE));
 	cubeList.push_back(tentBoxes(2, GameObject::CUBE));
 	cubeList.push_back(tentBoxes(3, GameObject::CUBE));
 	cubeList.push_back(tentBoxes(4, GameObject::CUBE));
@@ -240,7 +240,7 @@ void SceneMain::Init()
 	cubeList.push_back(tentBoxes(6, GameObject::CUBE));
 	cubeList.push_back(tentBoxes(7, GameObject::CUBE));
 
-	playerPointer->pos = camera.position;
+	player[0].pos = camera.position;
 	cubeList[0].pos = glm::vec3{ 30, 3, -40 };
 	cubeList[1].pos = glm::vec3{ 30, 3, 0 };
 	cubeList[2].pos = glm::vec3{ 30, 3, 40 };
@@ -248,7 +248,7 @@ void SceneMain::Init()
 	cubeList[4].pos = glm::vec3{ -30, 3, 0 };
 	cubeList[5].pos = glm::vec3{ -30, 3, 40 };
 
-	playerPointer->mass = 0.f;
+	player[0].mass = 0.f;
 	for (int i = 0; i < cubeList.size(); i++) {
 		cubeList[i].mass = 0.f;
 	}
@@ -307,10 +307,11 @@ void SceneMain::Update(double dt)
 	//light[0].position = camera.position;
 
 	camera.Update(dt);
-
+	player[0].pos = camera.position;
+	std::cout << "x: " << player[0].pos.x << " y: " << player[0].pos.y << " z: " << player[0].pos.z << std::endl;
 	CollisionData cd;
 	for (int i = 0; i < cubeList.size(); i++) {
-		if (OverlapAABB2AABB(*playerPointer, playerPointer->playerDimensions, cubeList[i], cubeList[i].tentDimensions, cd))
+		if (OverlapAABB2AABB(player[0], player[0].playerDimensions, cubeList[i], cubeList[i].tentDimensions, cd))
 			ResolveCollision(cd);
 	}
 
@@ -318,7 +319,7 @@ void SceneMain::Update(double dt)
 		cubeList[i].UpdatePhysics(dt);
 	}
 
-	playerPointer->UpdatePhysics(dt);
+	player[0].UpdatePhysics(dt);
 
 	float distance = glm::distance(camera.position, signPosition);
 	if (distance < 8.0f) 
