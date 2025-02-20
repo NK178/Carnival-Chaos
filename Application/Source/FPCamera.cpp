@@ -351,7 +351,7 @@ void FPCamera::Update(double dt)
 
 	
 
-	multDebugX = pitchView.z > 0 ? -1 : 1;
+	multDebugX = pitchView.z > 0 ? 1 : -1;
 	multDebugZ = pitchView.x > 0 ? -1 : 1;
 	
 }
