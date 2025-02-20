@@ -68,7 +68,7 @@ void SceneBalloonPop::Init()
 
 	// Load the shader programs
 	m_programID = LoadShaders("Shader//Texture.vertexshader",
-							  "Shader//Text.fragmentshader");
+		"Shader//Text.fragmentshader");
 	glUseProgram(m_programID);
 
 	// Get a handle for our "MVP" uniform
@@ -133,7 +133,7 @@ void SceneBalloonPop::Init()
 		m_parameters[U_MATERIAL_SHININESS]);
 
 	// Initialise camera properties
-	camera.Init(glm::vec3(-10,3,-10), glm::vec3(0,0,0), glm::vec3(0,1,0));
+	camera.Init(glm::vec3(-10, 3, -10), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 
 	// Init VBO here
 	for (int i = 0; i < NUM_GEOMETRY; ++i)
@@ -144,60 +144,68 @@ void SceneBalloonPop::Init()
 	meshList[GEO_AXES] = MeshBuilder::GenerateAxes("Axes", 10000.f, 10000.f, 10000.f);
 	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Sun", glm::vec3(1.f, 1.f, 1.f), 1.f, 16, 16);
 	meshList[GEO_PLANE] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 2.f);
-	meshList[GEO_PLANE]->textureID = LoadTGA("Images//grass.tga");
+	meshList[GEO_PLANE]->textureID = LoadTGA("Images//wooden-stage-flooring-250x250.tga");
 	meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("STAMINA_BAR", glm::vec3(1, 1, 1), 1.f);
 
 	meshList[GEO_LEFT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_LEFT]->textureID = LoadTGA("Images//nightsky_lfD.tga");
+	meshList[GEO_LEFT]->textureID = LoadTGA("Images//stage.tga");
 	meshList[GEO_RIGHT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_RIGHT]->textureID = LoadTGA("Images//nightsky_rtD.tga");
+	meshList[GEO_RIGHT]->textureID = LoadTGA("Images//stage.tga");
 	meshList[GEO_TOP] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_TOP]->textureID = LoadTGA("Images//nightsky_upD.tga");
-	meshList[GEO_BOTTOM] = MeshBuilder::GenerateQuad("Plane",glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_BOTTOM]->textureID = LoadTGA("Images//nightsky_dnD.tga");
+	meshList[GEO_TOP]->textureID = LoadTGA("Images//stageroof.tga");
+	meshList[GEO_BOTTOM] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
+	meshList[GEO_BOTTOM]->textureID = LoadTGA("Images//stage.tga");
 	meshList[GEO_FRONT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_FRONT]->textureID = LoadTGA("Images//nightsky_bkD.tga");
+	meshList[GEO_FRONT]->textureID = LoadTGA("Images//stage.tga");
 	meshList[GEO_BACK] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_BACK]->textureID = LoadTGA("Images//nightsky_ftD.tga");
+	meshList[GEO_BACK]->textureID = LoadTGA("Images//stage.tga");
 
 	// 16 x 16 is the number of columns and rows for the text
-	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16,16);
+	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Images//calibri.tga");
 
-	//meshList[GEO_BalloonPop] = MeshBuilder::GenerateOBJ("BalloonPop",
-	//	"Models//Teeter03.obj");
-	/*meshList[GEO_BalloonPop]->textureID = LoadTGA("Teeter03_diffuse.tga");*/
+	meshList[GEO_CRATE] = MeshBuilder::GenerateOBJ("Crate",
+		"Models//cube_low.obj");
+	meshList[GEO_CRATE]->textureID = LoadTGA("Images//cube_low_None_BaseColor.tga");
+
+	meshList[GEO_BALLOONS] = MeshBuilder::GenerateOBJ("Balloons",
+		"Models//13499_Balloon_Cluster_v1_L2.obj");
+	meshList[GEO_BALLOONS]->textureID = LoadTGA("Images//13499_Balloon_Cluster_diffuse_ballon_yellow.tga");
+
+	meshList[GEO_PRESENT] = MeshBuilder::GenerateOBJ("Present",
+		"Models//uploads_files_4008356_GiftBox_obj.obj");
+	meshList[GEO_PRESENT]->textureID = LoadTGA("Images//present.tga");
 
 	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 1000.0f);
 	projectionStack.LoadMatrix(projection);
 
 	glUniform1i(m_parameters[U_NUMLIGHTS], NUM_LIGHTS);
 
-	light[0].position = glm::vec3(30, 30, 0);
-	light[0].color = glm::vec3(1, 1, 1);
-	light[0].type = Light::LIGHT_DIRECTIONAL;
-	light[0].power = 1.f;
-	light[0].kC = 1.f;
-	light[0].kL = 0.01f;
-	light[0].kQ = 0.001f;
-	light[0].cosCutoff = 30.f;
-	light[0].cosInner = 15.f;
-	light[0].exponent = 3.f;
-	light[0].spotDirection = glm::vec3(0.f, 1.f, 0.f);
+	//light[0].position = glm::vec3(30, 30, 0);
+	//light[0].color = glm::vec3(1, 1, 1);
+	//light[0].type = Light::LIGHT_DIRECTIONAL;
+	//light[0].power = 1.f;
+	//light[0].kC = 1.f;
+	//light[0].kL = 0.01f;
+	//light[0].kQ = 0.001f;
+	//light[0].cosCutoff = 30.f;
+	//light[0].cosInner = 15.f;
+	//light[0].exponent = 3.f;
+	//light[0].spotDirection = glm::vec3(0.f, 1.f, 0.f);
 
-	light[1].position = glm::vec3(0, 3, 0);
+	light[1].position = glm::vec3(0, 60, 0);
 	light[1].color = glm::vec3(1, 1, 1);
 	light[1].type = Light::LIGHT_SPOT;
-	light[1].power = 0.4f;
+	light[1].power = 16.0f;
 	light[1].kC = 1.f;
 	light[1].kL = 0.01f;
 	light[1].kQ = 0.001f;
-	light[1].cosCutoff = 45.f;
+	light[1].cosCutoff = 110.f;
 	light[1].cosInner = 30.f;
 	light[1].exponent = 3.f;
 	light[1].spotDirection = glm::vec3(0.f, 1.f, 0.f);
 
-	light[2].position = glm::vec3(-50,4,0);
+	/*light[2].position = glm::vec3(-50,4,0);
 	light[2].color = glm::vec3(1, 1, 1);
 	light[2].type = Light::LIGHT_POINT;
 	light[2].power = 1.f;
@@ -207,7 +215,7 @@ void SceneBalloonPop::Init()
 	light[2].cosCutoff = 45.f;
 	light[2].cosInner = 30.f;
 	light[2].exponent = 3.f;
-	light[2].spotDirection = glm::vec3(0.f, 1.f, 0.f);
+	light[2].spotDirection = glm::vec3(0.f, 1.f, 0.f);*/
 
 	glUniform3fv(m_parameters[U_LIGHT0_COLOR], 1, &light[0].color.r);
 	glUniform1i(m_parameters[U_LIGHT0_TYPE], light[0].type);
@@ -248,7 +256,7 @@ void SceneBalloonPop::Update(double dt)
 {
 	HandleKeyPress();
 
-	if (KeyboardController::GetInstance()->IsKeyDown('I'))
+	/*if (KeyboardController::GetInstance()->IsKeyDown('I'))
 		light[0].position.z -= static_cast<float>(dt) * 5.f;
 	if (KeyboardController::GetInstance()->IsKeyDown('K'))
 		light[0].position.z += static_cast<float>(dt) * 5.f;
@@ -259,11 +267,17 @@ void SceneBalloonPop::Update(double dt)
 	if (KeyboardController::GetInstance()->IsKeyDown('O'))
 		light[0].position.y -= static_cast<float>(dt) * 5.f;
 	if (KeyboardController::GetInstance()->IsKeyDown('P'))
-		light[0].position.y += static_cast<float>(dt) * 5.f;
+		light[0].position.y += static_cast<float>(dt) * 5.f;*/
 
-	//light[0].spotDirection = -glm::normalize (camera.target - camera.position);
-	//light[0].position = camera.position;
+		//light[0].spotDirection = -glm::normalize (camera.target - camera.position);
+		//light[0].position = camera.position;
 
+		/*if (MouseController::GetInstance()->IsButtonPressed(GLFW_MOUSE_BUTTON_LEFT))
+		{
+				CSceneManager::GetInstance().ChangeScene(CSceneManager::SCENE_ARCHERY);
+				std::cout << "Scene change called!" << std::endl;
+
+		}*/
 
 	camera.Update(dt);
 
@@ -289,7 +303,7 @@ void SceneBalloonPop::Render()
 	for (int i = 0; i < NUM_LIGHTS; i++) {
 		UNIFORM_TYPE pos, spotdir;
 		switch (i) {
-		//index 0 be like
+			//index 0 be like
 		case 0: pos = U_LIGHT0_POSITION; spotdir = U_LIGHT0_SPOTDIRECTION; break;
 		case 1: pos = U_LIGHT1_POSITION; spotdir = U_LIGHT1_SPOTDIRECTION; break;
 		case 2: pos = U_LIGHT2_POSITION; spotdir = U_LIGHT2_SPOTDIRECTION; break;
@@ -319,34 +333,331 @@ void SceneBalloonPop::Render()
 	RenderMesh(meshList[GEO_AXES], false);
 	modelStack.PopMatrix();
 
-	modelStack.PushMatrix();
-	modelStack.Translate(light[0].position.x, light[0].position.y, light[0].position.z);
-	modelStack.Scale(0.1f, 0.1f, 0.1f);
-	RenderMesh(meshList[GEO_SPHERE], false);
-	modelStack.PopMatrix();
+	//modelStack.PushMatrix();
+	//modelStack.Translate(light[1].position.x, light[1].position.y, light[1].position.z);
+	//modelStack.Scale(0.1f, 0.1f, 0.1f);
+	//RenderMesh(meshList[GEO_SPHERE], false);
+	//modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Scale(100.f, 1.f, 100.f);
+	modelStack.Scale(150.f, 1.f, 150.f);
 	modelStack.Rotate(-90.f, 1, 0, 0);
-	meshList[GEO_PLANE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-	meshList[GEO_PLANE]->material.kDiffuse = glm::vec3(0.5f,0.5f, 0.5f);
+	meshList[GEO_PLANE]->material.kAmbient = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_PLANE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
 	meshList[GEO_PLANE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
 	meshList[GEO_PLANE]->material.kShininess = 1.0f;
 	RenderMesh(meshList[GEO_PLANE], true);
 	modelStack.PopMatrix();
 
-	/*modelStack.PushMatrix();
-	modelStack.Scale(10.f, 10.f, 10.f);
-	modelStack.Rotate(-90.f, 1, 0, 0);
-	meshList[GEO_BalloonPop]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-	meshList[GEO_BalloonPop]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-	meshList[GEO_BalloonPop]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	meshList[GEO_BalloonPop]->material.kShininess = 1.0f;
-	RenderMesh(meshList[GEO_BalloonPop], true);
-	modelStack.PopMatrix();*/
+	// Corner crates - Front left
+	modelStack.PushMatrix();
+	modelStack.Translate(-120, 7, 120);  // Moved inward from -140, 7, 140
+	modelStack.Rotate(-30.f, 0, 1, 0);
+	modelStack.Scale(10.0f, 10.0f, 10.0f);
+	meshList[GEO_CRATE]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+	meshList[GEO_CRATE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_CRATE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_CRATE]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_CRATE], true);
+	modelStack.PopMatrix();
+
+	// Front right corner stack
+	modelStack.PushMatrix();
+	modelStack.Translate(120, 7, 120);  // Moved inward from 140, 7, 140
+	modelStack.Rotate(45.f, 0, 1, 0);
+	modelStack.Scale(10.0f, 10.0f, 10.0f);
+	meshList[GEO_CRATE]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+	meshList[GEO_CRATE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_CRATE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_CRATE]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_CRATE], true);
+	modelStack.PopMatrix();
+
+	// Stack a second crate on top
+	modelStack.PushMatrix();
+	modelStack.Translate(120, 27, 120);  // Moved inward from 140, 27, 140
+	modelStack.Rotate(15.f, 0, 1, 0);
+	modelStack.Scale(10.0f, 10.0f, 10.0f);
+	meshList[GEO_CRATE]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+	meshList[GEO_CRATE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_CRATE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_CRATE]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_CRATE], true);
+	modelStack.PopMatrix();
+
+	// Back left corner
+	modelStack.PushMatrix();
+	modelStack.Translate(-120, 7, -120);  // Moved inward from -140, 7, -140
+	modelStack.Rotate(-15.f, 0, 1, 0);
+	modelStack.Scale(10.0f, 10.0f, 10.0f);
+	meshList[GEO_CRATE]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+	meshList[GEO_CRATE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_CRATE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_CRATE]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_CRATE], true);
+	modelStack.PopMatrix();
+
+	// Back right corner stack
+	modelStack.PushMatrix();
+	modelStack.Translate(120, 7, -120);  // Moved inward from 140, 7, -140
+	modelStack.Rotate(60.f, 0, 1, 0);
+	modelStack.Scale(10.0f, 10.0f, 10.0f);
+	meshList[GEO_CRATE]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+	meshList[GEO_CRATE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_CRATE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_CRATE]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_CRATE], true);
+	modelStack.PopMatrix();
+
+	// Add another crate on top
+	modelStack.PushMatrix();
+	modelStack.Translate(120, 27, -120);  // Moved inward from 140, 27, -140
+	modelStack.Rotate(30.f, 0, 1, 0);
+	modelStack.Scale(10.0f, 10.0f, 10.0f);
+	meshList[GEO_CRATE]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+	meshList[GEO_CRATE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_CRATE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_CRATE]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_CRATE], true);
+	modelStack.PopMatrix();
+
+	// Add crates along the left wall
+	modelStack.PushMatrix();
+	modelStack.Translate(-100, 7, 40);  // Against left wall
+	modelStack.Rotate(25.f, 0, 1, 0);   // Slight rotation for variety
+	modelStack.Scale(8.0f, 8.0f, 8.0f); // Slightly smaller scale
+	meshList[GEO_CRATE]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+	meshList[GEO_CRATE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_CRATE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_CRATE]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_CRATE], true);
+	modelStack.PopMatrix();
+
+	// Add crates along the right wall
+	modelStack.PushMatrix();
+	modelStack.Translate(100, 7, -40);
+	modelStack.Rotate(-15.f, 0, 1, 0);
+	modelStack.Scale(8.0f, 8.0f, 8.0f);
+	meshList[GEO_CRATE]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+	meshList[GEO_CRATE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_CRATE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_CRATE]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_CRATE], true);
+	modelStack.PopMatrix();
+
+	// Small cluster of crates
+	modelStack.PushMatrix();
+	modelStack.Translate(-80, 7, -60);
+	modelStack.Rotate(45.f, 0, 1, 0);
+	modelStack.Scale(7.0f, 7.0f, 7.0f);
+	meshList[GEO_CRATE]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+	meshList[GEO_CRATE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_CRATE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_CRATE]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_CRATE], true);
+	modelStack.PopMatrix();
+
+	// Stack on top of previous crate
+	modelStack.PushMatrix();
+	modelStack.Translate(-80, 21, -60);
+	modelStack.Rotate(30.f, 0, 1, 0);
+	modelStack.Scale(7.0f, 7.0f, 7.0f);
+	meshList[GEO_CRATE]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+	meshList[GEO_CRATE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_CRATE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_CRATE]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_CRATE], true);
+	modelStack.PopMatrix();
+
+	// Add a crate near the back wall
+	modelStack.PushMatrix();
+	modelStack.Translate(60, 7, -90);
+	modelStack.Rotate(-35.f, 0, 1, 0);
+	modelStack.Scale(9.0f, 9.0f, 9.0f);
+	meshList[GEO_CRATE]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+	meshList[GEO_CRATE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_CRATE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_CRATE]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_CRATE], true);
+	modelStack.PopMatrix();
+
+	// Small group near front
+	modelStack.PushMatrix();
+	modelStack.Translate(-40, 7, 80);
+	modelStack.Rotate(10.f, 0, 1, 0);
+	modelStack.Scale(6.0f, 6.0f, 6.0f);
+	meshList[GEO_CRATE]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+	meshList[GEO_CRATE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_CRATE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_CRATE]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_CRATE], true);
+	modelStack.PopMatrix();
+
+	// Stacked crates
+	modelStack.PushMatrix();
+	modelStack.Translate(80, 7, 60);
+	modelStack.Rotate(-20.f, 0, 1, 0);
+	modelStack.Scale(8.0f, 8.0f, 8.0f);
+	meshList[GEO_CRATE]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+	meshList[GEO_CRATE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_CRATE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_CRATE]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_CRATE], true);
+	modelStack.PopMatrix();
+
+	// Top crate of stack
+	modelStack.PushMatrix();
+	modelStack.Translate(80, 23, 60);
+	modelStack.Rotate(-50.f, 0, 1, 0);
+	modelStack.Scale(8.0f, 8.0f, 8.0f);
+	meshList[GEO_CRATE]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+	meshList[GEO_CRATE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_CRATE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_CRATE]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_CRATE], true);
+	modelStack.PopMatrix();
 
 
-	RenderTextOnScreen(meshList[GEO_TEXT], "Stamina", glm::vec3(0, 1, 0), 40, 0, 0);
+	// Balloon on front left corner crate
+	modelStack.PushMatrix();
+	modelStack.Translate(-120, 17, 120);  // Positioned on top of crate
+	modelStack.Rotate(270.f, 1, 0, 0);    // Base rotation for balloon
+	modelStack.Rotate(45.f, 0, 0, 1);     // Additional rotation for variety
+	modelStack.Scale(1.2f, 1.2f, 1.2f);
+	meshList[GEO_BALLOONS]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+	meshList[GEO_BALLOONS]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_BALLOONS]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_BALLOONS]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_BALLOONS], true);
+	modelStack.PopMatrix();
+
+	// Balloon on stacked crate (front right)
+	modelStack.PushMatrix();
+	modelStack.Translate(120, 37, 120);  // Positioned on top of stacked crate
+	modelStack.Rotate(270.f, 1, 0, 0);
+	modelStack.Rotate(-30.f, 0, 0, 1);
+	modelStack.Scale(1.4f, 1.4f, 1.4f);
+	meshList[GEO_BALLOONS]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+	meshList[GEO_BALLOONS]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_BALLOONS]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_BALLOONS]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_BALLOONS], true);
+	modelStack.PopMatrix();
+
+	// Balloon on small cluster crate
+	modelStack.PushMatrix();
+	modelStack.Translate(-80, 31, -60);  // On top of stacked small cluster
+	modelStack.Rotate(270.f, 1, 0, 0);
+	modelStack.Rotate(15.f, 0, 0, 1);
+	modelStack.Scale(1.0f, 1.0f, 1.0f);
+	meshList[GEO_BALLOONS]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+	meshList[GEO_BALLOONS]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_BALLOONS]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_BALLOONS]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_BALLOONS], true);
+	modelStack.PopMatrix();
+
+	// Balloon on back wall crate
+	modelStack.PushMatrix();
+	modelStack.Translate(60, 17, -90);
+	modelStack.Rotate(270.f, 1, 0, 0);
+	modelStack.Rotate(-20.f, 0, 0, 1);
+	modelStack.Scale(1.3f, 1.3f, 1.3f);
+	meshList[GEO_BALLOONS]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+	meshList[GEO_BALLOONS]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_BALLOONS]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_BALLOONS]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_BALLOONS], true);
+	modelStack.PopMatrix();
+
+	// Balloon on stacked crates near front
+	modelStack.PushMatrix();
+	modelStack.Translate(80, 33, 60);    // On top of highest crate
+	modelStack.Rotate(270.f, 1, 0, 0);
+	modelStack.Rotate(60.f, 0, 0, 1);
+	modelStack.Scale(1.5f, 1.5f, 1.5f);
+	meshList[GEO_BALLOONS]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+	meshList[GEO_BALLOONS]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_BALLOONS]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_BALLOONS]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_BALLOONS], true);
+	modelStack.PopMatrix();
+
+
+	// Present on front left crate
+	modelStack.PushMatrix();
+	modelStack.Translate(-120, 17, 120);
+	modelStack.Rotate(30.f, 0, 1, 0);
+	modelStack.Scale(3.0f, 3.0f, 3.0f);
+	meshList[GEO_PRESENT]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+	meshList[GEO_PRESENT]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_PRESENT]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_PRESENT]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_PRESENT], true);
+	modelStack.PopMatrix();
+
+	// Small present cluster near corner
+	modelStack.PushMatrix();
+	modelStack.Translate(-100, 1, -100);  // Lowered from y=3 to y=1
+	modelStack.Rotate(-15.f, 0, 1, 0);
+	modelStack.Scale(3.5f, 3.5f, 3.5f);
+	meshList[GEO_PRESENT]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+	meshList[GEO_PRESENT]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_PRESENT]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_PRESENT]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_PRESENT], true);
+	modelStack.PopMatrix();
+
+	// Present stacked on another
+	modelStack.PushMatrix();
+	modelStack.Translate(-100, 8, -100);  // This one stays at y=5 since it's stacked
+	modelStack.Rotate(60.f, 0, 1, 0);
+	modelStack.Scale(2.5f, 2.5f, 2.5f);
+	meshList[GEO_PRESENT]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+	meshList[GEO_PRESENT]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_PRESENT]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_PRESENT]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_PRESENT], true);
+	modelStack.PopMatrix();
+
+	// Present on right side
+	modelStack.PushMatrix();
+	modelStack.Translate(90, 0, 40);  // Lowered from y=5 to y=1
+	modelStack.Rotate(-25.f, 0, 1, 0);
+	modelStack.Scale(3.8f, 3.8f, 3.8f);
+	meshList[GEO_PRESENT]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+	meshList[GEO_PRESENT]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_PRESENT]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_PRESENT]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_PRESENT], true);
+	modelStack.PopMatrix();
+
+	// Present near back wall
+	modelStack.PushMatrix();
+	modelStack.Translate(30, 0, -80);  // Lowered from y=5 to y=1
+	modelStack.Rotate(10.f, 0, 1, 0);
+	modelStack.Scale(4.2f, 4.2f, 4.2f);
+	meshList[GEO_PRESENT]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+	meshList[GEO_PRESENT]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_PRESENT]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_PRESENT]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_PRESENT], true);
+	modelStack.PopMatrix();
+
+	// Present by left wall
+	modelStack.PushMatrix();
+	modelStack.Translate(-90, 0, 20);  // Lowered from y=5 to y=1
+	modelStack.Rotate(35.f, 0, 1, 0);
+	modelStack.Scale(3.2f, 3.2f, 3.2f);
+	meshList[GEO_PRESENT]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+	meshList[GEO_PRESENT]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_PRESENT]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_PRESENT]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_PRESENT], true);
+	modelStack.PopMatrix();
+
+
+	/*RenderTextOnScreen(meshList[GEO_TEXT], "Stamina", glm::vec3(0, 1, 0), 40, 0, 0);*/
 
 	RenderSkyBox();
 }
@@ -387,7 +698,7 @@ void SceneBalloonPop::RenderMesh(Mesh* mesh, bool enableLight)
 	else
 	{
 		glUniform1i(m_parameters[U_COLOR_TEXTURE_ENABLED], 0);
-	}	
+	}
 	mesh->Render();
 
 	if (mesh->textureID > 0)
@@ -472,7 +783,7 @@ void SceneBalloonPop::HandleKeyPress()
 
 
 bool SceneBalloonPop::OverlapAABB2AABB(glm::vec3 Obj1, const int Width1, const int Height1,
-glm::vec3 Obj2, const int Width2, const int Height2)
+	glm::vec3 Obj2, const int Width2, const int Height2)
 {
 
 	float MinX1, MaxX1, MinY1, MaxY1, MinX2, MaxX2, MinY2, MaxY2;
@@ -598,46 +909,49 @@ void SceneBalloonPop::Material(GEOMETRY_TYPE obj, float AmR, float AmG, float Am
 
 void SceneBalloonPop::RenderSkyBox() {
 	modelStack.PushMatrix();
+	modelStack.Translate(0, 100, 0);
+	{
 
-	modelStack.PushMatrix();
-	modelStack.Translate(0.f, 0.f, 250.f);
-	modelStack.Rotate(180, 0, 1, 0);
-	modelStack.Scale(5.f, 5.f, 5.f);
-	RenderMesh(meshList[GEO_FRONT], false);
-	modelStack.PopMatrix();
+		modelStack.PushMatrix();
+		modelStack.Translate(0.f, 0.f, 250.f);
+		modelStack.Rotate(180, 0, 1, 0);
+		modelStack.Scale(5.f, 5.f, 5.f);
+		RenderMesh(meshList[GEO_FRONT], false);
+		modelStack.PopMatrix();
 
-	modelStack.PushMatrix();
-	modelStack.Translate(0.f, 0.f, -250.f);
-	modelStack.Scale(5.f, 5.f, 5.f);
-	RenderMesh(meshList[GEO_BACK], false);
-	modelStack.PopMatrix();
+		modelStack.PushMatrix();
+		modelStack.Translate(0.f, 0.f, -250.f);
+		modelStack.Scale(5.f, 5.f, 5.f);
+		RenderMesh(meshList[GEO_BACK], false);
+		modelStack.PopMatrix();
 
-	modelStack.PushMatrix();
-	modelStack.Translate(250.f, 0.f, 0.f);
-	modelStack.Rotate(270, 0, 1, 0);
-	modelStack.Scale(5.f, 5.f, 5.f);
-	RenderMesh(meshList[GEO_LEFT], false);
-	modelStack.PopMatrix();
+		modelStack.PushMatrix();
+		modelStack.Translate(250.f, 0.f, 0.f);
+		modelStack.Rotate(270, 0, 1, 0);
+		modelStack.Scale(5.f, 5.f, 5.f);
+		RenderMesh(meshList[GEO_LEFT], false);
+		modelStack.PopMatrix();
 
-	modelStack.PushMatrix();
-	modelStack.Translate(-250.f, 0.f, 0.f);
-	modelStack.Rotate(90, 0, 1, 0);
-	modelStack.Scale(5.f, 5.f, 5.f);
-	RenderMesh(meshList[GEO_RIGHT], false);
-	modelStack.PopMatrix();
+		modelStack.PushMatrix();
+		modelStack.Translate(-250.f, 0.f, 0.f);
+		modelStack.Rotate(90, 0, 1, 0);
+		modelStack.Scale(5.f, 5.f, 5.f);
+		RenderMesh(meshList[GEO_RIGHT], false);
+		modelStack.PopMatrix();
 
-	modelStack.PushMatrix();
-	modelStack.Rotate(90, 0, 1, 0);
-	modelStack.Translate(0.f, 250.f, 0.f);
-	modelStack.Rotate(90, 1, 0, 0);
-	modelStack.Scale(5.f, 5.f, 5.f);
-	RenderMesh(meshList[GEO_TOP], false);
-	modelStack.PopMatrix();
+		modelStack.PushMatrix();
+		modelStack.Rotate(90, 0, 1, 0);
+		modelStack.Translate(0.f, 250.f, 0.f);
+		modelStack.Rotate(90, 1, 0, 0);
+		modelStack.Scale(5.f, 5.f, 5.f);
+		RenderMesh(meshList[GEO_TOP], false);
+		modelStack.PopMatrix();
 
-	modelStack.PushMatrix();
-	modelStack.Translate(0.f, -250.f, 0.f);
-	modelStack.Rotate(270, 1, 0, 0);
-	modelStack.Scale(5.f, 5.f, 5.f);
-	RenderMesh(meshList[GEO_BOTTOM], false);
-	modelStack.PopMatrix();
+		modelStack.PushMatrix();
+		modelStack.Translate(0.f, -250.f, 0.f);
+		modelStack.Rotate(270, 1, 0, 0);
+		modelStack.Scale(5.f, 5.f, 5.f);
+		RenderMesh(meshList[GEO_BOTTOM], false);
+		modelStack.PopMatrix();
+	}
 }

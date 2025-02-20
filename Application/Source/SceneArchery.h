@@ -103,69 +103,69 @@ public:
 
 private:
  
-    //struct Arrow : public GameObject {
-    //    float lifetime{ 5.0f };
-    //    float currentTime{ 0.0f };
-    //    bool isActive{ false };
-    //    bool isStuck{ false };
-    //    glm::vec3 stuckPosition{ 0.0f, 0.0f, 0.0f };
-    //    glm::vec3 targetNormal{ 0.0f, 0.0f, 0.0f };
+    struct Arrow : public GameObject {
+        float lifetime{ 5.0f };
+        float currentTime{ 0.0f };
+        bool isActive{ false };
+        bool isStuck{ false };
+        glm::vec3 stuckPosition{ 0.0f, 0.0f, 0.0f };
+        glm::vec3 targetNormal{ 0.0f, 0.0f, 0.0f };
 
-    //    // Add a default constructor
-    //    Arrow() {
-    //        SetID(0);  // Default ID
-    //        mass = 0.4f;
-    //        bounciness = 0.2f;
-    //        accel = glm::vec3(0, -9.8f, 0);
-    //    }
+        //// Add a default constructor
+        //Arrow() {
+        //    SetID(0);  // Default ID
+        //    mass = 0.4f;
+        //    bounciness = 0.2f;
+        //    accel = glm::vec3(0, -9.8f, 0);
+        //}
 
-    //    // Keep the existing constructor
-    //    Arrow(int id) {
-    //        SetID(id);
-    //        mass = 0.4f;
-    //        bounciness = 0.2f;
-    //        accel = glm::vec3(0, -9.8f, 0);
-    //    }
+        //// Keep the existing constructor
+        //Arrow(int id) {
+        //    SetID(id);
+        //    mass = 0.4f;
+        //    bounciness = 0.2f;
+        //    accel = glm::vec3(0, -9.8f, 0);
+        //}
 
 
-    //    void Fire(const glm::vec3& startPos, const glm::vec3& direction, float speed) {
-    //        pos = startPos;
-    //        vel = glm::vec3(0);
-    //        m_totalForces = glm::vec3(0);
+        void Fire(const glm::vec3& startPos, const glm::vec3& direction, float speed) {
+            pos = startPos;
+            vel = glm::vec3(0);
+            m_totalForces = glm::vec3(0);
 
-    //        glm::vec3 randomSpread{
-    //            (rand() % 100 - 50) * 0.001f,
-    //            (rand() % 100 - 50) * 0.001f,
-    //            0.0f
-    //        };
+            glm::vec3 randomSpread{
+                (rand() % 100 - 50) * 0.001f,
+                (rand() % 100 - 50) * 0.001f,
+                0.0f
+            };
 
-    //        glm::vec3 impulse = (direction + randomSpread) * speed;
-    //        AddImpulse(impulse);
-    //        AddForce(glm::vec3(0, 5.0f, 0));
+            glm::vec3 impulse = (direction + randomSpread) * speed;
+            AddImpulse(impulse);
+            AddForce(glm::vec3(0, 5.0f, 0));
 
-    //        isActive = true;
-    //        isStuck = false;
-    //        lifetime = 5.0f + (rand() % 100 - 50) * 0.05f;
-    //        currentTime = 0.0f;
-    //    }
+            isActive = true;
+            isStuck = false;
+            lifetime = 5.0f + (rand() % 100 - 50) * 0.05f;
+            currentTime = 0.0f;
+        }
 
-    //    void StickToTarget(const glm::vec3& hitPos, const glm::vec3& normal) {
-    //        stuckPosition = hitPos;
-    //        targetNormal = normal;
-    //        isStuck = true;
-    //        vel = glm::vec3(0);
-    //        m_totalForces = glm::vec3(0);
-    //    }
+        void StickToTarget(const glm::vec3& hitPos, const glm::vec3& normal) {
+            stuckPosition = hitPos;
+            targetNormal = normal;
+            isStuck = true;
+            vel = glm::vec3(0);
+            m_totalForces = glm::vec3(0);
+        }
 
-    //    void Update(float dt) {
-    //        if (!isActive || isStuck) return;
-    //        currentTime += dt;
-    //        UpdatePhysics(dt);
-    //        lifetime -= dt;
-    //        if (lifetime <= 0) isActive = false;
-    //        vel *= 0.99f;
-    //    }
-    //};
+        void Update(float dt) {
+            if (!isActive || isStuck) return;
+            currentTime += dt;
+            UpdatePhysics(dt);
+            lifetime -= dt;
+            if (lifetime <= 0) isActive = false;
+            vel *= 0.99f;
+        }
+    };
 
 
     float m_arrowPower;         // Current power level of the arrow
@@ -194,7 +194,7 @@ private:
         float SpA, float SpG, float SpB, float Shiny);
     void RenderSkyBox();
 
-    //// Arrow-related methods
+    // Arrow-related methods
     //void HandleArrowInput();
     //void FireArrow();
     //void CheckArrowCollisions();

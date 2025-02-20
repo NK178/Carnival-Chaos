@@ -32,7 +32,7 @@ void SceneHole::Init()
 	camera.allowJump = true;
 	camera.allowSprint = true;
 	camera.allowCrouch = true;
-	camera.allowProne = true;
+	camera.allowProne = false;
 	camera.allowLocomotiveTilt = true;
 	camera.allowLocomotiveBop = false;
 
@@ -149,7 +149,7 @@ void SceneHole::Init()
 	meshList[GEO_BACK] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
 	meshList[GEO_BACK]->textureID = LoadTGA("Images//nightsky_ftD.tga");
 
-	meshList[GEO_HWALL1] = MeshBuilder::GenerateQuad("HWall", glm::vec3(1.f, 1.f, 1.f));
+	meshList[GEO_HWALL1] = MeshBuilder::GenerateHWall1("HWall", glm::vec3(1.f, 1.f, 1.f));
 	meshList[GEO_HWALL1]->textureID = LoadTGA("Images//sign.tga");
 
 	// 16 x 16 is the number of columns and rows for the text
@@ -324,8 +324,8 @@ void SceneHole::Render()
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Translate(0, 10, 0);
-	modelStack.Scale(10.f, 10.f, 10.f);
+	modelStack.Translate(0, -3, 0);
+	modelStack.Scale(10.f, 2.f, 2.f);
 	modelStack.Rotate(90.f, 0, 1, 0);
 	RenderMesh(meshList[GEO_HWALL1], false);
 	modelStack.PopMatrix();

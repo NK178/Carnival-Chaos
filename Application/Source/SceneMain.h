@@ -8,6 +8,7 @@
 #include "MatrixStack.h"
 #include "Light.h"
 #include "CollisionDetection.h"
+#include "GameObject.h"
 
 class SceneMain : public Scene
 {
@@ -22,24 +23,43 @@ public:
 
 		//Text
 		GEO_TEXT,
+		GEO_FPS,
 
 		//Models
 		GEO_TENT,
 		GEO_TREE,
 		GEO_FENCE,
 		GEO_SIGN,
+		GEO_HOUSE,
 
 		//GUI
 		GEO_KEY_E,
 		GEO_KEY_F,
 
-		//SKybox
+		//Skybox
 		GEO_LEFT,
 		GEO_RIGHT,
 		GEO_TOP,
 		GEO_BOTTOM,
 		GEO_FRONT,
 		GEO_BACK,
+
+		//Skybox 2 (Sunset)
+		GEO_LEFT2,
+		GEO_RIGHT2,
+		GEO_TOP2,
+		GEO_BOTTOM2,
+		GEO_FRONT2,
+		GEO_BACK2,
+
+		//Skybox 3 (Midnight Silence)
+		GEO_LEFT3,
+		GEO_RIGHT3,
+		GEO_TOP3,
+		GEO_BOTTOM3,
+		GEO_FRONT3,
+		GEO_BACK3,
+
 		NUM_GEOMETRY,
 	};
 
@@ -132,10 +152,7 @@ private:
 	Light light[NUM_LIGHTS];
 	bool enableLight;
 
-	glm::vec3 signPosition;
-	bool showSignText;
-	bool readSign;
-
+	// structure for dialogue lines
 	struct DialogueLine {
 		std::vector<std::string> textLines;  
 		bool isMultiLine;                    
@@ -165,6 +182,7 @@ private:
 		  "games in their respective tents first."}, true},
 	};
 
+	// dialogue displays
 	int currentLineIndex = 0;
 	float dialogueTimer = 0;
 	const float TEXT_DISPLAY_TIME = 4.0f;
@@ -172,12 +190,18 @@ private:
 	bool isEnterMainSceneDialogueActive;
 	bool hasPlayedEnterMainSceneDialogue;
 
+	// sign interaction
+	glm::vec3 signPosition;
+	bool showSignText;
+	bool readSign;
+
 	bool isSignDialogueActive;
 	bool hasReadSign;
 	bool showReadSignText;
 	float readSignTextTimer;
 	const float READ_SIGN_TEXT_DISPLAY_TIME = 3.0f;
 
+	// tent positions and tent interactions
 	glm::vec3 tentPositions[6];
 	bool showEnterTentText[6];
 	bool tentCompleted[6];
@@ -185,9 +209,23 @@ private:
 	bool showEnterFinalTentText;
 	bool isFinalChallengeCompleted;
 
+	struct playerBox : public GameObject {
+		glm::vec3 playerDimensions{ 1.5f,7.f,1.5f };
+		playerBox(int id, int type) : GameObject(id, type) {}
+	};
+
+	struct tentBoxes : public GameObject {
+		glm::vec3 tentDimensions{ 30.f,30.f,30.f };
+		tentBoxes(int id, int type) : GameObject(id, type) {}
+	};
+
+	std::vector<playerBox> player;
+	std::vector<tentBoxes> cubeList;
+
 	Application app;
 
-	bool OverlapAABB2AABB(glm::vec3 Obj1, const int Width1, const int Height1, glm::vec3 Obj2, const int Width2, const int Height2);
+	float fps = 0;
+
 	void RenderUI();
 	void RenderObjectives();
 	void UpdateDialogue(double dt);

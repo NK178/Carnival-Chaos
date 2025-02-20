@@ -10,6 +10,7 @@ public:
         SCENE_ARCHERY,
         SCENE_MAIN_MENU,
         SCENE_CARNIVAL,
+        SCENE_SPINNING_RING,
         SCENE_TOTAL
     };
 

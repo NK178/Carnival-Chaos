@@ -1,3 +1,4 @@
+
 #ifndef SCENE_BalloonPop_H
 #define SCENE_BalloonPop_H
 
@@ -20,7 +21,9 @@ public:
 		GEO_SPHERE,
 		GEO_QUAD,
 		GEO_PLANE,
-		GEO_BalloonPop,
+		GEO_CRATE,
+		GEO_BALLOONS,
+		GEO_PRESENT,
 
 		//Text
 		GEO_TEXT,
@@ -118,7 +121,7 @@ private:
 	FPCamera camera;
 	int projType = 1; // fix to 0 for orthographic, 1 for projection
 
-	MatrixStack modelStack, viewStack, projectionStack;	
+	MatrixStack modelStack, viewStack, projectionStack;
 
 	static const int NUM_LIGHTS = 3;
 	Light light[NUM_LIGHTS];
