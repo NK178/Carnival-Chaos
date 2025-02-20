@@ -3,12 +3,13 @@
 #include "SceneWIUtest.h"
 #include "SceneArchery.h"
 #include "SceneMain.h"
+#include "SceneWIUtest.h"
 #include "MainMenu.h"
 // Include other scene headers
 
 void CSceneManager::Init() {
     // Initialize with first scene
-    activeScene = new MainMenu();
+    activeScene = new SceneWIUtest();
     currentSceneType = SCENE_MAIN_MENU;
     activeScene->Init();
 }

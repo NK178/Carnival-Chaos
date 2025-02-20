@@ -275,7 +275,7 @@ void SceneWIUtest::Update(double dt)
 	if (OverlapAABB2Sphere(spherelist[1], spherelist[1].radius, cubelist[1], cubelist[1].pos - cubelist[1].boxextent, cubelist[1].pos + cubelist[1].boxextent, cd))
 		ResolveCollision(cd);
 
-	cubelist[1].angularVel = 20.f;
+	//cubelist[1].angularVel = 20.f;
 	if (KeyboardController::GetInstance()->IsKeyPressed('G')) {
 		if (!activate)
 			activate = true;
