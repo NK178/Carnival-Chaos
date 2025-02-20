@@ -177,12 +177,16 @@ void SceneMain::Init()
 
 	meshList[GEO_TENT] = MeshBuilder::GenerateOBJ("Tent", "Models//circus_tent.obj");
 	meshList[GEO_TENT]->textureID = LoadTGA("Images//circus_tent.tga");
-	meshList[GEO_SIGN] = MeshBuilder::GenerateOBJ("Tent", "Models//sign.obj");
+	meshList[GEO_SIGN] = MeshBuilder::GenerateOBJ("Sign", "Models//sign.obj");
 	meshList[GEO_SIGN]->textureID = LoadTGA("Images//sign.tga");
 	//meshList[GEO_TREE] = MeshBuilder::GenerateOBJMTL("Tree", "Models//tree.obj", "Models//tree.mtl");
 	//meshList[GEO_TREE]->textureID = LoadTGA("Images//tree.tga");
 	meshList[GEO_FENCE] = MeshBuilder::GenerateOBJMTL("Fence", "Models//fence.obj", "Models//fence.mtl");
 	meshList[GEO_FENCE]->textureID = LoadTGA("Images//fence.tga");
+	meshList[GEO_HOUSE] = MeshBuilder::GenerateOBJMTL("House", "Models//cottage_obj.obj", "Models//cottage_obj.mtl");
+	meshList[GEO_HOUSE]->textureID = LoadTGA("Images//cottage_diffuse.tga");
+	meshList[GEO_ROAD] = MeshBuilder::GenerateOBJMTL("Road", "Models//road.obj", "Models//road.mtl");
+	meshList[GEO_ROAD]->textureID = LoadTGA("Images//road.tga");
 
 	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 1000.0f);
 	projectionStack.LoadMatrix(projection);
@@ -467,7 +471,7 @@ void SceneMain::Render()
 	//modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Scale(100.f, 1.f, 100.f);
+	modelStack.Scale(150.f, 1.f, 150.f);
 	modelStack.Rotate(-90.f, 1, 0, 0);
 	meshList[GEO_PLANE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
 	meshList[GEO_PLANE]->material.kDiffuse = glm::vec3(0.5f,0.5f, 0.5f);
@@ -476,7 +480,7 @@ void SceneMain::Render()
 	RenderMesh(meshList[GEO_PLANE], true);
 	modelStack.PopMatrix();
 
-	// Generate Tents
+	// Render Tents
 	{
 		meshList[GEO_TENT]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
 		meshList[GEO_TENT]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
@@ -544,7 +548,7 @@ void SceneMain::Render()
 		}
 	}
 
-	// Generate Trees
+	// Render Trees
 	{
 	//	meshList[GEO_TREE]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
 	//	meshList[GEO_TREE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
@@ -590,7 +594,7 @@ void SceneMain::Render()
 		}
 	}
 
-	// Generate Sign
+	// Render Sign
 	modelStack.PushMatrix();
 	modelStack.Translate(30.f, 3.f, -70.f);
 	modelStack.Rotate(225.f, 0, 1, 0);
@@ -602,7 +606,7 @@ void SceneMain::Render()
 	RenderMesh(meshList[GEO_SIGN], true);
 	modelStack.PopMatrix();
 
-	// Generate Fences
+	// Render Fences
 	{
 		meshList[GEO_FENCE]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
 		meshList[GEO_FENCE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
@@ -711,6 +715,54 @@ void SceneMain::Render()
 		RenderMesh(meshList[GEO_FENCE], true);
 		modelStack.PopMatrix();
 	}
+
+	// Render Houses
+	{
+		meshList[GEO_HOUSE]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+		meshList[GEO_HOUSE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+		meshList[GEO_HOUSE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+		meshList[GEO_HOUSE]->material.kShininess = 1.0f;
+
+		modelStack.PushMatrix();
+		modelStack.Translate(30.f, 0.f, -165.f);
+		modelStack.Rotate(-5.f, 0, 1, 0);
+		modelStack.Scale(2.f, 2.f, 2.f);
+		RenderMesh(meshList[GEO_HOUSE], true);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Translate(100.f, 0.f, -165.f);
+		modelStack.Rotate(-5.f, 0, 1, 0);
+		modelStack.Scale(2.f, 2.f, 2.f);
+		RenderMesh(meshList[GEO_HOUSE], true);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Translate(-40.f, 0.f, -165.f);
+		modelStack.Rotate(-5.f, 0, 1, 0);
+		modelStack.Scale(2.f, 2.f, 2.f);
+		RenderMesh(meshList[GEO_HOUSE], true);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Translate(-110.f, 0.f, -165.f);
+		modelStack.Rotate(-5.f, 0, 1, 0);
+		modelStack.Scale(2.f, 2.f, 2.f);
+		RenderMesh(meshList[GEO_HOUSE], true);
+		modelStack.PopMatrix();
+	}
+
+	// Render Road
+	modelStack.PushMatrix();
+	modelStack.Translate(-110.f, 1.f, -105.f);
+	modelStack.Rotate(90.f, 0, 1, 0);
+	modelStack.Scale(1.f, 1.f, 1.f);
+	meshList[GEO_ROAD]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_ROAD]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_ROAD]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_ROAD]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_ROAD], true);
+	modelStack.PopMatrix();
 
 	RenderUI();
 	RenderDialogue();

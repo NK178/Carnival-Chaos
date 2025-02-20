@@ -31,6 +31,7 @@ public:
 		GEO_FENCE,
 		GEO_SIGN,
 		GEO_HOUSE,
+		GEO_ROAD,
 
 		//GUI
 		GEO_KEY_E,
