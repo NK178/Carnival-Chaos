@@ -156,16 +156,11 @@ void SceneHole::Init()
 	meshList[GEO_BACK] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
 	meshList[GEO_BACK]->textureID = LoadTGA("Images//color.tga");
 
-<<<<<<< HEAD
 	meshList[GEO_HWALL1] = MeshBuilder::GenerateHWall1("HWall1", glm::vec3(1.f, 1.f, 1.f));
 	meshList[GEO_HWALL1]->textureID = LoadTGA("Images//floorcircus.tga");
 
 	meshList[GEO_HWALL2] = MeshBuilder::GenerateHWall2("HWall2", glm::vec3(1.f, 1.f, 1.f));
 	meshList[GEO_HWALL2]->textureID = LoadTGA("Images//floorcircus.tga");
-=======
-	meshList[GEO_HWALL1] = MeshBuilder::GenerateQuad("HWall", glm::vec3(1.f, 1.f, 1.f));
-	meshList[GEO_HWALL1]->textureID = LoadTGA("Images//sign.tga");
->>>>>>> a9ff5f3e1e1f19c532eb70915a6b72d61caf0e58
 
 	// 16 x 16 is the number of columns and rows for the text
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
@@ -382,13 +377,8 @@ void SceneHole::Render()
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-<<<<<<< HEAD
-	modelStack.Translate(wallDisp, -3, 0);
+	modelStack.Translate(0, -3, 0);
 	modelStack.Scale(10.f, 2.f, 2.f);
-=======
-	modelStack.Translate(0, 10, 0);
-	modelStack.Scale(10.f, 10.f, 10.f);
->>>>>>> a9ff5f3e1e1f19c532eb70915a6b72d61caf0e58
 	modelStack.Rotate(90.f, 0, 1, 0);
 	RenderMesh(meshList[GEO_HWALL1], false);
 	modelStack.PopMatrix();
