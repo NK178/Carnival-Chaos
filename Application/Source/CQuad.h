@@ -39,6 +39,7 @@ public:
 	int GetDepth(void);
 	int GetXpos(void);
 	int GetYpos(void);
+	int GetQuadType(void);
 	void SetCount(int c);
 	void IncrementDepth(void);
 

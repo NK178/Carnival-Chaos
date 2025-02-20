@@ -28,6 +28,14 @@ SceneHole::~SceneHole()
 
 void SceneHole::Init()
 {
+	camera.allowMovement = true;
+	camera.allowJump = true;
+	camera.allowSprint = true;
+	camera.allowCrouch = true;
+	camera.allowProne = true;
+	camera.allowLocomotiveTilt = true;
+	camera.allowLocomotiveBop = false;
+
 	// Set background color to dark blue
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
@@ -94,6 +102,9 @@ void SceneHole::Init()
 	m_parameters[U_LIGHT2_COSINNER] = glGetUniformLocation(m_programID, "lights[2].cosInner");
 	m_parameters[U_LIGHT2_EXPONENT] = glGetUniformLocation(m_programID, "lights[2].exponent");
 
+	meshList[GEO_HWALL1] = MeshBuilder::GenerateQuad("HWall1", glm::vec3(1.f, 1.f, 1.f));
+	meshList[GEO_HWALL1]->textureID = LoadTGA("Images//sign.tga");
+
 	m_parameters[U_LIGHTENABLED] = glGetUniformLocation(m_programID, "lightEnabled");
 	m_parameters[U_NUMLIGHTS] = glGetUniformLocation(m_programID, "numLights");
 
@@ -120,9 +131,9 @@ void SceneHole::Init()
 	}
 
 	meshList[GEO_AXES] = MeshBuilder::GenerateAxes("Axes", 10000.f, 10000.f, 10000.f);
-	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Sun", glm::vec3(1.f, 1.f, 1.f), 1.f, 16, 16);
-	meshList[GEO_PLANE] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 2.f);
-	meshList[GEO_PLANE]->textureID = LoadTGA("Images//grass.tga");
+	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Sun", glm::vec3(1.f, 1.f, 1.f), 12.f, 16, 16);
+	meshList[GEO_PLANE] = MeshBuilder::GenerateQuad("Plane", glm::vec3(.9f, .9f, 1.f), 4.f);
+	meshList[GEO_PLANE]->textureID = LoadTGA("Images//asphalt.tga");
 	meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("STAMINA_BAR", glm::vec3(1, 1, 1), 1.f);
 
 	meshList[GEO_LEFT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
@@ -138,6 +149,9 @@ void SceneHole::Init()
 	meshList[GEO_BACK] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
 	meshList[GEO_BACK]->textureID = LoadTGA("Images//nightsky_ftD.tga");
 
+	meshList[GEO_HWALL1] = MeshBuilder::GenerateQuad("HWall", glm::vec3(1.f, 1.f, 1.f));
+	meshList[GEO_HWALL1]->textureID = LoadTGA("Images//sign.tga");
+
 	// 16 x 16 is the number of columns and rows for the text
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Images//calibri.tga");
@@ -150,7 +164,7 @@ void SceneHole::Init()
 	light[0].position = glm::vec3(30, 30, 0);
 	light[0].color = glm::vec3(1, 1, 1);
 	light[0].type = Light::LIGHT_DIRECTIONAL;
-	light[0].power = 1.f;
+	light[0].power = 2.f;
 	light[0].kC = 1.f;
 	light[0].kL = 0.01f;
 	light[0].kQ = 0.001f;
@@ -299,13 +313,21 @@ void SceneHole::Render()
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Scale(100.f, 1.f, 100.f);
+	modelStack.Translate(0, 0, 0);
+	modelStack.Scale(100.f, 1.f, 10.f);
 	modelStack.Rotate(-90.f, 1, 0, 0);
 	meshList[GEO_PLANE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
 	meshList[GEO_PLANE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
 	meshList[GEO_PLANE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
 	meshList[GEO_PLANE]->material.kShininess = 1.0f;
 	RenderMesh(meshList[GEO_PLANE], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(0, 10, 0);
+	modelStack.Scale(10.f, 10.f, 10.f);
+	modelStack.Rotate(90.f, 0, 1, 0);
+	RenderMesh(meshList[GEO_HWALL1], false);
 	modelStack.PopMatrix();
 
 

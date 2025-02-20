@@ -19,6 +19,11 @@ public:
 		GEO_SPHERE,
 		GEO_QUAD,
 		GEO_PLANE,
+		GEO_HWALL1,
+		GEO_HWALL2,
+		GEO_HWALL3,
+		GEO_HWALL4,
+		GEO_HWALL5,
 
 		//Text
 		GEO_TEXT,
