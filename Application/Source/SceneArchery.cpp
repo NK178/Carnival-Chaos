@@ -593,39 +593,39 @@ void SceneArchery::Render()
 	modelStack.PopMatrix();
 
 
-	// Render all active arrows
-	for (int i = 0; i < MAX_ARROWS; ++i) {
-		if (arrows[i].isActive) {
-			modelStack.PushMatrix();
+	//// Render all active arrows
+	//for (int i = 0; i < MAX_ARROWS; ++i) {
+	//	if (arrows[i].isActive) {
+	//		modelStack.PushMatrix();
 
-			// Translate to arrow's current position
-			if (arrows[i].isStuck) {
-				// If stuck, use the stuck position
-				modelStack.Translate(
-					arrows[i].stuckPosition.x,
-					arrows[i].stuckPosition.y,
-					arrows[i].stuckPosition.z
-				);
-			}
-			else {
-				// If flying, use current physics position
-				modelStack.Translate(
-					arrows[i].pos.x,
-					arrows[i].pos.y,
-					arrows[i].pos.z
-				);
-			}
+	//		// Translate to arrow's current position
+	//		if (arrows[i].isStuck) {
+	//			// If stuck, use the stuck position
+	//			modelStack.Translate(
+	//				arrows[i].stuckPosition.x,
+	//				arrows[i].stuckPosition.y,
+	//				arrows[i].stuckPosition.z
+	//			);
+	//		}
+	//		else {
+	//			// If flying, use current physics position
+	//			modelStack.Translate(
+	//				arrows[i].pos.x,
+	//				arrows[i].pos.y,
+	//				arrows[i].pos.z
+	//			);
+	//		}
 
-			// Scale and render arrow mesh
-			modelStack.Scale(0.1f, 0.1f, 0.1f);
-			meshList[GEO_ARROW]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
-			meshList[GEO_ARROW]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-			meshList[GEO_ARROW]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-			meshList[GEO_ARROW]->material.kShininess = 1.0f;
-			RenderMesh(meshList[GEO_ARROW], true);
-			modelStack.PopMatrix();
-		}
-	}
+	//		// Scale and render arrow mesh
+	//		modelStack.Scale(0.1f, 0.1f, 0.1f);
+	//		meshList[GEO_ARROW]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+	//		meshList[GEO_ARROW]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	//		meshList[GEO_ARROW]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	//		meshList[GEO_ARROW]->material.kShininess = 1.0f;
+	//		RenderMesh(meshList[GEO_ARROW], true);
+	//		modelStack.PopMatrix();
+	//	}
+	//}
 
 
 	// CARPET IS PLAYER'S SPAWN POINT!
