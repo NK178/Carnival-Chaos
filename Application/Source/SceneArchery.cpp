@@ -303,99 +303,99 @@ void SceneArchery::Init()
 
 }
 
-
-void SceneArchery::HandleArrowInput() {
-	// When left mouse button is held down
-	if (MouseController::GetInstance()->IsButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
-		if (!m_isChargingShot) {
-			// Start charging
-			m_isChargingShot = true;
-			m_arrowPower = 0.0f;
-		}
-		else {
-			// Continue charging, increase power
-			m_arrowPower = std::min<float>(m_arrowPower + m_powerChargeRate, m_maxArrowPower);
-		}
-	}
-	// When left mouse button is released
-	else if (MouseController::GetInstance()->IsButtonUp(GLFW_MOUSE_BUTTON_LEFT)) {
-		if (m_isChargingShot) {
-			// Fire the arrow with current power
-			FireArrow();
-			// Reset charging state
-			m_isChargingShot = false;
-			m_arrowPower = 0.0f;
-		}
-	}
-}
-
-void SceneArchery::FireArrow() {
-	// Only fire if player has arrows left
-	if (m_arrowsLeft <= 0) {
-		return;  // Don't fire if no arrows left
-	}
-
-	// Attempt to find an inactive arrow
-	for (int i = 0; i < MAX_ARROWS; ++i) {
-		if (!arrows[i].isActive) {
-			// Decrease arrows left
-			m_arrowsLeft--;
-
-			// Calculate fire direction based on camera
-			glm::vec3 fireDirection = glm::normalize(camera.target - camera.position);
-
-			// Rest of the firing code remains the same
-			float minSpeed = 1.0f;
-			float maxSpeed = 40.0f;
-			float powerPercentage = m_arrowPower / m_maxArrowPower;
-			float speedMultiplier = powerPercentage * powerPercentage;
-			float finalSpeed = minSpeed + (maxSpeed - minSpeed) * speedMultiplier;
-
-			arrows[i].Fire(
-				camera.position,
-				fireDirection,
-				finalSpeed
-			);
-
-			arrows[i].AddForce(glm::vec3(0, 15.0f, 0));
-			break;
-		}
-	}
-}
-
-void SceneArchery::CheckArrowCollisions()
-{
-	struct TargetInfo {
-		glm::vec3 position;
-		glm::vec3 normal;
-		float radius;
-	};
-
-	TargetInfo targetPositions[3] = {
-		{glm::vec3(0, 0, -40), glm::vec3(0, 1, 0), 15.0f},
-		{glm::vec3(20, 0, -30), glm::vec3(0, 1, 0), 15.0f},
-		{glm::vec3(-20, 0, -20), glm::vec3(0, 1, 0), 15.0f}
-	};
-
-	for (int i = 0; i < MAX_ARROWS; ++i) {
-		if (arrows[i].isActive && !arrows[i].isStuck) {
-			for (int j = 0; j < 3; ++j) {
-				float distance = glm::length(arrows[i].pos - targetPositions[j].position);
-
-				if (distance < targetPositions[j].radius) {
-					// Increment score when arrow hits target
-					m_playerScore++;
-
-					arrows[i].StickToTarget(
-						targetPositions[j].position,
-						targetPositions[j].normal
-					);
-					break;
-				}
-			}
-		}
-	}
-}
+//
+//void SceneArchery::HandleArrowInput() {
+//	// When left mouse button is held down
+//	if (MouseController::GetInstance()->IsButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
+//		if (!m_isChargingShot) {
+//			// Start charging
+//			m_isChargingShot = true;
+//			m_arrowPower = 0.0f;
+//		}
+//		else {
+//			// Continue charging, increase power
+//			m_arrowPower = std::min<float>(m_arrowPower + m_powerChargeRate, m_maxArrowPower);
+//		}
+//	}
+//	// When left mouse button is released
+//	else if (MouseController::GetInstance()->IsButtonUp(GLFW_MOUSE_BUTTON_LEFT)) {
+//		if (m_isChargingShot) {
+//			// Fire the arrow with current power
+//			FireArrow();
+//			// Reset charging state
+//			m_isChargingShot = false;
+//			m_arrowPower = 0.0f;
+//		}
+//	}
+//}
+//
+//void SceneArchery::FireArrow() {
+//	// Only fire if player has arrows left
+//	if (m_arrowsLeft <= 0) {
+//		return;  // Don't fire if no arrows left
+//	}
+//
+//	// Attempt to find an inactive arrow
+//	for (int i = 0; i < MAX_ARROWS; ++i) {
+//		if (!arrows[i].isActive) {
+//			// Decrease arrows left
+//			m_arrowsLeft--;
+//
+//			// Calculate fire direction based on camera
+//			glm::vec3 fireDirection = glm::normalize(camera.target - camera.position);
+//
+//			// Rest of the firing code remains the same
+//			float minSpeed = 1.0f;
+//			float maxSpeed = 40.0f;
+//			float powerPercentage = m_arrowPower / m_maxArrowPower;
+//			float speedMultiplier = powerPercentage * powerPercentage;
+//			float finalSpeed = minSpeed + (maxSpeed - minSpeed) * speedMultiplier;
+//
+//			arrows[i].Fire(
+//				camera.position,
+//				fireDirection,
+//				finalSpeed
+//			);
+//
+//			arrows[i].AddForce(glm::vec3(0, 15.0f, 0));
+//			break;
+//		}
+//	}
+//}
+//
+//void SceneArchery::CheckArrowCollisions()
+//{
+//	struct TargetInfo {
+//		glm::vec3 position;
+//		glm::vec3 normal;
+//		float radius;
+//	};
+//
+//	TargetInfo targetPositions[3] = {
+//		{glm::vec3(0, 0, -40), glm::vec3(0, 1, 0), 15.0f},
+//		{glm::vec3(20, 0, -30), glm::vec3(0, 1, 0), 15.0f},
+//		{glm::vec3(-20, 0, -20), glm::vec3(0, 1, 0), 15.0f}
+//	};
+//
+//	for (int i = 0; i < MAX_ARROWS; ++i) {
+//		if (arrows[i].isActive && !arrows[i].isStuck) {
+//			for (int j = 0; j < 3; ++j) {
+//				float distance = glm::length(arrows[i].pos - targetPositions[j].position);
+//
+//				if (distance < targetPositions[j].radius) {
+//					// Increment score when arrow hits target
+//					m_playerScore++;
+//
+//					arrows[i].StickToTarget(
+//						targetPositions[j].position,
+//						targetPositions[j].normal
+//					);
+//					break;
+//				}
+//			}
+//		}
+//	}
+//}
 
 void SceneArchery::Update(double dt)
 {
@@ -431,19 +431,19 @@ void SceneArchery::Update(double dt)
 	camera.Update(dt);
 
 
-	// Handle arrow input
-	HandleArrowInput();
+	//// Handle arrow input
+	//HandleArrowInput();
 
-	// Update all active arrows
-	for (int i = 0; i < MAX_ARROWS; ++i) {
-		if (arrows[i].isActive) {
-			// Cast dt to float for physics calculations
-			arrows[i].Update(static_cast<float>(dt));
-		}
-	}
+	//// Update all active arrows
+	//for (int i = 0; i < MAX_ARROWS; ++i) {
+	//	if (arrows[i].isActive) {
+	//		// Cast dt to float for physics calculations
+	//		arrows[i].Update(static_cast<float>(dt));
+	//	}
+	//}
 
-	// Check for arrow collisions with targets
-	CheckArrowCollisions();
+	//// Check for arrow collisions with targets
+	//CheckArrowCollisions();
 
 }
 
