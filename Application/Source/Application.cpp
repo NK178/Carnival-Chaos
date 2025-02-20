@@ -94,7 +94,7 @@ void Application::Init()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); //We don't want the old OpenGL
 
 	//Create a window and create its OpenGL context
-	m_window = glfwCreateWindow(1920, 1080, "DX1118 OPENGL FRAMEWORK", NULL, NULL);
+	m_window = glfwCreateWindow(1920, 1080, "FSDJSJDKSLAJADKJADJDLSXKLMLKSCICJOPDPDWLAHDKLSJKLS", NULL, NULL);
 
 	//If the window couldn't be created
 	if (!m_window)
@@ -139,7 +139,7 @@ void Application::Init()
 void Application::Run()
 {
 	//Main Loop
-	Scene *scene = new SceneWIUtest();
+	Scene *scene = new SceneMain();
 	scene->Init();
 
 	m_timer.startTimer();    // Start timer to calculate how long it takes to render this frame

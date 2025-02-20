@@ -24,6 +24,12 @@ public:
 	static Mesh* GenerateHemisphere(const std::string& meshName, glm::vec3 color, int numStack, int numSlice, float radius);
 	static Mesh* GenerateCube(const std::string& meshName, glm::vec3 color, float length = 1.f);
 
+	static Mesh* GenerateHWall1(const std::string& meshName, glm::vec3 color);
+	static Mesh* GenerateHWall2(const std::string& meshName, glm::vec3 color);
+	static Mesh* GenerateHWall3(const std::string& meshName, glm::vec3 color);
+	static Mesh* GenerateHWall4(const std::string& meshName, glm::vec3 color);
+	static Mesh* GenerateHWall5(const std::string& meshName, glm::vec3 color);
+
 	// Step 7
 	static Mesh* GenerateOBJ(const std::string& meshName, const
 		std::string& file_path);

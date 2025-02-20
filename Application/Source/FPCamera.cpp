@@ -315,8 +315,8 @@ void FPCamera::Update(double dt)
 			sway *= 0.9;
 		}
 
-		up.x = sin(sway) * 0.25;
-		up.z = sin(sway) * 0.25;
+		up.x = sin(sway) * 0.25 * multDebugX;
+		up.z = sin(sway) * 0.25 * multDebugZ;
 	}
 
 	if (allowLocomotiveBop)
@@ -346,6 +346,14 @@ void FPCamera::Update(double dt)
 	target = position + pitchView + yawView;
 	isDirty = true;
 	this->Refresh();
+
+	//std::cout << pitchView.x << std::endl;
+
+	
+
+	multDebugX = pitchView.z > 0 ? 1 : -1;
+	multDebugZ = pitchView.x > 0 ? -1 : 1;
+	
 }
 
 glm::vec3 FPCamera::GetView(void)
