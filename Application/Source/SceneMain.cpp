@@ -138,6 +138,32 @@ void SceneMain::Init()
 	meshList[GEO_BACK] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
 	meshList[GEO_BACK]->textureID = LoadTGA("Images//hills_ft.tga");
 
+	meshList[GEO_LEFT2] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
+	meshList[GEO_LEFT2]->textureID = LoadTGA("Images//sunset_lf.tga");
+	meshList[GEO_RIGHT2] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
+	meshList[GEO_RIGHT2]->textureID = LoadTGA("Images//sunset_rt.tga");
+	meshList[GEO_TOP2] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
+	meshList[GEO_TOP2]->textureID = LoadTGA("Images//sunset_up.tga");
+	meshList[GEO_BOTTOM2] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
+	meshList[GEO_BOTTOM2]->textureID = LoadTGA("Images//sunset_dn.tga");
+	meshList[GEO_FRONT2] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
+	meshList[GEO_FRONT2]->textureID = LoadTGA("Images//sunset_bk.tga");
+	meshList[GEO_BACK2] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
+	meshList[GEO_BACK2]->textureID = LoadTGA("Images//sunset_ft.tga");
+
+	meshList[GEO_LEFT3] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
+	meshList[GEO_LEFT3]->textureID = LoadTGA("Images//midnight-silence_lf.tga");
+	meshList[GEO_RIGHT3] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
+	meshList[GEO_RIGHT3]->textureID = LoadTGA("Images//midnight-silence_rt.tga");
+	meshList[GEO_TOP3] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
+	meshList[GEO_TOP3]->textureID = LoadTGA("Images//midnight-silence_up.tga");
+	meshList[GEO_BOTTOM3] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
+	meshList[GEO_BOTTOM3]->textureID = LoadTGA("Images//midnight-silence_dn.tga");
+	meshList[GEO_FRONT3] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
+	meshList[GEO_FRONT3]->textureID = LoadTGA("Images//midnight-silence_bk.tga");
+	meshList[GEO_BACK3] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
+	meshList[GEO_BACK3]->textureID = LoadTGA("Images//midnight-silence_ft.tga");
+
 	// 16 x 16 is the number of columns and rows for the text
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16,16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Images//calibri.tga");
@@ -1228,45 +1254,144 @@ void SceneMain::Material(GEOMETRY_TYPE obj, float AmR, float AmG, float AmB, flo
 void SceneMain::RenderSkyBox() {
 	modelStack.PushMatrix();
 
-	modelStack.PushMatrix();
-	modelStack.Translate(0.f, 0.f, 250.f);
-	modelStack.Rotate(180, 0, 1, 0);
-	modelStack.Scale(5.f, 5.f, 5.f);
-	RenderMesh(meshList[GEO_FRONT], false);
-	modelStack.PopMatrix();
+	int completedGames = 0;
+	for (int i = 0; i < 6; i++) {
+		if (tentCompleted[i]) {
+			completedGames++;
+		}
+	}
 
-	modelStack.PushMatrix();
-	modelStack.Translate(0.f, 0.f, -250.f);
-	modelStack.Scale(5.f, 5.f, 5.f);
-	RenderMesh(meshList[GEO_BACK], false);
-	modelStack.PopMatrix();
+	bool useFinalSkybox = isFinalChallengeCompleted;
 
-	modelStack.PushMatrix();
-	modelStack.Translate(250.f, 0.f, 0.f);
-	modelStack.Rotate(270, 0, 1, 0);
-	modelStack.Scale(5.f, 5.f, 5.f);
-	RenderMesh(meshList[GEO_LEFT], false);
-	modelStack.PopMatrix();
+	if (useFinalSkybox) {
+		modelStack.PushMatrix();
+		modelStack.Translate(0.f, 0.f, 250.f);
+		modelStack.Rotate(180, 0, 1, 0);
+		modelStack.Scale(5.f, 5.f, 5.f);
+		RenderMesh(meshList[GEO_FRONT3], false);
+		modelStack.PopMatrix();
 
-	modelStack.PushMatrix();
-	modelStack.Translate(-250.f, 0.f, 0.f);
-	modelStack.Rotate(90, 0, 1, 0);
-	modelStack.Scale(5.f, 5.f, 5.f);
-	RenderMesh(meshList[GEO_RIGHT], false);
-	modelStack.PopMatrix();
+		modelStack.PushMatrix();
+		modelStack.Translate(0.f, 0.f, -250.f);
+		modelStack.Scale(5.f, 5.f, 5.f);
+		RenderMesh(meshList[GEO_BACK3], false);
+		modelStack.PopMatrix();
 
-	modelStack.PushMatrix();
-	modelStack.Rotate(90, 0, 1, 0);
-	modelStack.Translate(0.f, 250.f, 0.f);
-	modelStack.Rotate(90, 1, 0, 0);
-	modelStack.Scale(5.f, 5.f, 5.f);
-	RenderMesh(meshList[GEO_TOP], false);
-	modelStack.PopMatrix();
+		modelStack.PushMatrix();
+		modelStack.Translate(250.f, 0.f, 0.f);
+		modelStack.Rotate(270, 0, 1, 0);
+		modelStack.Scale(5.f, 5.f, 5.f);
+		RenderMesh(meshList[GEO_LEFT3], false);
+		modelStack.PopMatrix();
 
-	modelStack.PushMatrix();
-	modelStack.Translate(0.f, -250.f, 0.f);
-	modelStack.Rotate(270, 1, 0, 0);
-	modelStack.Scale(5.f, 5.f, 5.f);
-	RenderMesh(meshList[GEO_BOTTOM], false);
+		modelStack.PushMatrix();
+		modelStack.Translate(-250.f, 0.f, 0.f);
+		modelStack.Rotate(90, 0, 1, 0);
+		modelStack.Scale(5.f, 5.f, 5.f);
+		RenderMesh(meshList[GEO_RIGHT3], false);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Rotate(90, 0, 1, 0);
+		modelStack.Translate(0.f, 250.f, 0.f);
+		modelStack.Rotate(90, 1, 0, 0);
+		modelStack.Scale(5.f, 5.f, 5.f);
+		RenderMesh(meshList[GEO_TOP3], false);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Translate(0.f, -250.f, 0.f);
+		modelStack.Rotate(270, 1, 0, 0);
+		modelStack.Scale(5.f, 5.f, 5.f);
+		RenderMesh(meshList[GEO_BOTTOM3], false);
+		modelStack.PopMatrix();
+	}
+	else if (completedGames >= 6) {
+		modelStack.PushMatrix();
+		modelStack.Translate(0.f, 0.f, 250.f);
+		modelStack.Rotate(180, 0, 1, 0);
+		modelStack.Scale(5.f, 5.f, 5.f);
+		RenderMesh(meshList[GEO_FRONT2], false);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Translate(0.f, 0.f, -250.f);
+		modelStack.Scale(5.f, 5.f, 5.f);
+		RenderMesh(meshList[GEO_BACK2], false);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Translate(250.f, 0.f, 0.f);
+		modelStack.Rotate(270, 0, 1, 0);
+		modelStack.Scale(5.f, 5.f, 5.f);
+		RenderMesh(meshList[GEO_LEFT2], false);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Translate(-250.f, 0.f, 0.f);
+		modelStack.Rotate(90, 0, 1, 0);
+		modelStack.Scale(5.f, 5.f, 5.f);
+		RenderMesh(meshList[GEO_RIGHT2], false);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Rotate(90, 0, 1, 0);
+		modelStack.Translate(0.f, 250.f, 0.f);
+		modelStack.Rotate(90, 1, 0, 0);
+		modelStack.Scale(5.f, 5.f, 5.f);
+		RenderMesh(meshList[GEO_TOP2], false);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Translate(0.f, -250.f, 0.f);
+		modelStack.Rotate(270, 1, 0, 0);
+		modelStack.Scale(5.f, 5.f, 5.f);
+		RenderMesh(meshList[GEO_BOTTOM2], false);
+		modelStack.PopMatrix();
+	}
+	else {
+		modelStack.PushMatrix();
+		modelStack.Translate(0.f, 0.f, 250.f);
+		modelStack.Rotate(180, 0, 1, 0);
+		modelStack.Scale(5.f, 5.f, 5.f);
+		RenderMesh(meshList[GEO_FRONT], false);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Translate(0.f, 0.f, -250.f);
+		modelStack.Scale(5.f, 5.f, 5.f);
+		RenderMesh(meshList[GEO_BACK], false);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Translate(250.f, 0.f, 0.f);
+		modelStack.Rotate(270, 0, 1, 0);
+		modelStack.Scale(5.f, 5.f, 5.f);
+		RenderMesh(meshList[GEO_LEFT], false);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Translate(-250.f, 0.f, 0.f);
+		modelStack.Rotate(90, 0, 1, 0);
+		modelStack.Scale(5.f, 5.f, 5.f);
+		RenderMesh(meshList[GEO_RIGHT], false);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Rotate(90, 0, 1, 0);
+		modelStack.Translate(0.f, 250.f, 0.f);
+		modelStack.Rotate(90, 1, 0, 0);
+		modelStack.Scale(5.f, 5.f, 5.f);
+		RenderMesh(meshList[GEO_TOP], false);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Translate(0.f, -250.f, 0.f);
+		modelStack.Rotate(270, 1, 0, 0);
+		modelStack.Scale(5.f, 5.f, 5.f);
+		RenderMesh(meshList[GEO_BOTTOM], false);
+		modelStack.PopMatrix();
+	}
+
 	modelStack.PopMatrix();
 }

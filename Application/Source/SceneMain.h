@@ -35,13 +35,30 @@ public:
 		GEO_KEY_E,
 		GEO_KEY_F,
 
-		//SKybox
+		//Skybox
 		GEO_LEFT,
 		GEO_RIGHT,
 		GEO_TOP,
 		GEO_BOTTOM,
 		GEO_FRONT,
 		GEO_BACK,
+
+		//Skybox 2 (Sunset)
+		GEO_LEFT2,
+		GEO_RIGHT2,
+		GEO_TOP2,
+		GEO_BOTTOM2,
+		GEO_FRONT2,
+		GEO_BACK2,
+
+		//Skybox 3 (Midnight Silence)
+		GEO_LEFT3,
+		GEO_RIGHT3,
+		GEO_TOP3,
+		GEO_BOTTOM3,
+		GEO_FRONT3,
+		GEO_BACK3,
+
 		NUM_GEOMETRY,
 	};
 
