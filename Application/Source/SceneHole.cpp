@@ -33,7 +33,7 @@ void SceneHole::Init()
 
 	camera.allowMovement = true;
 	camera.allowJump = true;
-	camera.allowSprint = true;
+	camera.allowSprint = false;
 	camera.allowCrouch = true;
 	camera.allowProne = true;
 	camera.allowLocomotiveTilt = true;
@@ -144,17 +144,17 @@ void SceneHole::Init()
 	meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("STAMINA_BAR", glm::vec3(1, 1, 1), 1.f);
 
 	meshList[GEO_LEFT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_LEFT]->textureID = LoadTGA("Images//color.tga");
+	meshList[GEO_LEFT]->textureID = LoadTGA("Images//gettyimages.tga");
 	meshList[GEO_RIGHT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_RIGHT]->textureID = LoadTGA("Images//color.tga");
+	meshList[GEO_RIGHT]->textureID = LoadTGA("Images//gettyimages.tga");
 	meshList[GEO_TOP] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_TOP]->textureID = LoadTGA("Images//color.tga");
+	meshList[GEO_TOP]->textureID = LoadTGA("Images//winebottle.tga");
 	//meshList[GEO_BOTTOM] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
 	//meshList[GEO_BOTTOM]->textureID = LoadTGA("Images//color.tga");
 	meshList[GEO_FRONT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_FRONT]->textureID = LoadTGA("Images//color.tga");
+	meshList[GEO_FRONT]->textureID = LoadTGA("Images//gettyimages.tga");
 	meshList[GEO_BACK] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_BACK]->textureID = LoadTGA("Images//color.tga");
+	meshList[GEO_BACK]->textureID = LoadTGA("Images//gettyimages.tga");
 
 	meshList[GEO_HWALL1] = MeshBuilder::GenerateHWall1("HWall1", glm::vec3(1.f, 1.f, 1.f));
 	meshList[GEO_HWALL1]->textureID = LoadTGA("Images//floorcircus.tga");
@@ -173,6 +173,9 @@ void SceneHole::Init()
 
 	// 16 x 16 is the number of columns and rows for the text
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
+	meshList[GEO_TEXT]->textureID = LoadTGA("Images//calibri.tga");
+
+	meshList[GEO_TEXT] = MeshBuilder::GenerateText("result", 16, 16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Images//calibri.tga");
 
 	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 1000.0f);
@@ -253,45 +256,45 @@ void SceneHole::Init()
 
 void SceneHole::Update(double dt)
 {
-	HandleKeyPress();
-
-	if (KeyboardController::GetInstance()->IsKeyDown('I'))
-		light[0].position.z -= static_cast<float>(dt) * 5.f;
-	if (KeyboardController::GetInstance()->IsKeyDown('K'))
-		light[0].position.z += static_cast<float>(dt) * 5.f;
-	if (KeyboardController::GetInstance()->IsKeyDown('J'))
-		light[0].position.x -= static_cast<float>(dt) * 5.f;
-	if (KeyboardController::GetInstance()->IsKeyDown('L'))
-		light[0].position.x += static_cast<float>(dt) * 5.f;
-	if (KeyboardController::GetInstance()->IsKeyDown('O'))
-		light[0].position.y -= static_cast<float>(dt) * 5.f;
-	if (KeyboardController::GetInstance()->IsKeyDown('P'))
-		light[0].position.y += static_cast<float>(dt) * 5.f;
-
-	wallDisp -= dt * 60;
-	std::cout << camera.position.x << std::endl << camera.position.z << "\n\n\n";
-	if (!((camera.position.x > -170 && camera.position.x < -130) && (camera.position.z < 20 && camera.position.z > -20)))
+	if (gameResult == 0)
 	{
-		if (camera.position.y < 0)
+		HandleKeyPress();
+
+		wallDisp -= dt * 60;
+		//std::cout << wallDisp << "\n\n\n";
+		if (!((camera.position.x > -170 && camera.position.x < -130) && (camera.position.z < 20 && camera.position.z > -20)))
+		{
+			if (camera.position.y < 0)
+			{
+				failedGrav *= 1.01;
+			}
+			else if (camera.position.y < 3.5)
+			{
+				failedGrav += 0.05;
+			}
+		}
+		camera.position.y -= failedGrav;
+
+		if (camera.position.y <= -100)
 		{
 			std::cout << "FAILED\n";
-			failedGrav *= 1.01;
+			gameResult = -1;
 		}
-		else if (camera.position.y < 3.5)
+		else
 		{
-			failedGrav += 0.05;
+			if (wallDisp <= -1200)
+			{
+				std::cout << "SUCCESS\n";
+				gameResult = 1;
+			}
 		}
+
+
+		//light[0].spotDirection = -glm::normalize (camera.target - camera.position);
+		//light[0].position = camera.position;
+
+		camera.Update(dt);
 	}
-
-
-	camera.position.y -= failedGrav;
-	
-
-	//light[0].spotDirection = -glm::normalize (camera.target - camera.position);
-	//light[0].position = camera.position;
-
-	camera.Update(dt);
-
 }
 
 void SceneHole::Render()
@@ -420,12 +423,26 @@ void SceneHole::Render()
 	RenderMesh(meshList[GEO_HWALL5], false);
 	modelStack.PopMatrix();
 
-
-
-
-	RenderTextOnScreen(meshList[GEO_TEXT], "Stamina", glm::vec3(0, 1, 0), 40, 0, 0);
-
 	RenderSkyBox();
+
+	//RenderTextOnScreen(meshList[GEO_TEXT], "Stamina", glm::vec3(0, 1, 0), 40, 0, 0);
+
+	if (gameResult == -1)
+	{
+		RenderTextOnScreen(meshList[GEO_TEXT], "DIED", glm::vec3(1, 0, 0), 40, 325, 400);
+		RenderTextOnScreen(meshList[GEO_TEXT], "[SPACE] to retry", glm::vec3(1, 0, 0), 40, 100, 300);
+
+		if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_SPACE))
+		{
+
+		}
+	}
+	else if (gameResult == 1)
+	{
+		RenderTextOnScreen(meshList[GEO_TEXT], "You Beat", glm::vec3(0, 1, 0), 40, 300, 400);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Hole in the Wall!", glm::vec3(0, 1, 0), 40, 100, 300);
+		RenderTextOnScreen(meshList[GEO_TEXT], "[SPACE] to retry", glm::vec3(0, 1, 0), 40, 100, 200);
+	}
 }
 
 void SceneHole::RenderMesh(Mesh* mesh, bool enableLight)
