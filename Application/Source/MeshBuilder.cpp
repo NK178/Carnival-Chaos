@@ -1,8 +1,8 @@
+#define _USE_MATH_DEFINES
 #include "MeshBuilder.h"
 #include <GL\glew.h>
 #include <vector>
 #include "LoadOBJ.h"
-#define USE_MATHS_DEFINES
 
 /******************************************************************************/
 /*!
