@@ -152,7 +152,7 @@ void SceneWIUtest::Init()
 
 	light[0].position = glm::vec3(30, 30, 0);
 	light[0].color = glm::vec3(1, 1, 1);
-	light[0].type = Light::LIGHT_DIRECTIONAL;
+	light[0].type = Light::LIGHT_SPOT;
 	light[0].power = 1.f;
 	light[0].kC = 1.f;
 	light[0].kL = 0.01f;
@@ -294,7 +294,7 @@ void SceneWIUtest::Update(double dt)
 	if (OverlapAABB2Sphere(spherelist[1], spherelist[1].radius, cubelist[1], cubelist[1].pos - cubelist[1].boxextent, cubelist[1].pos + cubelist[1].boxextent, cd))
 		ResolveCollision(cd);
 
-
+	cubelist[1].angularVel = 20.f;
 	if (KeyboardController::GetInstance()->IsKeyPressed('G')) {
 		if (!activate)
 			activate = true;
@@ -381,18 +381,19 @@ void SceneWIUtest::Render()
 	RenderMesh(meshList[GEO_PLANE], true);
 	modelStack.PopMatrix();
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	for (int i = 0; i < cubelist.size(); i++) {
 		modelStack.PushMatrix();
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		modelStack.Translate(cubelist[i].pos.x, cubelist[i].pos.y, cubelist[i].pos.z);
+		modelStack.Rotate(cubelist[i].angleDeg, 0, 1, 0);
 		modelStack.Scale(2*cubelist[i].boxextent.x, 2*cubelist[i].boxextent.y, 2*cubelist[i].boxextent.z);
-		meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-		meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-		meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-		meshList[GEO_CUBE]->material.kShininess = 1.0f;
+		meshList[GEO_CUBE]->material.kAmbient = glm::vec3(1.f, 0.1f, 0.1f);
+		meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(1.f, 0.1f, 0.1f);
+		meshList[GEO_CUBE]->material.kSpecular = glm::vec3(1.f, 0.2f, 0.2f);
+		meshList[GEO_CUBE]->material.kShininess = 2.0f;
 		RenderMesh(meshList[GEO_CUBE], true);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		modelStack.PopMatrix();
 	}
 

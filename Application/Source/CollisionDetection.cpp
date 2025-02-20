@@ -1,6 +1,13 @@
 #include "CollisionDetection.h"
-
 #include <iostream>
+
+void Updatevertices(PhysicsObject& obj, std::vector<glm::vec3>& vertices)
+{
+	float oldX{ obj.pos.x }, oldY{ obj.pos.y }, oldZ{ obj.pos.z };
+	float radian = glm::radians(obj.angleDeg);
+	//x = cos(radian) * oldX - sin(radian) * oldY;
+	//y = sin(radian) * oldX + cos(radian) * oldY;
+}
 
 void ResolveCollision(CollisionData& cd)
 {
@@ -133,40 +140,8 @@ bool OverlapAABB2Sphere(PhysicsObject& circle, float radius, PhysicsObject& box,
 		return false;
 }
 
-//////////////////////////////////////////// CIRCLE 2 AABB /////////////////////////////////////
-//bool OverlapCircle2AABB(PhysicsObject& circle, float radius, PhysicsObject& box, glm::vec3 boxMin, glm::vec3 boxMax, CollisionData& cd)
-//{
-//	float nearestPoint, nearestPoint2, distancesquared;
-//	if (circle.pos.x > boxMax.x)
-//		nearestPoint = boxMax.x;
-//	else if (circle.pos.x < boxMin.x)
-//		nearestPoint = boxMin.x;
-//	else
-//		nearestPoint = circle.pos.x;
-//
-//	if (circle.pos.y > boxMax.y)
-//		nearestPoint2 = boxMax.y;
-//	else if (circle.pos.y < boxMin.y)
-//		nearestPoint2 = boxMin.y;
-//	else
-//		nearestPoint2 = circle.pos.y;
-//
-//	glm::vec3 nearpos(nearestPoint, nearestPoint2, 0.f);
-//	glm::vec3 dispvector = circle.pos - nearpos;
-//	distancesquared = dispvector.LengthSquared();
-//
-//	if (distancesquared < radius * radius) {
-//		cd.pObj1 = &circle;
-//		cd.pObj2 = &box;
-//		cd.pd = radius - dispvector.Length();
-//		cd.normal = dispvector.Normalized(); 
-//		return true;
-//	}
-//	else
-//		return false;
-//}
-//
-//////////////////////////////////////////// SAT /////////////////////////////////////
+
+////////////////////////////////////////// SAT /////////////////////////////////////
 //bool SAT(PhysicsObject& obj1, const std::vector<glm::vec3>& polA, PhysicsObject& obj2, const std::vector<glm::vec3>& polB, CollisionData& cd)
 //{
 //	size_t sizeA = polA.size();
@@ -181,8 +156,8 @@ bool OverlapAABB2Sphere(PhysicsObject& circle, float radius, PhysicsObject& box,
 //		const glm::vec3& pt2 = polA[(i + 1) % sizeA];
 //		glm::vec3 edge = pt2 - pt1;
 //		glm::vec3 normal{ -edge.y, edge.x };
-//		normal.Normalize();
-//		std::vector<float> MinMaxA;
+//		//glm::vec3 norma
+//		std::vector<float> MinMaxA;	
 //		std::vector<float> MinMaxB;
 //
 //		//2) Map the point to the Seperating Axis) 
@@ -321,7 +296,8 @@ bool OverlapAABB2Sphere(PhysicsObject& circle, float radius, PhysicsObject& box,
 //	cd.pd = overlap;
 //	return true;
 //}
-//
+
+
 ////////////////////////////////////////////CIRCLE 2 SAT /////////////////////////////////////
 //bool SAT2Circle(PhysicsObject& circle, const float& circleRadius, PhysicsObject& SAT, const std::vector<glm::vec3>& polA, glm::vec3& contactpt, const glm::vec3& offset,CollisionData& cd)
 //{

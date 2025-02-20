@@ -12,6 +12,8 @@ struct CollisionData {
 	glm::vec3 spinvec{ 0,0,0 };
 };
 
+//Updates ur vertices LIVE
+void Updatevertices(PhysicsObject& obj, std::vector<glm::vec3>& vertices);
 
 //Resolve 2 moving objects 
 void ResolveCollision(CollisionData& cd);
@@ -22,6 +24,9 @@ bool OverlapSphere2Sphere(PhysicsObject& obj1, float r1, PhysicsObject& obj2, fl
 
 bool OverlapAABB2Sphere(PhysicsObject& circle, float radius, PhysicsObject& box, glm::vec3 boxMin, glm::vec3 boxMax, CollisionData& cd);
 
+bool SAT(PhysicsObject& obj1, const std::vector<glm::vec3>& polA, PhysicsObject& obj2, const std::vector<glm::vec3>& polB, CollisionData& cd);
+
+
 //
 //bool SAT2Circle(PhysicsObject& circle, const float& circleRadius, PhysicsObject& SAT, const std::vector<glm::vec3>& polA, glm::vec3& contactpt, const glm::vec3& offset, CollisionData& cd);
 //
@@ -29,7 +34,6 @@ bool OverlapAABB2Sphere(PhysicsObject& circle, float radius, PhysicsObject& box,
 //
 //
 //
-//bool SAT(PhysicsObject& obj1, const std::vector<glm::vec3>& polA, PhysicsObject& obj2, const std::vector<glm::vec3>& polB, CollisionData& cd);
 //
 ////collision resolution function
 //void ResolveCircle2StaticLine(PhysicsObject& ball, float radius, const glm::vec3& lineStart, const glm::vec3& lineEnd);
