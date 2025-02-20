@@ -264,7 +264,7 @@ void MainMenu::Render()
 	// Load view matrix stack and set it with camera position, target position and up direction
 	viewStack.LoadIdentity();
 	viewStack.LookAt(
-		camera.position.x, camera.position.y, camera.position.z,
+		camera.pos.x, camera.pos.y, camera.pos.z,
 		camera.target.x, camera.target.y, camera.target.z,
 		camera.up.x, camera.up.y, camera.up.z
 	);

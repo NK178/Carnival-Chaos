@@ -15,6 +15,9 @@ struct CollisionData {
 //Updates ur vertices LIVE
 void Updatevertices(PhysicsObject& obj, std::vector<glm::vec3>& vertices);
 
+std::vector<glm::vec3> UpdateverticesinYaxis(PhysicsObject& obj, const std::vector<glm::vec3>& vertices);
+
+
 //Resolve 2 moving objects	
 void ResolveCollision(CollisionData& cd);
 
