@@ -269,8 +269,8 @@ void SceneBalloonPop::Update(double dt)
 	if (KeyboardController::GetInstance()->IsKeyDown('P'))
 		light[0].position.y += static_cast<float>(dt) * 5.f;*/
 
-		//light[0].spotDirection = -glm::normalize (camera.target - camera.position);
-		//light[0].position = camera.position;
+		//light[0].spotDirection = -glm::normalize (camera.target - camera.pos);
+		//light[0].position = camera.pos;
 
 		/*if (MouseController::GetInstance()->IsButtonPressed(GLFW_MOUSE_BUTTON_LEFT))
 		{

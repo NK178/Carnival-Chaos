@@ -266,7 +266,7 @@ void SceneMain::Init()
 	cubeList.push_back(tentBoxes(6, GameObject::CUBE));
 	cubeList.push_back(tentBoxes(7, GameObject::CUBE));
 
-	player[0].pos = camera.position;
+	player[0].pos = camera.pos;
 	cubeList[0].pos = glm::vec3{ 30, 3, -40 };
 	cubeList[1].pos = glm::vec3{ 30, 3, 0 };
 	cubeList[2].pos = glm::vec3{ 30, 3, 40 };
@@ -329,11 +329,11 @@ void SceneMain::Update(double dt)
 	if (KeyboardController::GetInstance()->IsKeyDown('P'))
 		light[0].position.y += static_cast<float>(dt) * 5.f;
 
-	//light[0].spotDirection = -glm::normalize (camera.target - camera.position);
-	//light[0].position = camera.position;
+	//light[0].spotDirection = -glm::normalize (camera.target - camera.pos);
+	//light[0].position = camera.pos;
 
 	camera.Update(dt);
-	player[0].pos = camera.position;
+	player[0].pos = camera.pos;
 	std::cout << "x: " << player[0].pos.x << " y: " << player[0].pos.y << " z: " << player[0].pos.z << std::endl;
 	CollisionData cd;
 	for (int i = 0; i < cubeList.size(); i++) {
@@ -347,7 +347,7 @@ void SceneMain::Update(double dt)
 
 	player[0].UpdatePhysics(dt);
 
-	float distance = glm::distance(camera.position, signPosition);
+	float distance = glm::distance(camera.pos, signPosition);
 	if (distance < 12.0f) 
 	{
 		showSignText = true;
@@ -359,7 +359,7 @@ void SceneMain::Update(double dt)
 
 	for (int i = 0; i < 6; i++)
 	{
-		float distanceToTent = glm::distance(camera.position, tentPositions[i]);
+		float distanceToTent = glm::distance(camera.pos, tentPositions[i]);
 		if (distanceToTent < 18.0f) 
 		{
 			showEnterTentText[i] = true;
@@ -382,7 +382,7 @@ void SceneMain::Update(double dt)
 
 	if (allTentsCompleted)
 	{
-		float distanceToFinalTent = glm::distance(camera.position, finalTentPosition);
+		float distanceToFinalTent = glm::distance(camera.pos, finalTentPosition);
 		if (distanceToFinalTent < 25.0f) 
 		{
 			showEnterFinalTentText = true;
@@ -417,7 +417,7 @@ void SceneMain::Render()
 	// Load view matrix stack and set it with camera position, target position and up direction
 	viewStack.LoadIdentity();
 	viewStack.LookAt(
-		camera.position.x, camera.position.y, camera.position.z,
+		camera.pos.x, camera.pos.y, camera.pos.z,
 		camera.target.x, camera.target.y, camera.target.z,
 		camera.up.x, camera.up.y, camera.up.z
 	);
