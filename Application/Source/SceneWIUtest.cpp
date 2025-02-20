@@ -152,7 +152,7 @@ void SceneWIUtest::Init()
 
 	light[0].position = glm::vec3(30, 30, 0);
 	light[0].color = glm::vec3(1, 1, 1);
-	light[0].type = Light::LIGHT_SPOT;
+	light[0].type = Light::LIGHT_DIRECTIONAL;
 	light[0].power = 1.f;
 	light[0].kC = 1.f;
 	light[0].kL = 0.01f;
@@ -230,6 +230,9 @@ void SceneWIUtest::Init()
 	spherelist[1].pos = glm::vec3{ -15,3,0 };
 	spherelist[1].mass = 0.f;
 
+	obblist.push_back(OBB(5, GameObject::CUBE));
+	obblist[0].pos = glm::vec3{ -15,3,-15 };
+	obblist[0].angleDeg = 0;
 
 }
 
@@ -239,17 +242,17 @@ void SceneWIUtest::Update(double dt)
 	HandleKeyPress();
 	const float SPEED = 15.f;
 	if (KeyboardController::GetInstance()->IsKeyDown('I'))
-		cubelist[1].pos.z -= static_cast<float>(dt) * SPEED;
+		obblist[0].pos.z -= static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('K'))
-		cubelist[1].pos.z += static_cast<float>(dt) * SPEED;
+		obblist[0].pos.z += static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('J'))
-		cubelist[1].pos.x -= static_cast<float>(dt) * SPEED;
+		obblist[0].pos.x -= static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('L'))
-		cubelist[1].pos.x += static_cast<float>(dt) * SPEED;
+		obblist[0].pos.x += static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('O'))
-		cubelist[1].pos.y -= static_cast<float>(dt) * SPEED;
+		obblist[0].pos.y -= static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('P'))
-		cubelist[1].pos.y += static_cast<float>(dt) * SPEED;
+		obblist[0].pos.y += static_cast<float>(dt) * SPEED;
 
 	//if (KeyboardController::GetInstance()->IsKeyDown('I'))
 	//	spherelist[1].pos.z -= static_cast<float>(dt) * SPEED;
@@ -264,11 +267,21 @@ void SceneWIUtest::Update(double dt)
 	//if (KeyboardController::GetInstance()->IsKeyDown('P'))
 	//	spherelist[1].pos.y += static_cast<float>(dt) * SPEED;
 
+	
+	std::vector<glm::vec3> obb_worldvertices = obblist[0].vertices;
+	obb_worldvertices = UpdateverticesinYaxis(obblist[0], obb_worldvertices);
+	//std::cout << obb_worldvertices[0].x << std::endl;
+	//std::cout << cube1_worldvertices[0].x << std::endl;
+		//std::cout << obblist[0].angleDeg << std::endl;
+
+	if (KeyboardController::GetInstance()->IsKeyPressed('R')) {
+		obblist[0].angularVel += 20.f;
+	}
 
 	CollisionData cd;
 	if (OverlapAABB2AABB(cubelist[1], cubelist[1].boxextent, cubelist[0], cubelist[0].boxextent, cd)) 
 		ResolveCollision(cd);
-	
+
 	if (OverlapSphere2Sphere(spherelist[1], spherelist[1].radius, spherelist[0], spherelist[0].radius, cd)) 
 		ResolveCollision(cd);
 	
@@ -282,7 +295,7 @@ void SceneWIUtest::Update(double dt)
 		else
 			activate = false;
 	}
-	if (activate)
+	if (activate) 
 		cubelist[1].AddForce(glm::vec3{ 0,-1,0 } *10.f);
 
 
@@ -292,6 +305,11 @@ void SceneWIUtest::Update(double dt)
 	for (int i = 0; i < spherelist.size(); i++) {
 		spherelist[i].UpdatePhysics(dt);
 	}
+	for (int i = 0; i < obblist.size(); i++) {
+		obblist[i].UpdatePhysics(dt);
+	}
+	//camera.AddForce(glm::vec3(1, 0, 0) * 50.f);
+
 	camera.Update(dt);
 
 }
@@ -304,7 +322,7 @@ void SceneWIUtest::Render()
 	// Load view matrix stack and set it with camera position, target position and up direction
 	viewStack.LoadIdentity();
 	viewStack.LookAt(
-		camera.position.x, camera.position.y, camera.position.z,
+		camera.pos.x, camera.pos.y, camera.pos.z,
 		camera.target.x, camera.target.y, camera.target.z,
 		camera.up.x, camera.up.y, camera.up.z
 	);
@@ -390,27 +408,16 @@ void SceneWIUtest::Render()
 		modelStack.PopMatrix();
 	}
 
-
 	modelStack.PushMatrix();
-	modelStack.Translate(25,3,25);
-	modelStack.Scale(1,1,1);
-	meshList[GEO_SPHERE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-	meshList[GEO_SPHERE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-	meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	meshList[GEO_SPHERE]->material.kShininess = 1.0f;
-	RenderMesh(meshList[GEO_SPHERE], true);
-	modelStack.PopMatrix();
-
-	modelStack.PushMatrix();
-	modelStack.Translate(0, 3, 0);
+	modelStack.Translate(obblist[0].pos.x, obblist[0].pos.y, obblist[0].pos.z);
+	modelStack.Rotate(obblist[0].angleDeg, 0, 1, 0);
 	modelStack.Scale(1, 1, 1);
-	meshList[GEO_SPHERE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-	meshList[GEO_SPHERE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-	meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	meshList[GEO_SPHERE]->material.kShininess = 1.0f;
-	RenderMesh(meshList[GEO_SPHERE], true);
+	meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+	meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_CUBE]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_CUBE], true);
 	modelStack.PopMatrix();
-
 
 
 	RenderTextOnScreen(meshList[GEO_TEXT], "Stamina", glm::vec3(0, 1, 0), 40, 0, 0);

@@ -269,8 +269,8 @@ void SceneBalloonPop::Update(double dt)
 	if (KeyboardController::GetInstance()->IsKeyDown('P'))
 		light[0].position.y += static_cast<float>(dt) * 5.f;*/
 
-		//light[0].spotDirection = -glm::normalize (camera.target - camera.position);
-		//light[0].position = camera.position;
+		//light[0].spotDirection = -glm::normalize (camera.target - camera.pos);
+		//light[0].position = camera.pos;
 
 		/*if (MouseController::GetInstance()->IsButtonPressed(GLFW_MOUSE_BUTTON_LEFT))
 		{
@@ -291,7 +291,7 @@ void SceneBalloonPop::Render()
 	// Load view matrix stack and set it with camera position, target position and up direction
 	viewStack.LoadIdentity();
 	viewStack.LookAt(
-		camera.position.x, camera.position.y, camera.position.z,
+		camera.pos.x, camera.pos.y, camera.pos.z,
 		camera.target.x, camera.target.y, camera.target.z,
 		camera.up.x, camera.up.y, camera.up.z
 	);

@@ -9,6 +9,50 @@ void Updatevertices(PhysicsObject& obj, std::vector<glm::vec3>& vertices)
 	//y = sin(radian) * oldX + cos(radian) * oldY;
 }
 
+
+//Vector3& Vector3::RotateVec(const float& angle)
+//{
+//	float oldX{ x }, oldY{ y };
+//	float radian = Math::DegreeToRadian(angle);
+//	x = cos(radian) * oldX - sin(radian) * oldY;
+//	y = sin(radian) * oldX + cos(radian) * oldY;
+//	return *this;
+//
+//}
+
+std::vector<glm::vec3> UpdateverticesinYaxis(PhysicsObject& obj, const std::vector<glm::vec3>& vertices)
+{
+	std::vector<glm::vec3> newvertices;
+	//std::cout << obj.angleDeg << std::endl;
+	float radian = glm::radians(obj.angleDeg);
+	float x, z;
+	for (int i = 0; i < vertices.size(); i++) {
+		glm::vec3 newvec = vertices[i];
+		float oldX{ vertices[i].x }, oldY{ vertices[i].y }, oldZ{ vertices[i].z };
+		newvec.x = cos(radian) * oldX - sin(radian) * oldY;
+		newvec.z = sin(radian) * oldX + cos(radian) * oldY;
+
+		newvec += obj.pos;
+		newvertices.push_back(newvec);
+	}
+
+	return newvertices;
+		
+	//var rotateY3D = function(theta) {
+	//	var sinTheta = sin(theta);
+	//	var cosTheta = cos(theta);
+
+	//	for (var n = 0; n < nodes.length; n++) {
+	//		var node = nodes[n];
+	//		var x = node[0];
+	//		var z = node[2];
+	//		node[0] = x * cosTheta + z * sinTheta;
+	//		node[2] = z * cosTheta - x * sinTheta;
+	//	}
+	//};
+
+}
+
 void ResolveCollision(CollisionData& cd)
 {
 	PhysicsObject& obj1 = *cd.pObj1;
@@ -141,7 +185,7 @@ bool OverlapAABB2Sphere(PhysicsObject& circle, float radius, PhysicsObject& box,
 }
 
 
-////////////////////////////////////////// SAT /////////////////////////////////////
+//////////////////////////////////////// SAT /////////////////////////////////////
 //bool SAT(PhysicsObject& obj1, const std::vector<glm::vec3>& polA, PhysicsObject& obj2, const std::vector<glm::vec3>& polB, CollisionData& cd)
 //{
 //	size_t sizeA = polA.size();

@@ -129,6 +129,11 @@ private:
 
 	Application app;
 
+	float wallDisp;
+	float failedGrav;
+
+	signed short int gameResult = 0;
+
 	bool OverlapAABB2AABB(glm::vec3 Obj1, const int Width1, const int Height1, glm::vec3 Obj2, const int Width2, const int Height2);
 
 	void RenderMeshOnScreen(Mesh* mesh, float x, float y, float sizex, float sizey);

@@ -5,11 +5,12 @@
 #include <glm\glm.hpp>
 #include <glm\gtc\matrix_transform.hpp>
 #include <glm\gtc\type_ptr.hpp>
+#include "GameObject.h"
 
-class FPCamera
+class FPCamera : public GameObject
 {
 public:
-    glm::vec3 position;
+    //glm::vec3 position;
     glm::vec3 target;
     glm::vec3 forward;
     glm::vec3 up;
@@ -29,6 +30,7 @@ public:
 
     //bools for camera mechanics
 
+    bool enableFNAF = false;
     bool allowMovement = true; // 
     bool allowJump = true; // 
     bool allowSprint = true; // 

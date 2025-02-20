@@ -11,8 +11,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "SceneWIUtest.h"
-#include "SceneMain.h"
 #include "MainMenu.h"
 #include "KeyboardController.h"
 #include "MouseController.h"
@@ -103,7 +101,7 @@ void Application::Init()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); //We don't want the old OpenGL
 
 	//Create a window and create its OpenGL context
-	m_window = glfwCreateWindow(1920, 1080, "FSDJSJDKSLAJADKJADJDLSXKLMLKSCICJOPDPDWLAHDKLSJKLS", NULL, NULL);
+	m_window = glfwCreateWindow(1920, 1080, "CARNIVAL CHAOS by x86 Assembly", NULL, NULL);
 
 	//If the window couldn't be created
 	if (!m_window)
