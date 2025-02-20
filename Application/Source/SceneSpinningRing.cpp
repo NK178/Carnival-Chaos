@@ -300,7 +300,8 @@ void SceneSpinningRing::Render()
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Scale(10.f, 10.f, 10.f);
+	modelStack.Translate(0.f, -120.f, 0.f);
+	modelStack.Scale(500.f, 10.f, 500.f);
 	meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
 	meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
 	meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
