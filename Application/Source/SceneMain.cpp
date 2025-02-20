@@ -470,7 +470,7 @@ void SceneMain::Render()
 	//modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Scale(150.f, 1.f, 150.f);
+	modelStack.Scale(150.f, 1.f, 200.f);
 	modelStack.Rotate(-90.f, 1, 0, 0);
 	meshList[GEO_PLANE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
 	meshList[GEO_PLANE]->material.kDiffuse = glm::vec3(0.5f,0.5f, 0.5f);
