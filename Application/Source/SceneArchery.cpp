@@ -1,4 +1,3 @@
-
 #pragma once
 #include "SceneArchery.h"
 #include "GL\glew.h"
@@ -36,7 +35,9 @@ SceneArchery::SceneArchery() :
 	m_powerChargeRate(2.0f),
 	m_isChargingShot(false),
 	m_arrowsLeft(10),    // Start with 10 arrows
-	m_playerScore(0)     // Start with 0 score
+	m_playerScore(0),   // Start with 0 score
+	m_isGameOver(false),
+	m_hasWon(false)
 
 {
 	// Additional initialization if needed
@@ -184,6 +185,9 @@ void SceneArchery::Init()
 		"Models//3DBK_100121.obj");
 	meshList[GEO_CARPET]->textureID = LoadTGA("Images//3DBK_100121_rug_Diffuse.tga");
 
+	meshList[GEO_GAMEOVER] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 2.f);
+	meshList[GEO_GAMEOVER]->textureID = LoadTGA("Images//LoseScreenArchery.tga");
+
 	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 1000.0f);
 	projectionStack.LoadMatrix(projection);
 
@@ -315,6 +319,25 @@ void SceneArchery::Init()
 	targets.push_back(Target(2, glm::vec3(-20, 0, -20), TARGET_RADIUS));
 
 
+}
+
+void SceneArchery::RestartGame()
+{
+	// Reset game state
+	m_isGameOver = false;
+	m_hasWon = false;
+	m_arrowsLeft = 10;
+	m_playerScore = 0;
+	m_arrowPower = 0.0f;
+	m_isChargingShot = false;
+
+	// Reset all arrows
+	for (auto& arrow : arrows) {
+		arrow.isActive = false;
+		arrow.isStuck = false;
+		arrow.pos = glm::vec3(0.0f);
+		arrow.vel = glm::vec3(0.0f);
+	}
 }
 
 
@@ -455,6 +478,22 @@ void SceneArchery::Update(double dt)
 	//	light[0].position.y -= static_cast<float>(dt) * 5.f;
 	//if (KeyboardController::GetInstance()->IsKeyDown('P'))
 	//	light[0].position.y += static_cast<float>(dt) * 5.f;
+
+
+	// If game is over, only check for restart
+	if (m_isGameOver) {
+		if (KeyboardController::GetInstance()->IsKeyPressed('R')) {
+			RestartGame();
+		}
+		return;
+	}
+
+	// Check for game over condition
+	if (m_arrowsLeft <= 0 && m_playerScore < 20) {
+		m_isGameOver = true;
+		m_hasWon = false;
+		return;
+	}
 
 	glm::vec3 targetPositions[3] = {
 		glm::vec3(0, 0, -40),      // Center target
@@ -850,7 +889,9 @@ void SceneArchery::Render()
 		10, 30);             // Position (x,y)
 
 
-
+	if (m_isGameOver) {
+		RenderMeshOnScreen(meshList[GEO_GAMEOVER], 400, 300, 400, 300); 
+	}
 
 
 }

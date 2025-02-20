@@ -29,6 +29,7 @@ public:
         GEO_BARREL,
         // Text
         GEO_TEXT,
+        GEO_GAMEOVER,
         // Skybox
         GEO_LEFT,
         GEO_RIGHT,
@@ -169,6 +170,10 @@ private:
     };
 
 
+    bool m_isGameOver;
+    bool m_hasWon;
+   
+
     float m_arrowPower;         // Current power level of the arrow
     float m_maxArrowPower;      // Maximum power level
     float m_powerChargeRate;    // How fast power increases
@@ -196,6 +201,8 @@ private:
     void HandleArrowInput();
     void FireArrow();
     void CheckArrowCollisions();
+
+    void RestartGame();
 
     // Member variables
     unsigned m_vertexArrayID;
