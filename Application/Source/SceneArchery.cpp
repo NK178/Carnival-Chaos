@@ -571,9 +571,9 @@ void SceneArchery::Render()
 	}
 
 
-	modelStack.PushMatrix();
+	/*modelStack.PushMatrix();
 	RenderMesh(meshList[GEO_AXES], false);
-	modelStack.PopMatrix();
+	modelStack.PopMatrix();*/
 
 	// Render all three light sources
 	for (int i = 0; i < NUM_LIGHTS; ++i)
@@ -814,13 +814,32 @@ void SceneArchery::Render()
 		25,                   // Size
 		10, 510);            // Position (x,y)
 
+	RenderTextOnScreen(meshList[GEO_TEXT],
+		"Yellow: 3 points",
+		glm::vec3(1, 1, 0),  // Yellow color
+		25,                   // Size
+		10, 470);            // Position (x,y)
+
+	RenderTextOnScreen(meshList[GEO_TEXT],
+		"Red/Blue: 2 points",
+		glm::vec3(0, 0, 0.5f),  // Yellow color
+		25,                   // Size
+		10, 430);            // Position (x,y)
+
+
+	RenderTextOnScreen(meshList[GEO_TEXT],
+		"White/Black: 1 point",
+		glm::vec3(1, 1, 1),  // Yellow color
+		25,                   // Size
+		10, 390);            // Position (x,y)
+
 	// Render score counter
 	std::string scoreText = "Score: " + std::to_string(m_playerScore);
 	RenderTextOnScreen(meshList[GEO_TEXT],
 		scoreText,
-		glm::vec3(1, 1, 0),  // Yellow color
+		glm::vec3(1.0f, 1.0f, 0.f), // Yellow color
 		25,                   // Size
-		10, 470);            // Position (x,y)
+		10, 350);            // Position (x,y)
 
 	// Render arrows left counter at bottom left
 	std::string arrowsText = "Arrows Left: " + std::to_string(m_arrowsLeft);
