@@ -12,6 +12,7 @@ void CSceneManager::Init() {
     currentSceneType = SCENE_ARCHERY;
     activeScene->Init();
 }
+// sdsdds
 
 void CSceneManager::Update(double dt) {
     // Handle scene transition if needed
