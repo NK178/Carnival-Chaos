@@ -31,6 +31,7 @@ void SceneHole::Init()
 	wallDisp = 100;
 	failedGrav = 0;
 
+	camera.enableFNAF = false;
 	camera.allowMovement = true;
 	camera.allowJump = true;
 	camera.allowSprint = false;
