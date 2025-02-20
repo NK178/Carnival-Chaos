@@ -15,7 +15,7 @@ struct CollisionData {
 //Updates ur vertices LIVE
 void Updatevertices(PhysicsObject& obj, std::vector<glm::vec3>& vertices);
 
-//Resolve 2 moving objects	
+//Resolve 2 moving objects 
 void ResolveCollision(CollisionData& cd);
 
 bool OverlapAABB2AABB(PhysicsObject& obj1, const glm::vec3& obj1extent, PhysicsObject& obj2, const glm::vec3& obj2extent, CollisionData& cd);
