@@ -30,6 +30,7 @@ public:
 		GEO_TREE,
 		GEO_FENCE,
 		GEO_SIGN,
+		GEO_HOUSE,
 
 		//GUI
 		GEO_KEY_E,
