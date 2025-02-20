@@ -168,6 +168,9 @@ void SceneHole::Init()
 	meshList[GEO_HWALL4] = MeshBuilder::GenerateHWall4("HWall4", glm::vec3(1.f, 1.f, 1.f));
 	meshList[GEO_HWALL4]->textureID = LoadTGA("Images//floorcircus.tga");
 
+	meshList[GEO_HWALL5] = MeshBuilder::GenerateHWall5("HWall5", glm::vec3(1.f, 1.f, 1.f));
+	meshList[GEO_HWALL5]->textureID = LoadTGA("Images//floorcircus.tga");
+
 	// 16 x 16 is the number of columns and rows for the text
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Images//calibri.tga");
@@ -408,6 +411,13 @@ void SceneHole::Render()
 	modelStack.Scale(10.f, 2.f, 2.f);
 	modelStack.Rotate(90.f, 0, 1, 0);
 	RenderMesh(meshList[GEO_HWALL4], false);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(wallDisp + 800, -3, 0);
+	modelStack.Scale(10.f, 2.f, 2.f);
+	modelStack.Rotate(90.f, 0, 1, 0);
+	RenderMesh(meshList[GEO_HWALL5], false);
 	modelStack.PopMatrix();
 
 
