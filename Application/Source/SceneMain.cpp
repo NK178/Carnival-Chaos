@@ -111,7 +111,7 @@ void SceneMain::Init()
 		m_parameters[U_MATERIAL_SHININESS]);
 
 	// Initialise camera properties
-	camera.Init(glm::vec3(-10,7,-10), glm::vec3(0,0,0), glm::vec3(0,1,0));
+	camera.Init(glm::vec3(-50,10,-90), glm::vec3(0,0,0), glm::vec3(0,1,0));
 
 	// Init VBO here
 	for (int i = 0; i < NUM_GEOMETRY; ++i)
@@ -348,7 +348,7 @@ void SceneMain::Update(double dt)
 	player[0].UpdatePhysics(dt);
 
 	float distance = glm::distance(camera.position, signPosition);
-	if (distance < 8.0f) 
+	if (distance < 12.0f) 
 	{
 		showSignText = true;
 	}
@@ -360,7 +360,7 @@ void SceneMain::Update(double dt)
 	for (int i = 0; i < 6; i++)
 	{
 		float distanceToTent = glm::distance(camera.position, tentPositions[i]);
-		if (distanceToTent < 15.0f) 
+		if (distanceToTent < 18.0f) 
 		{
 			showEnterTentText[i] = true;
 		}
