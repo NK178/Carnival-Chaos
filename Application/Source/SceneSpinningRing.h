@@ -131,26 +131,6 @@ private:
 	void RenderTextOnScreen(Mesh* mesh, std::string text, glm::vec3 color, float size, float x, float y);
 	void Material(GEOMETRY_TYPE obj, float AmR, float AmG, float AmB, float DifA, float DifG, float DifB, float SpA, float SpG, float SpB, float Shiny);
 	void RenderSkyBox();
-
-
-	struct Cube : public GameObject {
-		glm::vec3 boxextent{ 1.5f,1.5f,1.5f };
-		Cube(int id, int type) : GameObject(id, type) {}
-	};
-	struct Sphere : public GameObject {
-		float radius;
-		Sphere(int id, int r, int type) : radius(r), GameObject(id, type) {}
-	};
-	bool activate = false;
-	std::vector<Cube> cubelist;
-	std::vector<Sphere> spherelist;	
-
-	void SortCube2Collide(std::vector<GameObject> GOlist, std::vector<Cube> maincubelist, std::vector<Cube>& newcubelist);
-	//void CubeCollisions(std::vector<Cube>& Cubelist, CollisionData cd);
-	void CubeCollisions(std::vector<int> idlist, std::vector<Cube>& Cubelist, CollisionData cd);
-
-	//testing
-
 };
 
 #endif
