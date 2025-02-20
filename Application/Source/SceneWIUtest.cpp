@@ -261,13 +261,13 @@ void SceneWIUtest::Update(double dt)
 	obb_worldvertices = UpdateverticesinYaxis(obblist[0], obb_worldvertices);
 	if (KeyboardController::GetInstance()->IsKeyPressed('T')) {
 		iter += 1;
-		if (iter > 8)
+		if (iter > 7)
 			iter = iter % obblist[0].vertices.size();
 	}
 	std::cout << "Iter: " << iter << " " << obb_worldvertices[iter].x << " " << obb_worldvertices[iter].y << " " << obb_worldvertices[iter].z << std::endl;
 
 	if (KeyboardController::GetInstance()->IsKeyPressed('R')) {
-		obblist[0].angularVel -= 10.f;
+		obblist[0].angularVel += 50.f;
 	}
 
 
