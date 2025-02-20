@@ -28,11 +28,14 @@ SceneHole::~SceneHole()
 
 void SceneHole::Init()
 {
+	wallDisp = 100;
+	failedGrav = 0;
+
 	camera.allowMovement = true;
 	camera.allowJump = true;
-	camera.allowSprint = true;
+	camera.allowSprint = false;
 	camera.allowCrouch = true;
-	camera.allowProne = false;
+	camera.allowProne = true;
 	camera.allowLocomotiveTilt = true;
 	camera.allowLocomotiveBop = false;
 
@@ -122,7 +125,7 @@ void SceneHole::Init()
 		m_parameters[U_MATERIAL_SHININESS]);
 
 	// Initialise camera properties
-	camera.Init(glm::vec3(-10, 3, -10), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	camera.Init(glm::vec3(-150, 3, -10), glm::vec3(1, 0, 0), glm::vec3(0, 1, 0));
 
 	// Init VBO here
 	for (int i = 0; i < NUM_GEOMETRY; ++i)
@@ -134,26 +137,45 @@ void SceneHole::Init()
 	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Sun", glm::vec3(1.f, 1.f, 1.f), 12.f, 16, 16);
 	meshList[GEO_PLANE] = MeshBuilder::GenerateQuad("Plane", glm::vec3(.9f, .9f, 1.f), 4.f);
 	meshList[GEO_PLANE]->textureID = LoadTGA("Images//asphalt.tga");
+	meshList[GEO_PLANE] = MeshBuilder::GenerateQuad("Edging1", glm::vec3(0.f, 0.f, 0.f), 4.f);
+	meshList[GEO_PLANE]->textureID = LoadTGA("Images//asphalt.tga");
+	meshList[GEO_PLANE] = MeshBuilder::GenerateQuad("Plat1", glm::vec3(.9f, .9f, 1.f), 4.f);
+	meshList[GEO_PLANE]->textureID = LoadTGA("Images//asphalt.tga");
 	meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("STAMINA_BAR", glm::vec3(1, 1, 1), 1.f);
 
 	meshList[GEO_LEFT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_LEFT]->textureID = LoadTGA("Images//nightsky_lfD.tga");
+	meshList[GEO_LEFT]->textureID = LoadTGA("Images//gettyimages.tga");
 	meshList[GEO_RIGHT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_RIGHT]->textureID = LoadTGA("Images//nightsky_rtD.tga");
+	meshList[GEO_RIGHT]->textureID = LoadTGA("Images//gettyimages.tga");
 	meshList[GEO_TOP] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_TOP]->textureID = LoadTGA("Images//nightsky_upD.tga");
-	meshList[GEO_BOTTOM] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_BOTTOM]->textureID = LoadTGA("Images//nightsky_dnD.tga");
+	meshList[GEO_TOP]->textureID = LoadTGA("Images//winebottle.tga");
+	//meshList[GEO_BOTTOM] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
+	//meshList[GEO_BOTTOM]->textureID = LoadTGA("Images//color.tga");
 	meshList[GEO_FRONT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_FRONT]->textureID = LoadTGA("Images//nightsky_bkD.tga");
+	meshList[GEO_FRONT]->textureID = LoadTGA("Images//gettyimages.tga");
 	meshList[GEO_BACK] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_BACK]->textureID = LoadTGA("Images//nightsky_ftD.tga");
+	meshList[GEO_BACK]->textureID = LoadTGA("Images//gettyimages.tga");
 
-	meshList[GEO_HWALL1] = MeshBuilder::GenerateHWall1("HWall", glm::vec3(1.f, 1.f, 1.f));
-	meshList[GEO_HWALL1]->textureID = LoadTGA("Images//sign.tga");
+	meshList[GEO_HWALL1] = MeshBuilder::GenerateHWall1("HWall1", glm::vec3(1.f, 1.f, 1.f));
+	meshList[GEO_HWALL1]->textureID = LoadTGA("Images//floorcircus.tga");
+
+	meshList[GEO_HWALL2] = MeshBuilder::GenerateHWall2("HWall2", glm::vec3(1.f, 1.f, 1.f));
+	meshList[GEO_HWALL2]->textureID = LoadTGA("Images//floorcircus.tga");
+
+	meshList[GEO_HWALL3] = MeshBuilder::GenerateHWall3("HWall3", glm::vec3(1.f, 1.f, 1.f));
+	meshList[GEO_HWALL3]->textureID = LoadTGA("Images//floorcircus.tga");
+
+	meshList[GEO_HWALL4] = MeshBuilder::GenerateHWall4("HWall4", glm::vec3(1.f, 1.f, 1.f));
+	meshList[GEO_HWALL4]->textureID = LoadTGA("Images//floorcircus.tga");
+
+	meshList[GEO_HWALL5] = MeshBuilder::GenerateHWall5("HWall5", glm::vec3(1.f, 1.f, 1.f));
+	meshList[GEO_HWALL5]->textureID = LoadTGA("Images//floorcircus.tga");
 
 	// 16 x 16 is the number of columns and rows for the text
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
+	meshList[GEO_TEXT]->textureID = LoadTGA("Images//calibri.tga");
+
+	meshList[GEO_TEXT] = MeshBuilder::GenerateText("result", 16, 16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Images//calibri.tga");
 
 	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 1000.0f);
@@ -161,7 +183,7 @@ void SceneHole::Init()
 
 	glUniform1i(m_parameters[U_NUMLIGHTS], NUM_LIGHTS);
 
-	light[0].position = glm::vec3(30, 30, 0);
+	light[0].position = glm::vec3(-100, 30, 0);
 	light[0].color = glm::vec3(1, 1, 1);
 	light[0].type = Light::LIGHT_DIRECTIONAL;
 	light[0].power = 2.f;
@@ -234,26 +256,45 @@ void SceneHole::Init()
 
 void SceneHole::Update(double dt)
 {
-	HandleKeyPress();
+	if (gameResult == 0)
+	{
+		HandleKeyPress();
 
-	if (KeyboardController::GetInstance()->IsKeyDown('I'))
-		light[0].position.z -= static_cast<float>(dt) * 5.f;
-	if (KeyboardController::GetInstance()->IsKeyDown('K'))
-		light[0].position.z += static_cast<float>(dt) * 5.f;
-	if (KeyboardController::GetInstance()->IsKeyDown('J'))
-		light[0].position.x -= static_cast<float>(dt) * 5.f;
-	if (KeyboardController::GetInstance()->IsKeyDown('L'))
-		light[0].position.x += static_cast<float>(dt) * 5.f;
-	if (KeyboardController::GetInstance()->IsKeyDown('O'))
-		light[0].position.y -= static_cast<float>(dt) * 5.f;
-	if (KeyboardController::GetInstance()->IsKeyDown('P'))
-		light[0].position.y += static_cast<float>(dt) * 5.f;
+		wallDisp -= dt * 60;
+		//std::cout << wallDisp << "\n\n\n";
+		if (!((camera.position.x > -170 && camera.position.x < -130) && (camera.position.z < 20 && camera.position.z > -20)))
+		{
+			if (camera.position.y < 0)
+			{
+				failedGrav *= 1.01;
+			}
+			else if (camera.position.y < 3.5)
+			{
+				failedGrav += 0.05;
+			}
+		}
+		camera.position.y -= failedGrav;
 
-	//light[0].spotDirection = -glm::normalize (camera.target - camera.position);
-	//light[0].position = camera.position;
+		if (camera.position.y <= -100)
+		{
+			std::cout << "FAILED\n";
+			gameResult = -1;
+		}
+		else
+		{
+			if (wallDisp <= -1200)
+			{
+				std::cout << "SUCCESS\n";
+				gameResult = 1;
+			}
+		}
 
-	camera.Update(dt);
 
+		//light[0].spotDirection = -glm::normalize (camera.target - camera.position);
+		//light[0].position = camera.position;
+
+		camera.Update(dt);
+	}
 }
 
 void SceneHole::Render()
@@ -264,7 +305,7 @@ void SceneHole::Render()
 	// Load view matrix stack and set it with camera position, target position and up direction
 	viewStack.LoadIdentity();
 	viewStack.LookAt(
-		camera.position.x, camera.position.y, camera.position.z,
+		camera.pos.x, camera.pos.y, camera.pos.z,
 		camera.target.x, camera.target.y, camera.target.z,
 		camera.up.x, camera.up.y, camera.up.z
 	);
@@ -312,9 +353,33 @@ void SceneHole::Render()
 	RenderMesh(meshList[GEO_SPHERE], false);
 	modelStack.PopMatrix();
 
+	//wall platform
 	modelStack.PushMatrix();
 	modelStack.Translate(0, 0, 0);
-	modelStack.Scale(100.f, 1.f, 10.f);
+	modelStack.Scale(50.f, 1.f, 10.f);
+	modelStack.Rotate(-90.f, 1, 0, 0);
+	meshList[GEO_PLANE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+	meshList[GEO_PLANE]->material.kDiffuse = glm::vec3(0.1f, 0.1f, 0.1f);
+	meshList[GEO_PLANE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_PLANE]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_PLANE], true);
+	modelStack.PopMatrix();
+
+	//edging1
+	modelStack.PushMatrix();
+	modelStack.Translate(-100.f, -100.f, 0);
+	modelStack.Scale(1.f, 50.f, 10.f);
+	modelStack.Rotate(90.f, 0, 1, 0);
+	meshList[GEO_PLANE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+	meshList[GEO_PLANE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_PLANE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_PLANE]->material.kShininess = 0.5f;
+	RenderMesh(meshList[GEO_PLANE], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(-150, 0, 0);
+	modelStack.Scale(10.f, 1.f, 10.f);
 	modelStack.Rotate(-90.f, 1, 0, 0);
 	meshList[GEO_PLANE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
 	meshList[GEO_PLANE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
@@ -324,18 +389,60 @@ void SceneHole::Render()
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Translate(0, -3, 0);
+	modelStack.Translate(wallDisp, -3, 0);
 	modelStack.Scale(10.f, 2.f, 2.f);
 	modelStack.Rotate(90.f, 0, 1, 0);
 	RenderMesh(meshList[GEO_HWALL1], false);
 	modelStack.PopMatrix();
 
+	modelStack.PushMatrix();
+	modelStack.Translate(wallDisp + 200, -3, 0);
+	modelStack.Scale(10.f, 2.f, 2.f);
+	modelStack.Rotate(90.f, 0, 1, 0);
+	RenderMesh(meshList[GEO_HWALL2], false);
+	modelStack.PopMatrix();
 
+	modelStack.PushMatrix();
+	modelStack.Translate(wallDisp + 400, -3, 0);
+	modelStack.Scale(10.f, 2.f, 2.f);
+	modelStack.Rotate(90.f, 0, 1, 0);
+	RenderMesh(meshList[GEO_HWALL3], false);
+	modelStack.PopMatrix();
 
+	modelStack.PushMatrix();
+	modelStack.Translate(wallDisp + 600, -3, 0);
+	modelStack.Scale(10.f, 2.f, 2.f);
+	modelStack.Rotate(90.f, 0, 1, 0);
+	RenderMesh(meshList[GEO_HWALL4], false);
+	modelStack.PopMatrix();
 
-	RenderTextOnScreen(meshList[GEO_TEXT], "Stamina", glm::vec3(0, 1, 0), 40, 0, 0);
+	modelStack.PushMatrix();
+	modelStack.Translate(wallDisp + 800, -3, 0);
+	modelStack.Scale(10.f, 2.f, 2.f);
+	modelStack.Rotate(90.f, 0, 1, 0);
+	RenderMesh(meshList[GEO_HWALL5], false);
+	modelStack.PopMatrix();
 
 	RenderSkyBox();
+
+	//RenderTextOnScreen(meshList[GEO_TEXT], "Stamina", glm::vec3(0, 1, 0), 40, 0, 0);
+
+	if (gameResult == -1)
+	{
+		RenderTextOnScreen(meshList[GEO_TEXT], "DIED", glm::vec3(1, 0, 0), 40, 325, 400);
+		RenderTextOnScreen(meshList[GEO_TEXT], "[SPACE] to retry", glm::vec3(1, 0, 0), 40, 100, 300);
+
+		if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_SPACE))
+		{
+
+		}
+	}
+	else if (gameResult == 1)
+	{
+		RenderTextOnScreen(meshList[GEO_TEXT], "You Beat", glm::vec3(0, 1, 0), 40, 300, 400);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Hole in the Wall!", glm::vec3(0, 1, 0), 40, 100, 300);
+		RenderTextOnScreen(meshList[GEO_TEXT], "[SPACE] to retry", glm::vec3(0, 1, 0), 40, 100, 200);
+	}
 }
 
 void SceneHole::RenderMesh(Mesh* mesh, bool enableLight)
@@ -621,10 +728,10 @@ void SceneHole::RenderSkyBox() {
 	RenderMesh(meshList[GEO_TOP], false);
 	modelStack.PopMatrix();
 
-	modelStack.PushMatrix();
+	/*modelStack.PushMatrix();
 	modelStack.Translate(0.f, -250.f, 0.f);
 	modelStack.Rotate(270, 1, 0, 0);
 	modelStack.Scale(5.f, 5.f, 5.f);
 	RenderMesh(meshList[GEO_BOTTOM], false);
-	modelStack.PopMatrix();
+	modelStack.PopMatrix();*/
 }

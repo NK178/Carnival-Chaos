@@ -342,7 +342,7 @@ void SceneArchery::Init()
 //			m_arrowsLeft--;
 //
 //			// Calculate fire direction based on camera
-//			glm::vec3 fireDirection = glm::normalize(camera.target - camera.position);
+//			glm::vec3 fireDirection = glm::normalize(camera.target - camera.pos);
 //
 //			// Rest of the firing code remains the same
 //			float minSpeed = 1.0f;
@@ -352,7 +352,7 @@ void SceneArchery::Init()
 //			float finalSpeed = minSpeed + (maxSpeed - minSpeed) * speedMultiplier;
 //
 //			arrows[i].Fire(
-//				camera.position,
+//				camera.pos,
 //				fireDirection,
 //				finalSpeed
 //			);
@@ -456,7 +456,7 @@ void SceneArchery::Render()
 	// Load view matrix stack and set it with camera position, target position and up direction
 	viewStack.LoadIdentity();
 	viewStack.LookAt(
-		camera.position.x, camera.position.y, camera.position.z,
+		camera.pos.x, camera.pos.y, camera.pos.z,
 		camera.target.x, camera.target.y, camera.target.z,
 		camera.up.x, camera.up.y, camera.up.z
 	);
