@@ -144,47 +144,49 @@ void SceneSpinningRing::Init()
 	// 16 x 16 is the number of columns and rows for the text
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16,16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Images//calibri.tga");
+	meshList[GEO_FPS] = MeshBuilder::GenerateText("fpstext", 16, 16);
+	meshList[GEO_FPS]->textureID = LoadTGA("Images//bizudgothic.tga");
 
 	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 1000.0f);
 	projectionStack.LoadMatrix(projection);
 
 	glUniform1i(m_parameters[U_NUMLIGHTS], NUM_LIGHTS);
 
-	light[0].position = glm::vec3(30, 30, 0);
-	light[0].color = glm::vec3(1, 1, 1);
-	light[0].type = Light::LIGHT_SPOT;
-	light[0].power = 1.f;
-	light[0].kC = 1.f;
-	light[0].kL = 0.01f;
-	light[0].kQ = 0.001f;
-	light[0].cosCutoff = 30.f;
-	light[0].cosInner = 15.f;
-	light[0].exponent = 3.f;
-	light[0].spotDirection = glm::vec3(0.f, 1.f, 0.f);
+	//light[0].position = glm::vec3(30, 30, 0);
+	//light[0].color = glm::vec3(1, 1, 1);
+	//light[0].type = Light::LIGHT_SPOT;
+	//light[0].power = 1.f;
+	//light[0].kC = 1.f;
+	//light[0].kL = 0.01f;
+	//light[0].kQ = 0.001f;
+	//light[0].cosCutoff = 30.f;
+	//light[0].cosInner = 15.f;
+	//light[0].exponent = 3.f;
+	//light[0].spotDirection = glm::vec3(0.f, 1.f, 0.f);
 
-	light[1].position = glm::vec3(0, 3, 0);
-	light[1].color = glm::vec3(1, 1, 1);
-	light[1].type = Light::LIGHT_SPOT;
-	light[1].power = 0.4f;
-	light[1].kC = 1.f;
-	light[1].kL = 0.01f;
-	light[1].kQ = 0.001f;
-	light[1].cosCutoff = 45.f;
-	light[1].cosInner = 30.f;
-	light[1].exponent = 3.f;
-	light[1].spotDirection = glm::vec3(0.f, 1.f, 0.f);
+	//light[1].position = glm::vec3(0, 3, 0);
+	//light[1].color = glm::vec3(1, 1, 1);
+	//light[1].type = Light::LIGHT_SPOT;
+	//light[1].power = 0.4f;
+	//light[1].kC = 1.f;
+	//light[1].kL = 0.01f;
+	//light[1].kQ = 0.001f;
+	//light[1].cosCutoff = 45.f;
+	//light[1].cosInner = 30.f;
+	//light[1].exponent = 3.f;
+	//light[1].spotDirection = glm::vec3(0.f, 1.f, 0.f);
 
-	light[2].position = glm::vec3(-50,4,0);
-	light[2].color = glm::vec3(1, 1, 1);
-	light[2].type = Light::LIGHT_POINT;
-	light[2].power = 1.f;
-	light[2].kC = 1.f;
-	light[2].kL = 0.01f;
-	light[2].kQ = 0.001f;
-	light[2].cosCutoff = 45.f;
-	light[2].cosInner = 30.f;
-	light[2].exponent = 3.f;
-	light[2].spotDirection = glm::vec3(0.f, 1.f, 0.f);
+	//light[2].position = glm::vec3(-50,4,0);
+	//light[2].color = glm::vec3(1, 1, 1);
+	//light[2].type = Light::LIGHT_POINT;
+	//light[2].power = 1.f;
+	//light[2].kC = 1.f;
+	//light[2].kL = 0.01f;
+	//light[2].kQ = 0.001f;
+	//light[2].cosCutoff = 45.f;
+	//light[2].cosInner = 30.f;
+	//light[2].exponent = 3.f;
+	//light[2].spotDirection = glm::vec3(0.f, 1.f, 0.f);
 
 	glUniform3fv(m_parameters[U_LIGHT0_COLOR], 1, &light[0].color.r);
 	glUniform1i(m_parameters[U_LIGHT0_TYPE], light[0].type);
@@ -226,6 +228,9 @@ void SceneSpinningRing::Update(double dt)
 	CollisionData cd;
 
 	camera.Update(dt);
+
+	float temp = 1.f / dt;
+	fps = glm::round(temp * 100.f) / 100.f;
 }
 
 void SceneSpinningRing::Render()
@@ -248,7 +253,7 @@ void SceneSpinningRing::Render()
 	for (int i = 0; i < NUM_LIGHTS; i++) {
 		UNIFORM_TYPE pos, spotdir;
 		switch (i) {
-		//index 0 be like
+			//index 0 be like
 		case 0: pos = U_LIGHT0_POSITION; spotdir = U_LIGHT0_SPOTDIRECTION; break;
 		case 1: pos = U_LIGHT1_POSITION; spotdir = U_LIGHT1_SPOTDIRECTION; break;
 		case 2: pos = U_LIGHT2_POSITION; spotdir = U_LIGHT2_SPOTDIRECTION; break;
@@ -273,16 +278,15 @@ void SceneSpinningRing::Render()
 		}
 	}
 
+	//modelStack.PushMatrix();
+	//RenderMesh(meshList[GEO_AXES], false);
+	//modelStack.PopMatrix();
 
-	modelStack.PushMatrix();
-	RenderMesh(meshList[GEO_AXES], false);
-	modelStack.PopMatrix();
-
-	modelStack.PushMatrix();
-	modelStack.Translate(light[0].position.x, light[0].position.y, light[0].position.z);
-	modelStack.Scale(0.1f, 0.1f, 0.1f);
-	RenderMesh(meshList[GEO_SPHERE], false);
-	modelStack.PopMatrix();
+	//modelStack.PushMatrix();
+	//modelStack.Translate(light[0].position.x, light[0].position.y, light[0].position.z);
+	//modelStack.Scale(0.1f, 0.1f, 0.1f);
+	//RenderMesh(meshList[GEO_SPHERE], false);
+	//modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
 	modelStack.Scale(100.f, 1.f, 100.f);
@@ -294,31 +298,10 @@ void SceneSpinningRing::Render()
 	RenderMesh(meshList[GEO_PLANE], true);
 	modelStack.PopMatrix();
 
-	modelStack.PushMatrix();
-	modelStack.Translate(25,3,25);
-	modelStack.Scale(1,1,1);
-	meshList[GEO_SPHERE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-	meshList[GEO_SPHERE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-	meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	meshList[GEO_SPHERE]->material.kShininess = 1.0f;
-	RenderMesh(meshList[GEO_SPHERE], true);
-	modelStack.PopMatrix();
-
-	modelStack.PushMatrix();
-	modelStack.Translate(0, 3, 0);
-	modelStack.Scale(1, 1, 1);
-	meshList[GEO_SPHERE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-	meshList[GEO_SPHERE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-	meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	meshList[GEO_SPHERE]->material.kShininess = 1.0f;
-	RenderMesh(meshList[GEO_SPHERE], true);
-	modelStack.PopMatrix();
-
-
-
-	RenderTextOnScreen(meshList[GEO_TEXT], "Stamina", glm::vec3(0, 1, 0), 40, 0, 0);
-
 	RenderSkyBox();
+
+	std::string temp("FPS:" + std::to_string(fps));
+	RenderTextOnScreen(meshList[GEO_TEXT], temp.substr(0, 9), glm::vec3(0, 1, 0), 20, 620, 50);
 }
 
 void SceneSpinningRing::RenderMesh(Mesh* mesh, bool enableLight)
@@ -404,11 +387,6 @@ void SceneSpinningRing::HandleKeyPress()
 		// Key press to enable wireframe mode for the polygon
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //wireframe mode
 	}
-	//if (KeyboardController::GetInstance()->IsKeyPressed(VK_SPACE))
-	//{
-	//	// Change to black background
-	//	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	//}
 
 	static bool isRightUp = false;
 	if (!isRightUp && MouseController::GetInstance()->IsButtonDown(GLFW_MOUSE_BUTTON_RIGHT))

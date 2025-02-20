@@ -24,6 +24,7 @@ public:
 
 		//Text
 		GEO_TEXT,
+		GEO_FPS,
 
 		//SKybox
 		GEO_LEFT,
@@ -125,6 +126,8 @@ private:
 	bool enableLight;
 
 	Application app;
+
+	float fps = 0;
 	
 	void RenderMeshOnScreen(Mesh* mesh, float x, float y, float sizex, float sizey);
 	void RenderText(Mesh* mesh, std::string text, glm::vec3 color);

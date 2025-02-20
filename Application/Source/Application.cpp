@@ -11,9 +11,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "SceneWIUtest.h"
-#include "SceneMain.h"
-//#include "SceneSpinningRing.h"
 #include "MainMenu.h"
 #include "KeyboardController.h"
 #include "MouseController.h"
