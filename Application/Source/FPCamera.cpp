@@ -181,7 +181,7 @@ void FPCamera::Update(double dt)
 			time = amplitude = 0.f;
 		}
 		else if (!jumpflag && !proneflag && crouchflag) {
-			position.y = camheight - 3;
+			position.y = camheight - 1.5;
 			proneflag = true;
 			crouchflag = false;
 			time = amplitude = 0.f;
@@ -196,13 +196,13 @@ void FPCamera::Update(double dt)
 		time += dt;
 		ZOOM_SPEED = 15.f;
 		if (time < crouchduration)
-			position.y = glm::lerp(camheight, camheight - 3.f, time / crouchduration);
+			position.y = glm::lerp(camheight, camheight - 1.5f, time / crouchduration);
 	}
 	if (!crouchphase1) {
 		time += dt;
 		ZOOM_SPEED = 15.f;
 		if (time < crouchduration)
-			position.y = glm::lerp(camheight - 3.f, camheight, time / crouchduration);
+			position.y = glm::lerp(camheight - 1.5f, camheight, time / crouchduration);
 		else {
 			position.y = camheight;
 			crouchphase1 = true;
@@ -214,13 +214,13 @@ void FPCamera::Update(double dt)
 		time += dt;
 		ZOOM_SPEED = 15.f;
 		if (time < proneduration)
-			position.y = glm::lerp(camheight, camheight - 6.f, time / proneduration);
+			position.y = glm::lerp(camheight, camheight - 3.f, time / proneduration);
 	}
 	if (!pronephase1) {
 		time += dt;
 		ZOOM_SPEED = 15.f;
 		if (time < proneduration)
-			position.y = glm::lerp(camheight - 6.f, camheight, time / proneduration);
+			position.y = glm::lerp(camheight - 3.f, camheight, time / proneduration);
 		else {
 			position.y = camheight;
 			pronephase1 = true;

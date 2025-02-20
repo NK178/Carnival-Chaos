@@ -235,25 +235,6 @@ void SceneWIUtest::Init()
 
 void SceneWIUtest::Update(double dt)
 {
-	////imagine size 25 by 25, with position 0,0
-	//CTree tree(50,50,0,0);
-
-	////input all ur GOs
-	//for (int i = 0; i < cubelist.size(); i++) {
-	//	tree.AddGO(cubelist[i]);
-	//}
-	////for (int i = 0; i < spherelist.size(); i++) {
-	////	tree.AddGO(spherelist[i]);
-	////}
-	////Do the quad splitting
-	//if (tree.limit.size() > 1)
-	//	tree.CreateQuads();
-	//CollisionData cd;
-	//std::vector<int> idlist;
-	////eg check collision with cube 1
-	//tree.CheckCollisionWNearbyGOs(cubelist[1].GetID(), idlist);
-	//CubeCollisions(idlist,cubelist, cd);
-	//std::cout << tree.targettype << std::endl;
 
 	HandleKeyPress();
 	const float SPEED = 15.f;

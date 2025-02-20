@@ -9,10 +9,16 @@
 
 void CSceneManager::Init() {
     // Initialize with first scene
+<<<<<<< HEAD
     activeScene = new SceneMain();
     currentSceneType = SCENE_CARNIVAL;
+=======
+    activeScene = new SceneArchery();
+    currentSceneType = SCENE_ARCHERY;
+>>>>>>> 2b7b94e090872c8878a91f276b500b5d165e6d60
     activeScene->Init();
 }
+// sdsdds
 
 void CSceneManager::Update(double dt) {
     // Handle scene transition if needed
