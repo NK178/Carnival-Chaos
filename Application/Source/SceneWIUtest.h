@@ -141,9 +141,20 @@ private:
 		float radius;
 		Sphere(int id, int r, int type) : radius(r), GameObject(id, type) {}
 	};
+
+	//vertices.push_back(glm::vec3(-1.5f, 1.5f, 1.5f));    // Vertex 0
+	//vertices.push_back(glm::vec3(1.5f, 1.5f, 1.5f));    // Vertex 1
+	//vertices.push_back(glm::vec3(-1.5f, -1.5f, 1.5f));    // Vertex 2
+	//vertices.push_back(glm::vec3(1.5f, -1.5f, 1.5f));    // Vertex 3
+	//vertices.push_back(glm::vec3(-1.5f, 1.5f, -1.5f));    // Vertex 4
+	//vertices.push_back(glm::vec3(1.5f, 1.5f, -1.5f));    // Vertex 5
+	//vertices.push_back(glm::vec3(-1.5f, -1.5f, -1.5f));    // Vertex 6
+	//vertices.push_back(glm::vec3(1.5f, -1.5f, -1.5f));    // Vertex 7
+
 	struct OBB : public GameObject {
 		std::vector<glm::vec3> vertices; 
 		OBB(int id, int type) : GameObject(id, type) {
+
 			vertices.push_back(glm::vec3(-1.5f, 1.5f, 1.5f));    // Vertex 0
 			vertices.push_back(glm::vec3(1.5f, 1.5f, 1.5f));    // Vertex 1
 			vertices.push_back(glm::vec3(-1.5f, -1.5f, 1.5f));    // Vertex 2
@@ -152,9 +163,21 @@ private:
 			vertices.push_back(glm::vec3(1.5f, 1.5f, -1.5f));    // Vertex 5
 			vertices.push_back(glm::vec3(-1.5f, -1.5f, -1.5f));    // Vertex 6
 			vertices.push_back(glm::vec3(1.5f, -1.5f, -1.5f));    // Vertex 7
+
+			//vertices.push_back(glm::vec3(1.5f, 1.5f, -1.5f));    // Vertex 3
+			//vertices.push_back(glm::vec3(-1.5f, 1.5f, -1.5f));    // Vertex 2
+			//vertices.push_back(glm::vec3(-1.5f, 1.5f, 1.5f));    // Vertex 0
+			//vertices.push_back(glm::vec3(1.5f, 1.5f, 1.5f));    // Vertex 1
+			////vertices.push_back(glm::vec3(-1.5f, -1.5f, 1.5f));    // Vertex 2
+			////vertices.push_back(glm::vec3(1.5f, -1.5f, 1.5f));    // Vertex 3
+			////vertices.push_back(glm::vec3(1.5f, -1.5f, -1.5f));    // Vertex 4
+
+			//vertices.push_back(glm::vec3(-1.5f, -1.5f, -1.5f));    // Vertex 7
 		}
 	};
 
+
+	std::vector<glm::vec3> obb_worldvertices;
 	bool activate = false;
 	std::vector<Cube> cubelist;
 	std::vector<Sphere> spherelist;	
@@ -164,7 +187,7 @@ private:
 	//void CubeCollisions(std::vector<Cube>& Cubelist, CollisionData cd);
 	void CubeCollisions(std::vector<int> idlist, std::vector<Cube>& Cubelist, CollisionData cd);
 
-	//testing
+	int iter = 0;
 
 };
 

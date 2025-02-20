@@ -1,4 +1,4 @@
-#pragma once
+		#pragma once
 #include "SceneWIUtest.h"
 #include <iostream>
 #include "GL\glew.h"
@@ -234,6 +234,8 @@ void SceneWIUtest::Init()
 	obblist[0].pos = glm::vec3{ -15,3,-15 };
 	obblist[0].angleDeg = 0;
 
+	obb_worldvertices = obblist[0].vertices;
+
 }
 
 void SceneWIUtest::Update(double dt)
@@ -254,29 +256,20 @@ void SceneWIUtest::Update(double dt)
 	if (KeyboardController::GetInstance()->IsKeyDown('P'))
 		obblist[0].pos.y += static_cast<float>(dt) * SPEED;
 
-	//if (KeyboardController::GetInstance()->IsKeyDown('I'))
-	//	spherelist[1].pos.z -= static_cast<float>(dt) * SPEED;
-	//if (KeyboardController::GetInstance()->IsKeyDown('K'))
-	//	spherelist[1].pos.z += static_cast<float>(dt) * SPEED;
-	//if (KeyboardController::GetInstance()->IsKeyDown('J'))
-	//	spherelist[1].pos.x -= static_cast<float>(dt) * SPEED;
-	//if (KeyboardController::GetInstance()->IsKeyDown('L'))
-	//	spherelist[1].pos.x += static_cast<float>(dt) * SPEED;
-	//if (KeyboardController::GetInstance()->IsKeyDown('O'))
-	//	spherelist[1].pos.y -= static_cast<float>(dt) * SPEED;
-	//if (KeyboardController::GetInstance()->IsKeyDown('P'))
-	//	spherelist[1].pos.y += static_cast<float>(dt) * SPEED;
 
-	
-	std::vector<glm::vec3> obb_worldvertices = obblist[0].vertices;
+	obb_worldvertices = obblist[0].vertices;
 	obb_worldvertices = UpdateverticesinYaxis(obblist[0], obb_worldvertices);
-	//std::cout << obb_worldvertices[0].x << std::endl;
-	//std::cout << cube1_worldvertices[0].x << std::endl;
-		//std::cout << obblist[0].angleDeg << std::endl;
+	if (KeyboardController::GetInstance()->IsKeyPressed('T')) {
+		iter += 1;
+		if (iter > 8)
+			iter = iter % obblist[0].vertices.size();
+	}
+	std::cout << "Iter: " << iter << " " << obb_worldvertices[iter].x << " " << obb_worldvertices[iter].y << " " << obb_worldvertices[iter].z << std::endl;
 
 	if (KeyboardController::GetInstance()->IsKeyPressed('R')) {
-		obblist[0].angularVel += 20.f;
+		obblist[0].angularVel -= 10.f;
 	}
+
 
 	CollisionData cd;
 	if (OverlapAABB2AABB(cubelist[1], cubelist[1].boxextent, cubelist[0], cubelist[0].boxextent, cd)) 
@@ -370,15 +363,15 @@ void SceneWIUtest::Render()
 	RenderMesh(meshList[GEO_SPHERE], false);
 	modelStack.PopMatrix();
 
-	modelStack.PushMatrix();
-	modelStack.Scale(100.f, 1.f, 100.f);
-	modelStack.Rotate(-90.f, 1, 0, 0);
-	meshList[GEO_PLANE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-	meshList[GEO_PLANE]->material.kDiffuse = glm::vec3(0.5f,0.5f, 0.5f);
-	meshList[GEO_PLANE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	meshList[GEO_PLANE]->material.kShininess = 1.0f;
-	RenderMesh(meshList[GEO_PLANE], true);
-	modelStack.PopMatrix();
+	//modelStack.PushMatrix();
+	//modelStack.Scale(100.f, 1.f, 100.f);
+	//modelStack.Rotate(-90.f, 1, 0, 0);
+	//meshList[GEO_PLANE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+	//meshList[GEO_PLANE]->material.kDiffuse = glm::vec3(0.5f,0.5f, 0.5f);
+	//meshList[GEO_PLANE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	//meshList[GEO_PLANE]->material.kShininess = 1.0f;
+	//RenderMesh(meshList[GEO_PLANE], true);
+	//modelStack.PopMatrix();
 
 
 	for (int i = 0; i < cubelist.size(); i++) {
@@ -409,16 +402,34 @@ void SceneWIUtest::Render()
 	}
 
 	modelStack.PushMatrix();
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	modelStack.Translate(obblist[0].pos.x, obblist[0].pos.y, obblist[0].pos.z);
 	modelStack.Rotate(obblist[0].angleDeg, 0, 1, 0);
-	modelStack.Scale(1, 1, 1);
+	modelStack.Scale(2 * cubelist[0].boxextent.x, 2 * cubelist[0].boxextent.y, 2 * cubelist[0].boxextent.z);
 	meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
 	meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
 	meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
 	meshList[GEO_CUBE]->material.kShininess = 1.0f;
 	RenderMesh(meshList[GEO_CUBE], true);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	modelStack.PopMatrix();
 
+	for (int j = 0; j < obb_worldvertices.size(); j++) {
+		glm::vec3 diffuse, ambient; 
+		if (j == iter)
+			diffuse = ambient = glm::vec3(1.f, 0.1f, 0.1f);
+		else 
+			diffuse = ambient = glm::vec3(1.f, 1.f, 1.f);
+		modelStack.PushMatrix();
+		modelStack.Translate(obb_worldvertices[j].x, obb_worldvertices[j].y, obb_worldvertices[j].z);
+		modelStack.Scale(0.1, 0.1, 0.1);
+		meshList[GEO_SPHERE]->material.kAmbient = ambient;
+		meshList[GEO_SPHERE]->material.kDiffuse = diffuse;
+		meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+		meshList[GEO_SPHERE]->material.kShininess = 2.0f;
+		RenderMesh(meshList[GEO_SPHERE], true);
+		modelStack.PopMatrix();
+	}	
 
 	RenderTextOnScreen(meshList[GEO_TEXT], "Stamina", glm::vec3(0, 1, 0), 40, 0, 0);
 
