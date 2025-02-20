@@ -141,9 +141,24 @@ private:
 		float radius;
 		Sphere(int id, int r, int type) : radius(r), GameObject(id, type) {}
 	};
+	struct OBB : public GameObject {
+		std::vector<glm::vec3> vertices; 
+		OBB(int id, int type) : GameObject(id, type) {
+			vertices.push_back(glm::vec3(-1.5f, 1.5f, 1.5f));    // Vertex 0
+			vertices.push_back(glm::vec3(1.5f, 1.5f, 1.5f));    // Vertex 1
+			vertices.push_back(glm::vec3(-1.5f, -1.5f, 1.5f));    // Vertex 2
+			vertices.push_back(glm::vec3(1.5f, -1.5f, 1.5f));    // Vertex 3
+			vertices.push_back(glm::vec3(-1.5f, 1.5f, -1.5f));    // Vertex 4
+			vertices.push_back(glm::vec3(1.5f, 1.5f, -1.5f));    // Vertex 5
+			vertices.push_back(glm::vec3(-1.5f, -1.5f, -1.5f));    // Vertex 6
+			vertices.push_back(glm::vec3(1.5f, -1.5f, -1.5f));    // Vertex 7
+		}
+	};
+
 	bool activate = false;
 	std::vector<Cube> cubelist;
 	std::vector<Sphere> spherelist;	
+	std::vector<OBB> obblist;
 
 	void SortCube2Collide(std::vector<GameObject> GOlist, std::vector<Cube> maincubelist, std::vector<Cube>& newcubelist);
 	//void CubeCollisions(std::vector<Cube>& Cubelist, CollisionData cd);
