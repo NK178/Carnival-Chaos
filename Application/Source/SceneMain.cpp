@@ -318,6 +318,8 @@ void SceneMain::Update(double dt)
 		cubeList[i].UpdatePhysics(dt);
 	}
 
+	playerPointer->UpdatePhysics(dt);
+
 	float distance = glm::distance(camera.position, signPosition);
 	if (distance < 8.0f) 
 	{
