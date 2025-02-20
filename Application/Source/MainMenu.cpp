@@ -322,7 +322,6 @@ void MainMenu::Render()
 		RenderTextOnScreen(meshList[GEO_TITLE], "BACK", glm::vec3(1, 1, 1), 40, 50, 80);
 		RenderMeshOnScreen(meshList[GEO_UI], 120, 520, 20, 8);
 		RenderTextOnScreen(meshList[GEO_TITLE], "CREDITS", glm::vec3(1, 1, 0), 28, 30, 505);
-		RenderMeshOnScreen(meshList[GEO_UI], 195, 420, 5, 10);
 		RenderMeshOnScreen(meshList[GEO_UI], 520, 310, 50, 50);
 
 		if (isScrollUp) {
