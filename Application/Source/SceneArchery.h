@@ -104,6 +104,9 @@ public:
 
 private:
  
+
+ 
+
     struct Target : public GameObject {
         float radius;
         bool isHit;
@@ -151,13 +154,35 @@ private:
             currentTime = 0.0f;
         }
 
-        void StickToTarget(const glm::vec3& hitPos, const glm::vec3& normal) {
-            stuckPosition = hitPos;
-            targetNormal = normal;
+
+
+        void StickToTarget(const glm::vec3& hitPosition, const glm::vec3& surfaceNormal)
+        {
+            isActive = true;
             isStuck = true;
-            vel = glm::vec3(0);
-            m_totalForces = glm::vec3(0);
+            stuckPosition = hitPosition;
+
+            // Ensure the normal is valid
+            if (glm::length(surfaceNormal) < 0.0001f) {
+                std::cout << "Invalid Normal Detected! Defaulting to (0,1,0)" << std::endl;
+                targetNormal = glm::vec3(0, 1, 0);  // Default normal pointing up
+            }
+            else {
+                targetNormal = glm::normalize(surfaceNormal);
+            }
+
+            // Stop arrow movement
+            vel = glm::vec3(0, 0, 0);
+
+            std::cout << "Arrow Stuck at: " << stuckPosition.x << ", "
+                << stuckPosition.y << ", " << stuckPosition.z << std::endl;
+            std::cout << "Surface Normal: " << targetNormal.x << ", "
+                << targetNormal.y << ", " << targetNormal.z << std::endl;
         }
+
+
+
+
 
         void Update(float dt) {
             if (!isActive || isStuck) return;
@@ -222,11 +247,11 @@ private:
 
     std::vector<Target> targets;
 
-    static constexpr float TARGET_RADIUS = 15.0f;
-    static constexpr float TARGET_HEIGHT = 30.0f;  // Increased to match visual size
-    static constexpr float TARGET_WIDTH = 15.0f;   // Increased to match visual size
+    static constexpr float TARGET_RADIUS = 6.0f;
+    static constexpr float TARGET_HEIGHT = 12.0f;  // Increased to match visual size
+    static constexpr float TARGET_WIDTH = 12.0f;   // Increased to match visual size
     static constexpr float TARGET_DEPTH = 2.0f;    // Increased for better collision
-    static constexpr float ARROW_RADIUS = 0.8f;    // Increased for better hit detection
+    static constexpr float ARROW_RADIUS = 0.2f;    // Increased for better hit detection
 };
 
 #endif // SCENE_ARCHERY_H

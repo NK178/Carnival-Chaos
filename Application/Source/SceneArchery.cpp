@@ -378,7 +378,6 @@ void SceneArchery::FireArrow() {
 
 void SceneArchery::CheckArrowCollisions()
 {
-
 	for (auto& arrow : arrows) {
 		if (arrow.isActive && !arrow.isStuck) {
 			PhysicsObject arrowPhysics;
@@ -387,42 +386,66 @@ void SceneArchery::CheckArrowCollisions()
 			arrowPhysics.mass = arrow.mass;
 
 			for (auto& target : targets) {
-				PhysicsObject targetPhysics;
-				targetPhysics.pos = target.pos;
-				targetPhysics.mass = 0.0f;  // Immovable target
+				glm::vec3 targetPos = target.pos + glm::vec3(0, 10.0f, 3.0f);
 
-				glm::vec3 halfExtents(TARGET_WIDTH * 0.5f, TARGET_HEIGHT * 0.5f, TARGET_DEPTH * 0.5f);
-				glm::vec3 boxMin = target.pos - halfExtents;
-				glm::vec3 boxMax = target.pos + halfExtents;
+				float zoneScales[3] = {
+					0.3f,  // Inner zone (3 points)
+					0.6f,  // Middle zone (2 points)
+					1.0f   // Outer zone (1 point)
+				};
 
-				CollisionData cd;
+				int pointValues[3] = { 3, 2, 1 };
 
-				if (OverlapAABB2Sphere(arrowPhysics, ARROW_RADIUS, targetPhysics, boxMin, boxMax, cd)) {
-					m_playerScore++;
+				bool scored = false;  // Ensure only **one** score is applied per arrow
 
-					// Calculate hit position based on collision normal
-					glm::vec3 hitPosition = arrowPhysics.pos - (cd.normal * ARROW_RADIUS);
+				for (int i = 0; i < 3; ++i) {
+					if (scored) break;  // Stop checking if already scored
 
-					// Create a rotation matrix for random angle adjustment
-					float randomAngle = (rand() % 30 - 15) * 0.01f; // Small random angle in radians
-					glm::mat4 rotationMatrix = glm::rotate(
-						glm::mat4(1.0f),  // Start with identity matrix
-						randomAngle,       // Rotation angle in radians
-						glm::vec3(0, 1, 0) // Rotate around Y axis
+					float zoneWidth = TARGET_WIDTH * zoneScales[i];
+					float zoneHeight = TARGET_HEIGHT * zoneScales[i];
+
+					glm::vec3 halfExtents(
+						zoneWidth * 0.5f,
+						zoneHeight * 0.5f,
+						TARGET_DEPTH * 0.5f
 					);
 
-					// Apply rotation to the normal vector
-					glm::vec4 rotatedNormal = rotationMatrix * glm::vec4(cd.normal, 0.0f);
-					glm::vec3 adjustedNormal = glm::normalize(glm::vec3(rotatedNormal));
+					glm::vec3 boxMin = targetPos - halfExtents;
+					glm::vec3 boxMax = targetPos + halfExtents;
 
-					// Stick the arrow to the target
-					arrow.StickToTarget(hitPosition, adjustedNormal);
-					break;
+					PhysicsObject targetPhysics;
+					targetPhysics.pos = targetPos;
+					targetPhysics.mass = 0.0f;  // Immovable target
+
+					CollisionData cd;
+					if (OverlapAABB2Sphere(arrowPhysics, ARROW_RADIUS, targetPhysics, boxMin, boxMax, cd)) {
+						m_playerScore += pointValues[i];
+
+						// Ensure the normal is valid before using it
+						if (glm::length(cd.normal) > 0.0001f) {
+							glm::vec3 hitPosition = arrowPhysics.pos - (glm::normalize(cd.normal) * ARROW_RADIUS);
+							arrow.StickToTarget(hitPosition, glm::normalize(cd.normal));
+
+							// STOP the arrow from moving
+							arrow.vel = glm::vec3(0.0f);  // Set velocity to zero
+							arrow.isActive = true;  // Keep rendering the arrow
+							arrow.isStuck = true;   // Mark it as stuck
+
+							scored = true;  // Mark as scored and stop checking further zones
+						}
+						else {
+							std::cout << "Invalid collision normal detected! Skipping arrow stick logic." << std::endl;
+						}
+					}
+
 				}
 			}
 		}
 	}
 }
+
+
+
 
 void SceneArchery::Update(double dt)
 {
@@ -580,16 +603,44 @@ void SceneArchery::Render()
 	RenderMesh(meshList[GEO_PLANE], true);
 	modelStack.PopMatrix();
 
-	// Add this before rendering the regular targets in Render()
-	// Render collision boxes for targets
+	// Render collision boxes for targets with different zones
 	for (const auto& target : targets) {
-		modelStack.PushMatrix();
-		modelStack.Translate(target.pos.x, target.pos.y, target.pos.z);
-		modelStack.Scale(TARGET_WIDTH, TARGET_HEIGHT, TARGET_DEPTH);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);  // Enable wireframe
-		RenderMesh(meshList[GEO_QUAD], false);      // Render collision box
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);  // Reset to fill mode
-		modelStack.PopMatrix();
+		float zoneDepths[3] = {
+			TARGET_DEPTH * 0.25f,  // Closest zone (3 points)
+			TARGET_DEPTH * 0.5f,   // Middle zone (2 points)
+			TARGET_DEPTH * 0.75f   // Furthest zone (1 point)
+		};
+
+		glm::vec3 zoneColors[3] = {
+			glm::vec3(1, 0, 0),    // Red for highest points (closest)
+			glm::vec3(0, 1, 0),    // Green for middle points
+			glm::vec3(0, 0, 1)     // Blue for lowest points (furthest)
+		};
+
+		for (int i = 0; i < 3; ++i) {
+			modelStack.PushMatrix();
+			// Match the translation used in collision detection
+			modelStack.Translate(target.pos.x, target.pos.y + 10.0f, target.pos.z + 3);
+
+			// Apply the same rotations as the target
+			modelStack.Rotate(45.f, 1, 0, 0);
+			modelStack.Rotate(23.f, 0, 1, 0);
+			modelStack.Rotate(-15.f, 1, 0, 0);
+
+			// Scale based on zone depth
+			modelStack.Scale(TARGET_WIDTH, TARGET_HEIGHT, zoneDepths[i]);
+
+			// Set color for each zone
+			meshList[GEO_QUAD]->material.kAmbient = zoneColors[i];
+			meshList[GEO_QUAD]->material.kDiffuse = zoneColors[i];
+			meshList[GEO_QUAD]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+			meshList[GEO_QUAD]->material.kShininess = 1.0f;
+
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);  // Enable wireframe
+			RenderMesh(meshList[GEO_QUAD], false);      // Render collision box
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);  // Reset to fill mode
+			modelStack.PopMatrix();
+		}
 	}
 
 	// Render collision spheres for active arrows
@@ -660,19 +711,23 @@ void SceneArchery::Render()
 					arrows[i].stuckPosition.y,
 					arrows[i].stuckPosition.z
 				);
+				// Ensure the normal is valid before using it
+				if (glm::length(arrows[i].targetNormal) > 0.0001f) {
+					glm::vec3 defaultDir(0, 0, 1);  // Arrow's default forward direction
+					glm::vec3 targetDir = glm::normalize(arrows[i].targetNormal);
 
-				// Calculate rotation from normal vector
-				glm::vec3 defaultDir(0, 0, 1);  // Arrow's default forward direction
-				glm::vec3 targetDir = arrows[i].targetNormal;
+					// Clamp dot product to prevent NaN errors
+					float dotProduct = glm::dot(defaultDir, targetDir);
+					dotProduct = glm::clamp(dotProduct, -1.0f, 1.0f);
 
-				// Calculate rotation axis and angle
-				glm::vec3 rotAxis = glm::cross(defaultDir, targetDir);
-				float rotAngle = glm::acos(glm::dot(defaultDir, targetDir));
+					glm::vec3 rotAxis = glm::cross(defaultDir, targetDir);
+					float rotAngle = glm::acos(dotProduct);
 
-				// Apply rotation
-				if (glm::length(rotAxis) > 0.001f) {
-					modelStack.Rotate(glm::degrees(rotAngle), rotAxis.x, rotAxis.y, rotAxis.z);
+					if (glm::length(rotAxis) > 0.001f) {
+						modelStack.Rotate(glm::degrees(rotAngle), rotAxis.x, rotAxis.y, rotAxis.z);
+					}
 				}
+
 			}
 			else {
 				// If flying, use current physics position
@@ -719,7 +774,7 @@ void SceneArchery::Render()
 	RenderMesh(meshList[GEO_CARPET], true);
 	modelStack.PopMatrix();
 
-	
+
 	RenderSkyBox();
 
 	// Render vertical line of crosshair
