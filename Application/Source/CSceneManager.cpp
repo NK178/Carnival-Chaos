@@ -9,8 +9,8 @@
 
 void CSceneManager::Init() {
     // Initialize with first scene
-    activeScene = new SceneArchery();
-    currentSceneType = SCENE_MAIN_MENU;
+    activeScene = new SceneBalloonPop();
+    currentSceneType = SCENE_BALLOONPOP;
     activeScene->Init();
 }
 

@@ -42,6 +42,17 @@ SceneBalloonPop::SceneBalloonPop() :
 	for (int i = 0; i < U_TOTAL; ++i) {
 		m_parameters[i] = 0;
 	}
+
+	// Initialize game variables
+	gameTimer = GAME_TIME_LIMIT;
+	playerScore = 0;
+	gameOver = false;
+	spawnTimer = 0.0f;
+
+	// Spawn initial balloons
+	for (int i = 0; i < 5; ++i) {
+		SpawnBalloon();
+	}
 }
 
 SceneBalloonPop::~SceneBalloonPop()
@@ -176,6 +187,12 @@ void SceneBalloonPop::Init()
 		"Models//uploads_files_4008356_GiftBox_obj.obj");
 	meshList[GEO_PRESENT]->textureID = LoadTGA("Images//present.tga");
 
+	meshList[GEO_BALLOON] = MeshBuilder::GenerateOBJ("Balloon",
+		"Models//Balloon.obj");
+	meshList[GEO_BALLOON]->textureID = LoadTGA("Images//BalloonAlbedo.tga");
+
+	meshList[GEO_CROSSHAIR] = MeshBuilder::GenerateQuad("Crosshair", glm::vec3(1, 1, 1), 1.f);
+
 	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 1000.0f);
 	projectionStack.LoadMatrix(projection);
 
@@ -255,32 +272,123 @@ void SceneBalloonPop::Init()
 void SceneBalloonPop::Update(double dt)
 {
 	HandleKeyPress();
+	if (!gameOver) {
+		// Update game timer
+		gameTimer -= static_cast<float>(dt);
+		if (gameTimer <= 0 && playerScore < WIN_SCORE) {
+			gameOver = true;
+			return;
+		}
 
-	/*if (KeyboardController::GetInstance()->IsKeyDown('I'))
-		light[0].position.z -= static_cast<float>(dt) * 5.f;
-	if (KeyboardController::GetInstance()->IsKeyDown('K'))
-		light[0].position.z += static_cast<float>(dt) * 5.f;
-	if (KeyboardController::GetInstance()->IsKeyDown('J'))
-		light[0].position.x -= static_cast<float>(dt) * 5.f;
-	if (KeyboardController::GetInstance()->IsKeyDown('L'))
-		light[0].position.x += static_cast<float>(dt) * 5.f;
-	if (KeyboardController::GetInstance()->IsKeyDown('O'))
-		light[0].position.y -= static_cast<float>(dt) * 5.f;
-	if (KeyboardController::GetInstance()->IsKeyDown('P'))
-		light[0].position.y += static_cast<float>(dt) * 5.f;*/
+		// Update spawn timer
+		spawnTimer -= static_cast<float>(dt);
+		if (spawnTimer <= 0) {
+			SpawnBalloon();
+			spawnTimer = SPAWN_INTERVAL;
+		}
 
-		//light[0].spotDirection = -glm::normalize (camera.target - camera.pos);
-		//light[0].position = camera.pos;
+		for (auto& balloon : balloons) {
+			if (!balloon.isPopped) {
+				// Basic upward force
+				balloon.physics.AddForce(glm::vec3(0, BALLOON_UP_FORCE, 0));
 
-		/*if (MouseController::GetInstance()->IsButtonPressed(GLFW_MOUSE_BUTTON_LEFT))
-		{
-				CSceneManager::GetInstance().ChangeScene(CSceneManager::SCENE_ARCHERY);
-				std::cout << "Scene change called!" << std::endl;
+				// Add sine wave motion to create floating effect
+				float time = static_cast<float>(glfwGetTime());
+				float wobbleX = BALLOON_WOBBLE_FORCE * sin(time + balloon.timeAlive);
+				float wobbleZ = BALLOON_WOBBLE_FORCE * cos(time * 0.5f + balloon.timeAlive);
 
-		}*/
+				// Add wobble forces
+				balloon.physics.AddForce(glm::vec3(wobbleX, 0, wobbleZ));
+
+				// Add rightward force that varies with height
+				float rightForce = BALLOON_RIGHT_FORCE * (1.0f + 0.5f * sin(time * 2.0f + balloon.timeAlive));
+				balloon.physics.AddForce(glm::vec3(rightForce, 0, 0));
+
+				// Random movement to prevent synchronization
+				float randX = (rand() % 200 - 100) / 100.0f; // Random value between -1 and 1
+				float randZ = (rand() % 200 - 100) / 100.0f;
+				balloon.physics.AddForce(glm::vec3(randX, 0, randZ));
+
+				// Update balloon's time alive
+				balloon.timeAlive += static_cast<float>(dt);
+
+				// Wall repulsion forces 
+				const float WALL_REPULSION = 500.0f;
+				const float BOUNCE_FACTOR = 1.7f;
+
+				// X-axis walls
+				if (balloon.physics.pos.x < -120.0f) {
+					balloon.physics.pos.x = -120.0f;
+					balloon.physics.vel.x *= -BOUNCE_FACTOR;
+					balloon.physics.AddForce(glm::vec3(WALL_REPULSION, 0, 0));  // Strong push right
+				}
+				if (balloon.physics.pos.x > 120.0f) {
+					balloon.physics.pos.x = 120.0f;
+					balloon.physics.vel.x *= -BOUNCE_FACTOR;
+					balloon.physics.AddForce(glm::vec3(-WALL_REPULSION, 0, 0));  // Strong push left
+				}
+
+				// Z-axis walls
+				if (balloon.physics.pos.z < -120.0f) {
+					balloon.physics.pos.z = -120.0f;
+					balloon.physics.vel.z *= -BOUNCE_FACTOR;
+					balloon.physics.AddForce(glm::vec3(0, 0, WALL_REPULSION));  // Strong push forward
+				}
+				if (balloon.physics.pos.z > 120.0f) {
+					balloon.physics.pos.z = 120.0f;
+					balloon.physics.vel.z *= -BOUNCE_FACTOR;
+					balloon.physics.AddForce(glm::vec3(0, 0, -WALL_REPULSION));  // Strong push back
+				}
+
+				// Ceiling behavior
+				if (balloon.physics.pos.y > CEILING_HEIGHT) {
+					balloon.physics.pos.y = CEILING_HEIGHT;
+					balloon.physics.vel.y *= -0.5f;
+					balloon.physics.AddForce(glm::vec3(0, -10.0f, 0));  // Push down from ceiling
+				}
+
+				// Update physics
+				balloon.physics.UpdatePhysics(static_cast<float>(dt));
+
+				// More gentle damping to maintain movement
+				balloon.physics.vel *= 0.99f;
+			}
+		}
+
+		// Mouse click handling
+		if (MouseController::GetInstance()->IsButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
+			glm::vec3 rayDir = glm::normalize(camera.target - camera.pos);
+			for (auto& balloon : balloons) {
+				if (!balloon.isPopped) {
+					glm::vec3 toBalloon = balloon.physics.pos - camera.pos;
+					float dotProduct = glm::dot(toBalloon, rayDir);
+					glm::vec3 projection = rayDir * dotProduct;
+					glm::vec3 closestPoint = camera.pos + projection;
+
+					if (glm::length(balloon.physics.pos - closestPoint) < 2.0f) {
+						balloon.isPopped = true;
+						playerScore++;
+						if (playerScore >= WIN_SCORE) {
+							gameOver = true;
+						}
+					}
+				}
+			}
+		}
+	}
+	else {
+		if (KeyboardController::GetInstance()->IsKeyPressed('R')) {
+			gameTimer = GAME_TIME_LIMIT;
+			playerScore = 0;
+			gameOver = false;
+			balloons.clear();
+			for (int i = 0; i < 5; ++i) {
+				SpawnBalloon();
+			}
+		}
+	}
 
 	camera.Update(dt);
-
 }
 
 void SceneBalloonPop::Render()
@@ -657,9 +765,54 @@ void SceneBalloonPop::Render()
 	modelStack.PopMatrix();
 
 
+
+
+
+	// Render all balloons
+	for (const auto& balloon : balloons) {
+		if (!balloon.isPopped) {
+			modelStack.PushMatrix();
+			modelStack.Translate(
+				balloon.physics.pos.x,
+				balloon.physics.pos.y,
+				balloon.physics.pos.z
+			);
+			modelStack.Scale(1.5f, 1.5f, 1.5f);
+			meshList[GEO_BALLOON]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+			meshList[GEO_BALLOON]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+			meshList[GEO_BALLOON]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+			meshList[GEO_BALLOON]->material.kShininess = 1.0f;
+			RenderMesh(meshList[GEO_BALLOON], true);
+			modelStack.PopMatrix();
+		}
+	}
+
+	
 	/*RenderTextOnScreen(meshList[GEO_TEXT], "Stamina", glm::vec3(0, 1, 0), 40, 0, 0);*/
 
 	RenderSkyBox();
+
+
+
+	// Render UI
+	std::string scoreText = "Score: " + std::to_string(playerScore) + "/" + std::to_string(WIN_SCORE);
+	RenderTextOnScreen(meshList[GEO_TEXT], scoreText, glm::vec3(1, 1, 0), 25, 10, 550);
+
+	std::string timeText = "Time: " + std::to_string(static_cast<int>(gameTimer));
+	RenderTextOnScreen(meshList[GEO_TEXT], timeText, glm::vec3(1, 1, 1), 25, 10, 520);
+
+	if (gameOver) {
+		std::string gameOverText = playerScore >= WIN_SCORE ? "You Win!" : "Game Over!";
+		RenderTextOnScreen(meshList[GEO_TEXT], gameOverText, glm::vec3(1, 0, 0), 40, 300, 300);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Press R to Restart", glm::vec3(1, 1, 1), 25, 300, 250);
+	}
+
+	// Render vertical line of crosshair
+	RenderMeshOnScreen(meshList[GEO_CROSSHAIR], 400, 300, 2, 20);  // Thin vertical line
+	// Render horizontal line of crosshair
+	RenderMeshOnScreen(meshList[GEO_CROSSHAIR], 400, 300, 20, 2);  // Thin horizontal line
+
+
 }
 
 void SceneBalloonPop::RenderMesh(Mesh* mesh, bool enableLight)
