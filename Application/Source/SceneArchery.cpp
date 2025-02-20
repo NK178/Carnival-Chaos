@@ -300,6 +300,19 @@ void SceneArchery::Init()
 
 	enableLight = true;
 
+	for (int i = 0; i < MAX_ARROWS; ++i) {
+		arrows.push_back(Arrow(i));  // i is used as the ID for each arrow
+	}
+
+	// Center target
+	targets.push_back(Target(0, glm::vec3(0, 0, -40), TARGET_RADIUS));
+
+	// Right target
+	targets.push_back(Target(1, glm::vec3(20, 0, -30), TARGET_RADIUS));
+
+	// Left target
+	targets.push_back(Target(2, glm::vec3(-20, 0, -20), TARGET_RADIUS));
+
 
 }
 
@@ -365,31 +378,45 @@ void SceneArchery::FireArrow() {
 
 void SceneArchery::CheckArrowCollisions()
 {
-	struct TargetInfo {
-		glm::vec3 position;
-		glm::vec3 normal;
-		float radius;
-	};
 
-	TargetInfo targetPositions[3] = {
-		{glm::vec3(0, 0, -40), glm::vec3(0, 1, 0), 15.0f},
-		{glm::vec3(20, 0, -30), glm::vec3(0, 1, 0), 15.0f},
-		{glm::vec3(-20, 0, -20), glm::vec3(0, 1, 0), 15.0f}
-	};
+	for (auto& arrow : arrows) {
+		if (arrow.isActive && !arrow.isStuck) {
+			PhysicsObject arrowPhysics;
+			arrowPhysics.pos = arrow.pos;
+			arrowPhysics.vel = arrow.vel;
+			arrowPhysics.mass = arrow.mass;
 
-	for (int i = 0; i < MAX_ARROWS; ++i) {
-		if (arrows[i].isActive && !arrows[i].isStuck) {
-			for (int j = 0; j < 3; ++j) {
-				float distance = glm::length(arrows[i].pos - targetPositions[j].position);
+			for (auto& target : targets) {
+				PhysicsObject targetPhysics;
+				targetPhysics.pos = target.pos;
+				targetPhysics.mass = 0.0f;  // Immovable target
 
-				if (distance < targetPositions[j].radius) {
-					// Increment score when arrow hits target
+				glm::vec3 halfExtents(TARGET_WIDTH * 0.5f, TARGET_HEIGHT * 0.5f, TARGET_DEPTH * 0.5f);
+				glm::vec3 boxMin = target.pos - halfExtents;
+				glm::vec3 boxMax = target.pos + halfExtents;
+
+				CollisionData cd;
+
+				if (OverlapAABB2Sphere(arrowPhysics, ARROW_RADIUS, targetPhysics, boxMin, boxMax, cd)) {
 					m_playerScore++;
 
-					arrows[i].StickToTarget(
-						targetPositions[j].position,
-						targetPositions[j].normal
+					// Calculate hit position based on collision normal
+					glm::vec3 hitPosition = arrowPhysics.pos - (cd.normal * ARROW_RADIUS);
+
+					// Create a rotation matrix for random angle adjustment
+					float randomAngle = (rand() % 30 - 15) * 0.01f; // Small random angle in radians
+					glm::mat4 rotationMatrix = glm::rotate(
+						glm::mat4(1.0f),  // Start with identity matrix
+						randomAngle,       // Rotation angle in radians
+						glm::vec3(0, 1, 0) // Rotate around Y axis
 					);
+
+					// Apply rotation to the normal vector
+					glm::vec4 rotatedNormal = rotationMatrix * glm::vec4(cd.normal, 0.0f);
+					glm::vec3 adjustedNormal = glm::normalize(glm::vec3(rotatedNormal));
+
+					// Stick the arrow to the target
+					arrow.StickToTarget(hitPosition, adjustedNormal);
 					break;
 				}
 			}
@@ -553,7 +580,34 @@ void SceneArchery::Render()
 	RenderMesh(meshList[GEO_PLANE], true);
 	modelStack.PopMatrix();
 
+	// Add this before rendering the regular targets in Render()
+	// Render collision boxes for targets
+	for (const auto& target : targets) {
+		modelStack.PushMatrix();
+		modelStack.Translate(target.pos.x, target.pos.y, target.pos.z);
+		modelStack.Scale(TARGET_WIDTH, TARGET_HEIGHT, TARGET_DEPTH);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);  // Enable wireframe
+		RenderMesh(meshList[GEO_QUAD], false);      // Render collision box
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);  // Reset to fill mode
+		modelStack.PopMatrix();
+	}
+
+	// Render collision spheres for active arrows
+	for (const auto& arrow : arrows) {
+		if (arrow.isActive && !arrow.isStuck) {
+			modelStack.PushMatrix();
+			modelStack.Translate(arrow.pos.x, arrow.pos.y, arrow.pos.z);
+			modelStack.Scale(ARROW_RADIUS * 2, ARROW_RADIUS * 2, ARROW_RADIUS * 2);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);  // Enable wireframe
+			RenderMesh(meshList[GEO_SPHERE], false);    // Render collision sphere
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);  // Reset to fill mode
+			modelStack.PopMatrix();
+		}
+	}
+
+
 	modelStack.PushMatrix();
+	/*glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);*/
 	modelStack.Translate(0, 0, -40);
 	modelStack.Rotate(45.f, 1, 0, 0);
 	modelStack.Rotate(23.f, 0, 1, 0);
@@ -564,6 +618,7 @@ void SceneArchery::Render()
 	meshList[GEO_TARGET]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
 	meshList[GEO_TARGET]->material.kShininess = 1.0f;
 	RenderMesh(meshList[GEO_TARGET], true);
+	/*glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);*/
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
@@ -593,19 +648,31 @@ void SceneArchery::Render()
 	modelStack.PopMatrix();
 
 
-	// Render all active arrows
+	// In the arrow rendering section, modify this part:
 	for (int i = 0; i < MAX_ARROWS; ++i) {
 		if (arrows[i].isActive) {
 			modelStack.PushMatrix();
 
-			// Translate to arrow's current position
 			if (arrows[i].isStuck) {
-				// If stuck, use the stuck position
+				// If stuck, use the stuck position and orient along normal
 				modelStack.Translate(
 					arrows[i].stuckPosition.x,
 					arrows[i].stuckPosition.y,
 					arrows[i].stuckPosition.z
 				);
+
+				// Calculate rotation from normal vector
+				glm::vec3 defaultDir(0, 0, 1);  // Arrow's default forward direction
+				glm::vec3 targetDir = arrows[i].targetNormal;
+
+				// Calculate rotation axis and angle
+				glm::vec3 rotAxis = glm::cross(defaultDir, targetDir);
+				float rotAngle = glm::acos(glm::dot(defaultDir, targetDir));
+
+				// Apply rotation
+				if (glm::length(rotAxis) > 0.001f) {
+					modelStack.Rotate(glm::degrees(rotAngle), rotAxis.x, rotAxis.y, rotAxis.z);
+				}
 			}
 			else {
 				// If flying, use current physics position
@@ -614,6 +681,19 @@ void SceneArchery::Render()
 					arrows[i].pos.y,
 					arrows[i].pos.z
 				);
+
+				// Get velocity direction and normalize it
+				glm::vec3 velocity = arrows[i].vel;
+				glm::vec3 direction = glm::normalize(velocity);
+
+				// Only calculate pitch (up/down rotation)
+				float pitch = atan2(direction.y, sqrt(direction.x * direction.x + direction.z * direction.z));
+				modelStack.Rotate(glm::degrees(pitch), 1, 0, 0);
+
+				// Initial forward direction based on camera
+				glm::vec3 forward = glm::normalize(camera.target - camera.position);
+				float initialYaw = atan2(forward.x, forward.z);
+				modelStack.Rotate(glm::degrees(initialYaw), 0, 1, 0);
 			}
 
 			// Scale and render arrow mesh
@@ -706,6 +786,11 @@ void SceneArchery::Render()
 		glm::vec3(1, 0, 0),  // Red color
 		25,                   // Size
 		10, 30);             // Position (x,y)
+
+
+
+
+
 }
 
 void SceneArchery::RenderMesh(Mesh* mesh, bool enableLight)

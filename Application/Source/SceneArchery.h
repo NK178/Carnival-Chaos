@@ -9,6 +9,7 @@
 #include "Light.h"
 #include "CSceneManager.h"
 #include "GameObject.h"
+#include "CollisionDetection.h"
 #include <iostream>
 
 class SceneArchery : public Scene
@@ -103,23 +104,27 @@ public:
 
 private:
  
+    struct Target : public GameObject {
+        float radius;
+        bool isHit;
+
+        Target(int id, const glm::vec3& position, float rad) : GameObject(id, GameObject::CUBE) {
+            pos = position;
+            radius = rad;
+            isHit = false;
+        }
+    };
+
     struct Arrow : public GameObject {
         float lifetime{ 5.0f };
         float currentTime{ 0.0f };
         bool isActive{ false };
         bool isStuck{ false };
+        float radius{ 0.5f };  // Collision radius for arrow
         glm::vec3 stuckPosition{ 0.0f, 0.0f, 0.0f };
         glm::vec3 targetNormal{ 0.0f, 0.0f, 0.0f };
 
-        // Constructor that calls GameObject's constructor with required parameters
-        Arrow() : GameObject(0, 1) {  // Using default ID=0 and type=1 for arrows
-            mass = 0.4f;
-            bounciness = 0.2f;
-            accel = glm::vec3(0, -9.8f, 0);
-        }
-
-        // Constructor with specific ID
-        Arrow(int id) : GameObject(id, 1) {  // type=1 for arrows
+        Arrow(int id) : GameObject(id, GameObject::SPHERE) {  // Changed to SPHERE for collision
             mass = 0.4f;
             bounciness = 0.2f;
             accel = glm::vec3(0, -9.8f, 0);
@@ -176,13 +181,12 @@ private:
     int m_arrowsLeft;     // Track remaining arrows
     int m_playerScore;    // Track player's score
 
-    static const int MAX_ARROWS = 10;
-
     // Utility methods
     void HandleKeyPress();
     void RenderMesh(Mesh* mesh, bool enableLight);
     bool OverlapAABB2AABB(glm::vec3 Obj1, const int Width1, const int Height1,
         glm::vec3 Obj2, const int Width2, const int Height2);
+   
     void RenderMeshOnScreen(Mesh* mesh, float x, float y, float sizex, float sizey);
     void RenderText(Mesh* mesh, std::string text, glm::vec3 color);
     void RenderTextOnScreen(Mesh* mesh, std::string text, glm::vec3 color, float size, float x, float y);
@@ -213,7 +217,16 @@ private:
     Application app;
 
     // Arrow array
-    Arrow arrows[MAX_ARROWS];
+    std::vector<Arrow> arrows;
+    static const int MAX_ARROWS = 10;
+
+    std::vector<Target> targets;
+
+    static constexpr float TARGET_RADIUS = 15.0f;
+    static constexpr float TARGET_HEIGHT = 30.0f;  // Increased to match visual size
+    static constexpr float TARGET_WIDTH = 15.0f;   // Increased to match visual size
+    static constexpr float TARGET_DEPTH = 2.0f;    // Increased for better collision
+    static constexpr float ARROW_RADIUS = 0.8f;    // Increased for better hit detection
 };
 
 #endif // SCENE_ARCHERY_H
