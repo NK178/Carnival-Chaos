@@ -126,7 +126,6 @@ void SceneSpinningRing::Init()
 	meshList[GEO_PLANE]->textureID = LoadTGA("Images//grass.tga");
 	meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("STAMINA_BAR", glm::vec3(1, 1, 1), 1.f);
 	meshList[GEO_CUBE] = MeshBuilder::GenerateCube("Cube", glm::vec3(1, 1, 1), 1.f);
-	meshList[GEO_CUBE]->textureID = LoadTGA("Images//lava.tga");
 	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Sphere", glm::vec3(1, 1, 1), 1.f);
 
 	meshList[GEO_LEFT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
@@ -218,15 +217,102 @@ void SceneSpinningRing::Init()
 	glUniform1f(m_parameters[U_LIGHT2_EXPONENT], light[2].exponent);
 
 	enableLight = true;
+
+	cubelist.push_back(Cube(1,GameObject::CUBE));
+	cubelist.push_back(Cube(2,GameObject::CUBE));
+	cubelist[0].pos = glm::vec3{ 3,3,4 };
+	cubelist[1].pos = glm::vec3{ 15,3,4 };
+	cubelist[0].mass = 0.f;
+
+	spherelist.push_back(Sphere(3,2.f,GameObject::SPHERE));
+	spherelist.push_back(Sphere(4,2.f,GameObject::SPHERE));
+	spherelist[0].pos = glm::vec3{ -15,3,15 };
+	spherelist[1].pos = glm::vec3{ -15,3,0 };
+	spherelist[1].mass = 0.f;
+
+
 }
 
 void SceneSpinningRing::Update(double dt)
 {
+	////imagine size 25 by 25, with position 0,0
+	//CTree tree(50,50,0,0);
+
+	////input all ur GOs
+	//for (int i = 0; i < cubelist.size(); i++) {
+	//	tree.AddGO(cubelist[i]);
+	//}
+	////for (int i = 0; i < spherelist.size(); i++) {
+	////	tree.AddGO(spherelist[i]);
+	////}
+	////Do the quad splitting
+	//if (tree.limit.size() > 1)
+	//	tree.CreateQuads();
+	//CollisionData cd;
+	//std::vector<int> idlist;
+	////eg check collision with cube 1
+	//tree.CheckCollisionWNearbyGOs(cubelist[1].GetID(), idlist);
+	//CubeCollisions(idlist,cubelist, cd);
+	//std::cout << tree.targettype << std::endl;
+
 	HandleKeyPress();
+	const float SPEED = 15.f;
+	if (KeyboardController::GetInstance()->IsKeyDown('I'))
+		cubelist[1].pos.z -= static_cast<float>(dt) * SPEED;
+	if (KeyboardController::GetInstance()->IsKeyDown('K'))
+		cubelist[1].pos.z += static_cast<float>(dt) * SPEED;
+	if (KeyboardController::GetInstance()->IsKeyDown('J'))
+		cubelist[1].pos.x -= static_cast<float>(dt) * SPEED;
+	if (KeyboardController::GetInstance()->IsKeyDown('L'))
+		cubelist[1].pos.x += static_cast<float>(dt) * SPEED;
+	if (KeyboardController::GetInstance()->IsKeyDown('O'))
+		cubelist[1].pos.y -= static_cast<float>(dt) * SPEED;
+	if (KeyboardController::GetInstance()->IsKeyDown('P'))
+		cubelist[1].pos.y += static_cast<float>(dt) * SPEED;
+
+	//if (KeyboardController::GetInstance()->IsKeyDown('I'))
+	//	spherelist[1].pos.z -= static_cast<float>(dt) * SPEED;
+	//if (KeyboardController::GetInstance()->IsKeyDown('K'))
+	//	spherelist[1].pos.z += static_cast<float>(dt) * SPEED;
+	//if (KeyboardController::GetInstance()->IsKeyDown('J'))
+	//	spherelist[1].pos.x -= static_cast<float>(dt) * SPEED;
+	//if (KeyboardController::GetInstance()->IsKeyDown('L'))
+	//	spherelist[1].pos.x += static_cast<float>(dt) * SPEED;
+	//if (KeyboardController::GetInstance()->IsKeyDown('O'))
+	//	spherelist[1].pos.y -= static_cast<float>(dt) * SPEED;
+	//if (KeyboardController::GetInstance()->IsKeyDown('P'))
+	//	spherelist[1].pos.y += static_cast<float>(dt) * SPEED;
+
 
 	CollisionData cd;
+	if (OverlapAABB2AABB(cubelist[1], cubelist[1].boxextent, cubelist[0], cubelist[0].boxextent, cd)) 
+		ResolveCollision(cd);
+	
+	if (OverlapSphere2Sphere(spherelist[1], spherelist[1].radius, spherelist[0], spherelist[0].radius, cd)) 
+		ResolveCollision(cd);
+	
+	if (OverlapAABB2Sphere(spherelist[1], spherelist[1].radius, cubelist[1], cubelist[1].pos - cubelist[1].boxextent, cubelist[1].pos + cubelist[1].boxextent, cd))
+		ResolveCollision(cd);
 
+	cubelist[1].angularVel = 20.f;
+	if (KeyboardController::GetInstance()->IsKeyPressed('G')) {
+		if (!activate)
+			activate = true;
+		else
+			activate = false;
+	}
+	if (activate)
+		cubelist[1].AddForce(glm::vec3{ 0,-1,0 } *10.f);
+
+
+	for (int i = 0; i < cubelist.size(); i++) {
+		cubelist[i].UpdatePhysics(dt);
+	}
+	for (int i = 0; i < spherelist.size(); i++) {
+		spherelist[i].UpdatePhysics(dt);
+	}
 	camera.Update(dt);
+
 }
 
 void SceneSpinningRing::Render()
@@ -274,9 +360,10 @@ void SceneSpinningRing::Render()
 		}
 	}
 
-	//modelStack.PushMatrix();
-	//RenderMesh(meshList[GEO_AXES], false);
-	//modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	RenderMesh(meshList[GEO_AXES], false);
+	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
 	modelStack.Translate(light[0].position.x, light[0].position.y, light[0].position.z);
@@ -285,9 +372,67 @@ void SceneSpinningRing::Render()
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Scale(10.f, 10.f, 10.f);
-	RenderMesh(meshList[GEO_CUBE], false);
+	modelStack.Scale(100.f, 1.f, 100.f);
+	modelStack.Rotate(-90.f, 1, 0, 0);
+	meshList[GEO_PLANE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+	meshList[GEO_PLANE]->material.kDiffuse = glm::vec3(0.5f,0.5f, 0.5f);
+	meshList[GEO_PLANE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_PLANE]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_PLANE], true);
 	modelStack.PopMatrix();
+
+
+	for (int i = 0; i < cubelist.size(); i++) {
+		modelStack.PushMatrix();
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		modelStack.Translate(cubelist[i].pos.x, cubelist[i].pos.y, cubelist[i].pos.z);
+		modelStack.Rotate(cubelist[i].angleDeg, 0, 1, 0);
+		modelStack.Scale(2*cubelist[i].boxextent.x, 2*cubelist[i].boxextent.y, 2*cubelist[i].boxextent.z);
+		meshList[GEO_CUBE]->material.kAmbient = glm::vec3(1.f, 0.1f, 0.1f);
+		meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(1.f, 0.1f, 0.1f);
+		meshList[GEO_CUBE]->material.kSpecular = glm::vec3(1.f, 0.2f, 0.2f);
+		meshList[GEO_CUBE]->material.kShininess = 2.0f;
+		RenderMesh(meshList[GEO_CUBE], true);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		modelStack.PopMatrix();
+	}
+
+	for (int i = 0; i < spherelist.size(); i++) {
+		modelStack.PushMatrix();
+		modelStack.Translate(spherelist[i].pos.x, spherelist[i].pos.y, spherelist[i].pos.z);
+		modelStack.Scale(spherelist[i].radius, spherelist[i].radius, spherelist[i].radius);
+		meshList[GEO_SPHERE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+		meshList[GEO_SPHERE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+		meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+		meshList[GEO_SPHERE]->material.kShininess = 1.0f;
+		RenderMesh(meshList[GEO_SPHERE], true);
+		modelStack.PopMatrix();
+	}
+
+
+	modelStack.PushMatrix();
+	modelStack.Translate(25,3,25);
+	modelStack.Scale(1,1,1);
+	meshList[GEO_SPHERE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+	meshList[GEO_SPHERE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_SPHERE]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_SPHERE], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(0, 3, 0);
+	modelStack.Scale(1, 1, 1);
+	meshList[GEO_SPHERE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+	meshList[GEO_SPHERE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_SPHERE]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_SPHERE], true);
+	modelStack.PopMatrix();
+
+
+
+	RenderTextOnScreen(meshList[GEO_TEXT], "Stamina", glm::vec3(0, 1, 0), 40, 0, 0);
 
 	RenderSkyBox();
 }
@@ -604,3 +749,17 @@ void SceneSpinningRing::SortCube2Collide(std::vector<GameObject> GOlist, std::ve
 		}
 	}
 }
+
+//void SceneSpinningRing::CubeCollisions(std::vector<Cube>& Cubelist, CollisionData cd)
+//{
+//	//Filter out the correct GOs (includes filtering the correct GO types)
+//	for (int i = 0; i < Cubelist.size() - 1; ++i) {
+//		for (int j = i + 1; j < Cubelist.size(); ++j) {
+//			if (OverlapAABB2AABB(Cubelist[i], Cubelist[i].boxextent, Cubelist[j], Cubelist[j].boxextent, cd)) {
+//				ResolveCollision(cd);
+//			}
+//		}
+//	}
+
+//}
+

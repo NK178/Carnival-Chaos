@@ -13,7 +13,7 @@
 
 #include "SceneWIUtest.h"
 #include "SceneMain.h"
-#include "SceneSpinningRing.h"
+//#include "SceneSpinningRing.h"
 #include "MainMenu.h"
 #include "KeyboardController.h"
 #include "MouseController.h"

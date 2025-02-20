@@ -3,7 +3,7 @@
 #include "SceneWIUtest.h"
 #include "SceneArchery.h"
 #include "SceneMain.h"
-#include "SceneSpinningRing.h"
+//#include "SceneSpinningRing.h"
 #include "MainMenu.h"
 // Include other scene headers
 
@@ -68,7 +68,7 @@ void CSceneManager::ChangeScene(SCENE_TYPE newScene) {
         std::cout << "In Archery!" << std::endl;
         break;
     case SCENE_SPINNING_RING:
-        scene = new SceneSpinningRing();
+        //scene = new SceneSpinningRing();
         break;
     case SCENE_CARNIVAL:
         scene = new SceneMain();
