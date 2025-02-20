@@ -125,7 +125,7 @@ void SceneHole::Init()
 		m_parameters[U_MATERIAL_SHININESS]);
 
 	// Initialise camera properties
-	camera.Init(glm::vec3(-150, 3, -10), glm::vec3(1, 1, 0), glm::vec3(0, 1, 0));
+	camera.Init(glm::vec3(-150, 3, -10), glm::vec3(1, 0, 0), glm::vec3(0, 1, 0));
 
 	// Init VBO here
 	for (int i = 0; i < NUM_GEOMETRY; ++i)
@@ -161,6 +161,12 @@ void SceneHole::Init()
 
 	meshList[GEO_HWALL2] = MeshBuilder::GenerateHWall2("HWall2", glm::vec3(1.f, 1.f, 1.f));
 	meshList[GEO_HWALL2]->textureID = LoadTGA("Images//floorcircus.tga");
+
+	meshList[GEO_HWALL3] = MeshBuilder::GenerateHWall3("HWall3", glm::vec3(1.f, 1.f, 1.f));
+	meshList[GEO_HWALL3]->textureID = LoadTGA("Images//floorcircus.tga");
+
+	meshList[GEO_HWALL4] = MeshBuilder::GenerateHWall4("HWall4", glm::vec3(1.f, 1.f, 1.f));
+	meshList[GEO_HWALL4]->textureID = LoadTGA("Images//floorcircus.tga");
 
 	// 16 x 16 is the number of columns and rows for the text
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
@@ -388,6 +394,20 @@ void SceneHole::Render()
 	modelStack.Scale(10.f, 2.f, 2.f);
 	modelStack.Rotate(90.f, 0, 1, 0);
 	RenderMesh(meshList[GEO_HWALL2], false);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(wallDisp + 400, -3, 0);
+	modelStack.Scale(10.f, 2.f, 2.f);
+	modelStack.Rotate(90.f, 0, 1, 0);
+	RenderMesh(meshList[GEO_HWALL3], false);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(wallDisp + 600, -3, 0);
+	modelStack.Scale(10.f, 2.f, 2.f);
+	modelStack.Rotate(90.f, 0, 1, 0);
+	RenderMesh(meshList[GEO_HWALL4], false);
 	modelStack.PopMatrix();
 
 
