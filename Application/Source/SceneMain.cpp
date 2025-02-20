@@ -141,6 +141,8 @@ void SceneMain::Init()
 	// 16 x 16 is the number of columns and rows for the text
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16,16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Images//calibri.tga");
+	meshList[GEO_FPS] = MeshBuilder::GenerateText("fpstext", 16, 16);
+	meshList[GEO_FPS]->textureID = LoadTGA("Images//bizudgothic.tga");
 
 	meshList[GEO_KEY_E] = MeshBuilder::GenerateQuad("KeyE", glm::vec3(1.f, 1.f, 1.f), 2.f);
 	meshList[GEO_KEY_E]->textureID = LoadTGA("Images//keyboard_key_e.tga");
@@ -229,6 +231,28 @@ void SceneMain::Init()
 
 	enableLight = true;
 
+	// collisions
+	playerPointer = new playerBox(1, GameObject::CUBE);
+	cubeList.push_back(tentBoxes(2, GameObject::CUBE));
+	cubeList.push_back(tentBoxes(3, GameObject::CUBE));
+	cubeList.push_back(tentBoxes(4, GameObject::CUBE));
+	cubeList.push_back(tentBoxes(5, GameObject::CUBE));
+	cubeList.push_back(tentBoxes(6, GameObject::CUBE));
+	cubeList.push_back(tentBoxes(7, GameObject::CUBE));
+
+	playerPointer->pos = camera.position;
+	cubeList[0].pos = glm::vec3{ 30, 3, -40 };
+	cubeList[1].pos = glm::vec3{ 30, 3, 0 };
+	cubeList[2].pos = glm::vec3{ 30, 3, 40 };
+	cubeList[3].pos = glm::vec3{ -30, 3, -40 };
+	cubeList[4].pos = glm::vec3{ -30, 3, 0 };
+	cubeList[5].pos = glm::vec3{ -30, 3, 40 };
+
+	playerPointer->mass = 0.f;
+	for (int i = 0; i < cubeList.size(); i++) {
+		cubeList[i].mass = 0.f;
+	}
+
 	isEnterMainSceneDialogueActive = true; 
 	hasPlayedEnterMainSceneDialogue = false;
 
@@ -283,6 +307,16 @@ void SceneMain::Update(double dt)
 	//light[0].position = camera.position;
 
 	camera.Update(dt);
+
+	CollisionData cd;
+	for (int i = 0; i < cubeList.size(); i++) {
+		if (OverlapAABB2AABB(*playerPointer, playerPointer->playerDimensions, cubeList[i], cubeList[i].tentDimensions, cd))
+			ResolveCollision(cd);
+	}
+
+	for (int i = 0; i < cubeList.size(); i++) {
+		cubeList[i].UpdatePhysics(dt);
+	}
 
 	float distance = glm::distance(camera.position, signPosition);
 	if (distance < 8.0f) 
@@ -339,6 +373,9 @@ void SceneMain::Update(double dt)
 			readSignTextTimer = 0.0f;
 		}
 	}
+
+	float temp = 1.f / dt;
+	fps = glm::round(temp * 100.f) / 100.f;
 
 	UpdateDialogue(dt);
 }
@@ -646,11 +683,12 @@ void SceneMain::Render()
 		modelStack.PopMatrix();
 	}
 
-	//RenderTextOnScreen(meshList[GEO_TEXT], "Stamina", glm::vec3(0, 1, 0), 40, 0, 0);
-
 	RenderUI();
 	RenderDialogue();
 	RenderObjectives();
+
+	std::string temp("FPS:" + std::to_string(fps));
+	RenderTextOnScreen(meshList[GEO_TEXT], temp.substr(0, 9), glm::vec3(0, 1, 0), 20, 620, 50);
 }
 
 void SceneMain::RenderUI()
@@ -1038,20 +1076,6 @@ void SceneMain::HandleKeyPress()
 		// logic to complete the final challenge
 		isFinalChallengeCompleted = true; 
 	}
-}
-
-bool SceneMain::OverlapAABB2AABB(glm::vec3 Obj1, const int Width1, const int Height1,
-glm::vec3 Obj2, const int Width2, const int Height2)
-{
-
-	float MinX1, MaxX1, MinY1, MaxY1, MinX2, MaxX2, MinY2, MaxY2;
-	MinX1 = Obj1.x - Width1 / 2; MaxX1 = Obj1.x + Width1 / 2;
-	MinY1 = Obj1.z - Height1 / 2; MaxY1 = Obj1.z + Height1 / 2;
-
-	MinX2 = Obj2.x - Width2 / 2; MaxX2 = Obj2.x + Width2 / 2;
-	MinY2 = Obj2.z - Height2 / 2; MaxY2 = Obj2.z + Height2 / 2;
-
-	return false;
 }
 
 void SceneMain::RenderMeshOnScreen(Mesh* mesh, float x, float y, float sizex, float sizey)

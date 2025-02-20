@@ -111,21 +111,21 @@ private:
         glm::vec3 stuckPosition{ 0.0f, 0.0f, 0.0f };
         glm::vec3 targetNormal{ 0.0f, 0.0f, 0.0f };
 
-        // Add a default constructor
-        Arrow() {
-            SetID(0);  // Default ID
-            mass = 0.4f;
-            bounciness = 0.2f;
-            accel = glm::vec3(0, -9.8f, 0);
-        }
+        //// Add a default constructor
+        //Arrow() {
+        //    SetID(0);  // Default ID
+        //    mass = 0.4f;
+        //    bounciness = 0.2f;
+        //    accel = glm::vec3(0, -9.8f, 0);
+        //}
 
-        // Keep the existing constructor
-        Arrow(int id) {
-            SetID(id);
-            mass = 0.4f;
-            bounciness = 0.2f;
-            accel = glm::vec3(0, -9.8f, 0);
-        }
+        //// Keep the existing constructor
+        //Arrow(int id) {
+        //    SetID(id);
+        //    mass = 0.4f;
+        //    bounciness = 0.2f;
+        //    accel = glm::vec3(0, -9.8f, 0);
+        //}
 
 
         void Fire(const glm::vec3& startPos, const glm::vec3& direction, float speed) {
@@ -195,9 +195,9 @@ private:
     void RenderSkyBox();
 
     // Arrow-related methods
-    void HandleArrowInput();
-    void FireArrow();
-    void CheckArrowCollisions();
+    //void HandleArrowInput();
+    //void FireArrow();
+    //void CheckArrowCollisions();
 
     // Member variables
     unsigned m_vertexArrayID;
@@ -216,7 +216,7 @@ private:
     Application app;
 
     // Arrow array
-    Arrow arrows[MAX_ARROWS];
+    //Arrow arrows[MAX_ARROWS];
 };
 
 #endif // SCENE_ARCHERY_H

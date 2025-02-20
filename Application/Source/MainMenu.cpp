@@ -376,6 +376,11 @@ void MainMenu::Render()
 		RenderTextOnScreen(meshList[GEO_TITLE], "CONTROLS", glm::vec3(1, 1, 0), 25, 25, 505);
 		RenderMeshOnScreen(meshList[GEO_UI], 520, 310, 50, 50);
 
+		RenderTextOnScreen(meshList[GEO_TITLE], "W,A,S,D - Walk", glm::vec3(1, 1, 1), 15, 280, 530);
+		RenderTextOnScreen(meshList[GEO_TITLE], "Space - Jump", glm::vec3(1, 1, 1), 15, 280, 500);
+		RenderTextOnScreen(meshList[GEO_TITLE], "E - Enter (Object)", glm::vec3(1, 1, 1), 15, 280, 470);
+		RenderTextOnScreen(meshList[GEO_TITLE], "F - Interact", glm::vec3(1, 1, 1), 15, 280, 440);
+		RenderTextOnScreen(meshList[GEO_TITLE], "other controls placeholder here", glm::vec3(1, 1, 1), 15, 280, 410);
 	}
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
