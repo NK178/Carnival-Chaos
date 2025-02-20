@@ -377,7 +377,7 @@ void SceneHole::Render()
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Translate(0, -3, 0);
+	modelStack.Translate(wallDisp, -3, 0);
 	modelStack.Scale(10.f, 2.f, 2.f);
 	modelStack.Rotate(90.f, 0, 1, 0);
 	RenderMesh(meshList[GEO_HWALL1], false);

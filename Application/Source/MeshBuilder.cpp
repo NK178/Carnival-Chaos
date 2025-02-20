@@ -499,15 +499,31 @@ Mesh* MeshBuilder::GenerateHWall1(const std::string& meshName, glm::vec3 color)
 	v.pos = glm::vec3(-10.f, 0.f, 0.5f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
 	v.pos = glm::vec3(-9.f, 0.f, 0.5f);		v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
 
-	v.pos = glm::vec3(-9.f, 10.f, -0.5f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(-10.f, 10.f, -0.5f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(-10.f, 0.f, -0.5f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(10.f, 10.f, 0.5f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(-10.f, 10.f, 0.5f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(-10.f, 8.f, 0.5f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
 
-	v.pos = glm::vec3(-9.f, 10.f, -0.5f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(-10.f, 0.f, -0.5f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(-9.f, 0.f, -0.5f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(10.f, 10.f, 0.5f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(-10.f, 8.f, 0.5f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(10.f, 8.f, 0.5f);	v.normal = glm::vec3(0, 0, 1);		vertex_buffer_data.push_back(v);
 
-	for (unsigned i = 0; i < 12; ++i)
+	v.pos = glm::vec3(10.f, 10.f, 0.5f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(9.f, 10.f, 0.5f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(9.f, 0.f, 0.5f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
+
+	v.pos = glm::vec3(10.f, 10.f, 0.5f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(9.f, 0.f, 0.5f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(10.f, 0.f, 0.5f);	v.normal = glm::vec3(0, 0, 1);		vertex_buffer_data.push_back(v);
+
+	v.pos = glm::vec3(6.f, 10.f, 0.5f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(-10.f, 10.f, 0.5f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(-10.f, 3.f, 0.5f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
+
+	v.pos = glm::vec3(6.f, 10.f, 0.5f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(-10.f, 3.f, 0.5f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(6.f, 3.f, 0.5f);	v.normal = glm::vec3(0, 0, 1);		vertex_buffer_data.push_back(v);
+
+	for (unsigned i = 0; i < 24; ++i)
 	{
 		index_buffer_data.push_back(i);
 	}
