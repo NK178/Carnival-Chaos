@@ -194,10 +194,10 @@ private:
         float SpA, float SpG, float SpB, float Shiny);
     void RenderSkyBox();
 
-    // Arrow-related methods
-    void HandleArrowInput();
-    void FireArrow();
-    void CheckArrowCollisions();
+    //// Arrow-related methods
+    //void HandleArrowInput();
+    //void FireArrow();
+    //void CheckArrowCollisions();
 
     // Member variables
     unsigned m_vertexArrayID;
