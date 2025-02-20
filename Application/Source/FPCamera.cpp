@@ -10,32 +10,34 @@
 
 float FPCamera::currentPitch = 0.f;
 
-FPCamera::FPCamera() : isDirty(false)
+//DONT INIT ANYTHING
+FPCamera::FPCamera() : isDirty(false), GameObject(10,GameObject::CAMERA)
 {
-	this->position = position;
-	this->position.y += 15.0f;
-	this->target = target;
-	this->forward = glm::vec3(0, 0, 0);
-	this->up = up;
-	this->isDirty = true;
-	amplitude = 0.0f;
-	frequency = 7.f;
-	time = 0.f;
-	jumpflag = false;
-	crouchflag = false;
-	crouchduration = 0.2f;
-	proneflag = false;
-	proneduration = 0.5f;
-	jumpphase1 = true;
-	crouchphase1 = true;
-	pronephase1 = true;
-	swaytimer = 0.f;
-	swayduration = 2.f;
-	swayphase1 = true;
-	sway = 0.f;
-	boptimer = 0.f;
-	bop = 0.f;
-	bopflag = true;
+
+	//this->position = position;
+	//this->position.y += 15.0f;
+	//this->target = target;
+	//this->forward = glm::vec3(0, 0, 0);
+	//this->up = up;
+	//this->isDirty = true;
+	//amplitude = 0.0f;
+	//frequency = 7.f;
+	//time = 0.f;
+	//jumpflag = false;
+	//crouchflag = false;
+	//crouchduration = 0.2f;
+	//proneflag = false;
+	//proneduration = 0.5f;
+	//jumpphase1 = true;
+	//crouchphase1 = true;
+	//pronephase1 = true;
+	//swaytimer = 0.f;
+	//swayduration = 2.f;
+	//swayphase1 = true;
+	//sway = 0.f;
+	//boptimer = 0.f;
+	//bop = 0.f;
+	//bopflag = true;
 }
 
 FPCamera::~FPCamera()
@@ -44,7 +46,7 @@ FPCamera::~FPCamera()
 
 void FPCamera::Init(glm::vec3 position, glm::vec3 target, glm::vec3 up) //use this one
 {
-	this->position = position;
+	pos = position;
 	this->target = target;
 	camheight = position.y;
 	this->forward = glm::vec3(0, 0, 0);
@@ -91,7 +93,7 @@ void FPCamera::Update(double dt)
 	static float BOP_AMPLITUDE = 0.1f;
 	static const float JUMP_POWER = 0.75f;
 
-	glm::vec3 view = glm::normalize(target - position); //calculate the new view vector
+	glm::vec3 view = glm::normalize(target - pos); //calculate the new view vector
 	glm::vec3 front = view;
 	glm::vec3 right = glm::normalize(glm::cross(view, glm::vec3{0,1,0}));
 
@@ -107,26 +109,26 @@ void FPCamera::Update(double dt)
 	if (allowMovement)
 	{
 		if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_W)) {
-			position += front * ZOOM_SPEED * static_cast<float>(dt);
+			pos += front * ZOOM_SPEED * static_cast<float>(dt);
 			target += view * ZOOM_SPEED * static_cast<float>(dt);
 			if (bop != 0.f && bopflag)
-				position.y += bop;
+				pos.y += bop;
 			isDirty = isMoving = true;
 		}
 		if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_S)) {
-			position -= front * ZOOM_SPEED * static_cast<float>(dt);
+			pos -= front * ZOOM_SPEED * static_cast<float>(dt);
 			target -= view * ZOOM_SPEED * static_cast<float>(dt);
 			if (bop != 0.f && bopflag)
-				position.y += bop;
+				pos.y += bop;
 			isDirty = isMoving = true;
 		}
 		if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_A)) {
-			position -= right * ZOOM_SPEED * static_cast<float>(dt);
+			pos -= right * ZOOM_SPEED * static_cast<float>(dt);
 			target -= right * ZOOM_SPEED * static_cast<float>(dt);
 			isDirty = isMoving = true;
 		}
 		if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_D)) {
-			position += right * ZOOM_SPEED * static_cast<float>(dt);
+			pos += right * ZOOM_SPEED * static_cast<float>(dt);
 			target += right * ZOOM_SPEED * static_cast<float>(dt);
 			isDirty = isMoving = true;
 		}
@@ -136,7 +138,7 @@ void FPCamera::Update(double dt)
 	//Jump 
 	if (KeyboardController::GetInstance()->IsKeyPressed(VK_SPACE) && allowJump) { 
 		if (!crouchflag && !proneflag && !jumpflag) {
-			position.y = camheight;
+			pos.y = camheight;
 			jumpflag = jumpphase1 = true;
 			bopflag = false;
 			time = 0.f;
@@ -145,13 +147,13 @@ void FPCamera::Update(double dt)
 	if (jumpphase1 && jumpflag) {
 		time += dt;
 		amplitude = glm::sin(time * frequency) * JUMP_POWER;
-		position += glm::vec3(0, 1, 0) * amplitude;
+		pos += glm::vec3(0, 1, 0) * amplitude;
 		if (time > 0.9f)
 			jumpflag = false;
 	}
 	else if (!jumpflag && !crouchflag && !bopflag) {
 		time += dt;
-		position.y = camheight;
+		pos.y = camheight;
 		time = amplitude = 0.f;
 		bopflag = true;
 	}
@@ -159,12 +161,12 @@ void FPCamera::Update(double dt)
 	//Crouch
 	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_C) && allowCrouch) { 
 		if (!jumpflag && !crouchflag && !proneflag) {
-			position.y = camheight;
+			pos.y = camheight;
 			crouchflag = true;
 			time = amplitude = 0.f;
 		}
 		else if (!jumpflag && !crouchflag && proneflag) {
-			position.y = camheight - 6;
+			pos.y = camheight - 6;
 			crouchflag = true;
 			proneflag = false;
 			time = amplitude = 0.f;
@@ -176,12 +178,12 @@ void FPCamera::Update(double dt)
 	}
 	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_X) && allowProne) {
 		if (!jumpflag && !proneflag && !crouchflag) {
-			position.y = camheight;
+			pos.y = camheight;
 			proneflag = true;
 			time = amplitude = 0.f;
 		}
 		else if (!jumpflag && !proneflag && crouchflag) {
-			position.y = camheight - 3;
+			pos.y = camheight - 3;
 			proneflag = true;
 			crouchflag = false;
 			time = amplitude = 0.f;
@@ -196,15 +198,15 @@ void FPCamera::Update(double dt)
 		time += dt;
 		ZOOM_SPEED = 15.f;
 		if (time < crouchduration)
-			position.y = glm::lerp(camheight, camheight - 3.f, time / crouchduration);
+			pos.y = glm::lerp(camheight, camheight - 3.f, time / crouchduration);
 	}
 	if (!crouchphase1) {
 		time += dt;
 		ZOOM_SPEED = 15.f;
 		if (time < crouchduration)
-			position.y = glm::lerp(camheight - 3.f, camheight, time / crouchduration);
+			pos.y = glm::lerp(camheight - 3.f, camheight, time / crouchduration);
 		else {
-			position.y = camheight;
+			pos.y = camheight;
 			crouchphase1 = true;
 			crouchflag = false;
 			ZOOM_SPEED = DEFAULT_SPEED;
@@ -214,15 +216,15 @@ void FPCamera::Update(double dt)
 		time += dt;
 		ZOOM_SPEED = 15.f;
 		if (time < proneduration)
-			position.y = glm::lerp(camheight, camheight - 6.f, time / proneduration);
+			pos.y = glm::lerp(camheight, camheight - 6.f, time / proneduration);
 	}
 	if (!pronephase1) {
 		time += dt;
 		ZOOM_SPEED = 15.f;
 		if (time < proneduration)
-			position.y = glm::lerp(camheight - 6.f, camheight, time / proneduration);
+			pos.y = glm::lerp(camheight - 6.f, camheight, time / proneduration);
 		else {
-			position.y = camheight;
+			pos.y = camheight;
 			pronephase1 = true;
 			proneflag = false;
 			ZOOM_SPEED = DEFAULT_SPEED;
@@ -246,7 +248,7 @@ void FPCamera::Update(double dt)
 		if (sprintstamina < 100) {
 			sprintstamina += 0.5f;
 			if (!heightresetflag && runflag) {
-				position.y = camheight;
+				pos.y = camheight;
 				heightresetflag = true;
 				runflag = false;
 			}
@@ -285,7 +287,7 @@ void FPCamera::Update(double dt)
 	//	glm::vec3(right.x, right.y, right.z)// the axis to rotate along
 	//);
 	//glm::vec3 pitchView = pitch * glm::vec4(view, 0.f);
-	//target = position + pitchView + yawView;
+	//target = pos + pitchView + yawView;
 	//isDirty = true;
 	//this->Refresh();
 
@@ -343,7 +345,7 @@ void FPCamera::Update(double dt)
 		glm::vec3(right.x, right.y, right.z)// the axis to rotate along
 	);
 	glm::vec3 pitchView = pitch * glm::vec4(view, 0.f);
-	target = position + pitchView + yawView;
+	target = pos + pitchView + yawView;
 	isDirty = true;
 	this->Refresh();
 
@@ -353,12 +355,13 @@ void FPCamera::Update(double dt)
 
 	multDebugX = pitchView.z > 0 ? 1 : -1;
 	multDebugZ = pitchView.x > 0 ? -1 : 1;
+	UpdatePhysics(dt);
 	
 }
 
 glm::vec3 FPCamera::GetView(void)
 {
-	return glm::normalize(target - position);
+	return glm::normalize(target - pos);
 }
 
 glm::vec3 FPCamera::GetFront(void)
@@ -374,7 +377,7 @@ float FPCamera::GetStamina(void)
 void FPCamera::Refresh()
 {
 	if (!this->isDirty) return;
-	glm::vec3 view = glm::normalize(target - position);
+	glm::vec3 view = glm::normalize(target - pos);
 	glm::vec3 right = glm::normalize(glm::cross(up, view));
 	// Recalculate the up vector  (used for tilting head) 
 	//this->up = glm::normalize(glm::cross(view, right));
@@ -383,35 +386,35 @@ void FPCamera::Refresh()
 }
 
 void FPCamera::RotateCamera(float angle) {
-	glm::vec3 view = glm::normalize(target - position); 
+	glm::vec3 view = glm::normalize(target - pos); 
 
 	float radians = glm::radians(angle);
 	glm::mat4 rotation = glm::mat4(1.0f);
 	rotation = glm::rotate(glm::mat4(1.0f), radians, glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::vec3 rot = rotation * glm::vec4(view, 0.f);
-	target = position + rot;
+	target = pos + rot;
 	isDirty = true;
 	this->Refresh();
 }
 
 //void FPCamera::RotateAboutCamera(glm::vec3 rotpt, float angle)
 //{
-//	glm::vec3 view = glm::normalize(target - position);
+//	glm::vec3 view = glm::normalize(target - pos);
 //
 //	float radians = glm::radians(angle);
 //	glm::mat4 rotation = glm::mat4(1.0f);
 //	rotation = glm::rotate(glm::mat4(1.0f), radians, glm::vec3(0.0f, 1.0f, 0.0f));
 //	glm::vec3 rot = rotation * glm::vec4(view, 0.f);
-//	position = target + rot;
+//	pos = target + rot;
 //	isDirty = true;
 //	this->Refresh();
 //	//float anglerad = glm::radians(angle);
-//	//position = glm::vec3(cos(anglerad), camheight, sin(anglerad));
+//	//pos = glm::vec3(cos(anglerad), camheight, sin(anglerad));
 //
-//	//glm::vec3 relativepos = position - rotpt;
+//	//glm::vec3 relativepos = pos - rotpt;
 //	//glm::mat4 rotmat = glm::rotate(glm::mat4(1.0f), glm::radians(rotsp * dt), glm::vec3{0,1,0});
 //	//relativepos = glm::vec3(rotmat * glm::vec4(relativepos, 1.0f));
-//	//position = relativepos + rotpt;
+//	//pos = relativepos + rotpt;
 //}
 
 

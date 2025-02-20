@@ -272,7 +272,7 @@ void SceneWIUtest::Update(double dt)
 	obb_worldvertices = UpdateverticesinYaxis(obblist[0], obb_worldvertices);
 	//std::cout << obb_worldvertices[0].x << std::endl;
 	//std::cout << cube1_worldvertices[0].x << std::endl;
-	//std::cout << obblist[0].angleDeg << std::endl;
+		//std::cout << obblist[0].angleDeg << std::endl;
 
 	if (KeyboardController::GetInstance()->IsKeyPressed('R')) {
 		obblist[0].angularVel += 20.f;
@@ -308,6 +308,8 @@ void SceneWIUtest::Update(double dt)
 	for (int i = 0; i < obblist.size(); i++) {
 		obblist[i].UpdatePhysics(dt);
 	}
+	//camera.AddForce(glm::vec3(1, 0, 0) * 50.f);
+
 	camera.Update(dt);
 
 }
@@ -320,7 +322,7 @@ void SceneWIUtest::Render()
 	// Load view matrix stack and set it with camera position, target position and up direction
 	viewStack.LoadIdentity();
 	viewStack.LookAt(
-		camera.position.x, camera.position.y, camera.position.z,
+		camera.pos.x, camera.pos.y, camera.pos.z,
 		camera.target.x, camera.target.y, camera.target.z,
 		camera.up.x, camera.up.y, camera.up.z
 	);
