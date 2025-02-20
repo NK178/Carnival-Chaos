@@ -10,7 +10,7 @@
 
 void CSceneManager::Init() {
     // Initialize with first scene
-    activeScene = new SceneMain;
+    activeScene = new SceneSpinningRing;
     currentSceneType = SCENE_SPINNING_RING;
     activeScene->Init();
 }

@@ -148,6 +148,8 @@ void SceneSpinningRing::Init()
 	meshList[GEO_FPS] = MeshBuilder::GenerateText("fpstext", 16, 16);
 	meshList[GEO_FPS]->textureID = LoadTGA("Images//bizudgothic.tga");
 
+	meshList[GEO_SPINNER] = MeshBuilder::GenerateOBJMTL("Spinner", "Models//spinner.obj", "Models//spinner.mtl");
+
 	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 1000.0f);
 	projectionStack.LoadMatrix(projection);
 
@@ -307,6 +309,16 @@ void SceneSpinningRing::Render()
 	meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
 	meshList[GEO_CUBE]->material.kShininess = 1.0f;
 	RenderMesh(meshList[GEO_CUBE], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(0.f, 0.f, 0.f);
+	modelStack.Scale(10.f, 10.f, 10.f);
+	meshList[GEO_SPINNER]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_SPINNER]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_SPINNER]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_SPINNER]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_SPINNER], true);
 	modelStack.PopMatrix();
 
 	RenderSkyBox();

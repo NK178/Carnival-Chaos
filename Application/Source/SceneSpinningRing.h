@@ -22,6 +22,9 @@ public:
 		GEO_SPHERE,
 		GEO_PLANE,
 
+		// Models
+		GEO_SPINNER,
+
 		//Text
 		GEO_TEXT,
 		GEO_FPS,
