@@ -156,32 +156,6 @@ private:
 
 
 
-        void StickToTarget(const glm::vec3& hitPosition, const glm::vec3& surfaceNormal)
-        {
-            isActive = true;
-            isStuck = true;
-            stuckPosition = hitPosition;
-
-            // Ensure the normal is valid
-            if (glm::length(surfaceNormal) < 0.0001f) {
-                std::cout << "Invalid Normal Detected! Defaulting to (0,1,0)" << std::endl;
-                targetNormal = glm::vec3(0, 1, 0);  // Default normal pointing up
-            }
-            else {
-                targetNormal = glm::normalize(surfaceNormal);
-            }
-
-            // Stop arrow movement
-            vel = glm::vec3(0, 0, 0);
-
-            std::cout << "Arrow Stuck at: " << stuckPosition.x << ", "
-                << stuckPosition.y << ", " << stuckPosition.z << std::endl;
-            std::cout << "Surface Normal: " << targetNormal.x << ", "
-                << targetNormal.y << ", " << targetNormal.z << std::endl;
-        }
-
-
-
 
 
         void Update(float dt) {
@@ -209,8 +183,6 @@ private:
     // Utility methods
     void HandleKeyPress();
     void RenderMesh(Mesh* mesh, bool enableLight);
-    bool OverlapAABB2AABB(glm::vec3 Obj1, const int Width1, const int Height1,
-        glm::vec3 Obj2, const int Width2, const int Height2);
    
     void RenderMeshOnScreen(Mesh* mesh, float x, float y, float sizex, float sizey);
     void RenderText(Mesh* mesh, std::string text, glm::vec3 color);
