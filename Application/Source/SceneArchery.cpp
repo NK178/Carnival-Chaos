@@ -57,6 +57,18 @@ SceneArchery::~SceneArchery()
 
 void SceneArchery::Init()
 {
+
+	camera.enableFNAF = false;
+	camera.allowMovement = false;
+	camera.allowJump = true;
+	camera.allowSprint = false;
+	camera.allowCrouch = false;
+	camera.allowProne = false;
+	camera.allowLocomotiveTilt = false;
+	camera.allowLocomotiveBop = false;
+
+	
+
 	// Set background color to dark blue
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
@@ -140,7 +152,7 @@ void SceneArchery::Init()
 		m_parameters[U_MATERIAL_SHININESS]);
 
 	// Initialise camera properties
-	camera.Init(glm::vec3(-10, 10, -10), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	camera.Init(glm::vec3(0, 10, 50), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 
 	// Init VBO here
 	for (int i = 0; i < NUM_GEOMETRY; ++i)
@@ -379,7 +391,7 @@ void SceneArchery::FireArrow() {
 			m_arrowsLeft--;
 
 			// Calculate fire direction based on camera
-			glm::vec3 fireDirection = glm::normalize(camera.target - camera.position);
+			glm::vec3 fireDirection = glm::normalize(camera.target - camera.pos);
 
 			// Rest of the firing code remains the same
 			float minSpeed = 1.0f;
@@ -389,7 +401,7 @@ void SceneArchery::FireArrow() {
 			float finalSpeed = minSpeed + (maxSpeed - minSpeed) * speedMultiplier;
 
 			arrows[i].Fire(
-				camera.position,
+				camera.pos,
 				fireDirection,
 				finalSpeed
 			);
@@ -537,7 +549,7 @@ void SceneArchery::Render()
 	// Load view matrix stack and set it with camera position, target position and up direction
 	viewStack.LoadIdentity();
 	viewStack.LookAt(
-		camera.position.x, camera.position.y, camera.position.z,
+		camera.pos.x, camera.pos.y, camera.pos.z,
 		camera.target.x, camera.target.y, camera.target.z,
 		camera.up.x, camera.up.y, camera.up.z
 	);
@@ -619,7 +631,7 @@ void SceneArchery::Render()
 	{
 		modelStack.PushMatrix();
 		modelStack.Translate(light[i].position.x, light[i].position.y, light[i].position.z);
-		modelStack.Scale(0.1f, 0.1f, 0.1f);
+		modelStack.Scale(0.f, 0.f, 0.f);
 		RenderMesh(meshList[GEO_SPHERE], false);
 		modelStack.PopMatrix();
 	}
@@ -773,7 +785,7 @@ void SceneArchery::Render()
 				modelStack.Rotate(glm::degrees(pitch), 1, 0, 0);
 
 				// Initial forward direction based on camera
-				glm::vec3 forward = glm::normalize(camera.target - camera.position);
+				glm::vec3 forward = glm::normalize(camera.target - camera.pos);
 				float initialYaw = atan2(forward.x, forward.z);
 				modelStack.Rotate(glm::degrees(initialYaw), 0, 1, 0);
 			}

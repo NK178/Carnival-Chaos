@@ -36,7 +36,7 @@ void SceneHole::Init()
 	camera.allowJump = true;
 	camera.allowSprint = false;
 	camera.allowCrouch = true;
-	camera.allowProne = true;
+	camera.allowProne = false;
 	camera.allowLocomotiveTilt = true;
 	camera.allowLocomotiveBop = false;
 
