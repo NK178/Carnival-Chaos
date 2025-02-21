@@ -112,7 +112,7 @@ void SceneWhackAMole::Init()
 		m_parameters[U_MATERIAL_SHININESS]);
 
 	// Initialise camera properties
-	camera.Init(glm::vec3(-10, 9, -10), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	camera.Init(glm::vec3(0, 9, 0), glm::vec3(-1, 9, 0), glm::vec3(0, 1, 0));
 
 	// Init VBO here
 	for (int i = 0; i < NUM_GEOMETRY; ++i)
@@ -122,12 +122,18 @@ void SceneWhackAMole::Init()
 
 	meshList[GEO_AXES] = MeshBuilder::GenerateAxes("Axes", 10000.f, 10000.f, 10000.f);
 	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Sun", glm::vec3(1.f, 1.f, 1.f), 1.f, 16, 16);
-	meshList[GEO_PLANE] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 2.f);
-	meshList[GEO_PLANE]->textureID = LoadTGA("Images//whackamole_grid2.tga");
 	meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("STAMINA_BAR", glm::vec3(1, 1, 1), 1.f);
 	meshList[GEO_CUBE] = MeshBuilder::GenerateCube("Cube", glm::vec3(1, 1, 1), 1.f);
 	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Sphere", glm::vec3(1, 1, 1), 1.f);
 	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Sphere", glm::vec3(1, 1, 1), 1.f);
+
+	//tgas
+	meshList[GEO_BASE] = MeshBuilder::GenerateQuad("base", glm::vec3(1.f, 1.f, 1.f), 2.f);
+	meshList[GEO_BASE]->textureID = LoadTGA("Images//whackamole_grid2.tga");
+	meshList[GEO_BACKBOARD] = MeshBuilder::GenerateQuad("backboard", glm::vec3(1.f, 1.f, 1.f), 2.f);
+	meshList[GEO_BACKBOARD]->textureID = LoadTGA("Images//whackamole_backboard.tga");
+
+
 	meshList[GEO_HAMMER1] = MeshBuilder::GenerateOBJMTL("war hammer", "Models//lava_hammer.obj", "Models//lava_hammer.mtl");
 	meshList[GEO_HAMMER1]->textureID = LoadTGA("Images//hammer.tga");
 	meshList[GEO_HAMMER2] = MeshBuilder::GenerateOBJMTL("mallet", "Models//mallet.obj", "Models//mallet.mtl");
@@ -158,15 +164,15 @@ void SceneWhackAMole::Init()
 
 	glUniform1i(m_parameters[U_NUMLIGHTS], NUM_LIGHTS);
 
-	light[0].position = glm::vec3(30, 30, 0);
+	light[0].position = glm::vec3(0, 25, 0);
 	light[0].color = glm::vec3(1, 1, 1);
 	light[0].type = Light::LIGHT_DIRECTIONAL;
 	light[0].power = 1.f;
 	light[0].kC = 1.f;
 	light[0].kL = 0.01f;
 	light[0].kQ = 0.001f;
-	light[0].cosCutoff = 30.f;
-	light[0].cosInner = 15.f;
+	light[0].cosCutoff = 100.f;
+	light[0].cosInner = 50.f;
 	light[0].exponent = 3.f;
 	light[0].spotDirection = glm::vec3(0.f, 1.f, 0.f);
 
@@ -232,47 +238,37 @@ void SceneWhackAMole::Init()
 	cubelist[1].pos = glm::vec3{ 15,3,4 };
 	cubelist[0].mass = 0.f;
 
-	spherelist.push_back(Sphere(3,2.f,GameObject::SPHERE));
-	spherelist.push_back(Sphere(4,2.f,GameObject::SPHERE));
-	spherelist[0].pos = glm::vec3{ -15,3,15 };
-	spherelist[1].pos = glm::vec3{ -15,3,0 };
-	spherelist[1].mass = 0.f;
-
+	camera.allowJump = false;
 }
 
 void SceneWhackAMole::Update(double dt)
 {
-
+	if (startcountdown > 0.f)
+		startcountdown -= dt;
+	else 
+		gamestart = true;
+	
 	HandleKeyPress();
 	const float SPEED = 15.f;
 	if (KeyboardController::GetInstance()->IsKeyDown('I'))
-		spherelist[0].pos.z -= static_cast<float>(dt) * SPEED;
+		cubelist[0].pos.z -= static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('K'))
-		spherelist[0].pos.z += static_cast<float>(dt) * SPEED;
+		cubelist[0].pos.z += static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('J'))
-		spherelist[0].pos.x -= static_cast<float>(dt) * SPEED;
+		cubelist[0].pos.x -= static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('L'))
-		spherelist[0].pos.x += static_cast<float>(dt) * SPEED;
+		cubelist[0].pos.x += static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('O'))
-		spherelist[0].pos.y -= static_cast<float>(dt) * SPEED;
+		cubelist[0].pos.y -= static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('P'))
-		spherelist[0].pos.y += static_cast<float>(dt) * SPEED;
+		cubelist[0].pos.y += static_cast<float>(dt) * SPEED;
 
 	CollisionData cd;
 	if (OverlapAABB2AABB(cubelist[1], cubelist[1].boxextent, cubelist[0], cubelist[0].boxextent, cd)) 
 		ResolveCollision(cd);
 
-	if (OverlapSphere2Sphere(spherelist[1], spherelist[1].radius, spherelist[0], spherelist[0].radius, cd)) 
-		ResolveCollision(cd);
-	
-	if (OverlapAABB2Sphere(spherelist[1], spherelist[1].radius, cubelist[1], cubelist[1].pos - cubelist[1].boxextent, cubelist[1].pos + cubelist[1].boxextent, cd))
-		ResolveCollision(cd);
-
 	for (int i = 0; i < cubelist.size(); i++) {
 		cubelist[i].UpdatePhysics(dt);
-	}
-	for (int i = 0; i < spherelist.size(); i++) {
-		spherelist[i].UpdatePhysics(dt);
 	}
 
 	camera.Update(dt);
@@ -324,6 +320,7 @@ void SceneWhackAMole::Render()
 		}
 	}
 
+	RenderSkyBox();
 
 	modelStack.PushMatrix();
 	RenderMesh(meshList[GEO_AXES], false);
@@ -336,13 +333,23 @@ void SceneWhackAMole::Render()
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Scale(100.f, 1.f, 100.f);
 	modelStack.Rotate(-90.f, 1, 0, 0);
-	meshList[GEO_PLANE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-	meshList[GEO_PLANE]->material.kDiffuse = glm::vec3(0.5f,0.5f, 0.5f);
-	meshList[GEO_PLANE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	meshList[GEO_PLANE]->material.kShininess = 1.0f;
-	RenderMesh(meshList[GEO_PLANE], true);
+	modelStack.Scale(100.f, 100.f, 100.f);
+	meshList[GEO_BASE]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_BASE]->material.kDiffuse = glm::vec3(0.5f,0.5f, 0.5f);
+	meshList[GEO_BASE]->material.kSpecular = glm::vec3(0.3f, 0.3f, 0.3f);
+	meshList[GEO_BASE]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_BASE], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(0, 60, -100);
+	modelStack.Scale(100.f, 70.f, 1.f);
+	meshList[GEO_BACKBOARD]->material.kAmbient = glm::vec3(0.9f,0.9f,0.9f);
+	meshList[GEO_BACKBOARD]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_BACKBOARD]->material.kSpecular = glm::vec3(0.3f, 0.3f, 0.3f);
+	meshList[GEO_BACKBOARD]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_BACKBOARD], true);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
@@ -379,10 +386,16 @@ void SceneWhackAMole::Render()
 	//RenderMesh(meshList[GEO_HAMMER3], true);
 	//modelStack.PopMatrix();
 
+	if (!gamestart) {
+		if (startcountdown < 1.f)
+			RenderTextOnScreen(meshList[GEO_TEXT], "Start!", glm::vec3(0, 1, 0), 40, 350, 400);
+		else
+			RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(static_cast<int>(startcountdown)), glm::vec3(0, 1, 0), 40, 400, 400);
+	}
+
 
 	RenderTextOnScreen(meshList[GEO_TEXT], "Stamina", glm::vec3(0, 1, 0), 40, 0, 0);
 
-	RenderSkyBox();
 }
 
 void SceneWhackAMole::RenderMesh(Mesh* mesh, bool enableLight)

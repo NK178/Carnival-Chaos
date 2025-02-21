@@ -20,7 +20,12 @@ public:
 		GEO_CUBE,
 		GEO_QUAD,
 		GEO_SPHERE,
-		GEO_PLANE,
+
+		//TGAs
+		GEO_BASE,
+		GEO_BACKBOARD,
+
+		//OBJS
 		GEO_HAMMER1,
 		GEO_HAMMER2,
 		GEO_HAMMER3,
@@ -140,16 +145,12 @@ private:
 		glm::vec3 boxextent{ 1.5f,1.5f,1.5f };
 		Cube(int id, int type) : GameObject(id, type) {}
 	};
-	struct Sphere : public GameObject {
-		float radius;
-		Sphere(int id, int r, int type) : radius(r), GameObject(id, type) {}
-	};
 
 	bool activate = false;
 	std::vector<Cube> cubelist;
-	std::vector<Sphere> spherelist;	
 
-
+	float startcountdown = 4.f;
+	bool gamestart = true; //TO CHANGE
 };
 
 #endif
