@@ -147,8 +147,11 @@ void SceneSpinningRing::Init()
 	// 16 x 16 is the number of columns and rows for the text
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16,16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Images//calibri.tga");
+	meshList[GEO_TEXT2] = MeshBuilder::GenerateText("text2", 16, 16);
+	meshList[GEO_TEXT2]->textureID = LoadTGA("Images//yugothicuisemibold.tga");
 	meshList[GEO_FPS] = MeshBuilder::GenerateText("fpstext", 16, 16);
 	meshList[GEO_FPS]->textureID = LoadTGA("Images//bizudgothic.tga");
+	meshList[GEO_UI] = MeshBuilder::GenerateQuad("UIBox", glm::vec3(0.12f, 0.12f, 0.12f), 10.f);
 
 	meshList[GEO_SPINNER] = MeshBuilder::GenerateOBJ("Spinner", "Models//spinner.obj");
 	meshList[GEO_SPINNER]->textureID = LoadTGA("Images//spinner.tga");
@@ -227,6 +230,7 @@ void SceneSpinningRing::Init()
 	glUniform1f(m_parameters[U_LIGHT2_EXPONENT], light[2].exponent);
 
 	enableLight = true;
+	remainingTime = 30.0f;
 }
 
 void SceneSpinningRing::Update(double dt)
@@ -239,6 +243,11 @@ void SceneSpinningRing::Update(double dt)
 
 	float temp = 1.f / dt;
 	fps = glm::round(temp * 100.f) / 100.f;
+
+	remainingTime -= dt; // decrease time
+	if (remainingTime < 0) {
+		remainingTime = 0; // time will not go below 0
+	}
 }
 
 void SceneSpinningRing::Render()
@@ -296,6 +305,9 @@ void SceneSpinningRing::Render()
 	//RenderMesh(meshList[GEO_SPHERE], false);
 	//modelStack.PopMatrix();
 
+	RenderSkyBox();
+
+	// Render Lava
 	modelStack.PushMatrix();
 	modelStack.Translate(0.f, -120.f, 0.f);
 	modelStack.Scale(500.f, 10.f, 500.f);
@@ -306,6 +318,7 @@ void SceneSpinningRing::Render()
 	RenderMesh(meshList[GEO_CUBE], true);
 	modelStack.PopMatrix();
 
+	// Render Spinners
 	modelStack.PushMatrix();
 	modelStack.Translate(0.f, 15.f, 0.f);
 	modelStack.Scale(30.f, 30.f, 50.f);
@@ -326,6 +339,7 @@ void SceneSpinningRing::Render()
 	RenderMesh(meshList[GEO_SPINNER2], true);
 	modelStack.PopMatrix();
 
+	// Render Platform
 	modelStack.PushMatrix();
 	modelStack.Translate(0.f, -120.f, 0.f);
 	modelStack.Scale(50.f, 15.f, 50.f);
@@ -336,10 +350,12 @@ void SceneSpinningRing::Render()
 	RenderMesh(meshList[GEO_CYLINDER], true);
 	modelStack.PopMatrix();
 
-	RenderSkyBox();
+	RenderMeshOnScreen(meshList[GEO_UI], 45, 560, 45, 3);
+	std::string timeText = "Time Left: " + std::to_string(static_cast<int>(remainingTime));
+	RenderTextOnScreen(meshList[GEO_TEXT2], timeText, glm::vec3(1, 1, 1), 20, 10, 550);
 
 	std::string temp("FPS:" + std::to_string(fps));
-	RenderTextOnScreen(meshList[GEO_TEXT], temp.substr(0, 9), glm::vec3(0, 1, 0), 20, 620, 50);
+	RenderTextOnScreen(meshList[GEO_FPS], temp.substr(0, 9), glm::vec3(0, 1, 0), 20, 620, 50);
 }
 
 void SceneSpinningRing::RenderMesh(Mesh* mesh, bool enableLight)

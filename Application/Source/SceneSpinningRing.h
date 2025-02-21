@@ -29,7 +29,9 @@ public:
 
 		//Text
 		GEO_TEXT,
+		GEO_TEXT2,
 		GEO_FPS,
+		GEO_UI,
 
 		//SKybox
 		GEO_LEFT,
@@ -123,6 +125,8 @@ private:
 	//AltAzCamera camera;
 	FPCamera camera;
 	int projType = 1; // fix to 0 for orthographic, 1 for projection
+
+	float remainingTime;
 
 	MatrixStack modelStack, viewStack, projectionStack;	
 
