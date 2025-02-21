@@ -38,7 +38,8 @@ SceneBalloonPop::SceneBalloonPop() :
 	m_maxDartPower(100.0f),
 	m_powerChargeRate(2.0f),
 	m_isChargingShot(false),
-	m_dartsLeft(1000)  
+	m_dartsLeft(1000),
+	m_shootCooldown(0.0f)  // Initialize cooldown timer to 0
 
 {
 	// Additional initialization if needed
@@ -207,6 +208,11 @@ void SceneBalloonPop::Init()
 		"Models//dart.obj");
 	meshList[GEO_DART]->textureID = LoadTGA("Images//arrow.tga");
 
+	meshList[GEO_GAMEOVER] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 2.f);
+	meshList[GEO_GAMEOVER]->textureID = LoadTGA("Images//balloonpopgameover.tga");
+
+
+
 
 	meshList[GEO_CROSSHAIR] = MeshBuilder::GenerateQuad("Crosshair", glm::vec3(1, 1, 1), 1.f);
 
@@ -288,6 +294,11 @@ void SceneBalloonPop::Init()
 
 
 void SceneBalloonPop::HandleDartInput() {
+	// Update cooldown timer
+	if (m_shootCooldown > 0) {
+		return;  // Don't process input while on cooldown
+	}
+
 	if (MouseController::GetInstance()->IsButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
 		if (!m_isChargingShot) {
 			m_isChargingShot = true;
@@ -302,9 +313,11 @@ void SceneBalloonPop::HandleDartInput() {
 			FireDart();
 			m_isChargingShot = false;
 			m_dartPower = 0.0f;
+			m_shootCooldown = SHOOT_COOLDOWN_DURATION;  // Start cooldown after firing
 		}
 	}
 }
+
 
 void SceneBalloonPop::FireDart() {
 	if (m_dartsLeft <= 0) return;
@@ -358,13 +371,16 @@ void SceneBalloonPop::Update(double dt)
 {
 	HandleKeyPress();
 	if (!gameOver) {
+
+		if (m_shootCooldown > 0) {
+			m_shootCooldown -= static_cast<float>(dt);
+		}
 		// Update game timer
 		gameTimer -= static_cast<float>(dt);
 		if (gameTimer <= 0 && playerScore < WIN_SCORE) {
-			gameOver = true;
+			gameOver = true;  // Only set gameOver to true if player hasn't reached WIN_SCORE
 			return;
 		}
-
 		HandleDartInput();
 
 		// Update all active darts
@@ -476,7 +492,8 @@ void SceneBalloonPop::Update(double dt)
 		}
 	}
 	else {
-		if (KeyboardController::GetInstance()->IsKeyPressed('R')) {
+		// Only allow restart if player lost (didn't reach WIN_SCORE)
+		if (KeyboardController::GetInstance()->IsKeyPressed('R') && playerScore < WIN_SCORE) {
 			gameTimer = GAME_TIME_LIMIT;
 			playerScore = 0;
 			gameOver = false;
@@ -931,12 +948,9 @@ void SceneBalloonPop::Render()
 	std::string timeText = "Time: " + std::to_string(static_cast<int>(gameTimer));
 	RenderTextOnScreen(meshList[GEO_TEXT], timeText, glm::vec3(1, 1, 1), 25, 10, 520);
 
-	if (gameOver) {
-		std::string gameOverText = playerScore >= WIN_SCORE ? "You Win!" : "Game Over!";
-		RenderTextOnScreen(meshList[GEO_TEXT], gameOverText, glm::vec3(1, 0, 0), 40, 300, 300);
-		RenderTextOnScreen(meshList[GEO_TEXT], "Press R to Restart", glm::vec3(1, 1, 1), 25, 300, 250);
+	if (gameOver && playerScore < WIN_SCORE) {
+		RenderMeshOnScreen(meshList[GEO_GAMEOVER], 400, 300, 400, 300);
 	}
-
 	// Render vertical line of crosshair
 	RenderMeshOnScreen(meshList[GEO_CROSSHAIR], 400, 300, 2, 20);  // Thin vertical line
 	// Render horizontal line of crosshair

@@ -27,6 +27,7 @@ public:
 		GEO_BALLOON,
 		GEO_CROSSHAIR,
 		GEO_DART,
+		GEO_GAMEOVER,
 
 		//Text
 		GEO_TEXT,
@@ -172,6 +173,9 @@ private:
 	const float DART_RADIUS = 3.0f;
 	const float BALLOON_RADIUS = 5.0f;
 	const int MAX_DARTS = 1000;
+
+	float m_shootCooldown;        // Current cooldown timer
+	const float SHOOT_COOLDOWN_DURATION = 1.0f;  // One second cooldown
 
 	void SpawnBalloon() {
 		Balloon newBalloon;
