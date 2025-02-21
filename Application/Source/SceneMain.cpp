@@ -907,7 +907,7 @@ void SceneMain::UpdateDialogue(double dt)
 	{
 		dialogueTimer += dt;
 
-		if (dialogueTimer >= TEXT_DISPLAY_TIME)
+		if (dialogueTimer >= TEXT_DISPLAY_TIME || KeyboardController::GetInstance()->IsKeyPressed('E'))
 		{
 			dialogueTimer = 0;
 			currentLineIndex++;
@@ -924,7 +924,7 @@ void SceneMain::UpdateDialogue(double dt)
 	{
 		dialogueTimer += dt;
 
-		if (dialogueTimer >= TEXT_DISPLAY_TIME)
+		if (dialogueTimer >= TEXT_DISPLAY_TIME || KeyboardController::GetInstance()->IsKeyPressed('E'))
 		{
 			dialogueTimer = 0;
 			currentLineIndex++;
@@ -1248,7 +1248,7 @@ void SceneMain::HandleKeyPress()
 	if (KeyboardController::GetInstance()->IsKeyPressed('E') && showEnterFinalTentText)
 	{
 		// logic to complete the final challenge
-		isFinalChallengeCompleted = true; 
+		isFinalChallengeCompleted = true;
 	}
 }
 
