@@ -6,16 +6,12 @@
 #include "SceneSpinningRing.h"
 #include "SceneHole.h"
 #include "MainMenu.h"
-
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
 // Include other scene headers
 
 void CSceneManager::Init() {
     // Initialize with first scene
     activeScene = new SceneArchery;
-    currentSceneType = SCENE_MAIN_MENU;
-    loadingScreen = new LoadingScreen;
+    currentSceneType = SCENE_BALLOONPOP;
     activeScene->Init();
 }
 
@@ -37,36 +33,6 @@ void CSceneManager::Update(double dt) {
     }
 }
 
-//void CSceneManager::Update(double dt) {
-//    if (isLoading) {
-//        loadingScreen->Update(dt);
-//        if (loadingScreen->IsLoadingComplete()) {
-//            // Transition from loading screen to next scene
-//            if (activeScene != loadingScreen) {
-//                delete activeScene;
-//            }
-//            activeScene = nextScene;
-//            nextScene = nullptr;
-//            isLoading = false;
-//        }
-//    }
-//    else if (nextScene != nullptr) {
-//        // Start loading sequence
-//        isLoading = true;
-//        loadingScreen->SetSceneToLoad(nextScene);
-//        loadingScreen->Init();
-//        if (activeScene != loadingScreen) {
-//            activeScene->Exit();
-//            Scene* oldScene = activeScene;
-//            activeScene = loadingScreen;
-//            delete oldScene;
-//        }
-//    }
-//    else if (activeScene != nullptr) {
-//        activeScene->Update(dt);
-//    }
-//}
-
 void CSceneManager::Render() {
     if (activeScene != nullptr) {
         activeScene->Render();
@@ -83,11 +49,6 @@ void CSceneManager::Exit() {
     if (nextScene != nullptr) {
         delete nextScene;
         nextScene = nullptr;
-    }
-
-    if (loadingScreen != nullptr) {
-        delete loadingScreen;
-        loadingScreen = nullptr;
     }
 }
 
