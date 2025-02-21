@@ -38,7 +38,6 @@ void SceneMain::Init()
 	camera.allowLocomotiveTilt = false;
 	camera.allowLocomotiveBop = false;
 
-
 	// Set background color to dark blue
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
@@ -328,6 +327,8 @@ void SceneMain::Init()
 	isSignDialogueActive = false;
 	currentLineIndex = 0;
 	dialogueTimer = 0;
+
+	cutsceneStage = -1;
 }
 
 void SceneMain::Update(double dt)
@@ -351,12 +352,22 @@ void SceneMain::Update(double dt)
 	//light[0].spotDirection = -glm::normalize (camera.target - camera.pos);
 	//light[0].position = camera.pos;
 
-	std::cout << camera.pos.z << std::endl;
+	std::cout << camera.pos.x << std::endl;
 
 	switch (cutsceneStage)
 	{
 	case 0:
-		camera.pos.x += 1 * dt;
+		camera.pos.x = -50;
+		camera.pos.y = 10;
+		camera.pos.z = -90;
+		cutsceneStage = 1;
+		break;
+	case -1:
+		camera.pos.x = -50;
+		camera.pos.y = 10;
+		camera.pos.z = -90;
+		cutsceneStage = 0;
+		break;
 	case 1:
 		camera.pos.x += abs(camera.pos.x + 10) / 2 * dt;
 		camera.pos.z += 1 * dt;
@@ -395,6 +406,8 @@ void SceneMain::Update(double dt)
 
 		break;
 	}
+
+
 
 	camera.Update(dt);
 	player[0].pos = camera.pos;
@@ -1037,6 +1050,7 @@ void SceneMain::RenderObjectives() {
 
 	int visibleObjectives = 1; 
 	if (hasReadSign) {
+		camera.allowMovement = true;
 		visibleObjectives++;
 		if (completedGames == 6) {
 			visibleObjectives++;
@@ -1224,6 +1238,7 @@ void SceneMain::HandleKeyPress()
 
 	if (KeyboardController::GetInstance()->IsKeyPressed('F') && showSignText)
 	{
+		camera.allowMovement = false;
 		readSign = true;
 		hasReadSign = true;
 	}

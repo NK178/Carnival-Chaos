@@ -30,6 +30,9 @@ public:
     void RotateCamera(float dt);
     void RotateAboutCamera(glm::vec3 rotpt, float angle);
 
+    void setWalkSpeed(float speed);
+    void setRunSpeed(float speed);
+
     //bools for camera mechanics
 
     bool enableFNAF = false;
@@ -75,6 +78,9 @@ private:
     bool staminaflag;
     bool runflag;
     bool heightresetflag = false;
+
+    float walkSpeed = 30;
+    float runSpeed = 100;
 
     signed short int multDebugX, multDebugZ;
 
