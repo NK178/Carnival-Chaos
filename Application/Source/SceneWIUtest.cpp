@@ -272,7 +272,7 @@ void SceneWIUtest::Update(double dt)
 		if (iter > 7)
 			iter = iter % obblist[0].vertices.size();
 	}
-	std::cout << "Iter: " << iter << " " << obb_worldvertices[iter].x << " " << obb_worldvertices[iter].y << " " << obb_worldvertices[iter].z << std::endl;
+	//std::cout << "Iter: " << iter << " " << obb_worldvertices[iter].x << " " << obb_worldvertices[iter].y << " " << obb_worldvertices[iter].z << std::endl;
 
 	if (KeyboardController::GetInstance()->IsKeyPressed('R')) {
 		obblist[0].angularVel += 50.f;
@@ -755,8 +755,6 @@ void SceneWIUtest::RenderSkyBox() {
 
 void SceneWIUtest::CubeCollisions(std::vector<int> idlist, std::vector<Cube>& Cubelist, CollisionData cd)
 {
-	//std::cout << idlist[0] << std::endl;
-	//std::cout << idlist[1] << std::endl;
 	for (int i = 0; i < idlist.size() - 1; i++) {	
 		for (int j = i + 1; j < idlist.size(); j++) {
 			int idA = idlist[i];

@@ -1,5 +1,5 @@
-#ifndef SCENE_WIU_TEST_H
-#define SCENE_WIU_TEST_H
+#ifndef SCENE_WHACK_A_MOLE_H
+#define SCENE_WHACK_A_MOLE_H
 
 #include "Scene.h"
 #include "Mesh.h"

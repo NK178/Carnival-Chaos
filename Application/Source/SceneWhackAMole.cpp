@@ -123,7 +123,7 @@ void SceneWhackAMole::Init()
 	meshList[GEO_AXES] = MeshBuilder::GenerateAxes("Axes", 10000.f, 10000.f, 10000.f);
 	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Sun", glm::vec3(1.f, 1.f, 1.f), 1.f, 16, 16);
 	meshList[GEO_PLANE] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 2.f);
-	meshList[GEO_PLANE]->textureID = LoadTGA("Images//grass.tga");
+	meshList[GEO_PLANE]->textureID = LoadTGA("Images//whackamole_grid2.tga");
 	meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("STAMINA_BAR", glm::vec3(1, 1, 1), 1.f);
 	meshList[GEO_CUBE] = MeshBuilder::GenerateCube("Cube", glm::vec3(1, 1, 1), 1.f);
 	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Sphere", glm::vec3(1, 1, 1), 1.f);
@@ -137,17 +137,17 @@ void SceneWhackAMole::Init()
 
 	//skybox
 	meshList[GEO_LEFT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_LEFT]->textureID = LoadTGA("Images//nightsky_lfD.tga");
+	meshList[GEO_LEFT]->textureID = LoadTGA("Images//whackamole_sides.tga");
 	meshList[GEO_RIGHT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_RIGHT]->textureID = LoadTGA("Images//nightsky_rtD.tga");
+	meshList[GEO_RIGHT]->textureID = LoadTGA("Images//whackamole_sides.tga");
 	meshList[GEO_TOP] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_TOP]->textureID = LoadTGA("Images//nightsky_upD.tga");
+	meshList[GEO_TOP]->textureID = LoadTGA("Images//dark_tenttop.tga");
 	meshList[GEO_BOTTOM] = MeshBuilder::GenerateQuad("Plane",glm::vec3(1.f, 1.f, 1.f), 100.f);
 	meshList[GEO_BOTTOM]->textureID = LoadTGA("Images//nightsky_dnD.tga");
 	meshList[GEO_FRONT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_FRONT]->textureID = LoadTGA("Images//nightsky_bkD.tga");
+	meshList[GEO_FRONT]->textureID = LoadTGA("Images//whackamole_sides.tga");
 	meshList[GEO_BACK] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_BACK]->textureID = LoadTGA("Images//nightsky_ftD.tga");
+	meshList[GEO_BACK]->textureID = LoadTGA("Images//whackamole_sides.tga");
 
 	// 16 x 16 is the number of columns and rows for the text
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16,16);
@@ -335,15 +335,15 @@ void SceneWhackAMole::Render()
 	RenderMesh(meshList[GEO_SPHERE], false);
 	modelStack.PopMatrix();
 
-	//modelStack.PushMatrix();
-	//modelStack.Scale(100.f, 1.f, 100.f);
-	//modelStack.Rotate(-90.f, 1, 0, 0);
-	//meshList[GEO_PLANE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-	//meshList[GEO_PLANE]->material.kDiffuse = glm::vec3(0.5f,0.5f, 0.5f);
-	//meshList[GEO_PLANE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	//meshList[GEO_PLANE]->material.kShininess = 1.0f;
-	//RenderMesh(meshList[GEO_PLANE], true);
-	//modelStack.PopMatrix();
+	modelStack.PushMatrix();
+	modelStack.Scale(100.f, 1.f, 100.f);
+	modelStack.Rotate(-90.f, 1, 0, 0);
+	meshList[GEO_PLANE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+	meshList[GEO_PLANE]->material.kDiffuse = glm::vec3(0.5f,0.5f, 0.5f);
+	meshList[GEO_PLANE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_PLANE]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_PLANE], true);
+	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
 	modelStack.Translate(0, 0, 0);
@@ -379,32 +379,8 @@ void SceneWhackAMole::Render()
 	//RenderMesh(meshList[GEO_HAMMER3], true);
 	//modelStack.PopMatrix();
 
-	for (int i = 0; i < cubelist.size(); i++) {
-		modelStack.PushMatrix();
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		modelStack.Translate(cubelist[i].pos.x, cubelist[i].pos.y, cubelist[i].pos.z);
-		modelStack.Rotate(cubelist[i].angleDeg, 0, 1, 0);
-		modelStack.Scale(2*cubelist[i].boxextent.x, 2*cubelist[i].boxextent.y, 2*cubelist[i].boxextent.z);
-		meshList[GEO_CUBE]->material.kAmbient = glm::vec3(1.f, 0.1f, 0.1f);
-		meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(1.f, 0.1f, 0.1f);
-		meshList[GEO_CUBE]->material.kSpecular = glm::vec3(1.f, 0.2f, 0.2f);
-		meshList[GEO_CUBE]->material.kShininess = 2.0f;
-		RenderMesh(meshList[GEO_CUBE], true);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		modelStack.PopMatrix();
-	}
 
-	for (int i = 0; i < spherelist.size(); i++) {
-		modelStack.PushMatrix();
-		modelStack.Translate(spherelist[i].pos.x, spherelist[i].pos.y, spherelist[i].pos.z);
-		modelStack.Scale(spherelist[i].radius, spherelist[i].radius, spherelist[i].radius);
-		meshList[GEO_SPHERE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-		meshList[GEO_SPHERE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-		meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-		meshList[GEO_SPHERE]->material.kShininess = 1.0f;
-		RenderMesh(meshList[GEO_SPHERE], true);
-		modelStack.PopMatrix();
-	}
+	RenderTextOnScreen(meshList[GEO_TEXT], "Stamina", glm::vec3(0, 1, 0), 40, 0, 0);
 
 	RenderSkyBox();
 }
@@ -643,44 +619,45 @@ void SceneWhackAMole::RenderSkyBox() {
 	modelStack.PushMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Translate(0.f, 0.f, 250.f);
+	modelStack.Translate(0.f, 0.f, 300.f);
 	modelStack.Rotate(180, 0, 1, 0);
-	modelStack.Scale(5.f, 5.f, 5.f);
+	modelStack.Scale(6.f, 6.f, 6.f);
 	RenderMesh(meshList[GEO_FRONT], false);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Translate(0.f, 0.f, -250.f);
-	modelStack.Scale(5.f, 5.f, 5.f);
+	modelStack.Translate(0.f, 0.f, -300.f);
+	modelStack.Scale(6.f, 6.f, 6.f);
 	RenderMesh(meshList[GEO_BACK], false);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Translate(250.f, 0.f, 0.f);
+	modelStack.Translate(300.f, 0.f, 0.f);
 	modelStack.Rotate(270, 0, 1, 0);
-	modelStack.Scale(5.f, 5.f, 5.f);
+	modelStack.Scale(6.f, 6.f, 6.f);
 	RenderMesh(meshList[GEO_LEFT], false);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Translate(-250.f, 0.f, 0.f);
+	modelStack.Translate(-300.f, 0.f, 0.f);
 	modelStack.Rotate(90, 0, 1, 0);
-	modelStack.Scale(5.f, 5.f, 5.f);
+	modelStack.Scale(6.f, 6.f, 6.f);
 	RenderMesh(meshList[GEO_RIGHT], false);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
 	modelStack.Rotate(90, 0, 1, 0);
-	modelStack.Translate(0.f, 250.f, 0.f);
+	modelStack.Translate(0.f, 300.f, 0.f);
 	modelStack.Rotate(90, 1, 0, 0);
-	modelStack.Scale(5.f, 5.f, 5.f);
+	modelStack.Scale(6.f, 6.f, 6.f);
 	RenderMesh(meshList[GEO_TOP], false);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Translate(0.f, -250.f, 0.f);
+	modelStack.Translate(0.f, -300.f, 0.f);
 	modelStack.Rotate(270, 1, 0, 0);
-	modelStack.Scale(5.f, 5.f, 5.f);
+	modelStack.Scale(6.f, 6.f, 6.f);
 	RenderMesh(meshList[GEO_BOTTOM], false);
+	modelStack.PopMatrix();
 	modelStack.PopMatrix();
 }

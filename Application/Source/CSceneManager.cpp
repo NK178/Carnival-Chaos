@@ -4,6 +4,7 @@
 #include "SceneArchery.h"
 #include "SceneMain.h"
 #include "SceneHole.h"
+#include "SceneWhackAMole.h"
 #include "SceneWIUtest.h"
 #include "MainMenu.h"
 // Include other scene headers
@@ -11,7 +12,7 @@
 void CSceneManager::Init() {
     // Initialize with first scene
     //activeScene = new MainMenu();
-    activeScene = new SceneWIUtest;
+    activeScene = new SceneWhackAMole;
     currentSceneType = SCENE_MAIN_MENU;
     activeScene->Init();
 }
