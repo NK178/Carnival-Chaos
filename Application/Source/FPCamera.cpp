@@ -336,18 +336,7 @@ void FPCamera::Update(double dt)
 	{
 		Application::SetPointerStatus(true);
 
-		if (MouseController::GetInstance()->GetMousePositionX() > 1720)
-		{
-			angleX = -20 * ROTATE_SPEED * 0.05 * static_cast<float>(dt);
-		}
-		else if (MouseController::GetInstance()->GetMousePositionX() < 200)
-		{
-			angleX = 20 * ROTATE_SPEED * 0.05 * static_cast<float>(dt);
-		}
-		else
-		{
-			angleX = 0;
-		}
+		angleX = 0;
 	}
 	glm::mat4 yaw = glm::rotate(
 		glm::mat4(1.f), // matrix to modify
@@ -361,20 +350,7 @@ void FPCamera::Update(double dt)
 
 	if (enableFNAF)
 	{
-		Application::SetPointerStatus(true);
-
-		if (MouseController::GetInstance()->GetMousePositionY() > 800)
-		{
-			angleY = -20 * ROTATE_SPEED * 0.05 * static_cast<float>(dt);
-		}
-		else if (MouseController::GetInstance()->GetMousePositionY() < 200)
-		{
-			angleY = 20 * ROTATE_SPEED * 0.05 * static_cast<float>(dt);
-		}
-		else
-		{
-			angleY = 0;
-		}
+		angleY = 0;
 	}
 
 	glm::mat4 pitch = glm::rotate(
@@ -390,6 +366,22 @@ void FPCamera::Update(double dt)
 	
 	isDirty = true;
 	this->Refresh();
+
+	if (enableFNAF)
+	{
+		glm::vec3 velocity = pos - prevPos;
+		if (glm::length(velocity) > 0.001f) //please don't divide by 0 lol
+		{
+			glm::vec3 newForward = glm::normalize(velocity);
+			forward = glm::mix(forward, newForward, 1.f); //smoothly adjust direction
+			target = pos + forward;
+		}
+	}
+	
+	prevPos = pos;
+
+
+
 
 	UpdatePhysics(dt);
 	

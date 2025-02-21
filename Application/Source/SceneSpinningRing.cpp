@@ -128,25 +128,38 @@ void SceneSpinningRing::Init()
 	meshList[GEO_CUBE] = MeshBuilder::GenerateCube("Cube", glm::vec3(1, 1, 1), 1.f);
 	meshList[GEO_CUBE]->textureID = LoadTGA("Images//lava.tga");
 	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Sphere", glm::vec3(1, 1, 1), 1.f);
+	meshList[GEO_CYLINDER] = MeshBuilder::GenerateCylinder("Cylinder", glm::vec3(1, 1, 1), 16, 1.0f, 16.0f);
+	meshList[GEO_CYLINDER]->textureID = LoadTGA("Images//platform.tga");
 
 	meshList[GEO_LEFT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_LEFT]->textureID = LoadTGA("Images//nightsky_lfD.tga");
+	meshList[GEO_LEFT]->textureID = LoadTGA("Images//circus_skybox.tga");
 	meshList[GEO_RIGHT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_RIGHT]->textureID = LoadTGA("Images//nightsky_rtD.tga");
+	meshList[GEO_RIGHT]->textureID = LoadTGA("Images//circus_skybox.tga");
 	meshList[GEO_TOP] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_TOP]->textureID = LoadTGA("Images//nightsky_upD.tga");
+	meshList[GEO_TOP]->textureID = LoadTGA("Images//tenttop.tga");
 	meshList[GEO_BOTTOM] = MeshBuilder::GenerateQuad("Plane",glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_BOTTOM]->textureID = LoadTGA("Images//nightsky_dnD.tga");
+	meshList[GEO_BOTTOM]->textureID = LoadTGA("Images//tenttop.tga");
 	meshList[GEO_FRONT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_FRONT]->textureID = LoadTGA("Images//nightsky_bkD.tga");
+	meshList[GEO_FRONT]->textureID = LoadTGA("Images//circus_skybox.tga");
 	meshList[GEO_BACK] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_BACK]->textureID = LoadTGA("Images//nightsky_ftD.tga");
+	meshList[GEO_BACK]->textureID = LoadTGA("Images//circus_skybox.tga");
 
 	// 16 x 16 is the number of columns and rows for the text
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16,16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Images//calibri.tga");
+	meshList[GEO_TEXT2] = MeshBuilder::GenerateText("text2", 16, 16);
+	meshList[GEO_TEXT2]->textureID = LoadTGA("Images//yugothicuisemibold.tga");
 	meshList[GEO_FPS] = MeshBuilder::GenerateText("fpstext", 16, 16);
 	meshList[GEO_FPS]->textureID = LoadTGA("Images//bizudgothic.tga");
+	meshList[GEO_UI] = MeshBuilder::GenerateQuad("UIBox", glm::vec3(0.12f, 0.12f, 0.12f), 10.f);
+
+	meshList[GEO_KEY_E] = MeshBuilder::GenerateQuad("KeyE", glm::vec3(1.f, 1.f, 1.f), 2.f);
+	meshList[GEO_KEY_E]->textureID = LoadTGA("Images//keyboard_key_e.tga");
+
+	meshList[GEO_SPINNER] = MeshBuilder::GenerateOBJ("Spinner", "Models//spinner.obj");
+	meshList[GEO_SPINNER]->textureID = LoadTGA("Images//spinner.tga");
+	meshList[GEO_SPINNER2] = MeshBuilder::GenerateOBJ("Spinner", "Models//spinner2.obj");
+	meshList[GEO_SPINNER2]->textureID = LoadTGA("Images//spinner2.tga");
 
 	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 1000.0f);
 	projectionStack.LoadMatrix(projection);
@@ -220,6 +233,12 @@ void SceneSpinningRing::Init()
 	glUniform1f(m_parameters[U_LIGHT2_EXPONENT], light[2].exponent);
 
 	enableLight = true;
+	isObjectiveRead = false; 
+	//remainingTime = 30.0f;
+	remainingTime = 1.0f;
+	countdownTime = 4.0f;
+	playerWon = false;
+	playerLost = false;
 }
 
 void SceneSpinningRing::Update(double dt)
@@ -232,6 +251,23 @@ void SceneSpinningRing::Update(double dt)
 
 	float temp = 1.f / dt;
 	fps = glm::round(temp * 100.f) / 100.f;
+
+
+	if (isObjectiveRead) {
+		if (countdownTime > 0) {
+			countdownTime -= dt; // decrease countdown time
+			if (countdownTime < 0) {
+				countdownTime = 0; // ensure countdown does not go below 0
+			}
+		}
+		else {
+			remainingTime -= dt; // decrease game time after countdown ends
+			if (remainingTime < 0) {
+				remainingTime = 0; // ensure time does not go below 0
+				playerWon = true; // player wins
+			}
+		}
+	}
 }
 
 void SceneSpinningRing::Render()
@@ -289,18 +325,12 @@ void SceneSpinningRing::Render()
 	//RenderMesh(meshList[GEO_SPHERE], false);
 	//modelStack.PopMatrix();
 
-	modelStack.PushMatrix();
-	modelStack.Scale(100.f, 1.f, 100.f);
-	modelStack.Rotate(-90.f, 1, 0, 0);
-	meshList[GEO_PLANE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-	meshList[GEO_PLANE]->material.kDiffuse = glm::vec3(0.5f,0.5f, 0.5f);
-	meshList[GEO_PLANE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	meshList[GEO_PLANE]->material.kShininess = 1.0f;
-	RenderMesh(meshList[GEO_PLANE], true);
-	modelStack.PopMatrix();
+	RenderSkyBox();
 
+	// Render Lava
 	modelStack.PushMatrix();
-	modelStack.Scale(10.f, 10.f, 10.f);
+	modelStack.Translate(0.f, -120.f, 0.f);
+	modelStack.Scale(500.f, 10.f, 500.f);
 	meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
 	meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
 	meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
@@ -308,10 +338,84 @@ void SceneSpinningRing::Render()
 	RenderMesh(meshList[GEO_CUBE], true);
 	modelStack.PopMatrix();
 
-	RenderSkyBox();
+	// Render Spinners
+	modelStack.PushMatrix();
+	modelStack.Translate(0.f, 15.f, 0.f);
+	modelStack.Scale(30.f, 30.f, 50.f);
+	meshList[GEO_SPINNER]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_SPINNER]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_SPINNER]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_SPINNER]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_SPINNER], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(0.f, 5.f, 0.f);
+	modelStack.Scale(50.f, 30.f, 50.f);
+	meshList[GEO_SPINNER2]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_SPINNER2]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_SPINNER2]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_SPINNER2]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_SPINNER2], true);
+	modelStack.PopMatrix();
+
+	// Render Platform
+	modelStack.PushMatrix();
+	modelStack.Translate(0.f, -120.f, 0.f);
+	modelStack.Scale(50.f, 15.f, 50.f);
+	meshList[GEO_CYLINDER]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_CYLINDER]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_CYLINDER]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_CYLINDER]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_CYLINDER], true);
+	modelStack.PopMatrix();
+
+	if (!isObjectiveRead) {
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- SPINNING RING -", glm::vec3(1, 1, 0), 25, 200, 400);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Avoid the spinning walls and", glm::vec3(1, 1, 1), 15, 195, 350);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "beams by jumping over them!", glm::vec3(1, 1, 1), 15, 205, 320);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Survive until the timer ends!", glm::vec3(1, 1, 1), 15, 190, 270);
+
+		RenderMeshOnScreen(meshList[GEO_KEY_E], 310, 220, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Continue", glm::vec3(1, 1, 1), 20, 340, 210);
+	}
+
+	if (isObjectiveRead) {
+		if (countdownTime > 0) {
+			std::string countdownText;
+			if (countdownTime > 3.0f) {
+				countdownText = "3..";
+			}
+			else if (countdownTime > 2.0f) {
+				countdownText = "2..";
+			}
+			else if (countdownTime > 1.0f) {
+				countdownText = "1..";
+			}
+			else {
+				countdownText = "GO!";
+			}
+			RenderTextOnScreen(meshList[GEO_TEXT2], countdownText, glm::vec3(1, 1, 1), 50, 350, 300);
+		}
+		else if (playerWon) {
+			RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
+			RenderTextOnScreen(meshList[GEO_TEXT2], "YOU WON!", glm::vec3(0, 1, 0), 50, 220, 350);
+			RenderTextOnScreen(meshList[GEO_TEXT2], "You've beat", glm::vec3(1, 1, 1), 20, 295, 300);
+			RenderTextOnScreen(meshList[GEO_TEXT2], "Spinning Rings Game!", glm::vec3(1, 1, 1), 20, 210, 270);
+
+			RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
+			RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
+		}
+		else {
+			RenderMeshOnScreen(meshList[GEO_UI], 45, 560, 45, 3);
+			std::string timeText = "Time Left: " + std::to_string(static_cast<int>(remainingTime));
+			RenderTextOnScreen(meshList[GEO_TEXT2], timeText, glm::vec3(1, 1, 1), 20, 10, 550);
+		}
+	}
 
 	std::string temp("FPS:" + std::to_string(fps));
-	RenderTextOnScreen(meshList[GEO_TEXT], temp.substr(0, 9), glm::vec3(0, 1, 0), 20, 620, 50);
+	RenderTextOnScreen(meshList[GEO_FPS], temp.substr(0, 9), glm::vec3(0, 1, 0), 20, 620, 50);
 }
 
 void SceneSpinningRing::RenderMesh(Mesh* mesh, bool enableLight)
@@ -424,6 +528,17 @@ void SceneSpinningRing::HandleKeyPress()
 		}
 
 		glUniform1i(m_parameters[U_LIGHT0_TYPE], light[0].type);
+	}
+
+	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E)) {
+		if (playerWon) 
+		{
+			// go back to scene main
+		}
+		else 
+		{
+			isObjectiveRead = true; // set to true when the objective is read
+		}
 	}
 
 }
