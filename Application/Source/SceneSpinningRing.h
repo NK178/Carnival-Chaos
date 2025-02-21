@@ -20,11 +20,18 @@ public:
 		GEO_CUBE,
 		GEO_QUAD,
 		GEO_SPHERE,
+		GEO_CYLINDER,
 		GEO_PLANE,
+
+		// Models
+		GEO_SPINNER,
+		GEO_SPINNER2,
 
 		//Text
 		GEO_TEXT,
+		GEO_TEXT2,
 		GEO_FPS,
+		GEO_UI,
 
 		//SKybox
 		GEO_LEFT,
@@ -118,6 +125,8 @@ private:
 	//AltAzCamera camera;
 	FPCamera camera;
 	int projType = 1; // fix to 0 for orthographic, 1 for projection
+
+	float remainingTime;
 
 	MatrixStack modelStack, viewStack, projectionStack;	
 
