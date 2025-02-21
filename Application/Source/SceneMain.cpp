@@ -347,6 +347,29 @@ void SceneMain::Update(double dt)
 	//light[0].spotDirection = -glm::normalize (camera.target - camera.pos);
 	//light[0].position = camera.pos;
 
+	switch (cutsceneStage)
+	{
+	case 1:
+
+		camera.pos.x += 5 * dt;
+		if (camera.pos.x >= 0)
+		{
+			camera.pos.x = 0;
+			cutsceneStage = 2;
+		}
+		break;
+
+	case 2:
+
+		camera.pos.z += 5 * dt;
+		if (camera.pos.z >= 100)
+		{
+			camera.pos.z = 0;
+			cutsceneStage = 2;
+		}
+		break;
+	}
+
 	camera.Update(dt);
 	player[0].pos = camera.pos;
 	std::cout << "x: " << player[0].pos.x << " y: " << player[0].pos.y << " z: " << player[0].pos.z << std::endl;

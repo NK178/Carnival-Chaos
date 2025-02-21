@@ -367,6 +367,19 @@ void FPCamera::Update(double dt)
 	isDirty = true;
 	this->Refresh();
 
+
+	glm::vec3 newForward = glm::normalize(pos - prevPos);
+	if (glm::length(newForward) > 0.001f)
+	{ //don't divide by 0 lmao
+		forward = glm::mix(forward, newForward, 0.2f); //smooth
+		target = pos + forward;
+	}
+	
+	prevPos = pos;
+
+
+
+
 	UpdatePhysics(dt);
 	
 }
