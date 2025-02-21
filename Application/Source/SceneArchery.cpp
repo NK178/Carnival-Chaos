@@ -367,6 +367,11 @@ void SceneArchery::RestartGame()
 }
 
 void SceneArchery::HandleArrowInput() {
+	// Only allow shooting after countdown and not in game over state
+	if (!m_isObjectiveRead || countdownTime > 0 || m_isGameOver || m_hasWon) {
+		return;
+	}
+
 	// When left mouse button is held down
 	if (MouseController::GetInstance()->IsButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
 		if (!m_isChargingShot) {
@@ -463,18 +468,23 @@ void SceneArchery::CheckArrowCollisions()
 
 					CollisionData cd;
 					if (OverlapAABB2Sphere(arrowPhysics, ARROW_RADIUS, targetPhysics, boxMin, boxMax, cd)) {
-						// **Ensure Score is Always Added**
+						// Add score
 						m_playerScore += pointValues[i];
 
-						// **Fix: Correct Arrow Position**
+						// **Check for Win Condition**
+						if (m_playerScore >= 20) {
+							m_hasWon = true;
+							m_isGameOver = false;
+						}
+
+						// Rest of the existing collision handling...
 						glm::vec3 impactPoint = arrow.pos - glm::normalize(arrow.vel) * ARROW_RADIUS;
 						arrow.stuckPosition = impactPoint;
 
-						// **Fix: Properly Set Arrow as Stuck**
-						arrow.isActive = true;   // Ensure arrow remains visible
+						arrow.isActive = true;
 						arrow.isStuck = true;
-						arrow.vel = glm::vec3(0.0f);  // Stop movement
-						arrow.targetNormal = glm::normalize(cd.normal); // Store collision normal
+						arrow.vel = glm::vec3(0.0f);
+						arrow.targetNormal = glm::normalize(cd.normal);
 
 						scored = true;
 					}
@@ -942,7 +952,7 @@ void SceneArchery::Render()
 		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "YOU WON!", glm::vec3(0, 1, 0), 50, 220, 350);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "You've beat", glm::vec3(1, 1, 1), 20, 295, 300);
-		RenderTextOnScreen(meshList[GEO_TEXT2], "Archery Game!", glm::vec3(1, 1, 1), 20, 210, 270);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "   Archery Game!", glm::vec3(1, 1, 1), 20, 210, 270);
 
 		RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
