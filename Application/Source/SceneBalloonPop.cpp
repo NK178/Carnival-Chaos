@@ -326,22 +326,22 @@ void SceneBalloonPop::FireDart() {
 		if (!dart.isActive) {
 			m_dartsLeft--;
 
-			// Calculate fire direction based on camera
-			glm::vec3 fireDirection = glm::normalize(camera.target - camera.pos);
+			// Calculate fire direction from camera view direction
+			glm::vec3 forward = camera.target - camera.pos;
+			glm::vec3 fireDirection = glm::normalize(forward);
 
-			// Set base velocity 
-			const float DART_BASE_SPEED = 180.0f; 
+			// Keep the existing Fire() implementation
+			const float DART_BASE_SPEED = 180.0f;
 			dart.Fire(camera.pos, fireDirection, DART_BASE_SPEED);
 
-			// Add initial upward force to counter gravity
-			const float INITIAL_UP_FORCE = 10.0f;  
+			// Keep the existing upward force for arc trajectory
+			const float INITIAL_UP_FORCE = 10.0f;
 			dart.physics.AddForce(glm::vec3(0, INITIAL_UP_FORCE, 0));
 
 			break;
 		}
 	}
 }
-
 
 void SceneBalloonPop::CheckDartCollisions() {
 	for (auto& dart : darts) {
@@ -553,9 +553,9 @@ void SceneBalloonPop::Render()
 	}
 
 
-	modelStack.PushMatrix();
-	RenderMesh(meshList[GEO_AXES], false);
-	modelStack.PopMatrix();
+	//modelStack.PushMatrix();
+	//RenderMesh(meshList[GEO_AXES], false);
+	//modelStack.PopMatrix();
 
 	//modelStack.PushMatrix();
 	//modelStack.Translate(light[1].position.x, light[1].position.y, light[1].position.z);
