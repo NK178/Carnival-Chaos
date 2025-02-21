@@ -151,6 +151,8 @@ void SceneSpinningRing::Init()
 
 	meshList[GEO_SPINNER] = MeshBuilder::GenerateOBJ("Spinner", "Models//spinner.obj");
 	meshList[GEO_SPINNER]->textureID = LoadTGA("Images//spinner.tga");
+	meshList[GEO_SPINNER2] = MeshBuilder::GenerateOBJ("Spinner", "Models//spinner2.obj");
+	meshList[GEO_SPINNER2]->textureID = LoadTGA("Images//spinner2.tga");
 
 	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 1000.0f);
 	projectionStack.LoadMatrix(projection);
@@ -311,6 +313,16 @@ void SceneSpinningRing::Render()
 	meshList[GEO_SPINNER]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
 	meshList[GEO_SPINNER]->material.kShininess = 1.0f;
 	RenderMesh(meshList[GEO_SPINNER], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(0.f, 5.f, 0.f);
+	modelStack.Scale(50.f, 30.f, 50.f);
+	meshList[GEO_SPINNER2]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_SPINNER2]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_SPINNER2]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_SPINNER2]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_SPINNER2], true);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();

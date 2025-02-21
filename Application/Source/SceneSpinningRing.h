@@ -25,6 +25,7 @@ public:
 
 		// Models
 		GEO_SPINNER,
+		GEO_SPINNER2,
 
 		//Text
 		GEO_TEXT,
