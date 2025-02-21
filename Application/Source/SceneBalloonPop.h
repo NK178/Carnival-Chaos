@@ -26,6 +26,8 @@ public:
 		GEO_PRESENT,
 		GEO_BALLOON,
 		GEO_CROSSHAIR,
+		GEO_DART,
+		GEO_GAMEOVER,
 
 		//Text
 		GEO_TEXT,
@@ -168,6 +170,13 @@ private:
 	const float FLOOR_HEIGHT = 5.0f;
 
 
+	const float DART_RADIUS = 3.0f;
+	const float BALLOON_RADIUS = 5.0f;
+	const int MAX_DARTS = 1000;
+
+	float m_shootCooldown;        // Current cooldown timer
+	const float SHOOT_COOLDOWN_DURATION = 1.0f;  // One second cooldown
+
 	void SpawnBalloon() {
 		Balloon newBalloon;
 		// Random position at bottom of stage
@@ -178,6 +187,44 @@ private:
 		);
 		balloons.push_back(newBalloon);
 	}
+
+	class Dart {
+	public:
+		bool isActive;
+		PhysicsObject physics;
+		float mass;
+
+		Dart() : isActive(false), mass(1.0f) {
+			physics.mass = mass;
+		}
+
+		void Fire(const glm::vec3& pos, const glm::vec3& dir, float speed) {
+			physics.pos = pos;
+			physics.vel = dir * speed;
+			isActive = true;
+		}
+
+		void Update(float dt) {
+			if (isActive) {
+				// Add gravity
+				physics.AddForce(glm::vec3(0, -9.81f * mass, 0));
+				physics.UpdatePhysics(dt);
+			}
+		}
+	};
+
+
+	std::vector<Dart> darts;
+	float m_dartPower;
+	float m_maxDartPower;
+	float m_powerChargeRate;
+	bool m_isChargingShot;
+	int m_dartsLeft;
+
+	void HandleDartInput();
+	void FireDart();
+	void CheckDartCollisions();
+
 
 
 };

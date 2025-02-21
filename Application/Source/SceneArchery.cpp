@@ -742,7 +742,6 @@ void SceneArchery::Render()
 	modelStack.PopMatrix();
 
 
-	// In the arrow rendering section, modify this part:
 	for (int i = 0; i < MAX_ARROWS; ++i) {
 		if (arrows[i].isActive) {
 			modelStack.PushMatrix();
