@@ -38,7 +38,8 @@ SceneBalloonPop::SceneBalloonPop() :
 	m_maxDartPower(100.0f),
 	m_powerChargeRate(2.0f),
 	m_isChargingShot(false),
-	m_dartsLeft(1000)  
+	m_dartsLeft(1000),
+	m_shootCooldown(0.0f)  // Initialize cooldown timer to 0
 
 {
 	// Additional initialization if needed
@@ -205,7 +206,12 @@ void SceneBalloonPop::Init()
 
 	meshList[GEO_DART] = MeshBuilder::GenerateOBJ("Dart",
 		"Models//dart.obj");
-	meshList[GEO_DART]->textureID = LoadTGA("Images//present.tga");
+	meshList[GEO_DART]->textureID = LoadTGA("Images//arrow.tga");
+
+	meshList[GEO_GAMEOVER] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 2.f);
+	meshList[GEO_GAMEOVER]->textureID = LoadTGA("Images//balloonpopgameover.tga");
+
+
 
 
 	meshList[GEO_CROSSHAIR] = MeshBuilder::GenerateQuad("Crosshair", glm::vec3(1, 1, 1), 1.f);
@@ -288,6 +294,11 @@ void SceneBalloonPop::Init()
 
 
 void SceneBalloonPop::HandleDartInput() {
+	// Update cooldown timer
+	if (m_shootCooldown > 0) {
+		return;  // Don't process input while on cooldown
+	}
+
 	if (MouseController::GetInstance()->IsButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
 		if (!m_isChargingShot) {
 			m_isChargingShot = true;
@@ -302,9 +313,11 @@ void SceneBalloonPop::HandleDartInput() {
 			FireDart();
 			m_isChargingShot = false;
 			m_dartPower = 0.0f;
+			m_shootCooldown = SHOOT_COOLDOWN_DURATION;  // Start cooldown after firing
 		}
 	}
 }
+
 
 void SceneBalloonPop::FireDart() {
 	if (m_dartsLeft <= 0) return;
@@ -313,22 +326,22 @@ void SceneBalloonPop::FireDart() {
 		if (!dart.isActive) {
 			m_dartsLeft--;
 
-			// Calculate fire direction based on camera
-			glm::vec3 fireDirection = glm::normalize(camera.target - camera.pos);
+			// Calculate fire direction from camera view direction
+			glm::vec3 forward = camera.target - camera.pos;
+			glm::vec3 fireDirection = glm::normalize(forward);
 
-			// Set base velocity 
-			const float DART_BASE_SPEED = 120.0f; 
+			// Keep the existing Fire() implementation
+			const float DART_BASE_SPEED = 180.0f;
 			dart.Fire(camera.pos, fireDirection, DART_BASE_SPEED);
 
-			// Add initial upward force to counter gravity
-			const float INITIAL_UP_FORCE = 10.0f;  
+			// Keep the existing upward force for arc trajectory
+			const float INITIAL_UP_FORCE = 10.0f;
 			dart.physics.AddForce(glm::vec3(0, INITIAL_UP_FORCE, 0));
 
 			break;
 		}
 	}
 }
-
 
 void SceneBalloonPop::CheckDartCollisions() {
 	for (auto& dart : darts) {
@@ -358,13 +371,16 @@ void SceneBalloonPop::Update(double dt)
 {
 	HandleKeyPress();
 	if (!gameOver) {
+
+		if (m_shootCooldown > 0) {
+			m_shootCooldown -= static_cast<float>(dt);
+		}
 		// Update game timer
 		gameTimer -= static_cast<float>(dt);
 		if (gameTimer <= 0 && playerScore < WIN_SCORE) {
-			gameOver = true;
+			gameOver = true;  // Only set gameOver to true if player hasn't reached WIN_SCORE
 			return;
 		}
-
 		HandleDartInput();
 
 		// Update all active darts
@@ -476,7 +492,8 @@ void SceneBalloonPop::Update(double dt)
 		}
 	}
 	else {
-		if (KeyboardController::GetInstance()->IsKeyPressed('R')) {
+		// Only allow restart if player lost (didn't reach WIN_SCORE)
+		if (KeyboardController::GetInstance()->IsKeyPressed('R') && playerScore < WIN_SCORE) {
 			gameTimer = GAME_TIME_LIMIT;
 			playerScore = 0;
 			gameOver = false;
@@ -536,9 +553,9 @@ void SceneBalloonPop::Render()
 	}
 
 
-	modelStack.PushMatrix();
-	RenderMesh(meshList[GEO_AXES], false);
-	modelStack.PopMatrix();
+	//modelStack.PushMatrix();
+	//RenderMesh(meshList[GEO_AXES], false);
+	//modelStack.PopMatrix();
 
 	//modelStack.PushMatrix();
 	//modelStack.Translate(light[1].position.x, light[1].position.y, light[1].position.z);
@@ -875,15 +892,23 @@ void SceneBalloonPop::Render()
 				dart.physics.pos.z
 			);
 
-			// Calculate rotation based on velocity
+			// Get direction from player to dart
+			glm::vec3 directionFromPlayer = glm::normalize(dart.physics.pos - camera.pos);
+
+			// Calculate angle to face away from player
+			float angle = atan2(directionFromPlayer.x, directionFromPlayer.z);
+			modelStack.Rotate(glm::degrees(angle), 0, 1, 0);
+
+			// Add pitch based on velocity to show proper trajectory
 			glm::vec3 velocity = dart.physics.vel;
-			glm::vec3 direction = glm::normalize(velocity);
-			float pitch = atan2(direction.y, sqrt(direction.x * direction.x + direction.z * direction.z));
+			float pitch = atan2(velocity.y, sqrt(velocity.x * velocity.x + velocity.z * velocity.z));
 			modelStack.Rotate(glm::degrees(pitch), 1, 0, 0);
-			float yaw = atan2(direction.x, direction.z);
-			modelStack.Rotate(glm::degrees(yaw), 0, 1, 0);
 
 			modelStack.Scale(0.5f, 0.5f, 0.5f);
+			meshList[GEO_DART]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+			meshList[GEO_DART]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+			meshList[GEO_DART]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+			meshList[GEO_DART]->material.kShininess = 1.0f;
 			RenderMesh(meshList[GEO_DART], true);
 			modelStack.PopMatrix();
 		}
@@ -923,12 +948,9 @@ void SceneBalloonPop::Render()
 	std::string timeText = "Time: " + std::to_string(static_cast<int>(gameTimer));
 	RenderTextOnScreen(meshList[GEO_TEXT], timeText, glm::vec3(1, 1, 1), 25, 10, 520);
 
-	if (gameOver) {
-		std::string gameOverText = playerScore >= WIN_SCORE ? "You Win!" : "Game Over!";
-		RenderTextOnScreen(meshList[GEO_TEXT], gameOverText, glm::vec3(1, 0, 0), 40, 300, 300);
-		RenderTextOnScreen(meshList[GEO_TEXT], "Press R to Restart", glm::vec3(1, 1, 1), 25, 300, 250);
+	if (gameOver && playerScore < WIN_SCORE) {
+		RenderMeshOnScreen(meshList[GEO_GAMEOVER], 400, 300, 400, 300);
 	}
-
 	// Render vertical line of crosshair
 	RenderMeshOnScreen(meshList[GEO_CROSSHAIR], 400, 300, 2, 20);  // Thin vertical line
 	// Render horizontal line of crosshair
