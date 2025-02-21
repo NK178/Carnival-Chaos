@@ -262,7 +262,7 @@ void SceneHole::Update(double dt)
 		HandleKeyPress();
 
 		wallDisp -= dt * 60;
-		//std::cout << wallDisp << "\n\n\n";
+		std::cout << camera.pos.z << "\n\n\n";
 		if (!((camera.pos.x > -170 && camera.pos.x < -130) && (camera.pos.z < 20 && camera.pos.z > -20)))
 		{
 			if (camera.pos.y < 0)
@@ -287,6 +287,107 @@ void SceneHole::Update(double dt)
 			{
 				std::cout << "SUCCESS\n";
 				gameResult = 1;
+			}
+		}
+
+		//wall1
+		if (abs(camera.pos.x - wallDisp) < 3)
+		{
+			if (camera.pos.z > -17 && camera.pos.z < 17)
+			{
+				if (camera.pos.z > -12 && camera.pos.y > 2)
+				{
+					camera.allowMovement = false;
+					camera.AddForce(glm::vec3(-200, -10, 0));
+				}
+			}
+			else
+			{
+				camera.allowMovement = false;
+				camera.AddForce(glm::vec3(-200, -10, 0));
+			}
+		}
+
+		//wall2
+		if (abs(camera.pos.x - wallDisp - 200) < 3)
+		{
+			if (camera.pos.z > -17 && camera.pos.z < 17)
+			{
+				if (camera.pos.z > -3 && camera.pos.z < 3)
+				{
+					camera.allowMovement = false;
+					camera.AddForce(glm::vec3(-200, -10, 0));
+				}
+				else
+				{
+					if (camera.pos.y < 3.1)
+					{
+						camera.allowMovement = false;
+						camera.AddForce(glm::vec3(-200, -10, 0));
+					}
+				}
+			}
+		}
+
+		//wall3
+		if (abs(camera.pos.x - wallDisp - 400) < 3)
+		{
+			if (camera.pos.z > -9.5 && camera.pos.z < 17)
+			{
+				if (camera.pos.y > 2)
+				{
+					camera.allowMovement = false;
+					camera.AddForce(glm::vec3(-200, -10, 0));
+				}
+			}
+			else
+			{
+				camera.allowMovement = false;
+				camera.AddForce(glm::vec3(-200, -10, 0));
+			}
+		}
+
+		//wall4
+		if (abs(camera.pos.x - wallDisp - 600) < 3)
+		{
+			if (camera.pos.y == 3)
+			{
+				camera.allowMovement = false;
+				camera.AddForce(glm::vec3(-200, -10, 0));
+			}
+			else if (camera.pos.y > 3.1)
+			{
+				if (camera.pos.z > -8 && camera.pos.z < 8)
+				{
+					camera.allowMovement = false;
+					camera.AddForce(glm::vec3(-200, -10, 0));
+				}
+			}
+			else
+			{
+				if ((camera.pos.z < -8 || camera.pos.z > 8))
+				{
+					camera.allowMovement = false;
+					camera.AddForce(glm::vec3(-200, -10, 0));
+				}
+			}
+		}
+
+		//wall5
+		if (abs(camera.pos.x - wallDisp - 800) < 3)
+		{
+			if (camera.pos.y < 3.1)
+			{
+				camera.allowMovement = false;
+				camera.AddForce(glm::vec3(-200, -10, 0));
+			}
+			else
+			{
+				if (camera.pos.z > -6 || camera.pos.z < -17)
+				{
+					camera.allowMovement = false;
+					camera.AddForce(glm::vec3(-200, -10, 0));
+				}
 			}
 		}
 
