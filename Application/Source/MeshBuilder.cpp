@@ -226,6 +226,80 @@ Mesh* MeshBuilder::GenerateCube(const std::string& meshName, glm::vec3 color, fl
 	return mesh;
 }
 
+Mesh* MeshBuilder::GenerateCylinder(const std::string& meshName, glm::vec3 color, unsigned numSlice, float radius, float height)
+{
+	Vertex v;
+	v.color = color;
+	std::vector<Vertex> vertex_buffer_data;
+	std::vector<GLuint> index_buffer_data;
+
+	float degreePerSlice = glm::two_pi<float>() / numSlice;
+
+	// Bottom
+	v.pos = glm::vec3(0, -0.5f * height, 0); v.normal = glm::vec3(0, -1, 0);  vertex_buffer_data.push_back(v);
+	for (unsigned slice = 0; slice < numSlice + 1; ++slice)
+	{
+		float theta = slice * degreePerSlice;
+		v.pos = glm::vec3(radius * glm::cos(theta), -0.5f * height, radius * glm::sin(theta));
+		v.normal = glm::vec3(0, -1, 0);
+		vertex_buffer_data.push_back(v);
+	}
+
+	for (int slice = 0; slice < numSlice + 1; ++slice)
+	{
+		index_buffer_data.push_back(0);
+		index_buffer_data.push_back(slice + 1);
+
+	}
+
+	unsigned middleStartIndex = vertex_buffer_data.size();
+	for (int slice = 0; slice <= numSlice; ++slice) { // slice
+		float theta = slice * degreePerSlice;
+		v.pos = glm::vec3(radius * glm::cos(theta), -height * 0.5f, radius * glm::sin(theta));
+		v.normal = glm::vec3(glm::cos(theta), 0, glm::sin(theta));
+		vertex_buffer_data.push_back(v);
+
+		v.pos = glm::vec3(radius * glm::cos(theta), height * 0.5f, radius * glm::sin(theta));
+		v.normal = glm::vec3(glm::cos(theta), 0, glm::sin(theta));
+		vertex_buffer_data.push_back(v);
+
+	}
+
+	for (unsigned slice = 0; slice < numSlice + 1; slice++) {
+		index_buffer_data.push_back(middleStartIndex + 2 * slice + 0);
+		index_buffer_data.push_back(middleStartIndex + 1 + 2 * slice + 0);
+	}
+
+	// top
+	unsigned topStartIndex = vertex_buffer_data.size();
+	v.pos = glm::vec3(0, 0.5f * height, 0); v.normal = glm::vec3(0, 1, 0);  vertex_buffer_data.push_back(v);
+	for (unsigned slice = 0; slice < numSlice + 1; ++slice)
+	{
+		float theta = slice * degreePerSlice;
+		v.pos = glm::vec3(radius * glm::cos(theta), 0.5f * height, radius * glm::sin(theta));
+		v.normal = glm::vec3(0, 1, 0);
+		vertex_buffer_data.push_back(v);
+	}
+
+	for (int slice = 0; slice < numSlice + 1; ++slice)
+	{
+		index_buffer_data.push_back(topStartIndex + slice + 1);
+		index_buffer_data.push_back(topStartIndex);
+	}
+
+	// Crate Mesh code here
+	Mesh* mesh = new Mesh(meshName);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, vertex_buffer_data.size() * sizeof(Vertex), &vertex_buffer_data[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->indexBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_buffer_data.size() * sizeof(GLuint), &index_buffer_data[0], GL_STATIC_DRAW);
+
+	mesh->indexSize = index_buffer_data.size();
+	mesh->mode = Mesh::DRAW_TRIANGLE_STRIP;
+
+	return mesh;
+}
 
 Mesh* MeshBuilder::GenerateHemisphere(const std::string& meshName, glm::vec3 color, int numStack, int numSlice, float radius)
 {
@@ -288,87 +362,7 @@ Mesh* MeshBuilder::GenerateHemisphere(const std::string& meshName, glm::vec3 col
 	return mesh;
 }
 
-Mesh* MeshBuilder::GenerateCyclinder(const std::string& meshName, glm::vec3 color, unsigned numSlice, float radius, float height)
-{
-	Vertex v;
-	v.color = color;
-	std::vector<Vertex> vertex_buffer_data;
-	std::vector<GLuint> index_buffer_data;
 
-	float degreePerSlice = glm::two_pi<float>() / numSlice;
-
-	// Bottom
-	/*add_Vertex*/v.pos = glm::vec3(0, -0.5f * height, 0); /*add_Normal*/v.normal = glm::vec3(0, -1, 0);  vertex_buffer_data.push_back(v);
-	for (unsigned slice = 0; slice < numSlice + 1; ++slice)
-	{
-		float theta = slice * degreePerSlice;
-		/*add_Vertex*/v.pos = glm::vec3(radius * glm::cos(theta), -0.5f * height, radius * glm::sin(theta));
-		/*add_Normal*/v.normal = glm::vec3 (0, -1, 0);
-		vertex_buffer_data.push_back(v);
-	}
-
-	for (int slice = 0; slice < numSlice + 1; ++slice)
-	{
-		/*add_Index*/index_buffer_data.push_back(0);
-		/*add_Index*/index_buffer_data.push_back(slice + 1);
-
-	}
-
-
-	unsigned middleStartIndex = vertex_buffer_data.size();
-	for (int slice = 0; slice <= numSlice; ++slice) { // slice
-		float theta = slice * degreePerSlice;
-		/*add_Vertex*/v.pos = glm::vec3(radius * glm::cos(theta), -height * 0.5f, radius * glm::sin(theta));
-		/*add_Normal*/v.normal = glm::vec3(glm::cos(theta), 0, glm::sin(theta));
-		vertex_buffer_data.push_back(v);
-
-		/*add_Vertex*/v.pos = glm::vec3(radius * glm::cos(theta), height * 0.5f, radius * glm::sin(theta));
-		/*add_Normal*/v.normal = glm::vec3(glm::cos(theta), 0, glm::sin(theta));
-		vertex_buffer_data.push_back(v);
-
-	}
-
-	for (unsigned slice = 0; slice < numSlice + 1; slice++) {
-		/*add_Index*/index_buffer_data.push_back(middleStartIndex + 2 * slice + 0);
-		/*add_Index*/index_buffer_data.push_back(middleStartIndex + 1 + 2 * slice + 0);
-	}
-
-	// top
-	unsigned topStartIndex = vertex_buffer_data.size();
-	/*add_Vertex*/v.pos = glm::vec3(0, 0.5f * height, 0); /*add_Normal*/v.normal = glm::vec3(0, 1, 0);  vertex_buffer_data.push_back(v);
-	for (unsigned slice = 0; slice < numSlice + 1; ++slice)
-	{
-		float theta = slice * degreePerSlice;
-		/*add_Vertex*/v.pos = glm::vec3(radius * glm::cos(theta), 0.5f * height, radius * glm::sin(theta));
-		/*add_Normal*/v.normal = glm::vec3(0, 1, 0);
-		vertex_buffer_data.push_back(v);
-	}
-
-	for (int slice = 0; slice < numSlice + 1; ++slice)
-	{
-		/*add_Index*/index_buffer_data.push_back(topStartIndex + slice + 1);
-		/*add_Index*/index_buffer_data.push_back(topStartIndex);
-	}
-
-	// Crate Mesh code here
-	// ... ...
-	Mesh* mesh = new Mesh(meshName);
-	glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, vertex_buffer_data.size() *
-		sizeof(Vertex),
-		&vertex_buffer_data[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->indexBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_buffer_data.size() *
-		sizeof(GLuint),
-		&index_buffer_data[0], GL_STATIC_DRAW);
-	mesh->indexSize = index_buffer_data.size();
-	mesh->mode = Mesh::DRAW_TRIANGLE_STRIP;
-
-  // Set draw mesh to triangle strip
-	//mode = GL_TRIANGLES_STRIP;
-
-	return mesh;
-}
 
 // Step 8
 Mesh* MeshBuilder::GenerateOBJ(const std::string& meshName, const
@@ -800,83 +794,5 @@ Mesh* MeshBuilder::GenerateHWall5(const std::string& meshName, glm::vec3 color)
 	mesh->indexSize = index_buffer_data.size();
 	mesh->mode = Mesh::DRAW_TRIANGLES;
 
-	return mesh;
-}
-
-Mesh* MeshBuilder::GenerateCylinder(const std::string& meshName, glm::vec3 color, unsigned numSlice, float radius, float height)
-{
-	Vertex v;
-	std::vector<Vertex> vertex_buffer_data;
-	std::vector<GLuint> index_buffer_data;
-	v.color = color;
-
-	float degreePerSlice = 360.0f / numSlice;
-
-	// Bottom
-	v.pos = glm::vec3(0, -0.5f * height, 0); vertex_buffer_data.push_back(v);
-	for (unsigned slice = 0; slice < numSlice + 1; ++slice)
-	{
-		float theta = (slice * degreePerSlice) * (M_PI / 180);
-		v.pos = glm::vec3(radius * cos(theta), -0.5f * height, radius * sin(theta));
-		v.normal = glm::vec3(0, -1, 0);
-		vertex_buffer_data.push_back(v);
-	}
-
-	for (int slice = 0; slice < numSlice + 1; ++slice)
-	{
-		index_buffer_data.push_back(0);
-		index_buffer_data.push_back(slice + 1);
-
-	}
-
-
-	unsigned middleStartIndex = vertex_buffer_data.size();
-	for (int slice = 0; slice <= numSlice; ++slice) { // slice
-		float theta = (slice * degreePerSlice) * (M_PI / 180);
-		v.pos = glm::vec3(radius * cos(theta), -height * 0.5f, radius * sin(theta));
-		v.normal = glm::vec3(glm::cos(theta), 0, glm::sin(theta));
-
-		vertex_buffer_data.push_back(v);
-
-		v.pos = glm::vec3(radius * cos(theta), height * 0.5f, radius * sin(theta));
-		v.normal = glm::vec3(glm::cos(theta), 0, glm::sin(theta));
-		vertex_buffer_data.push_back(v);
-
-	}
-
-	for (unsigned slice = 0; slice < numSlice + 1; slice++) {
-		index_buffer_data.push_back(middleStartIndex + 2 * slice + 0);
-		index_buffer_data.push_back(middleStartIndex + 1 + 2 * slice + 0);
-	}
-
-	// top
-	unsigned topStartIndex = vertex_buffer_data.size();
-	v.pos = glm::vec3(0, 0.5f * height, 0);   vertex_buffer_data.push_back(v);
-	for (unsigned slice = 0; slice < numSlice + 1; ++slice)
-	{
-		float theta = (slice * degreePerSlice) * (M_PI / 180);
-		v.pos = glm::vec3(radius * cos(theta), 0.5f * height, radius * sin(theta));
-		v.normal = glm::vec3(0, -1, 0);
-		vertex_buffer_data.push_back(v);
-	}
-
-	for (int slice = 0; slice < numSlice + 1; ++slice)
-	{
-		index_buffer_data.push_back(topStartIndex + slice + 1);
-		index_buffer_data.push_back(topStartIndex);
-	}
-
-	// Create the new mesh
-	Mesh* mesh = new Mesh(meshName);
-	glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, vertex_buffer_data.size() *
-		sizeof(Vertex),
-		&vertex_buffer_data[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->indexBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_buffer_data.size() *
-		sizeof(GLuint),
-		&index_buffer_data[0], GL_STATIC_DRAW);
-	mesh->indexSize = index_buffer_data.size();
-	mesh->mode = Mesh::DRAW_TRIANGLE_STRIP;
 	return mesh;
 }
