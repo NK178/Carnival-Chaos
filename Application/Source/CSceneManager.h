@@ -26,6 +26,7 @@ public:
 
     // Scene management
     void ChangeScene(SCENE_TYPE newScene);
+   // void RenderLoadingScreen();
     Scene* GetCurrentScene() { return activeScene; }
 
 private:

@@ -294,6 +294,10 @@ void SceneMain::Init()
 		cubeList[i].mass = 0.f;
 	}
 
+	isTyping = false; 
+	typewriterTimer = 0.0f; 
+	currentText = "";
+	currentCharIndex = 0;
 	isEnterMainSceneDialogueActive = true; 
 	hasPlayedEnterMainSceneDialogue = false;
 
@@ -894,131 +898,126 @@ void SceneMain::RenderUI()
 	}
 }
 
-void SceneMain::UpdateDialogue(double dt)
-{
-	if (readSign && !isSignDialogueActive)
-	{
-		isSignDialogueActive = true;
-		currentLineIndex = 0;
-		dialogueTimer = 0;
-	}
+void SceneMain::RenderDialogue() {
+	if (isSignDialogueActive && currentLineIndex < signDialogueLines.size()) {
+		const DialogueLine& currentDialogue = signDialogueLines[currentLineIndex];
 
-	if (isSignDialogueActive)
-	{
-		dialogueTimer += dt;
-
-		if (dialogueTimer >= TEXT_DISPLAY_TIME || KeyboardController::GetInstance()->IsKeyPressed('E'))
-		{
-			dialogueTimer = 0;
-			currentLineIndex++;
-
-			if (currentLineIndex >= signDialogueLines.size())
-			{
-				isSignDialogueActive = false;
-				readSign = false;
+		if (currentDialogue.isMultiLine) {
+			if (currentDialogue.textLines.size() > 0) {
+				std::string textToRender = currentDialogue.textLines[0].substr(0, currentCharIndex);
+				RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 550);
 			}
+
+			if (currentDialogue.textLines.size() > 1) {
+				std::string textToRender = currentDialogue.textLines[1].substr(0, currentCharIndex);
+				RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 530);
+			}
+		}
+		else {
+			std::string textToRender = currentDialogue.textLines[0].substr(0, currentCharIndex);
+			RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 550);
 		}
 	}
 
-	if (isEnterMainSceneDialogueActive && !hasPlayedEnterMainSceneDialogue)
-	{
-		dialogueTimer += dt;
+	if (isEnterMainSceneDialogueActive && currentLineIndex < enterMainSceneLines.size()) {
+		const DialogueLine& currentDialogue = enterMainSceneLines[currentLineIndex];
 
-		if (dialogueTimer >= TEXT_DISPLAY_TIME || KeyboardController::GetInstance()->IsKeyPressed('E'))
-		{
-			dialogueTimer = 0;
-			currentLineIndex++;
-
-			if (currentLineIndex >= enterMainSceneLines.size())
-			{
-				isEnterMainSceneDialogueActive = false;
-				hasPlayedEnterMainSceneDialogue = true; 
+		if (currentDialogue.isMultiLine) {
+			if (currentDialogue.textLines.size() > 0) {
+				std::string textToRender = currentDialogue.textLines[0].substr(0, currentCharIndex);
+				RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 550);
 			}
+
+			if (currentDialogue.textLines.size() > 1) {
+				std::string textToRender = currentDialogue.textLines[1].substr(0, currentCharIndex);
+				RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 530);
+			}
+		}
+		else {
+			std::string textToRender = currentDialogue.textLines[0].substr(0, currentCharIndex);
+			RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 550);
 		}
 	}
 }
 
-void SceneMain::RenderDialogue()
-{
-	if (isSignDialogueActive && currentLineIndex < signDialogueLines.size())
-	{
-		const DialogueLine& currentDialogue = signDialogueLines[currentLineIndex];
+void SceneMain::UpdateDialogue(double dt) {
+	if (readSign && !isSignDialogueActive) {
+		isSignDialogueActive = true;
+		currentLineIndex = 0;
+		dialogueTimer = 0;
+		isTyping = true; // Start typing the first line
+		typewriterTimer = 0.0f;
+		currentText = signDialogueLines[currentLineIndex].textLines[0];
+		currentCharIndex = 0;
+	}
 
-		if (currentDialogue.isMultiLine)
-		{
-			if (currentDialogue.textLines.size() > 0) {
-				RenderTextOnScreen(
-					meshList[GEO_TEXT],
-					currentDialogue.textLines[0],
-					glm::vec3(1, 1, 1),
-					20,
-					10,
-					550
-				);
+	if (isSignDialogueActive) {
+		if (isTyping) {
+			typewriterTimer += dt;
+			if (typewriterTimer >= 0.05f) { // Adjust the typing speed here
+				typewriterTimer = 0.0f;
+				currentCharIndex++;
+				if (currentCharIndex >= currentText.length()) {
+					isTyping = false;
+				}
 			}
 
-			if (currentDialogue.textLines.size() > 1) {
-				RenderTextOnScreen(
-					meshList[GEO_TEXT],
-					currentDialogue.textLines[1],
-					glm::vec3(1, 1, 1),
-					20,
-					10,
-					530
-				);
+			if (KeyboardController::GetInstance()->IsKeyPressed('E')) {
+				isTyping = false;
+				currentCharIndex = currentText.length();
 			}
 		}
-		else
-		{
-			RenderTextOnScreen(
-				meshList[GEO_TEXT],
-				currentDialogue.textLines[0],
-				glm::vec3(1, 1, 1),
-				20,
-				10,
-				550
-			);
+		else {
+			dialogueTimer += dt;
+			if (dialogueTimer >= TEXT_DISPLAY_TIME || KeyboardController::GetInstance()->IsKeyPressed('E')) {
+				dialogueTimer = 0;
+				currentLineIndex++;
+				if (currentLineIndex >= signDialogueLines.size()) {
+					isSignDialogueActive = false;
+					readSign = false;
+				}
+				else {
+					isTyping = true;
+					typewriterTimer = 0.0f;
+					currentText = signDialogueLines[currentLineIndex].textLines[0];
+					currentCharIndex = 0;
+				}
+			}
 		}
 	}
 
-	if (isEnterMainSceneDialogueActive && currentLineIndex < enterMainSceneLines.size())
-	{
-		const DialogueLine& currentDialogue = enterMainSceneLines[currentLineIndex];
-
-		if (currentDialogue.isMultiLine)
-		{
-			if (currentDialogue.textLines.size() > 0) {
-				RenderTextOnScreen(
-					meshList[GEO_TEXT],
-					currentDialogue.textLines[0],
-					glm::vec3(1, 1, 1),
-					20,
-					10,
-					550
-				);
+	if (isEnterMainSceneDialogueActive && !hasPlayedEnterMainSceneDialogue) {
+		if (isTyping) {
+			typewriterTimer += dt;
+			if (typewriterTimer >= 0.05f) { // Adjust the typing speed here
+				typewriterTimer = 0.0f;
+				currentCharIndex++;
+				if (currentCharIndex >= currentText.length()) {
+					isTyping = false;
+				}
 			}
 
-			if (currentDialogue.textLines.size() > 1) {
-				RenderTextOnScreen(
-					meshList[GEO_TEXT],
-					currentDialogue.textLines[1],
-					glm::vec3(1, 1, 1),
-					20,
-					10,
-					530
-				);
+			if (KeyboardController::GetInstance()->IsKeyPressed('E')) {
+				isTyping = false;
+				currentCharIndex = currentText.length();
 			}
 		}
-		else
-		{
-			RenderTextOnScreen(
-				meshList[GEO_TEXT],
-				currentDialogue.textLines[0],
-				glm::vec3(1, 1, 1),
-				20,
-				10,
-				550
-			);
+		else {
+			dialogueTimer += dt;
+			if (dialogueTimer >= TEXT_DISPLAY_TIME || KeyboardController::GetInstance()->IsKeyPressed('E')) {
+				dialogueTimer = 0;
+				currentLineIndex++;
+				if (currentLineIndex >= enterMainSceneLines.size()) {
+					isEnterMainSceneDialogueActive = false;
+					hasPlayedEnterMainSceneDialogue = true;
+				}
+				else {
+					isTyping = true;
+					typewriterTimer = 0.0f;
+					currentText = enterMainSceneLines[currentLineIndex].textLines[0];
+					currentCharIndex = 0;
+				}
+			}
 		}
 	}
 }
