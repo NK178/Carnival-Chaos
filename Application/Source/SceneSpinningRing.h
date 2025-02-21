@@ -20,7 +20,12 @@ public:
 		GEO_CUBE,
 		GEO_QUAD,
 		GEO_SPHERE,
+		GEO_CYLINDER,
 		GEO_PLANE,
+
+		// Models
+		GEO_SPINNER,
+		GEO_SPINNER2,
 
 		//Text
 		GEO_TEXT,

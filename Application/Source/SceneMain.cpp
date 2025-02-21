@@ -372,7 +372,6 @@ void SceneMain::Update(double dt)
 
 	camera.Update(dt);
 	player[0].pos = camera.pos;
-	std::cout << "x: " << player[0].pos.x << " y: " << player[0].pos.y << " z: " << player[0].pos.z << std::endl;
 	CollisionData cd;
 	for (int i = 0; i < cubeList.size(); i++) {
 		if (OverlapAABB2AABB(player[0], player[0].playerDimensions, cubeList[i], cubeList[i].tentDimensions, cd))
@@ -505,7 +504,7 @@ void SceneMain::Render()
 	//modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Scale(150.f, 1.f, 150.f);
+	modelStack.Scale(150.f, 1.f, 200.f);
 	modelStack.Rotate(-90.f, 1, 0, 0);
 	meshList[GEO_PLANE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
 	meshList[GEO_PLANE]->material.kDiffuse = glm::vec3(0.5f,0.5f, 0.5f);
@@ -784,19 +783,57 @@ void SceneMain::Render()
 		modelStack.Scale(2.f, 2.f, 2.f);
 		RenderMesh(meshList[GEO_HOUSE], true);
 		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Translate(100.f, 0.f, -65.f);
+		modelStack.Rotate(-185.f, 0, 1, 0);
+		modelStack.Scale(2.f, 2.f, 2.f);
+		RenderMesh(meshList[GEO_HOUSE], true);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Translate(-110.f, 0.f, -65.f);
+		modelStack.Rotate(-185.f, 0, 1, 0);
+		modelStack.Scale(2.f, 2.f, 2.f);
+		RenderMesh(meshList[GEO_HOUSE], true);
+		modelStack.PopMatrix();
 	}
 
 	// Render Road
-	modelStack.PushMatrix();
-	modelStack.Translate(-110.f, 1.f, -105.f);
-	modelStack.Rotate(90.f, 0, 1, 0);
-	modelStack.Scale(1.f, 1.f, 1.f);
-	meshList[GEO_ROAD]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
-	meshList[GEO_ROAD]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-	meshList[GEO_ROAD]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	meshList[GEO_ROAD]->material.kShininess = 1.0f;
-	RenderMesh(meshList[GEO_ROAD], true);
-	modelStack.PopMatrix();
+	{
+		meshList[GEO_ROAD]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+		meshList[GEO_ROAD]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+		meshList[GEO_ROAD]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+		meshList[GEO_ROAD]->material.kShininess = 1.0f;
+
+		modelStack.PushMatrix();
+		modelStack.Translate(140.f, 1.f, -100.f);
+		modelStack.Rotate(41.5f, 0, 1, 0);
+		modelStack.Scale(4.f, 3.f, 4.f);
+		RenderMesh(meshList[GEO_ROAD], true);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Translate(50.f, 1.f, -100.f);
+		modelStack.Rotate(41.5f, 0, 1, 0);
+		modelStack.Scale(4.f, 3.f, 4.f);
+		RenderMesh(meshList[GEO_ROAD], true);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Translate(-40.f, 1.f, -100.f);
+		modelStack.Rotate(41.5f, 0, 1, 0);
+		modelStack.Scale(4.f, 3.f, 4.f);
+		RenderMesh(meshList[GEO_ROAD], true);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Translate(-130.f, 1.f, -100.f);
+		modelStack.Rotate(41.5f, 0, 1, 0);
+		modelStack.Scale(4.f, 3.f, 4.f);
+		RenderMesh(meshList[GEO_ROAD], true);
+		modelStack.PopMatrix();
+	}
 
 	RenderUI();
 	RenderDialogue();

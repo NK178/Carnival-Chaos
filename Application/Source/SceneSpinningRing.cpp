@@ -128,25 +128,31 @@ void SceneSpinningRing::Init()
 	meshList[GEO_CUBE] = MeshBuilder::GenerateCube("Cube", glm::vec3(1, 1, 1), 1.f);
 	meshList[GEO_CUBE]->textureID = LoadTGA("Images//lava.tga");
 	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Sphere", glm::vec3(1, 1, 1), 1.f);
+	meshList[GEO_CYLINDER] = MeshBuilder::GenerateCylinder("Cylinder", glm::vec3(1, 1, 1), 16, 1.0f, 16.0f);
 
 	meshList[GEO_LEFT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_LEFT]->textureID = LoadTGA("Images//nightsky_lfD.tga");
+	meshList[GEO_LEFT]->textureID = LoadTGA("Images//circus_skybox.tga");
 	meshList[GEO_RIGHT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_RIGHT]->textureID = LoadTGA("Images//nightsky_rtD.tga");
+	meshList[GEO_RIGHT]->textureID = LoadTGA("Images//circus_skybox.tga");
 	meshList[GEO_TOP] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_TOP]->textureID = LoadTGA("Images//nightsky_upD.tga");
+	meshList[GEO_TOP]->textureID = LoadTGA("Images//tenttop.tga");
 	meshList[GEO_BOTTOM] = MeshBuilder::GenerateQuad("Plane",glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_BOTTOM]->textureID = LoadTGA("Images//nightsky_dnD.tga");
+	meshList[GEO_BOTTOM]->textureID = LoadTGA("Images//tenttop.tga");
 	meshList[GEO_FRONT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_FRONT]->textureID = LoadTGA("Images//nightsky_bkD.tga");
+	meshList[GEO_FRONT]->textureID = LoadTGA("Images//circus_skybox.tga");
 	meshList[GEO_BACK] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_BACK]->textureID = LoadTGA("Images//nightsky_ftD.tga");
+	meshList[GEO_BACK]->textureID = LoadTGA("Images//circus_skybox.tga");
 
 	// 16 x 16 is the number of columns and rows for the text
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16,16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Images//calibri.tga");
 	meshList[GEO_FPS] = MeshBuilder::GenerateText("fpstext", 16, 16);
 	meshList[GEO_FPS]->textureID = LoadTGA("Images//bizudgothic.tga");
+
+	meshList[GEO_SPINNER] = MeshBuilder::GenerateOBJ("Spinner", "Models//spinner.obj");
+	meshList[GEO_SPINNER]->textureID = LoadTGA("Images//spinner.tga");
+	meshList[GEO_SPINNER2] = MeshBuilder::GenerateOBJ("Spinner", "Models//spinner2.obj");
+	meshList[GEO_SPINNER2]->textureID = LoadTGA("Images//spinner2.tga");
 
 	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 1000.0f);
 	projectionStack.LoadMatrix(projection);
@@ -290,22 +296,43 @@ void SceneSpinningRing::Render()
 	//modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Scale(100.f, 1.f, 100.f);
-	modelStack.Rotate(-90.f, 1, 0, 0);
-	meshList[GEO_PLANE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-	meshList[GEO_PLANE]->material.kDiffuse = glm::vec3(0.5f,0.5f, 0.5f);
-	meshList[GEO_PLANE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	meshList[GEO_PLANE]->material.kShininess = 1.0f;
-	RenderMesh(meshList[GEO_PLANE], true);
-	modelStack.PopMatrix();
-
-	modelStack.PushMatrix();
-	modelStack.Scale(10.f, 10.f, 10.f);
+	modelStack.Translate(0.f, -120.f, 0.f);
+	modelStack.Scale(500.f, 10.f, 500.f);
 	meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
 	meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
 	meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
 	meshList[GEO_CUBE]->material.kShininess = 1.0f;
 	RenderMesh(meshList[GEO_CUBE], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(0.f, 15.f, 0.f);
+	modelStack.Scale(30.f, 30.f, 50.f);
+	meshList[GEO_SPINNER]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_SPINNER]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_SPINNER]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_SPINNER]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_SPINNER], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(0.f, 5.f, 0.f);
+	modelStack.Scale(50.f, 30.f, 50.f);
+	meshList[GEO_SPINNER2]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_SPINNER2]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_SPINNER2]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_SPINNER2]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_SPINNER2], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(0.f, -120.f, 0.f);
+	modelStack.Scale(50.f, 15.f, 50.f);
+	meshList[GEO_CYLINDER]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_CYLINDER]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_CYLINDER]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_CYLINDER]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_CYLINDER], true);
 	modelStack.PopMatrix();
 
 	RenderSkyBox();
