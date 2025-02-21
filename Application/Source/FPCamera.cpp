@@ -367,12 +367,15 @@ void FPCamera::Update(double dt)
 	isDirty = true;
 	this->Refresh();
 
-
-	glm::vec3 newForward = glm::normalize(pos - prevPos);
-	if (glm::length(newForward) > 0.001f)
-	{ //don't divide by 0 lmao
-		forward = glm::mix(forward, newForward, 0.2f); //smooth
-		target = pos + forward;
+	if (enableFNAF)
+	{
+		glm::vec3 velocity = pos - prevPos;
+		if (glm::length(velocity) > 0.001f) //please don't divide by 0 lol
+		{
+			glm::vec3 newForward = glm::normalize(velocity);
+			forward = glm::mix(forward, newForward, 1.f); //smoothly adjust direction
+			target = pos + forward;
+		}
 	}
 	
 	prevPos = pos;
