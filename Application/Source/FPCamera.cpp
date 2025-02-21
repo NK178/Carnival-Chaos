@@ -79,12 +79,22 @@ void FPCamera::Reset()
 {
 }
 
+void FPCamera::setWalkSpeed(float speed)
+{
+	walkSpeed = speed;
+}
+
+void FPCamera::setRunSpeed(float speed)
+{
+	runSpeed = speed;
+}
+
 void FPCamera::Update(double dt)
 {
 
 	static const float ROTATE_SPEED = 100.0f;
-	static const float DEFAULT_SPEED = 30.f;
-	static float ZOOM_SPEED = DEFAULT_SPEED;
+	float DEFAULT_SPEED = walkSpeed;
+	float ZOOM_SPEED = DEFAULT_SPEED;
 	static const float DEFAULT_SWAY = 1.6f;
 	static float SWAY_SPEED = DEFAULT_SWAY;
 	static float SWAY_AMPLITUDE = 0.1f;
@@ -231,7 +241,7 @@ void FPCamera::Update(double dt)
 		}
 	}
 	if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_LEFT_SHIFT) && staminaflag && !crouchflag && allowSprint) {
-		ZOOM_SPEED = 100.f;
+		ZOOM_SPEED = runSpeed;
 		sprintstamina -= 2.f;
 		heightresetflag = false;
 		runflag = true;

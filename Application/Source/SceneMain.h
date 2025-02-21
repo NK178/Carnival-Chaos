@@ -159,7 +159,7 @@ private:
 		bool isMultiLine;                    
 	};
 
-	int cutsceneStage = 1;
+	int cutsceneStage = -1;
 	float tempCompensation;
 
 	std::vector<DialogueLine> enterMainSceneLines = {
