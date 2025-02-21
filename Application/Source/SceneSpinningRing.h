@@ -31,6 +31,7 @@ public:
 		GEO_TEXT,
 		GEO_TEXT2,
 		GEO_FPS,
+		GEO_KEY_E,
 		GEO_UI,
 
 		//SKybox
@@ -126,7 +127,11 @@ private:
 	FPCamera camera;
 	int projType = 1; // fix to 0 for orthographic, 1 for projection
 
+	bool isObjectiveRead;
 	float remainingTime;
+	float countdownTime;
+	bool playerWon;
+	bool playerLost;
 
 	MatrixStack modelStack, viewStack, projectionStack;	
 

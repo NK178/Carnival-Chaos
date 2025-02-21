@@ -153,6 +153,9 @@ void SceneSpinningRing::Init()
 	meshList[GEO_FPS]->textureID = LoadTGA("Images//bizudgothic.tga");
 	meshList[GEO_UI] = MeshBuilder::GenerateQuad("UIBox", glm::vec3(0.12f, 0.12f, 0.12f), 10.f);
 
+	meshList[GEO_KEY_E] = MeshBuilder::GenerateQuad("KeyE", glm::vec3(1.f, 1.f, 1.f), 2.f);
+	meshList[GEO_KEY_E]->textureID = LoadTGA("Images//keyboard_key_e.tga");
+
 	meshList[GEO_SPINNER] = MeshBuilder::GenerateOBJ("Spinner", "Models//spinner.obj");
 	meshList[GEO_SPINNER]->textureID = LoadTGA("Images//spinner.tga");
 	meshList[GEO_SPINNER2] = MeshBuilder::GenerateOBJ("Spinner", "Models//spinner2.obj");
@@ -230,7 +233,12 @@ void SceneSpinningRing::Init()
 	glUniform1f(m_parameters[U_LIGHT2_EXPONENT], light[2].exponent);
 
 	enableLight = true;
-	remainingTime = 30.0f;
+	isObjectiveRead = false; 
+	//remainingTime = 30.0f;
+	remainingTime = 1.0f;
+	countdownTime = 4.0f;
+	playerWon = false;
+	playerLost = false;
 }
 
 void SceneSpinningRing::Update(double dt)
@@ -244,9 +252,21 @@ void SceneSpinningRing::Update(double dt)
 	float temp = 1.f / dt;
 	fps = glm::round(temp * 100.f) / 100.f;
 
-	remainingTime -= dt; // decrease time
-	if (remainingTime < 0) {
-		remainingTime = 0; // time will not go below 0
+
+	if (isObjectiveRead) {
+		if (countdownTime > 0) {
+			countdownTime -= dt; // decrease countdown time
+			if (countdownTime < 0) {
+				countdownTime = 0; // ensure countdown does not go below 0
+			}
+		}
+		else {
+			remainingTime -= dt; // decrease game time after countdown ends
+			if (remainingTime < 0) {
+				remainingTime = 0; // ensure time does not go below 0
+				playerWon = true; // player wins
+			}
+		}
 	}
 }
 
@@ -350,9 +370,49 @@ void SceneSpinningRing::Render()
 	RenderMesh(meshList[GEO_CYLINDER], true);
 	modelStack.PopMatrix();
 
-	RenderMeshOnScreen(meshList[GEO_UI], 45, 560, 45, 3);
-	std::string timeText = "Time Left: " + std::to_string(static_cast<int>(remainingTime));
-	RenderTextOnScreen(meshList[GEO_TEXT2], timeText, glm::vec3(1, 1, 1), 20, 10, 550);
+	if (!isObjectiveRead) {
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- SPINNING RING -", glm::vec3(1, 1, 0), 25, 200, 400);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Avoid the spinning walls and", glm::vec3(1, 1, 1), 15, 195, 350);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "beams by jumping over them!", glm::vec3(1, 1, 1), 15, 205, 320);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Survive until the timer ends!", glm::vec3(1, 1, 1), 15, 190, 270);
+
+		RenderMeshOnScreen(meshList[GEO_KEY_E], 310, 220, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Continue", glm::vec3(1, 1, 1), 20, 340, 210);
+	}
+
+	if (isObjectiveRead) {
+		if (countdownTime > 0) {
+			std::string countdownText;
+			if (countdownTime > 3.0f) {
+				countdownText = "3..";
+			}
+			else if (countdownTime > 2.0f) {
+				countdownText = "2..";
+			}
+			else if (countdownTime > 1.0f) {
+				countdownText = "1..";
+			}
+			else {
+				countdownText = "GO!";
+			}
+			RenderTextOnScreen(meshList[GEO_TEXT2], countdownText, glm::vec3(1, 1, 1), 50, 350, 300);
+		}
+		else if (playerWon) {
+			RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
+			RenderTextOnScreen(meshList[GEO_TEXT2], "YOU WON!", glm::vec3(0, 1, 0), 50, 220, 350);
+			RenderTextOnScreen(meshList[GEO_TEXT2], "You've beat", glm::vec3(1, 1, 1), 20, 295, 300);
+			RenderTextOnScreen(meshList[GEO_TEXT2], "Spinning Rings Game!", glm::vec3(1, 1, 1), 20, 210, 270);
+
+			RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
+			RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
+		}
+		else {
+			RenderMeshOnScreen(meshList[GEO_UI], 45, 560, 45, 3);
+			std::string timeText = "Time Left: " + std::to_string(static_cast<int>(remainingTime));
+			RenderTextOnScreen(meshList[GEO_TEXT2], timeText, glm::vec3(1, 1, 1), 20, 10, 550);
+		}
+	}
 
 	std::string temp("FPS:" + std::to_string(fps));
 	RenderTextOnScreen(meshList[GEO_FPS], temp.substr(0, 9), glm::vec3(0, 1, 0), 20, 620, 50);
@@ -468,6 +528,17 @@ void SceneSpinningRing::HandleKeyPress()
 		}
 
 		glUniform1i(m_parameters[U_LIGHT0_TYPE], light[0].type);
+	}
+
+	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E)) {
+		if (playerWon) 
+		{
+			// go back to scene main
+		}
+		else 
+		{
+			isObjectiveRead = true; // set to true when the objective is read
+		}
 	}
 
 }
