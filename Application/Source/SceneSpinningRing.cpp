@@ -464,7 +464,6 @@ void SceneSpinningRing::RenderMesh(Mesh* mesh, bool enableLight)
 
 }
 
-
 void SceneSpinningRing::Exit()
 {
 	// Cleanup VBO here

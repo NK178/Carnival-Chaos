@@ -29,7 +29,12 @@ public:
         GEO_BARREL,
         // Text
         GEO_TEXT,
+        GEO_TEXT2,
         GEO_GAMEOVER,
+        GEO_KEY_E,
+        GEO_KEY_R,
+        GEO_FPS,
+        GEO_UI,
         // Skybox
         GEO_LEFT,
         GEO_RIGHT,
@@ -155,10 +160,6 @@ private:
             currentTime = 0.0f;
         }
 
-
-
-
-
         void Update(float dt) {
             if (!isActive || isStuck) return;
             currentTime += dt;
@@ -169,10 +170,13 @@ private:
         }
     };
 
+    float fps = 0;
 
     bool m_isGameOver;
     bool m_hasWon;
    
+    bool m_isObjectiveRead;
+    float countdownTime;
 
     float m_arrowPower;         // Current power level of the arrow
     float m_maxArrowPower;      // Maximum power level

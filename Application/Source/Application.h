@@ -26,7 +26,6 @@ private:
 
 	//Declare a window object
 	StopWatch m_timer;
-
 	bool showPointer = true;
 };
 

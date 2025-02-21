@@ -37,7 +37,9 @@ SceneArchery::SceneArchery() :
 	m_arrowsLeft(10),    // Start with 10 arrows
 	m_playerScore(0),   // Start with 0 score
 	m_isGameOver(false),
-	m_hasWon(false)
+	m_hasWon(false),
+	m_isObjectiveRead(false),
+	countdownTime(4.0f)
 
 {
 	// Additional initialization if needed
@@ -182,6 +184,17 @@ void SceneArchery::Init()
 	// 16 x 16 is the number of columns and rows for the text
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Images//calibri.tga");
+	meshList[GEO_TEXT2] = MeshBuilder::GenerateText("text2", 16, 16);
+	meshList[GEO_TEXT2]->textureID = LoadTGA("Images//yugothicuisemibold.tga");
+	meshList[GEO_FPS] = MeshBuilder::GenerateText("fpstext", 16, 16);
+	meshList[GEO_FPS]->textureID = LoadTGA("Images//bizudgothic.tga");
+
+	meshList[GEO_KEY_E] = MeshBuilder::GenerateQuad("KeyE", glm::vec3(1.f, 1.f, 1.f), 2.f);
+	meshList[GEO_KEY_E]->textureID = LoadTGA("Images//keyboard_key_e.tga");
+	meshList[GEO_KEY_R] = MeshBuilder::GenerateQuad("KeyE", glm::vec3(1.f, 1.f, 1.f), 2.f);
+	meshList[GEO_KEY_R]->textureID = LoadTGA("Images//keyboard_key_r.tga");
+
+	meshList[GEO_UI] = MeshBuilder::GenerateQuad("UIBox", glm::vec3(0.12f, 0.12f, 0.12f), 10.f);
 
 	meshList[GEO_TARGET] = MeshBuilder::GenerateOBJ("Target",
 		"Models//10480_Archery_target_v1_max2011_iteration-2.obj");
@@ -342,6 +355,7 @@ void SceneArchery::RestartGame()
 	m_playerScore = 0;
 	m_arrowPower = 0.0f;
 	m_isChargingShot = false;
+	m_isObjectiveRead = false;
 
 	// Reset all arrows
 	for (auto& arrow : arrows) {
@@ -351,7 +365,6 @@ void SceneArchery::RestartGame()
 		arrow.vel = glm::vec3(0.0f);
 	}
 }
-
 
 void SceneArchery::HandleArrowInput() {
 	// When left mouse button is held down
@@ -471,9 +484,6 @@ void SceneArchery::CheckArrowCollisions()
 	}
 }
 
-
-
-
 void SceneArchery::Update(double dt)
 {
 	HandleKeyPress();
@@ -520,9 +530,7 @@ void SceneArchery::Update(double dt)
 		light[i].spotDirection = -glm::normalize(direction);  // Note the negative sign
 	}
 
-
 	camera.Update(dt);
-
 
 	// Handle arrow input
 	HandleArrowInput();
@@ -538,8 +546,18 @@ void SceneArchery::Update(double dt)
 	// Check for arrow collisions with targets
 	CheckArrowCollisions();
 
-}
+	float temp = 1.f / dt;
+	fps = glm::round(temp * 100.f) / 100.f;
 
+	if (m_isObjectiveRead) {
+		if (countdownTime > 0) {
+			countdownTime -= dt; // decrease countdown time
+			if (countdownTime < 0) {
+				countdownTime = 0; // ensure countdown does not go below 0
+			}
+		}
+	}
+}
 
 void SceneArchery::Render()
 {
@@ -699,7 +717,6 @@ void SceneArchery::Render()
 	//	}
 	//}
 
-
 	modelStack.PushMatrix();
 	/*glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);*/
 	modelStack.Translate(0, 0, -40);
@@ -820,24 +837,6 @@ void SceneArchery::Render()
 	// Render horizontal line of crosshair
 	RenderMeshOnScreen(meshList[GEO_CROSSHAIR], 400, 300, 20, 2);  // Thin horizontal line
 
-
-
-	// Render "Power:" text
-	RenderTextOnScreen(meshList[GEO_TEXT],
-		"Power:",
-		glm::vec3(1, 1, 1),  // White color
-		25,                   // Size
-		560, 60);            // Position bottom right
-
-	// Display numerical power value
-	std::string powerText = std::to_string(static_cast<int>(m_arrowPower));
-	RenderTextOnScreen(meshList[GEO_TEXT],
-		powerText,
-		glm::vec3(1, 1, 1),  // White color
-		25,                   // Size
-		710, 60);            // Position (right of the power bar)
-
-
 	// Calculate power percentage (0.0 to 1.0)
 	float powerPercentage = m_arrowPower / m_maxArrowPower;
 
@@ -848,63 +847,109 @@ void SceneArchery::Render()
 	// Render the power bar with the scaled width
 	RenderMeshOnScreen(meshList[GEO_QUAD], 570 + scaledWidth / 2, 30, scaledWidth, 20);
 
+	if (!m_isObjectiveRead) {
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 40);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- ARCHERY -", glm::vec3(1, 1, 0), 25, 280, 480);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Hit the target with", glm::vec3(1, 1, 1), 15, 258, 450);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "your arrows!", glm::vec3(1, 1, 1), 15, 310, 420);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Get 20 points before", glm::vec3(1, 1, 1), 15, 240, 390);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "10 arrows are used!", glm::vec3(1, 1, 1), 15, 265, 360);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Hold and Release LMB", glm::vec3(1, 1, 1), 15, 240, 330);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "to charge and shoot!", glm::vec3(1, 1, 1), 15, 260, 300);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Yellow: 3 Points", glm::vec3(1, 1, 0), 15, 290, 250);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Red/Blue: 2 Points", glm::vec3(1, 0, 0), 15, 275, 220);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "White/Black: 1 Point", glm::vec3(1, 1, 1), 15, 260, 190);
 
-
-	// Render objective text at top left
-	RenderTextOnScreen(meshList[GEO_TEXT],
-		"Objective: Hit the targets with ",
-		glm::vec3(1, 1, 1),  // White color
-		25,                   // Size
-		10, 550);            // Position (x,y)
-
-	// Render objective text at top left
-	RenderTextOnScreen(meshList[GEO_TEXT],
-		"your arrows!",
-		glm::vec3(1, 1, 1),  // White color
-		25,                   // Size
-		10, 510);            // Position (x,y)
-
-	RenderTextOnScreen(meshList[GEO_TEXT],
-		"Yellow: 3 points",
-		glm::vec3(1, 1, 0),  // Yellow color
-		25,                   // Size
-		10, 470);            // Position (x,y)
-
-	RenderTextOnScreen(meshList[GEO_TEXT],
-		"Red/Blue: 2 points",
-		glm::vec3(0, 0, 0.5f),  // Yellow color
-		25,                   // Size
-		10, 430);            // Position (x,y)
-
-
-	RenderTextOnScreen(meshList[GEO_TEXT],
-		"White/Black: 1 point",
-		glm::vec3(1, 1, 1),  // Yellow color
-		25,                   // Size
-		10, 390);            // Position (x,y)
-
-	// Render score counter
-	std::string scoreText = "Score: " + std::to_string(m_playerScore);
-	RenderTextOnScreen(meshList[GEO_TEXT],
-		scoreText,
-		glm::vec3(1.0f, 1.0f, 0.f), // Yellow color
-		25,                   // Size
-		10, 350);            // Position (x,y)
-
-	// Render arrows left counter at bottom left
-	std::string arrowsText = "Arrows Left: " + std::to_string(m_arrowsLeft);
-	RenderTextOnScreen(meshList[GEO_TEXT],
-		arrowsText,
-		glm::vec3(1, 0, 0),  // Red color
-		25,                   // Size
-		10, 30);             // Position (x,y)
-
-
-	if (m_isGameOver) {
-		RenderMeshOnScreen(meshList[GEO_GAMEOVER], 400, 300, 400, 300); 
+		RenderMeshOnScreen(meshList[GEO_KEY_E], 310, 150, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Continue", glm::vec3(1, 1, 1), 20, 340, 140);
 	}
 
+	if (m_isObjectiveRead) {
+		if (countdownTime > 0) {
+			std::string countdownText;
+			if (countdownTime > 3.0f) {
+				countdownText = "3..";
+			}
+			else if (countdownTime > 2.0f) {
+				countdownText = "2..";
+			}
+			else if (countdownTime > 1.0f) {
+				countdownText = "1..";
+			}
+			else {
+				countdownText = "GO!";
+			}
+			RenderTextOnScreen(meshList[GEO_TEXT2], countdownText, glm::vec3(1, 1, 1), 50, 350, 300);
+		}
+		else if (m_hasWon) {
+			RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
+			RenderTextOnScreen(meshList[GEO_TEXT2], "YOU WON!", glm::vec3(0, 1, 0), 50, 220, 350);
+			RenderTextOnScreen(meshList[GEO_TEXT2], "You've beat", glm::vec3(1, 1, 1), 20, 295, 300);
+			RenderTextOnScreen(meshList[GEO_TEXT2], "Archery Game!", glm::vec3(1, 1, 1), 20, 210, 270);
 
+			RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
+			RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
+		}
+		else {
+			// Render score counter
+			RenderMeshOnScreen(meshList[GEO_UI], 45, 520, 55, 10);
+			std::string scoreText = "Score: " + std::to_string(m_playerScore);
+			RenderTextOnScreen(meshList[GEO_TEXT2],
+				scoreText,
+				glm::vec3(1.0f, 1.0f, 1.f), // White color
+				20,                   // Size
+				10, 540);            // Position (x,y)
+
+			// Render "Power:" text
+			RenderTextOnScreen(meshList[GEO_TEXT],
+				"Power:",
+				glm::vec3(1, 1, 1),  // White color
+				20,                   // Size
+				10, 510);            // Position bottom right
+
+			// Display numerical power value
+			std::string powerText = std::to_string(static_cast<int>(m_arrowPower));
+			RenderTextOnScreen(meshList[GEO_TEXT],
+				powerText,
+				glm::vec3(1, 1, 1),  // White color
+				20,                   // Size
+				150, 510);            // Position 
+
+			// Render Arrows Left Text
+			std::string arrowsText = "Arrows Left: " + std::to_string(m_arrowsLeft);
+			RenderTextOnScreen(meshList[GEO_TEXT],
+				arrowsText,
+				glm::vec3(1, 1, 1),  // White color
+				20,                   // Size
+				10, 480);             // Position (x,y)
+		}
+	}
+
+	if (m_isGameOver) {
+		//RenderMeshOnScreen(meshList[GEO_GAMEOVER], 400, 300, 400, 300);
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "GAME OVER!", glm::vec3(1, 0, 0), 40, 210, 370);
+
+		RenderTextOnScreen(meshList[GEO_TEXT2], "You ran out of arrows!", glm::vec3(1, 1, 1), 20, 190, 320);
+
+		RenderMeshOnScreen(meshList[GEO_KEY_R], 350, 270, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Retry", glm::vec3(1, 1, 1), 20, 390, 260);
+		RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
+	}
+
+	if (m_hasWon) {
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "YOU WON!", glm::vec3(0, 1, 0), 50, 220, 350);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "You've beat", glm::vec3(1, 1, 1), 20, 295, 300);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Archery Game!", glm::vec3(1, 1, 1), 20, 210, 270);
+
+		RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
+	}
+
+	std::string temp("FPS:" + std::to_string(fps));
+	RenderTextOnScreen(meshList[GEO_FPS], temp.substr(0, 9), glm::vec3(0, 1, 0), 20, 620, 50);
 }
 
 void SceneArchery::RenderMesh(Mesh* mesh, bool enableLight)
@@ -952,7 +997,6 @@ void SceneArchery::RenderMesh(Mesh* mesh, bool enableLight)
 	}
 
 }
-
 
 void SceneArchery::Exit()
 {
@@ -1023,11 +1067,17 @@ void SceneArchery::HandleKeyPress()
 
 	//	glUniform1i(m_parameters[U_LIGHT0_TYPE], light[0].type);
 	//}
-
+	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E)) {
+		if (m_hasWon)
+		{
+			// go back to scene main
+		}
+		else
+		{
+			m_isObjectiveRead = true; // set to true when the objective is read
+		}
+	}
 }
-
-
-
 
 void SceneArchery::RenderMeshOnScreen(Mesh* mesh, float x, float y, float sizex, float sizey)
 {
