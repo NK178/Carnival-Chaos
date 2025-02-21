@@ -141,13 +141,28 @@ private:
 	void RenderSkyBox();
 
 
-	struct Cube : public GameObject {
-		glm::vec3 boxextent{ 1.5f,1.5f,1.5f };
-		Cube(int id, int type) : GameObject(id, type) {}
+	struct HammerCollide : public GameObject {
+		bool iscollide = false;
+		glm::vec3 boxextent{ 33.f, 3.5f, 33.f };
+		HammerCollide(int id, int type) : GameObject(id, type) {}
+	};
+	struct Walls : public GameObject {
+		glm::vec3 boxextent;
+		Walls(int id, int type, glm::vec3 extent) : GameObject(id, type) {
+			boxextent = extent;
+		}
+	};
+	struct Player : public GameObject {
+		glm::vec3 boxextent{10.f,10.f,10.f};
+		Player(int id, int type) : GameObject(id,type) {}
 	};
 
+
+
 	bool activate = false;
-	std::vector<Cube> cubelist;
+	std::vector<HammerCollide> cubelist;
+	std::vector<Walls> walllist;
+	std::vector<Player> player;
 
 	float startcountdown = 4.f;
 	bool gamestart = true; //TO CHANGE

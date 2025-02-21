@@ -232,11 +232,49 @@ void SceneWhackAMole::Init()
 
 	enableLight = true;
 
-	cubelist.push_back(Cube(1,GameObject::CUBE));
-	cubelist.push_back(Cube(2,GameObject::CUBE));
-	cubelist[0].pos = glm::vec3{ 3,3,4 };
-	cubelist[1].pos = glm::vec3{ 15,3,4 };
-	cubelist[0].mass = 0.f;
+	//Hitbox for hammers
+	//in order keypad numbering style
+	cubelist.push_back(HammerCollide(1,GameObject::CUBE));
+	cubelist.push_back(HammerCollide(2, GameObject::CUBE));
+	cubelist.push_back(HammerCollide(3, GameObject::CUBE));
+	cubelist.push_back(HammerCollide(4, GameObject::CUBE));
+	cubelist.push_back(HammerCollide(5, GameObject::CUBE));
+	cubelist.push_back(HammerCollide(6, GameObject::CUBE));
+	cubelist.push_back(HammerCollide(7, GameObject::CUBE));
+	cubelist.push_back(HammerCollide(8, GameObject::CUBE));
+	cubelist.push_back(HammerCollide(9, GameObject::CUBE));
+	cubelist[0].pos = glm::vec3{ 67,2,66 };
+	cubelist[1].pos = glm::vec3{ 0,2,66 };
+	cubelist[2].pos = glm::vec3{ -67,2,66 };
+	cubelist[3].pos = glm::vec3{ 67,2,0 };
+	cubelist[4].pos = glm::vec3{ 0,2,0 };
+	cubelist[5].pos = glm::vec3{ -67,2,0 };
+	cubelist[6].pos = glm::vec3{ 67,2,-66 };
+	cubelist[7].pos = glm::vec3{ 0,2,-66 };
+	cubelist[8].pos = glm::vec3{ -67,2,-66 };
+
+	//hitbox for game walls
+	glm::vec3 boxextent{ 100.f, 50.f, 1.f };
+
+	walllist.push_back(Walls(101, GameObject::CUBE, glm::vec3{ 100.f, 50.f, 1.f }));
+	walllist.push_back(Walls(102, GameObject::CUBE, glm::vec3{ 100.f, 50.f, 1.f }));
+	walllist.push_back(Walls(103, GameObject::CUBE, glm::vec3{ 1.f, 50.f, 100.f }));
+	walllist.push_back(Walls(103, GameObject::CUBE, glm::vec3{ 1.f, 50.f, 100.f }));
+	walllist[0].pos = glm::vec3{ 0,0,-100};
+	walllist[1].pos = glm::vec3{ 0,0,100 };
+	walllist[2].pos = glm::vec3{ -100,0,0 };
+	walllist[3].pos = glm::vec3{ 100,0,0 };
+
+	//Player 
+	player.push_back(Player(999, GameObject::CUBE));
+	player[0].pos = camera.pos;
+
+	for (int i = 0; i < cubelist.size(); i++) {
+		cubelist[i].mass = 0.f;
+	}
+	for (int i = 0; i < walllist.size(); i++) {
+		walllist[i].mass = 0.f;
+	}
 
 	camera.allowJump = false;
 }
@@ -250,26 +288,60 @@ void SceneWhackAMole::Update(double dt)
 	
 	HandleKeyPress();
 	const float SPEED = 15.f;
+	int iter = 0;
+	//std::cout << "x: " << walllist[iter].pos.x << "y: " << walllist[iter].pos.y << "z: " << walllist[iter].pos.z << std::endl;
 	if (KeyboardController::GetInstance()->IsKeyDown('I'))
-		cubelist[0].pos.z -= static_cast<float>(dt) * SPEED;
+		walllist[iter].pos.z -= static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('K'))
-		cubelist[0].pos.z += static_cast<float>(dt) * SPEED;
+		walllist[iter].pos.z += static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('J'))
-		cubelist[0].pos.x -= static_cast<float>(dt) * SPEED;
+		walllist[iter].pos.x -= static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('L'))
-		cubelist[0].pos.x += static_cast<float>(dt) * SPEED;
+		walllist[iter].pos.x += static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('O'))
-		cubelist[0].pos.y -= static_cast<float>(dt) * SPEED;
+		walllist[iter].pos.y -= static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('P'))
-		cubelist[0].pos.y += static_cast<float>(dt) * SPEED;
+		walllist[iter].pos.y += static_cast<float>(dt) * SPEED;
+	 
+	//std::cout << "x: " << cubelist[iter].pos.x << "y: " << cubelist[iter].pos.y << "z: " << cubelist[iter].pos.z << std::endl;
+	//if (KeyboardController::GetInstance()->IsKeyDown('I'))
+	//	cubelist[iter].pos.z -= static_cast<float>(dt) * SPEED;
+	//if (KeyboardController::GetInstance()->IsKeyDown('K'))
+	//	cubelist[iter].pos.z += static_cast<float>(dt) * SPEED;
+	//if (KeyboardController::GetInstance()->IsKeyDown('J'))
+	//	cubelist[iter].pos.x -= static_cast<float>(dt) * SPEED;
+	//if (KeyboardController::GetInstance()->IsKeyDown('L'))
+	//	cubelist[iter].pos.x += static_cast<float>(dt) * SPEED;
+	//if (KeyboardController::GetInstance()->IsKeyDown('O'))
+	//	cubelist[iter].pos.y -= static_cast<float>(dt) * SPEED;
+	//if (KeyboardController::GetInstance()->IsKeyDown('P'))
+	//	cubelist[iter].pos.y += static_cast<float>(dt) * SPEED;
 
+
+	player[0].pos = camera.pos;
 	CollisionData cd;
-	if (OverlapAABB2AABB(cubelist[1], cubelist[1].boxextent, cubelist[0], cubelist[0].boxextent, cd)) 
-		ResolveCollision(cd);
+	for (int i = 0; i < walllist.size(); i++) {
+		if (OverlapAABB2AABB(player[0], player[0].boxextent, walllist[i], walllist[i].boxextent, cd)) {
+			ResolveCollision(cd);
+			camera.pos = player[0].pos;
+		}
+	}
+
+	for (int i = 0; i < cubelist.size(); i++) {
+		if (OverlapAABB2AABB(player[0], player[0].boxextent, cubelist[i], cubelist[i].boxextent, cd))
+			cubelist[i].iscollide = true;
+		else
+			cubelist[i].iscollide = false;
+	}
+
 
 	for (int i = 0; i < cubelist.size(); i++) {
 		cubelist[i].UpdatePhysics(dt);
 	}
+	for (int i = 0; i < walllist.size(); i++) {
+		walllist[i].UpdatePhysics(dt);
+	}
+	player[0].UpdatePhysics(dt);
 
 	camera.Update(dt);
 
@@ -332,6 +404,41 @@ void SceneWhackAMole::Render()
 	RenderMesh(meshList[GEO_SPHERE], false);
 	modelStack.PopMatrix();
 
+	for (int i = 0; i < cubelist.size(); i++) {
+		glm::vec3 material;
+		if (!cubelist[i].iscollide)
+			material = glm::vec3(0.1f, 1.f, 0.1f);
+		else
+			material = glm::vec3(1.f, 0.1f, 0.1f);
+
+		modelStack.PushMatrix();
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		modelStack.Translate(cubelist[i].pos.x, cubelist[i].pos.y, cubelist[i].pos.z);
+		modelStack.Scale(2*cubelist[i].boxextent.x, 2*cubelist[i].boxextent.y, 2*cubelist[i].boxextent.z);
+		meshList[GEO_CUBE]->material.kAmbient = material;
+		meshList[GEO_CUBE]->material.kDiffuse = material;
+		meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+		meshList[GEO_CUBE]->material.kShininess = 2.0f;
+		RenderMesh(meshList[GEO_CUBE], true);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		modelStack.PopMatrix();
+	}
+
+
+	for (int i = 0; i < walllist.size(); i++) {
+		modelStack.PushMatrix();
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		modelStack.Translate(walllist[i].pos.x, walllist[i].pos.y, walllist[i].pos.z);
+		modelStack.Scale( 2*walllist[i].boxextent.x, 2*walllist[i].boxextent.y, 2*walllist[i].boxextent.z);
+		meshList[GEO_CUBE]->material.kAmbient = glm::vec3(1.f, 0.1f, 0.1f);
+		meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(1.f, 0.1f, 0.1f);
+		meshList[GEO_CUBE]->material.kSpecular = glm::vec3(1.f, 0.2f, 0.2f);
+		meshList[GEO_CUBE]->material.kShininess = 2.0f;
+		RenderMesh(meshList[GEO_CUBE], true);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		modelStack.PopMatrix();
+	}
+
 	modelStack.PushMatrix();
 	modelStack.Rotate(-90.f, 1, 0, 0);
 	modelStack.Scale(100.f, 100.f, 100.f);
@@ -392,9 +499,11 @@ void SceneWhackAMole::Render()
 		else
 			RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(static_cast<int>(startcountdown)), glm::vec3(0, 1, 0), 40, 400, 400);
 	}
+	else {
+		RenderMeshOnScreen(meshList[GEO_QUAD], 100, 20, 1.5*camera.GetStamina(),10);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Stamina", glm::vec3(0, 1, 0), 40, 0, 30);
 
-
-	RenderTextOnScreen(meshList[GEO_TEXT], "Stamina", glm::vec3(0, 1, 0), 40, 0, 0);
+	}
 
 }
 
