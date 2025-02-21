@@ -9,8 +9,8 @@
 
 void CSceneManager::Init() {
     // Initialize with first scene
-    activeScene = new SceneBalloonPop();
-    currentSceneType = SCENE_BALLOONPOP;
+    activeScene = new SceneMain();
+    currentSceneType = SCENE_CARNIVAL;
     activeScene->Init();
 }
 

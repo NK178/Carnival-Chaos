@@ -28,6 +28,17 @@ SceneMain::~SceneMain()
 
 void SceneMain::Init()
 {
+
+	camera.enableFNAF = true;
+	camera.allowMovement = true;
+	camera.allowJump = true;
+	camera.allowSprint = false;
+	camera.allowCrouch = true;
+	camera.allowProne = false;
+	camera.allowLocomotiveTilt = true;
+	camera.allowLocomotiveBop = false;
+
+
 	// Set background color to dark blue
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
