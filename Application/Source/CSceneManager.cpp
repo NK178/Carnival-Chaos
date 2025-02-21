@@ -13,7 +13,7 @@
 // dsdsdsdsdsdsds
 void CSceneManager::Init() {
     // Initialize with first scene
-    activeScene = new SceneArchery;
+    activeScene = new SceneBalloonPop;
     currentSceneType = SCENE_MAIN_MENU;
     loadingScreen = new LoadingScreen;
     activeScene->Init();

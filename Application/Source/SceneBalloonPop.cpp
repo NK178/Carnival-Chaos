@@ -977,11 +977,11 @@ void SceneBalloonPop::Render()
 	if (!m_isObjectiveRead) {
 		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 30);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "- BALLOON POP -", glm::vec3(1, 1, 0), 25, 220, 430);
-		RenderTextOnScreen(meshList[GEO_TEXT2], "- Hit the balloons with", glm::vec3(1, 1, 1), 15, 230, 400);
-		RenderTextOnScreen(meshList[GEO_TEXT2], "your arrows!", glm::vec3(1, 1, 1), 15, 320, 370);
-		RenderTextOnScreen(meshList[GEO_TEXT2], "- Get 10 points before", glm::vec3(1, 1, 1), 15, 230, 340);
-		RenderTextOnScreen(meshList[GEO_TEXT2], "30 seconds is up!", glm::vec3(1, 1, 1), 15, 280, 310);
-		RenderTextOnScreen(meshList[GEO_TEXT2], "- Press LMB to shoot!", glm::vec3(1, 1, 1), 15, 240, 280);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Hit the balloons with", glm::vec3(1, 1, 1), 15, 230, 380);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "your arrows!", glm::vec3(1, 1, 1), 15, 320, 350);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Get 10 points before", glm::vec3(1, 1, 1), 15, 230, 320);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "30 seconds is up!", glm::vec3(1, 1, 1), 15, 280, 290);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Press LMB to shoot!", glm::vec3(1, 1, 1), 15, 240, 260);
 
 		RenderMeshOnScreen(meshList[GEO_KEY_E], 310, 200, 15, 15);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "Continue", glm::vec3(1, 1, 1), 20, 340, 190);
@@ -1008,7 +1008,7 @@ void SceneBalloonPop::Render()
 			RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
 			RenderTextOnScreen(meshList[GEO_TEXT2], "YOU WON!", glm::vec3(0, 1, 0), 50, 220, 350);
 			RenderTextOnScreen(meshList[GEO_TEXT2], "You've beat", glm::vec3(1, 1, 1), 20, 295, 300);
-			RenderTextOnScreen(meshList[GEO_TEXT2], "Archery Game!", glm::vec3(1, 1, 1), 20, 210, 270);
+			RenderTextOnScreen(meshList[GEO_TEXT2], "Balloon Pop Game!", glm::vec3(1, 1, 1), 20, 210, 270);
 
 			RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
 			RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
