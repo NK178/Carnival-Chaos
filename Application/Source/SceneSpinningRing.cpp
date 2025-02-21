@@ -129,6 +129,7 @@ void SceneSpinningRing::Init()
 	meshList[GEO_CUBE]->textureID = LoadTGA("Images//lava.tga");
 	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Sphere", glm::vec3(1, 1, 1), 1.f);
 	meshList[GEO_CYLINDER] = MeshBuilder::GenerateCylinder("Cylinder", glm::vec3(1, 1, 1), 16, 1.0f, 16.0f);
+	meshList[GEO_CYLINDER]->textureID = LoadTGA("Images//platform.tga");
 
 	meshList[GEO_LEFT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
 	meshList[GEO_LEFT]->textureID = LoadTGA("Images//circus_skybox.tga");

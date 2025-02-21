@@ -162,48 +162,53 @@ Mesh* MeshBuilder::GenerateCube(const std::string& meshName, glm::vec3 color, fl
 	std::vector<Vertex> vertex_buffer_data;
 	std::vector<GLuint> index_buffer_data;
 
-	v.pos = glm::vec3(0.5f * length, 0.5f * length, 0.5f * length);	  v.normal = glm::vec3(0, 0, 1); 	  vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(-0.5f * length, 0.5f * length, 0.5f * length);  v.normal = glm::vec3(0, 0, 1);  vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(-0.5f * length, -0.5f * length, 0.5f * length); v.normal = glm::vec3(0, 0, 1);	  vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(0.5f * length, 0.5f * length, 0.5f * length);	  v.normal = glm::vec3(0, 0, 1); 	  vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(-0.5f * length, -0.5f * length, 0.5f * length); v.normal = glm::vec3(0, 0, 1);	  vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(0.5f * length, -0.5f * length, 0.5f * length);  v.normal = glm::vec3(0, 0, 1);  vertex_buffer_data.push_back(v);
+	// Front face
+	v.pos = glm::vec3(0.5f * length, 0.5f * length, 0.5f * length);     v.normal = glm::vec3(0, 0, 1);   v.texCoord = glm::vec2(1.0f, 1.0f); vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(-0.5f * length, 0.5f * length, 0.5f * length);    v.normal = glm::vec3(0, 0, 1);   v.texCoord = glm::vec2(0.0f, 1.0f); vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(-0.5f * length, -0.5f * length, 0.5f * length);   v.normal = glm::vec3(0, 0, 1);   v.texCoord = glm::vec2(0.0f, 0.0f); vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(0.5f * length, 0.5f * length, 0.5f * length);     v.normal = glm::vec3(0, 0, 1);   v.texCoord = glm::vec2(1.0f, 1.0f); vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(-0.5f * length, -0.5f * length, 0.5f * length);   v.normal = glm::vec3(0, 0, 1);   v.texCoord = glm::vec2(0.0f, 0.0f); vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(0.5f * length, -0.5f * length, 0.5f * length);    v.normal = glm::vec3(0, 0, 1);   v.texCoord = glm::vec2(1.0f, 0.0f); vertex_buffer_data.push_back(v);
 
-	v.pos = glm::vec3(0.5f * length, 0.5f * length, -0.5f * length);  v.normal = glm::vec3(1, 0, 0); vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(0.5f * length, 0.5f * length, 0.5f * length);	  v.normal = glm::vec3(1, 0, 0); 	vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(0.5f * length, -0.5f * length, 0.5f * length);  v.normal = glm::vec3(1, 0, 0); vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(0.5f * length, 0.5f * length, -0.5f * length);  v.normal = glm::vec3(1, 0, 0); vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(0.5f * length, -0.5f * length, 0.5f * length);  v.normal = glm::vec3(1, 0, 0); vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(0.5f * length, -0.5f * length, -0.5f * length); v.normal = glm::vec3(1, 0, 0);	vertex_buffer_data.push_back(v);
+	// Right face
+	v.pos = glm::vec3(0.5f * length, 0.5f * length, -0.5f * length);    v.normal = glm::vec3(1, 0, 0);   v.texCoord = glm::vec2(1.0f, 1.0f); vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(0.5f * length, 0.5f * length, 0.5f * length);     v.normal = glm::vec3(1, 0, 0);   v.texCoord = glm::vec2(0.0f, 1.0f); vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(0.5f * length, -0.5f * length, 0.5f * length);    v.normal = glm::vec3(1, 0, 0);   v.texCoord = glm::vec2(0.0f, 0.0f); vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(0.5f * length, 0.5f * length, -0.5f * length);    v.normal = glm::vec3(1, 0, 0);   v.texCoord = glm::vec2(1.0f, 1.0f); vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(0.5f * length, -0.5f * length, 0.5f * length);    v.normal = glm::vec3(1, 0, 0);   v.texCoord = glm::vec2(0.0f, 0.0f); vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(0.5f * length, -0.5f * length, -0.5f * length);   v.normal = glm::vec3(1, 0, 0);   v.texCoord = glm::vec2(1.0f, 0.0f); vertex_buffer_data.push_back(v);
 
-	v.pos = glm::vec3(0.5f * length, 0.5f * length, -0.5f * length);  v.normal = glm::vec3(0, 1, 0); vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(-0.5f * length, 0.5f * length, -0.5f * length); v.normal = glm::vec3(0, 1, 0);	vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(-0.5f * length, 0.5f * length, 0.5f * length);  v.normal = glm::vec3(0, 1, 0); vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(0.5f * length, 0.5f * length, -0.5f * length);  v.normal = glm::vec3(0, 1, 0); vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(-0.5f * length, 0.5f * length, 0.5f * length);  v.normal = glm::vec3(0, 1, 0); vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(0.5f * length, 0.5f * length, 0.5f * length);	  v.normal = glm::vec3(0, 1, 0); 	vertex_buffer_data.push_back(v);
+	// Top face
+	v.pos = glm::vec3(0.5f * length, 0.5f * length, -0.5f * length);    v.normal = glm::vec3(0, 1, 0);   v.texCoord = glm::vec2(1.0f, 1.0f); vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(-0.5f * length, 0.5f * length, -0.5f * length);   v.normal = glm::vec3(0, 1, 0);   v.texCoord = glm::vec2(0.0f, 1.0f); vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(-0.5f * length, 0.5f * length, 0.5f * length);    v.normal = glm::vec3(0, 1, 0);   v.texCoord = glm::vec2(0.0f, 0.0f); vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(0.5f * length, 0.5f * length, -0.5f * length);    v.normal = glm::vec3(0, 1, 0);   v.texCoord = glm::vec2(1.0f, 1.0f); vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(-0.5f * length, 0.5f * length, 0.5f * length);    v.normal = glm::vec3(0, 1, 0);   v.texCoord = glm::vec2(0.0f, 0.0f); vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(0.5f * length, 0.5f * length, 0.5f * length);     v.normal = glm::vec3(0, 1, 0);   v.texCoord = glm::vec2(1.0f, 0.0f); vertex_buffer_data.push_back(v);
 
-	v.pos = glm::vec3(-0.5f * length, 0.5f * length, -0.5f * length);  v.normal = glm::vec3(0, 0, -1);	vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(0.5f * length, 0.5f * length, -0.5f * length);   v.normal = glm::vec3(0, 0, -1); vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(0.5f * length, -0.5f * length, -0.5f * length);  v.normal = glm::vec3(0, 0, -1);	vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(-0.5f * length, 0.5f * length, -0.5f * length);  v.normal = glm::vec3(0, 0, -1);	vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(0.5f * length, -0.5f * length, -0.5f * length);  v.normal = glm::vec3(0, 0, -1);	vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(-0.5f * length, -0.5f * length, -0.5f * length); v.normal = glm::vec3(0, 0, -1);	vertex_buffer_data.push_back(v);
+	// Back face
+	v.pos = glm::vec3(-0.5f * length, 0.5f * length, -0.5f * length);   v.normal = glm::vec3(0, 0, -1);  v.texCoord = glm::vec2(1.0f, 1.0f); vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(0.5f * length, 0.5f * length, -0.5f * length);    v.normal = glm::vec3(0, 0, -1);  v.texCoord = glm::vec2(0.0f, 1.0f); vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(0.5f * length, -0.5f * length, -0.5f * length);   v.normal = glm::vec3(0, 0, -1);  v.texCoord = glm::vec2(0.0f, 0.0f); vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(-0.5f * length, 0.5f * length, -0.5f * length);   v.normal = glm::vec3(0, 0, -1);  v.texCoord = glm::vec2(1.0f, 1.0f); vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(0.5f * length, -0.5f * length, -0.5f * length);   v.normal = glm::vec3(0, 0, -1);  v.texCoord = glm::vec2(0.0f, 0.0f); vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(-0.5f * length, -0.5f * length, -0.5f * length);  v.normal = glm::vec3(0, 0, -1);  v.texCoord = glm::vec2(1.0f, 0.0f); vertex_buffer_data.push_back(v);
 
-	v.pos = glm::vec3(-0.5f * length, 0.5f * length, 0.5f * length);   v.normal = glm::vec3(-1, 0, 0); vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(-0.5f * length, 0.5f * length, -0.5f * length);  v.normal = glm::vec3(-1, 0, 0);	vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(-0.5f * length, -0.5f * length, -0.5f * length); v.normal = glm::vec3(-1, 0, 0);	vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(-0.5f * length, 0.5f * length, 0.5f * length);   v.normal = glm::vec3(-1, 0, 0); vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(-0.5f * length, -0.5f * length, -0.5f * length); v.normal = glm::vec3(-1, 0, 0);	vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(-0.5f * length, -0.5f * length, 0.5f * length);  v.normal = glm::vec3(-1, 0, 0);	vertex_buffer_data.push_back(v);
+	// Left face
+	v.pos = glm::vec3(-0.5f * length, 0.5f * length, 0.5f * length);    v.normal = glm::vec3(-1, 0, 0);  v.texCoord = glm::vec2(1.0f, 1.0f); vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(-0.5f * length, 0.5f * length, -0.5f * length);   v.normal = glm::vec3(-1, 0, 0);  v.texCoord = glm::vec2(0.0f, 1.0f); vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(-0.5f * length, -0.5f * length, -0.5f * length);  v.normal = glm::vec3(-1, 0, 0);  v.texCoord = glm::vec2(0.0f, 0.0f); vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(-0.5f * length, 0.5f * length, 0.5f * length);    v.normal = glm::vec3(-1, 0, 0);  v.texCoord = glm::vec2(1.0f, 1.0f); vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(-0.5f * length, -0.5f * length, -0.5f * length);  v.normal = glm::vec3(-1, 0, 0);  v.texCoord = glm::vec2(0.0f, 0.0f); vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(-0.5f * length, -0.5f * length, 0.5f * length);   v.normal = glm::vec3(-1, 0, 0);  v.texCoord = glm::vec2(1.0f, 0.0f); vertex_buffer_data.push_back(v);
 
-	v.pos = glm::vec3(-0.5f * length, -0.5f * length, -0.5f * length);  v.normal = glm::vec3(0, -1, 0);	vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(0.5f * length, -0.5f * length, -0.5f * length);   v.normal = glm::vec3(0, -1, 0);	vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(0.5f * length, -0.5f * length, 0.5f * length);	v.normal = glm::vec3(0, -1, 0); vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(-0.5f * length, -0.5f * length, -0.5f * length);  v.normal = glm::vec3(0, -1, 0);	vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(0.5f * length, -0.5f * length, 0.5f * length);	v.normal = glm::vec3(0, -1, 0); vertex_buffer_data.push_back(v);
-	v.pos = glm::vec3(-0.5f * length, -0.5f * length, 0.5f * length);   v.normal = glm::vec3(0, -1, 0);	vertex_buffer_data.push_back(v);
-
+	// Bottom face
+	v.pos = glm::vec3(-0.5f * length, -0.5f * length, -0.5f * length);  v.normal = glm::vec3(0, -1, 0);  v.texCoord = glm::vec2(0.0f, 1.0f); vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(0.5f * length, -0.5f * length, -0.5f * length);   v.normal = glm::vec3(0, -1, 0);  v.texCoord = glm::vec2(1.0f, 1.0f); vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(0.5f * length, -0.5f * length, 0.5f * length);    v.normal = glm::vec3(0, -1, 0);  v.texCoord = glm::vec2(1.0f, 0.0f); vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(-0.5f * length, -0.5f * length, -0.5f * length);  v.normal = glm::vec3(0, -1, 0);  v.texCoord = glm::vec2(0.0f, 1.0f); vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(0.5f * length, -0.5f * length, 0.5f * length);    v.normal = glm::vec3(0, -1, 0);  v.texCoord = glm::vec2(1.0f, 0.0f); vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(-0.5f * length, -0.5f * length, 0.5f * length);   v.normal = glm::vec3(0, -1, 0);  v.texCoord = glm::vec2(0.0f, 0.0f); vertex_buffer_data.push_back(v);
 
 	for (unsigned i = 0; i < 36; ++i)
 	{
@@ -213,13 +218,9 @@ Mesh* MeshBuilder::GenerateCube(const std::string& meshName, glm::vec3 color, fl
 	// Create the new mesh
 	Mesh* mesh = new Mesh(meshName);
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, vertex_buffer_data.size() *
-		sizeof(Vertex),
-		&vertex_buffer_data[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertex_buffer_data.size() * sizeof(Vertex), &vertex_buffer_data[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->indexBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_buffer_data.size() *
-		sizeof(GLuint),
-		&index_buffer_data[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_buffer_data.size() * sizeof(GLuint), &index_buffer_data[0], GL_STATIC_DRAW);
 	mesh->indexSize = index_buffer_data.size();
 	mesh->mode = Mesh::DRAW_TRIANGLES;
 
@@ -232,16 +233,20 @@ Mesh* MeshBuilder::GenerateCylinder(const std::string& meshName, glm::vec3 color
 	v.color = color;
 	std::vector<Vertex> vertex_buffer_data;
 	std::vector<GLuint> index_buffer_data;
-
 	float degreePerSlice = glm::two_pi<float>() / numSlice;
 
 	// Bottom
-	v.pos = glm::vec3(0, -0.5f * height, 0); v.normal = glm::vec3(0, -1, 0);  vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(0, -0.5f * height, 0);
+	v.normal = glm::vec3(0, -1, 0);
+	v.texCoord = glm::vec2(0.5f, 0.5f);  // Center of bottom circle
+	vertex_buffer_data.push_back(v);
+
 	for (unsigned slice = 0; slice < numSlice + 1; ++slice)
 	{
 		float theta = slice * degreePerSlice;
 		v.pos = glm::vec3(radius * glm::cos(theta), -0.5f * height, radius * glm::sin(theta));
 		v.normal = glm::vec3(0, -1, 0);
+		v.texCoord = glm::vec2(0.5f + 0.5f * glm::cos(theta), 0.5f + 0.5f * glm::sin(theta));  // Map to circular texture
 		vertex_buffer_data.push_back(v);
 	}
 
@@ -249,20 +254,25 @@ Mesh* MeshBuilder::GenerateCylinder(const std::string& meshName, glm::vec3 color
 	{
 		index_buffer_data.push_back(0);
 		index_buffer_data.push_back(slice + 1);
-
 	}
 
+	// Middle (walls)
 	unsigned middleStartIndex = vertex_buffer_data.size();
-	for (int slice = 0; slice <= numSlice; ++slice) { // slice
+	for (int slice = 0; slice <= numSlice; ++slice) {
 		float theta = slice * degreePerSlice;
+		float u = static_cast<float>(slice) / numSlice;  // Texture coordinate along circumference
+
+		// Bottom vertex
 		v.pos = glm::vec3(radius * glm::cos(theta), -height * 0.5f, radius * glm::sin(theta));
 		v.normal = glm::vec3(glm::cos(theta), 0, glm::sin(theta));
+		v.texCoord = glm::vec2(u, 0.0f);  // Bottom of texture
 		vertex_buffer_data.push_back(v);
 
+		// Top vertex
 		v.pos = glm::vec3(radius * glm::cos(theta), height * 0.5f, radius * glm::sin(theta));
 		v.normal = glm::vec3(glm::cos(theta), 0, glm::sin(theta));
+		v.texCoord = glm::vec2(u, 1.0f);  // Top of texture
 		vertex_buffer_data.push_back(v);
-
 	}
 
 	for (unsigned slice = 0; slice < numSlice + 1; slice++) {
@@ -270,14 +280,19 @@ Mesh* MeshBuilder::GenerateCylinder(const std::string& meshName, glm::vec3 color
 		index_buffer_data.push_back(middleStartIndex + 1 + 2 * slice + 0);
 	}
 
-	// top
+	// Top
 	unsigned topStartIndex = vertex_buffer_data.size();
-	v.pos = glm::vec3(0, 0.5f * height, 0); v.normal = glm::vec3(0, 1, 0);  vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(0, 0.5f * height, 0);
+	v.normal = glm::vec3(0, 1, 0);
+	v.texCoord = glm::vec2(0.5f, 0.5f);  // Center of top circle
+	vertex_buffer_data.push_back(v);
+
 	for (unsigned slice = 0; slice < numSlice + 1; ++slice)
 	{
 		float theta = slice * degreePerSlice;
 		v.pos = glm::vec3(radius * glm::cos(theta), 0.5f * height, radius * glm::sin(theta));
 		v.normal = glm::vec3(0, 1, 0);
+		v.texCoord = glm::vec2(0.5f + 0.5f * glm::cos(theta), 0.5f + 0.5f * glm::sin(theta));  // Map to circular texture
 		vertex_buffer_data.push_back(v);
 	}
 
@@ -287,17 +302,13 @@ Mesh* MeshBuilder::GenerateCylinder(const std::string& meshName, glm::vec3 color
 		index_buffer_data.push_back(topStartIndex);
 	}
 
-	// Crate Mesh code here
 	Mesh* mesh = new Mesh(meshName);
-
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBuffer);
 	glBufferData(GL_ARRAY_BUFFER, vertex_buffer_data.size() * sizeof(Vertex), &vertex_buffer_data[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->indexBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_buffer_data.size() * sizeof(GLuint), &index_buffer_data[0], GL_STATIC_DRAW);
-
 	mesh->indexSize = index_buffer_data.size();
 	mesh->mode = Mesh::DRAW_TRIANGLE_STRIP;
-
 	return mesh;
 }
 
