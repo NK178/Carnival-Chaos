@@ -9,6 +9,7 @@
 #include "Light.h"
 #include "CSceneManager.h"
 #include "GameObject.h"
+#include "CollisionDetection.h"
 #include <iostream>
 
 class SceneArchery : public Scene
@@ -28,6 +29,7 @@ public:
         GEO_BARREL,
         // Text
         GEO_TEXT,
+        GEO_GAMEOVER,
         // Skybox
         GEO_LEFT,
         GEO_RIGHT,
@@ -103,30 +105,34 @@ public:
 
 private:
  
+
+ 
+
+    struct Target : public GameObject {
+        float radius;
+        bool isHit;
+
+        Target(int id, const glm::vec3& position, float rad) : GameObject(id, GameObject::CUBE) {
+            pos = position;
+            radius = rad;
+            isHit = false;
+        }
+    };
+
     struct Arrow : public GameObject {
         float lifetime{ 5.0f };
         float currentTime{ 0.0f };
         bool isActive{ false };
         bool isStuck{ false };
+        float radius{ 0.5f };  // Collision radius for arrow
         glm::vec3 stuckPosition{ 0.0f, 0.0f, 0.0f };
         glm::vec3 targetNormal{ 0.0f, 0.0f, 0.0f };
 
-        //// Add a default constructor
-        //Arrow() {
-        //    SetID(0);  // Default ID
-        //    mass = 0.4f;
-        //    bounciness = 0.2f;
-        //    accel = glm::vec3(0, -9.8f, 0);
-        //}
-
-        //// Keep the existing constructor
-        //Arrow(int id) {
-        //    SetID(id);
-        //    mass = 0.4f;
-        //    bounciness = 0.2f;
-        //    accel = glm::vec3(0, -9.8f, 0);
-        //}
-
+        Arrow(int id) : GameObject(id, GameObject::SPHERE) {  // Changed to SPHERE for collision
+            mass = 0.4f;
+            bounciness = 0.2f;
+            accel = glm::vec3(0, -9.8f, 0);
+        }
 
         void Fire(const glm::vec3& startPos, const glm::vec3& direction, float speed) {
             pos = startPos;
@@ -149,13 +155,9 @@ private:
             currentTime = 0.0f;
         }
 
-        void StickToTarget(const glm::vec3& hitPos, const glm::vec3& normal) {
-            stuckPosition = hitPos;
-            targetNormal = normal;
-            isStuck = true;
-            vel = glm::vec3(0);
-            m_totalForces = glm::vec3(0);
-        }
+
+
+
 
         void Update(float dt) {
             if (!isActive || isStuck) return;
@@ -168,6 +170,10 @@ private:
     };
 
 
+    bool m_isGameOver;
+    bool m_hasWon;
+   
+
     float m_arrowPower;         // Current power level of the arrow
     float m_maxArrowPower;      // Maximum power level
     float m_powerChargeRate;    // How fast power increases
@@ -179,13 +185,10 @@ private:
     int m_arrowsLeft;     // Track remaining arrows
     int m_playerScore;    // Track player's score
 
-    static const int MAX_ARROWS = 10;
-
     // Utility methods
     void HandleKeyPress();
     void RenderMesh(Mesh* mesh, bool enableLight);
-    bool OverlapAABB2AABB(glm::vec3 Obj1, const int Width1, const int Height1,
-        glm::vec3 Obj2, const int Width2, const int Height2);
+   
     void RenderMeshOnScreen(Mesh* mesh, float x, float y, float sizex, float sizey);
     void RenderText(Mesh* mesh, std::string text, glm::vec3 color);
     void RenderTextOnScreen(Mesh* mesh, std::string text, glm::vec3 color, float size, float x, float y);
@@ -195,9 +198,11 @@ private:
     void RenderSkyBox();
 
     // Arrow-related methods
-    //void HandleArrowInput();
-    //void FireArrow();
-    //void CheckArrowCollisions();
+    void HandleArrowInput();
+    void FireArrow();
+    void CheckArrowCollisions();
+
+    void RestartGame();
 
     // Member variables
     unsigned m_vertexArrayID;
@@ -216,7 +221,16 @@ private:
     Application app;
 
     // Arrow array
-    //Arrow arrows[MAX_ARROWS];
+    std::vector<Arrow> arrows;
+    static const int MAX_ARROWS = 10;
+
+    std::vector<Target> targets;
+
+    static constexpr float TARGET_RADIUS = 6.0f;
+    static constexpr float TARGET_HEIGHT = 12.0f;  // Increased to match visual size
+    static constexpr float TARGET_WIDTH = 12.0f;   // Increased to match visual size
+    static constexpr float TARGET_DEPTH = 2.0f;    // Increased for better collision
+    static constexpr float ARROW_RADIUS = 0.2f;    // Increased for better hit detection
 };
 
 #endif // SCENE_ARCHERY_H

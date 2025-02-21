@@ -24,6 +24,8 @@ public:
 		GEO_CRATE,
 		GEO_BALLOONS,
 		GEO_PRESENT,
+		GEO_BALLOON,
+		GEO_CROSSHAIR,
 
 		//Text
 		GEO_TEXT,
@@ -136,6 +138,46 @@ private:
 	void RenderTextOnScreen(Mesh* mesh, std::string text, glm::vec3 color, float size, float x, float y);
 	void Material(GEOMETRY_TYPE obj, float AmR, float AmG, float AmB, float DifA, float DifG, float DifB, float SpA, float SpG, float SpB, float Shiny);
 	void RenderSkyBox();
+
+
+	struct Balloon {
+		PhysicsObject physics;
+		bool isPopped;
+		float timeAlive;
+
+		Balloon() : isPopped(false), timeAlive(0.0f) {
+			physics.mass = 0.1f;  // Light mass for balloon
+			physics.bounciness = 0.5f;
+		}
+	};
+
+	std::vector<Balloon> balloons;
+	float gameTimer;
+	int playerScore;
+	bool gameOver;
+	const float GAME_TIME_LIMIT = 30.0f;
+	const int WIN_SCORE = 10;
+	const float SPAWN_INTERVAL = 2.0f;
+	float spawnTimer;
+
+	// Add these constants
+	const float BALLOON_UP_FORCE = 5.0f;        // Increased upward force
+	const float BALLOON_RIGHT_FORCE = 2.0f;     // Increased rightward force
+	const float BALLOON_WOBBLE_FORCE = 1.0f;    // Force for side-to-side movement
+	const float CEILING_HEIGHT = 50.0f;
+	const float FLOOR_HEIGHT = 5.0f;
+
+
+	void SpawnBalloon() {
+		Balloon newBalloon;
+		// Random position at bottom of stage
+		newBalloon.physics.pos = glm::vec3(
+			-100.0f + static_cast<float>(rand() % 200), // Random x between -100 and 100
+			FLOOR_HEIGHT,  // Start at floor height
+			-40.0f + static_cast<float>(rand() % 80)    // Random z between -40 and 40
+		);
+		balloons.push_back(newBalloon);
+	}
 
 
 };

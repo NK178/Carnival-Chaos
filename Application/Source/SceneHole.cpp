@@ -31,11 +31,12 @@ void SceneHole::Init()
 	wallDisp = 100;
 	failedGrav = 0;
 
+	camera.enableFNAF = false;
 	camera.allowMovement = true;
 	camera.allowJump = true;
 	camera.allowSprint = false;
 	camera.allowCrouch = true;
-	camera.allowProne = true;
+	camera.allowProne = false;
 	camera.allowLocomotiveTilt = true;
 	camera.allowLocomotiveBop = false;
 

@@ -30,6 +30,7 @@ public:
 
     //bools for camera mechanics
 
+    bool enableFNAF = false;
     bool allowMovement = true; // 
     bool allowJump = true; // 
     bool allowSprint = true; // 

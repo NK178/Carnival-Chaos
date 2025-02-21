@@ -6,7 +6,7 @@
 
 //Include GLFW
 #include <GLFW/glfw3.h>
-#include <iostream>
+#include "Application.h"
 
 float FPCamera::currentPitch = 0.f;
 
@@ -328,8 +328,16 @@ void FPCamera::Update(double dt)
 		bop = glm::sin(boptimer * BOP_SPEED) * BOP_AMPLITUDE;
 	}
 
+	
 	double deltaX = MouseController::GetInstance()->GetMouseDeltaX();
 	float angleX = -deltaX * ROTATE_SPEED * 0.05 * static_cast<float>(dt);
+
+	if (enableFNAF)
+	{
+		Application::SetPointerStatus(true);
+
+		angleX = 0;
+	}
 	glm::mat4 yaw = glm::rotate(
 		glm::mat4(1.f), // matrix to modify
 		glm::radians(angleX), // rotation angle in degree and
@@ -339,6 +347,12 @@ void FPCamera::Update(double dt)
 
 	double deltaY = MouseController::GetInstance()->GetMouseDeltaY();
 	float angleY = deltaY * ROTATE_SPEED * 0.05 * static_cast<float>(dt);
+
+	if (enableFNAF)
+	{
+		angleY = 0;
+	}
+
 	glm::mat4 pitch = glm::rotate(
 		glm::mat4(1.f), // matrix to modify
 		glm::clamp(glm::radians(angleY), -1.5f, 1.5f), // rotation angle in degree and
@@ -346,15 +360,13 @@ void FPCamera::Update(double dt)
 	);
 	glm::vec3 pitchView = pitch * glm::vec4(view, 0.f);
 	target = pos + pitchView + yawView;
-	isDirty = true;
-	this->Refresh();
-
-	//std::cout << pitchView.x << std::endl;
-
-	
 
 	multDebugX = pitchView.z > 0 ? 1 : -1;
 	multDebugZ = pitchView.x > 0 ? -1 : 1;
+	
+	isDirty = true;
+	this->Refresh();
+
 	UpdatePhysics(dt);
 	
 }

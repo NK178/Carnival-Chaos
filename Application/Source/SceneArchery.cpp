@@ -35,7 +35,9 @@ SceneArchery::SceneArchery() :
 	m_powerChargeRate(2.0f),
 	m_isChargingShot(false),
 	m_arrowsLeft(10),    // Start with 10 arrows
-	m_playerScore(0)     // Start with 0 score
+	m_playerScore(0),   // Start with 0 score
+	m_isGameOver(false),
+	m_hasWon(false)
 
 {
 	// Additional initialization if needed
@@ -55,6 +57,18 @@ SceneArchery::~SceneArchery()
 
 void SceneArchery::Init()
 {
+
+	camera.enableFNAF = false;
+	camera.allowMovement = false;
+	camera.allowJump = true;
+	camera.allowSprint = false;
+	camera.allowCrouch = false;
+	camera.allowProne = false;
+	camera.allowLocomotiveTilt = false;
+	camera.allowLocomotiveBop = false;
+
+	
+
 	// Set background color to dark blue
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
@@ -138,7 +152,7 @@ void SceneArchery::Init()
 		m_parameters[U_MATERIAL_SHININESS]);
 
 	// Initialise camera properties
-	camera.Init(glm::vec3(-10, 10, -10), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	camera.Init(glm::vec3(0, 10, 50), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 
 	// Init VBO here
 	for (int i = 0; i < NUM_GEOMETRY; ++i)
@@ -182,6 +196,9 @@ void SceneArchery::Init()
 	meshList[GEO_CARPET] = MeshBuilder::GenerateOBJ("Carpet",
 		"Models//3DBK_100121.obj");
 	meshList[GEO_CARPET]->textureID = LoadTGA("Images//3DBK_100121_rug_Diffuse.tga");
+
+	meshList[GEO_GAMEOVER] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 2.f);
+	meshList[GEO_GAMEOVER]->textureID = LoadTGA("Images//LoseScreenArchery.tga");
 
 	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 1000.0f);
 	projectionStack.LoadMatrix(projection);
@@ -300,103 +317,163 @@ void SceneArchery::Init()
 
 	enableLight = true;
 
+	for (int i = 0; i < MAX_ARROWS; ++i) {
+		arrows.push_back(Arrow(i));  // i is used as the ID for each arrow
+	}
+
+	// Center target
+	targets.push_back(Target(0, glm::vec3(0, 0, -40), TARGET_RADIUS));
+
+	// Right target
+	targets.push_back(Target(1, glm::vec3(20, 0, -30), TARGET_RADIUS));
+
+	// Left target
+	targets.push_back(Target(2, glm::vec3(-20, 0, -20), TARGET_RADIUS));
+
 
 }
 
-//
-//void SceneArchery::HandleArrowInput() {
-//	// When left mouse button is held down
-//	if (MouseController::GetInstance()->IsButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
-//		if (!m_isChargingShot) {
-//			// Start charging
-//			m_isChargingShot = true;
-//			m_arrowPower = 0.0f;
-//		}
-//		else {
-//			// Continue charging, increase power
-//			m_arrowPower = std::min<float>(m_arrowPower + m_powerChargeRate, m_maxArrowPower);
-//		}
-//	}
-//	// When left mouse button is released
-//	else if (MouseController::GetInstance()->IsButtonUp(GLFW_MOUSE_BUTTON_LEFT)) {
-//		if (m_isChargingShot) {
-//			// Fire the arrow with current power
-//			FireArrow();
-//			// Reset charging state
-//			m_isChargingShot = false;
-//			m_arrowPower = 0.0f;
-//		}
-//	}
-//}
-//
-//void SceneArchery::FireArrow() {
-//	// Only fire if player has arrows left
-//	if (m_arrowsLeft <= 0) {
-//		return;  // Don't fire if no arrows left
-//	}
-//
-//	// Attempt to find an inactive arrow
-//	for (int i = 0; i < MAX_ARROWS; ++i) {
-//		if (!arrows[i].isActive) {
-//			// Decrease arrows left
-//			m_arrowsLeft--;
-//
-//			// Calculate fire direction based on camera
-//			glm::vec3 fireDirection = glm::normalize(camera.target - camera.pos);
-//
-//			// Rest of the firing code remains the same
-//			float minSpeed = 1.0f;
-//			float maxSpeed = 40.0f;
-//			float powerPercentage = m_arrowPower / m_maxArrowPower;
-//			float speedMultiplier = powerPercentage * powerPercentage;
-//			float finalSpeed = minSpeed + (maxSpeed - minSpeed) * speedMultiplier;
-//
-//			arrows[i].Fire(
-//				camera.pos,
-//				fireDirection,
-//				finalSpeed
-//			);
-//
-//			arrows[i].AddForce(glm::vec3(0, 15.0f, 0));
-//			break;
-//		}
-//	}
-//}
-//
-//void SceneArchery::CheckArrowCollisions()
-//{
-//	struct TargetInfo {
-//		glm::vec3 position;
-//		glm::vec3 normal;
-//		float radius;
-//	};
-//
-//	TargetInfo targetPositions[3] = {
-//		{glm::vec3(0, 0, -40), glm::vec3(0, 1, 0), 15.0f},
-//		{glm::vec3(20, 0, -30), glm::vec3(0, 1, 0), 15.0f},
-//		{glm::vec3(-20, 0, -20), glm::vec3(0, 1, 0), 15.0f}
-//	};
-//
-//	for (int i = 0; i < MAX_ARROWS; ++i) {
-//		if (arrows[i].isActive && !arrows[i].isStuck) {
-//			for (int j = 0; j < 3; ++j) {
-//				float distance = glm::length(arrows[i].pos - targetPositions[j].position);
-//
-//				if (distance < targetPositions[j].radius) {
-//					// Increment score when arrow hits target
-//					m_playerScore++;
-//
-//					arrows[i].StickToTarget(
-//						targetPositions[j].position,
-//						targetPositions[j].normal
-//					);
-//					break;
-//				}
-//			}
-//		}
-//	}
-//}
-//
+void SceneArchery::RestartGame()
+{
+	// Reset game state
+	m_isGameOver = false;
+	m_hasWon = false;
+	m_arrowsLeft = 10;
+	m_playerScore = 0;
+	m_arrowPower = 0.0f;
+	m_isChargingShot = false;
+
+	// Reset all arrows
+	for (auto& arrow : arrows) {
+		arrow.isActive = false;
+		arrow.isStuck = false;
+		arrow.pos = glm::vec3(0.0f);
+		arrow.vel = glm::vec3(0.0f);
+	}
+}
+
+
+void SceneArchery::HandleArrowInput() {
+	// When left mouse button is held down
+	if (MouseController::GetInstance()->IsButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
+		if (!m_isChargingShot) {
+			// Start charging
+			m_isChargingShot = true;
+			m_arrowPower = 0.0f;
+		}
+		else {
+			// Continue charging, increase power
+			m_arrowPower = std::min<float>(m_arrowPower + m_powerChargeRate, m_maxArrowPower);
+		}
+	}
+	// When left mouse button is released
+	else if (MouseController::GetInstance()->IsButtonUp(GLFW_MOUSE_BUTTON_LEFT)) {
+		if (m_isChargingShot) {
+			// Fire the arrow with current power
+			FireArrow();
+			// Reset charging state
+			m_isChargingShot = false;
+			m_arrowPower = 0.0f;
+		}
+	}
+}
+
+void SceneArchery::FireArrow() {
+	// Only fire if player has arrows left
+	if (m_arrowsLeft <= 0) {
+		return;  // Don't fire if no arrows left
+	}
+
+	// Attempt to find an inactive arrow
+	for (int i = 0; i < MAX_ARROWS; ++i) {
+		if (!arrows[i].isActive) {
+			// Decrease arrows left
+			m_arrowsLeft--;
+
+			// Calculate fire direction based on camera
+			glm::vec3 fireDirection = glm::normalize(camera.target - camera.pos);
+
+			// Rest of the firing code remains the same
+			float minSpeed = 1.0f;
+			float maxSpeed = 40.0f;
+			float powerPercentage = m_arrowPower / m_maxArrowPower;
+			float speedMultiplier = powerPercentage * powerPercentage;
+			float finalSpeed = minSpeed + (maxSpeed - minSpeed) * speedMultiplier;
+
+			arrows[i].Fire(
+				camera.pos,
+				fireDirection,
+				finalSpeed
+			);
+
+			arrows[i].AddForce(glm::vec3(0, 15.0f, 0));
+			break;
+		}
+	}
+}
+
+void SceneArchery::CheckArrowCollisions()
+{
+	for (auto& arrow : arrows) {
+		if (arrow.isActive && !arrow.isStuck) {
+			PhysicsObject arrowPhysics;
+			arrowPhysics.pos = arrow.pos;
+			arrowPhysics.vel = arrow.vel;
+			arrowPhysics.mass = arrow.mass;
+
+			for (auto& target : targets) {
+				glm::vec3 targetPos = target.pos + glm::vec3(0, 10.0f, 3.0f);
+
+				float zoneScales[3] = { 0.3f, 0.6f, 1.0f };
+				int pointValues[3] = { 3, 2, 1 };
+
+				bool scored = false;
+
+				for (int i = 0; i < 3; ++i) {
+					if (scored) break;
+
+					float zoneWidth = TARGET_WIDTH * zoneScales[i];
+					float zoneHeight = TARGET_HEIGHT * zoneScales[i];
+
+					glm::vec3 halfExtents(
+						zoneWidth * 0.5f,
+						zoneHeight * 0.5f,
+						TARGET_DEPTH * 0.5f
+					);
+
+					glm::vec3 boxMin = targetPos - halfExtents;
+					glm::vec3 boxMax = targetPos + halfExtents;
+
+					PhysicsObject targetPhysics;
+					targetPhysics.pos = targetPos;
+					targetPhysics.mass = 0.0f;
+
+					CollisionData cd;
+					if (OverlapAABB2Sphere(arrowPhysics, ARROW_RADIUS, targetPhysics, boxMin, boxMax, cd)) {
+						// **Ensure Score is Always Added**
+						m_playerScore += pointValues[i];
+
+						// **Fix: Correct Arrow Position**
+						glm::vec3 impactPoint = arrow.pos - glm::normalize(arrow.vel) * ARROW_RADIUS;
+						arrow.stuckPosition = impactPoint;
+
+						// **Fix: Properly Set Arrow as Stuck**
+						arrow.isActive = true;   // Ensure arrow remains visible
+						arrow.isStuck = true;
+						arrow.vel = glm::vec3(0.0f);  // Stop movement
+						arrow.targetNormal = glm::normalize(cd.normal); // Store collision normal
+
+						scored = true;
+					}
+				}
+			}
+		}
+	}
+}
+
+
+
+
 void SceneArchery::Update(double dt)
 {
 	HandleKeyPress();
@@ -413,6 +490,22 @@ void SceneArchery::Update(double dt)
 	//	light[0].position.y -= static_cast<float>(dt) * 5.f;
 	//if (KeyboardController::GetInstance()->IsKeyDown('P'))
 	//	light[0].position.y += static_cast<float>(dt) * 5.f;
+
+
+	// If game is over, only check for restart
+	if (m_isGameOver) {
+		if (KeyboardController::GetInstance()->IsKeyPressed('R')) {
+			RestartGame();
+		}
+		return;
+	}
+
+	// Check for game over condition
+	if (m_arrowsLeft <= 0 && m_playerScore < 20) {
+		m_isGameOver = true;
+		m_hasWon = false;
+		return;
+	}
 
 	glm::vec3 targetPositions[3] = {
 		glm::vec3(0, 0, -40),      // Center target
@@ -431,19 +524,19 @@ void SceneArchery::Update(double dt)
 	camera.Update(dt);
 
 
-	//// Handle arrow input
-	//HandleArrowInput();
+	// Handle arrow input
+	HandleArrowInput();
 
-	//// Update all active arrows
-	//for (int i = 0; i < MAX_ARROWS; ++i) {
-	//	if (arrows[i].isActive) {
-	//		// Cast dt to float for physics calculations
-	//		arrows[i].Update(static_cast<float>(dt));
-	//	}
-	//}
+	// Update all active arrows
+	for (int i = 0; i < MAX_ARROWS; ++i) {
+		if (arrows[i].isActive) {
+			// Cast dt to float for physics calculations
+			arrows[i].Update(static_cast<float>(dt));
+		}
+	}
 
-	//// Check for arrow collisions with targets
-	//CheckArrowCollisions();
+	// Check for arrow collisions with targets
+	CheckArrowCollisions();
 
 }
 
@@ -529,16 +622,16 @@ void SceneArchery::Render()
 	}
 
 
-	modelStack.PushMatrix();
+	/*modelStack.PushMatrix();
 	RenderMesh(meshList[GEO_AXES], false);
-	modelStack.PopMatrix();
+	modelStack.PopMatrix();*/
 
 	// Render all three light sources
 	for (int i = 0; i < NUM_LIGHTS; ++i)
 	{
 		modelStack.PushMatrix();
 		modelStack.Translate(light[i].position.x, light[i].position.y, light[i].position.z);
-		modelStack.Scale(0.1f, 0.1f, 0.1f);
+		modelStack.Scale(0.f, 0.f, 0.f);
 		RenderMesh(meshList[GEO_SPHERE], false);
 		modelStack.PopMatrix();
 	}
@@ -553,7 +646,62 @@ void SceneArchery::Render()
 	RenderMesh(meshList[GEO_PLANE], true);
 	modelStack.PopMatrix();
 
+	//// Render collision boxes for targets with different zones
+	//for (const auto& target : targets) {
+	//	float zoneDepths[3] = {
+	//		TARGET_DEPTH * 0.25f,  // Closest zone (3 points)
+	//		TARGET_DEPTH * 0.5f,   // Middle zone (2 points)
+	//		TARGET_DEPTH * 0.75f   // Furthest zone (1 point)
+	//	};
+
+	//	glm::vec3 zoneColors[3] = {
+	//		glm::vec3(1, 0, 0),    // Red for highest points (closest)
+	//		glm::vec3(0, 1, 0),    // Green for middle points
+	//		glm::vec3(0, 0, 1)     // Blue for lowest points (furthest)
+	//	};
+
+	//	for (int i = 0; i < 3; ++i) {
+	//		modelStack.PushMatrix();
+	//		// Match the translation used in collision detection
+	//		modelStack.Translate(target.pos.x, target.pos.y + 10.0f, target.pos.z + 3);
+
+	//		// Apply the same rotations as the target
+	//		modelStack.Rotate(45.f, 1, 0, 0);
+	//		modelStack.Rotate(23.f, 0, 1, 0);
+	//		modelStack.Rotate(-15.f, 1, 0, 0);
+
+	//		// Scale based on zone depth
+	//		modelStack.Scale(TARGET_WIDTH, TARGET_HEIGHT, zoneDepths[i]);
+
+	//		// Set color for each zone
+	//		meshList[GEO_QUAD]->material.kAmbient = zoneColors[i];
+	//		meshList[GEO_QUAD]->material.kDiffuse = zoneColors[i];
+	//		meshList[GEO_QUAD]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	//		meshList[GEO_QUAD]->material.kShininess = 1.0f;
+
+	//		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);  // Enable wireframe
+	//		RenderMesh(meshList[GEO_QUAD], false);      // Render collision box
+	//		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);  // Reset to fill mode
+	//		modelStack.PopMatrix();
+	//	}
+	//}
+
+	//// Render collision spheres for active arrows
+	//for (const auto& arrow : arrows) {
+	//	if (arrow.isActive && !arrow.isStuck) {
+	//		modelStack.PushMatrix();
+	//		modelStack.Translate(arrow.pos.x, arrow.pos.y, arrow.pos.z);
+	//		modelStack.Scale(ARROW_RADIUS * 2, ARROW_RADIUS * 2, ARROW_RADIUS * 2);
+	//		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);  // Enable wireframe
+	//		RenderMesh(meshList[GEO_SPHERE], false);    // Render collision sphere
+	//		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);  // Reset to fill mode
+	//		modelStack.PopMatrix();
+	//	}
+	//}
+
+
 	modelStack.PushMatrix();
+	/*glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);*/
 	modelStack.Translate(0, 0, -40);
 	modelStack.Rotate(45.f, 1, 0, 0);
 	modelStack.Rotate(23.f, 0, 1, 0);
@@ -564,6 +712,7 @@ void SceneArchery::Render()
 	meshList[GEO_TARGET]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
 	meshList[GEO_TARGET]->material.kShininess = 1.0f;
 	RenderMesh(meshList[GEO_TARGET], true);
+	/*glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);*/
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
@@ -593,39 +742,64 @@ void SceneArchery::Render()
 	modelStack.PopMatrix();
 
 
-	//// Render all active arrows
-	//for (int i = 0; i < MAX_ARROWS; ++i) {
-	//	if (arrows[i].isActive) {
-	//		modelStack.PushMatrix();
+	// In the arrow rendering section, modify this part:
+	for (int i = 0; i < MAX_ARROWS; ++i) {
+		if (arrows[i].isActive) {
+			modelStack.PushMatrix();
 
-	//		// Translate to arrow's current position
-	//		if (arrows[i].isStuck) {
-	//			// If stuck, use the stuck position
-	//			modelStack.Translate(
-	//				arrows[i].stuckPosition.x,
-	//				arrows[i].stuckPosition.y,
-	//				arrows[i].stuckPosition.z
-	//			);
-	//		}
-	//		else {
-	//			// If flying, use current physics position
-	//			modelStack.Translate(
-	//				arrows[i].pos.x,
-	//				arrows[i].pos.y,
-	//				arrows[i].pos.z
-	//			);
-	//		}
+			if (arrows[i].isStuck) {
+				// If stuck, use the stuck position and orient along normal
+				modelStack.Translate(
+					arrows[i].stuckPosition.x,
+					arrows[i].stuckPosition.y,
+					arrows[i].stuckPosition.z
+				);
 
-	//		// Scale and render arrow mesh
-	//		modelStack.Scale(0.1f, 0.1f, 0.1f);
-	//		meshList[GEO_ARROW]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
-	//		meshList[GEO_ARROW]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-	//		meshList[GEO_ARROW]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	//		meshList[GEO_ARROW]->material.kShininess = 1.0f;
-	//		RenderMesh(meshList[GEO_ARROW], true);
-	//		modelStack.PopMatrix();
-	//	}
-	//}
+				// Calculate rotation from normal vector
+				glm::vec3 defaultDir(0, 0, 1);  // Arrow's default forward direction
+				glm::vec3 targetDir = arrows[i].targetNormal;
+
+				// Calculate rotation axis and angle
+				glm::vec3 rotAxis = glm::cross(defaultDir, targetDir);
+				float rotAngle = glm::acos(glm::dot(defaultDir, targetDir));
+
+				// Apply rotation
+				if (glm::length(rotAxis) > 0.001f) {
+					modelStack.Rotate(glm::degrees(rotAngle), rotAxis.x, rotAxis.y, rotAxis.z);
+				}
+			}
+			else {
+				// If flying, use current physics position
+				modelStack.Translate(
+					arrows[i].pos.x,
+					arrows[i].pos.y,
+					arrows[i].pos.z
+				);
+
+				// Get velocity direction and normalize it
+				glm::vec3 velocity = arrows[i].vel;
+				glm::vec3 direction = glm::normalize(velocity);
+
+				// Only calculate pitch (up/down rotation)
+				float pitch = atan2(direction.y, sqrt(direction.x * direction.x + direction.z * direction.z));
+				modelStack.Rotate(glm::degrees(pitch), 1, 0, 0);
+
+				// Initial forward direction based on camera
+				glm::vec3 forward = glm::normalize(camera.target - camera.pos);
+				float initialYaw = atan2(forward.x, forward.z);
+				modelStack.Rotate(glm::degrees(initialYaw), 0, 1, 0);
+			}
+
+			// Scale and render arrow mesh
+			modelStack.Scale(0.1f, 0.1f, 0.1f);
+			meshList[GEO_ARROW]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+			meshList[GEO_ARROW]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+			meshList[GEO_ARROW]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+			meshList[GEO_ARROW]->material.kShininess = 1.0f;
+			RenderMesh(meshList[GEO_ARROW], true);
+			modelStack.PopMatrix();
+		}
+	}
 
 
 	// CARPET IS PLAYER'S SPAWN POINT!
@@ -639,7 +813,7 @@ void SceneArchery::Render()
 	RenderMesh(meshList[GEO_CARPET], true);
 	modelStack.PopMatrix();
 
-	
+
 	RenderSkyBox();
 
 	// Render vertical line of crosshair
@@ -691,13 +865,32 @@ void SceneArchery::Render()
 		25,                   // Size
 		10, 510);            // Position (x,y)
 
+	RenderTextOnScreen(meshList[GEO_TEXT],
+		"Yellow: 3 points",
+		glm::vec3(1, 1, 0),  // Yellow color
+		25,                   // Size
+		10, 470);            // Position (x,y)
+
+	RenderTextOnScreen(meshList[GEO_TEXT],
+		"Red/Blue: 2 points",
+		glm::vec3(0, 0, 0.5f),  // Yellow color
+		25,                   // Size
+		10, 430);            // Position (x,y)
+
+
+	RenderTextOnScreen(meshList[GEO_TEXT],
+		"White/Black: 1 point",
+		glm::vec3(1, 1, 1),  // Yellow color
+		25,                   // Size
+		10, 390);            // Position (x,y)
+
 	// Render score counter
 	std::string scoreText = "Score: " + std::to_string(m_playerScore);
 	RenderTextOnScreen(meshList[GEO_TEXT],
 		scoreText,
-		glm::vec3(1, 1, 0),  // Yellow color
+		glm::vec3(1.0f, 1.0f, 0.f), // Yellow color
 		25,                   // Size
-		10, 470);            // Position (x,y)
+		10, 350);            // Position (x,y)
 
 	// Render arrows left counter at bottom left
 	std::string arrowsText = "Arrows Left: " + std::to_string(m_arrowsLeft);
@@ -706,6 +899,13 @@ void SceneArchery::Render()
 		glm::vec3(1, 0, 0),  // Red color
 		25,                   // Size
 		10, 30);             // Position (x,y)
+
+
+	if (m_isGameOver) {
+		RenderMeshOnScreen(meshList[GEO_GAMEOVER], 400, 300, 400, 300); 
+	}
+
+
 }
 
 void SceneArchery::RenderMesh(Mesh* mesh, bool enableLight)
@@ -828,19 +1028,7 @@ void SceneArchery::HandleKeyPress()
 }
 
 
-bool SceneArchery::OverlapAABB2AABB(glm::vec3 Obj1, const int Width1, const int Height1,
-	glm::vec3 Obj2, const int Width2, const int Height2)
-{
 
-	float MinX1, MaxX1, MinY1, MaxY1, MinX2, MaxX2, MinY2, MaxY2;
-	MinX1 = Obj1.x - Width1 / 2; MaxX1 = Obj1.x + Width1 / 2;
-	MinY1 = Obj1.z - Height1 / 2; MaxY1 = Obj1.z + Height1 / 2;
-
-	MinX2 = Obj2.x - Width2 / 2; MaxX2 = Obj2.x + Width2 / 2;
-	MinY2 = Obj2.z - Height2 / 2; MaxY2 = Obj2.z + Height2 / 2;
-
-	return false;
-}
 
 void SceneArchery::RenderMeshOnScreen(Mesh* mesh, float x, float y, float sizex, float sizey)
 {
