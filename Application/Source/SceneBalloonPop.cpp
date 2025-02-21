@@ -19,6 +19,8 @@
 
 #include <iostream>
 
+
+
 SceneBalloonPop::SceneBalloonPop() :
 	m_vertexArrayID(0),
 	m_programID(0),
@@ -31,7 +33,13 @@ SceneBalloonPop::SceneBalloonPop() :
 	projectionStack(),
 	light(),  // This will default construct all lights in the array
 	enableLight(false),
-	app()
+	app(),
+	m_dartPower(0.0f),
+	m_maxDartPower(100.0f),
+	m_powerChargeRate(2.0f),
+	m_isChargingShot(false),
+	m_dartsLeft(1000)  
+
 {
 	// Additional initialization if needed
 	for (int i = 0; i < NUM_GEOMETRY; ++i) {
@@ -52,6 +60,10 @@ SceneBalloonPop::SceneBalloonPop() :
 	// Spawn initial balloons
 	for (int i = 0; i < 5; ++i) {
 		SpawnBalloon();
+	}
+	// Initialize darts
+	for (int i = 0; i < MAX_DARTS; ++i) {
+		darts.push_back(Dart());
 	}
 }
 
@@ -191,6 +203,11 @@ void SceneBalloonPop::Init()
 		"Models//Balloon.obj");
 	meshList[GEO_BALLOON]->textureID = LoadTGA("Images//BalloonAlbedo.tga");
 
+	meshList[GEO_DART] = MeshBuilder::GenerateOBJ("Dart",
+		"Models//dart.obj");
+	meshList[GEO_DART]->textureID = LoadTGA("Images//present.tga");
+
+
 	meshList[GEO_CROSSHAIR] = MeshBuilder::GenerateQuad("Crosshair", glm::vec3(1, 1, 1), 1.f);
 
 	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 1000.0f);
@@ -269,6 +286,74 @@ void SceneBalloonPop::Init()
 
 }
 
+
+void SceneBalloonPop::HandleDartInput() {
+	if (MouseController::GetInstance()->IsButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
+		if (!m_isChargingShot) {
+			m_isChargingShot = true;
+			m_dartPower = 0.0f;
+		}
+		else {
+			m_dartPower = std::min<float>(m_dartPower + m_powerChargeRate, m_maxDartPower);
+		}
+	}
+	else if (MouseController::GetInstance()->IsButtonUp(GLFW_MOUSE_BUTTON_LEFT)) {
+		if (m_isChargingShot) {
+			FireDart();
+			m_isChargingShot = false;
+			m_dartPower = 0.0f;
+		}
+	}
+}
+
+void SceneBalloonPop::FireDart() {
+	if (m_dartsLeft <= 0) return;
+
+	for (auto& dart : darts) {
+		if (!dart.isActive) {
+			m_dartsLeft--;
+
+			// Calculate fire direction based on camera
+			glm::vec3 fireDirection = glm::normalize(camera.target - camera.pos);
+
+			// Set base velocity 
+			const float DART_BASE_SPEED = 120.0f; 
+			dart.Fire(camera.pos, fireDirection, DART_BASE_SPEED);
+
+			// Add initial upward force to counter gravity
+			const float INITIAL_UP_FORCE = 10.0f;  
+			dart.physics.AddForce(glm::vec3(0, INITIAL_UP_FORCE, 0));
+
+			break;
+		}
+	}
+}
+
+
+void SceneBalloonPop::CheckDartCollisions() {
+	for (auto& dart : darts) {
+		if (dart.isActive) {
+			for (auto& balloon : balloons) {
+				if (!balloon.isPopped) {
+					CollisionData cd;
+					// Check sphere to sphere collision
+					if (OverlapSphere2Sphere(dart.physics, DART_RADIUS,
+						balloon.physics, BALLOON_RADIUS, cd)) {
+						balloon.isPopped = true;
+						dart.isActive = false;  
+						playerScore++;
+
+						if (playerScore >= WIN_SCORE) {
+							gameOver = true;
+						}
+						break;
+					}
+				}
+			}
+		}
+	}
+}
+
 void SceneBalloonPop::Update(double dt)
 {
 	HandleKeyPress();
@@ -280,6 +365,40 @@ void SceneBalloonPop::Update(double dt)
 			return;
 		}
 
+		HandleDartInput();
+
+		// Update all active darts
+		for (auto& dart : darts) {
+			if (dart.isActive) {  // Remove the !dart.isStuck check since darts won't stick anymore
+				// Apply gravity - reduced strength
+				dart.physics.AddForce(glm::vec3(0, -9.81f * 0.05f, 0));
+
+				// Apply minimal air resistance
+				glm::vec3 airResistance = -dart.physics.vel * 0.01f;
+				dart.physics.AddForce(airResistance);
+
+				// Update physics
+				dart.Update(static_cast<float>(dt));
+
+				// Floor collision now makes dart disappear
+				if (dart.physics.pos.y < 1.0f) {
+					dart.isActive = false;  // Make dart disappear instead of sticking
+				}
+
+				// Wall collisions now make dart disappear
+				const float WALL_X = 120.0f;
+				const float WALL_Z = 120.0f;
+
+				if (std::abs(dart.physics.pos.x) > WALL_X ||
+					std::abs(dart.physics.pos.z) > WALL_Z) {
+					dart.isActive = false;  // Make dart disappear instead of bouncing
+				}
+			}
+		}
+
+		// Check for collisions
+		CheckDartCollisions();
+
 		// Update spawn timer
 		spawnTimer -= static_cast<float>(dt);
 		if (spawnTimer <= 0) {
@@ -287,6 +406,7 @@ void SceneBalloonPop::Update(double dt)
 			spawnTimer = SPAWN_INTERVAL;
 		}
 
+		// Update balloons
 		for (auto& balloon : balloons) {
 			if (!balloon.isPopped) {
 				// Basic upward force
@@ -305,7 +425,7 @@ void SceneBalloonPop::Update(double dt)
 				balloon.physics.AddForce(glm::vec3(rightForce, 0, 0));
 
 				// Random movement to prevent synchronization
-				float randX = (rand() % 200 - 100) / 100.0f; // Random value between -1 and 1
+				float randX = (rand() % 200 - 100) / 100.0f;
 				float randZ = (rand() % 200 - 100) / 100.0f;
 				balloon.physics.AddForce(glm::vec3(randX, 0, randZ));
 
@@ -320,31 +440,31 @@ void SceneBalloonPop::Update(double dt)
 				if (balloon.physics.pos.x < -120.0f) {
 					balloon.physics.pos.x = -120.0f;
 					balloon.physics.vel.x *= -BOUNCE_FACTOR;
-					balloon.physics.AddForce(glm::vec3(WALL_REPULSION, 0, 0));  // Strong push right
+					balloon.physics.AddForce(glm::vec3(WALL_REPULSION, 0, 0));
 				}
 				if (balloon.physics.pos.x > 120.0f) {
 					balloon.physics.pos.x = 120.0f;
 					balloon.physics.vel.x *= -BOUNCE_FACTOR;
-					balloon.physics.AddForce(glm::vec3(-WALL_REPULSION, 0, 0));  // Strong push left
+					balloon.physics.AddForce(glm::vec3(-WALL_REPULSION, 0, 0));
 				}
 
 				// Z-axis walls
 				if (balloon.physics.pos.z < -120.0f) {
 					balloon.physics.pos.z = -120.0f;
 					balloon.physics.vel.z *= -BOUNCE_FACTOR;
-					balloon.physics.AddForce(glm::vec3(0, 0, WALL_REPULSION));  // Strong push forward
+					balloon.physics.AddForce(glm::vec3(0, 0, WALL_REPULSION));
 				}
 				if (balloon.physics.pos.z > 120.0f) {
 					balloon.physics.pos.z = 120.0f;
 					balloon.physics.vel.z *= -BOUNCE_FACTOR;
-					balloon.physics.AddForce(glm::vec3(0, 0, -WALL_REPULSION));  // Strong push back
+					balloon.physics.AddForce(glm::vec3(0, 0, -WALL_REPULSION));
 				}
 
 				// Ceiling behavior
 				if (balloon.physics.pos.y > CEILING_HEIGHT) {
 					balloon.physics.pos.y = CEILING_HEIGHT;
 					balloon.physics.vel.y *= -0.5f;
-					balloon.physics.AddForce(glm::vec3(0, -10.0f, 0));  // Push down from ceiling
+					balloon.physics.AddForce(glm::vec3(0, -10.0f, 0));
 				}
 
 				// Update physics
@@ -352,27 +472,6 @@ void SceneBalloonPop::Update(double dt)
 
 				// More gentle damping to maintain movement
 				balloon.physics.vel *= 0.99f;
-			}
-		}
-
-		// Mouse click handling
-		if (MouseController::GetInstance()->IsButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
-			glm::vec3 rayDir = glm::normalize(camera.target - camera.pos);
-			for (auto& balloon : balloons) {
-				if (!balloon.isPopped) {
-					glm::vec3 toBalloon = balloon.physics.pos - camera.pos;
-					float dotProduct = glm::dot(toBalloon, rayDir);
-					glm::vec3 projection = rayDir * dotProduct;
-					glm::vec3 closestPoint = camera.pos + projection;
-
-					if (glm::length(balloon.physics.pos - closestPoint) < 2.0f) {
-						balloon.isPopped = true;
-						playerScore++;
-						if (playerScore >= WIN_SCORE) {
-							gameOver = true;
-						}
-					}
-				}
 			}
 		}
 	}
@@ -766,6 +865,29 @@ void SceneBalloonPop::Render()
 
 
 
+	// Render all active darts
+	for (const auto& dart : darts) {
+		if (dart.isActive) {
+			modelStack.PushMatrix();
+			modelStack.Translate(
+				dart.physics.pos.x,
+				dart.physics.pos.y,
+				dart.physics.pos.z
+			);
+
+			// Calculate rotation based on velocity
+			glm::vec3 velocity = dart.physics.vel;
+			glm::vec3 direction = glm::normalize(velocity);
+			float pitch = atan2(direction.y, sqrt(direction.x * direction.x + direction.z * direction.z));
+			modelStack.Rotate(glm::degrees(pitch), 1, 0, 0);
+			float yaw = atan2(direction.x, direction.z);
+			modelStack.Rotate(glm::degrees(yaw), 0, 1, 0);
+
+			modelStack.Scale(0.5f, 0.5f, 0.5f);
+			RenderMesh(meshList[GEO_DART], true);
+			modelStack.PopMatrix();
+		}
+	}
 
 
 	// Render all balloons
