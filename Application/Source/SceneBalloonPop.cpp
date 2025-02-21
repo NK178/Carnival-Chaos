@@ -205,7 +205,7 @@ void SceneBalloonPop::Init()
 
 	meshList[GEO_DART] = MeshBuilder::GenerateOBJ("Dart",
 		"Models//dart.obj");
-	meshList[GEO_DART]->textureID = LoadTGA("Images//present.tga");
+	meshList[GEO_DART]->textureID = LoadTGA("Images//arrow.tga");
 
 
 	meshList[GEO_CROSSHAIR] = MeshBuilder::GenerateQuad("Crosshair", glm::vec3(1, 1, 1), 1.f);
@@ -317,7 +317,7 @@ void SceneBalloonPop::FireDart() {
 			glm::vec3 fireDirection = glm::normalize(camera.target - camera.pos);
 
 			// Set base velocity 
-			const float DART_BASE_SPEED = 120.0f; 
+			const float DART_BASE_SPEED = 180.0f; 
 			dart.Fire(camera.pos, fireDirection, DART_BASE_SPEED);
 
 			// Add initial upward force to counter gravity
@@ -875,15 +875,23 @@ void SceneBalloonPop::Render()
 				dart.physics.pos.z
 			);
 
-			// Calculate rotation based on velocity
+			// Get direction from player to dart
+			glm::vec3 directionFromPlayer = glm::normalize(dart.physics.pos - camera.pos);
+
+			// Calculate angle to face away from player
+			float angle = atan2(directionFromPlayer.x, directionFromPlayer.z);
+			modelStack.Rotate(glm::degrees(angle), 0, 1, 0);
+
+			// Add pitch based on velocity to show proper trajectory
 			glm::vec3 velocity = dart.physics.vel;
-			glm::vec3 direction = glm::normalize(velocity);
-			float pitch = atan2(direction.y, sqrt(direction.x * direction.x + direction.z * direction.z));
+			float pitch = atan2(velocity.y, sqrt(velocity.x * velocity.x + velocity.z * velocity.z));
 			modelStack.Rotate(glm::degrees(pitch), 1, 0, 0);
-			float yaw = atan2(direction.x, direction.z);
-			modelStack.Rotate(glm::degrees(yaw), 0, 1, 0);
 
 			modelStack.Scale(0.5f, 0.5f, 0.5f);
+			meshList[GEO_DART]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+			meshList[GEO_DART]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+			meshList[GEO_DART]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+			meshList[GEO_DART]->material.kShininess = 1.0f;
 			RenderMesh(meshList[GEO_DART], true);
 			modelStack.PopMatrix();
 		}
