@@ -20,6 +20,7 @@ public:
 		GEO_CUBE,
 		GEO_QUAD,
 		GEO_SPHERE,
+		GEO_CYLINDER,
 		GEO_PLANE,
 
 		// Models
