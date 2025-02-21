@@ -23,6 +23,7 @@ public:
 		GEO_PLANE,
 		GEO_HAMMER1,
 		GEO_HAMMER2,
+		GEO_HAMMER3,
 
 		//Text
 		GEO_TEXT,

@@ -132,6 +132,8 @@ void SceneWIUtest::Init()
 	meshList[GEO_HAMMER1]->textureID = LoadTGA("Images//hammer.tga");
 	meshList[GEO_HAMMER2] = MeshBuilder::GenerateOBJMTL("mallet", "Models//mallet.obj", "Models//mallet.mtl");
 	meshList[GEO_HAMMER2]->textureID = LoadTGA("Images//Mallet_BaseColor.tga");
+	//meshList[GEO_HAMMER3] = MeshBuilder::GenerateOBJMTL("mallet2", "Models//mallet2.obj", "Models//mallet2.mtl");
+	//meshList[GEO_HAMMER3]->textureID = LoadTGA("Images//Mallet2_BaseColor.tga");
 
 	//skybox
 	meshList[GEO_LEFT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
@@ -401,6 +403,17 @@ void SceneWIUtest::Render()
 	meshList[GEO_HAMMER2]->material.kShininess = 1.0f;
 	RenderMesh(meshList[GEO_HAMMER2], true);
 	modelStack.PopMatrix();
+
+	//modelStack.PushMatrix();
+	//modelStack.Translate(0, 0, -30);
+	//modelStack.Rotate(90.f, 0, 0, 1.f);
+	//modelStack.Scale(0.2f, 0.2f, 0.2f);
+	//meshList[GEO_HAMMER3]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+	//meshList[GEO_HAMMER3]->material.kDiffuse = glm::vec3(0.8f, 0.8f, 0.8f);
+	//meshList[GEO_HAMMER3]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	//meshList[GEO_HAMMER3]->material.kShininess = 1.0f;
+	//RenderMesh(meshList[GEO_HAMMER3], true);
+	//modelStack.PopMatrix();
 
 	for (int i = 0; i < cubelist.size(); i++) {
 		modelStack.PushMatrix();
