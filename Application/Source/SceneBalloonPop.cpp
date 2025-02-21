@@ -74,6 +74,16 @@ SceneBalloonPop::~SceneBalloonPop()
 
 void SceneBalloonPop::Init()
 {
+
+	camera.enableFNAF = false;
+	camera.allowMovement = false;
+	camera.allowJump = false;
+	camera.allowSprint = false;
+	camera.allowCrouch = false;
+	camera.allowProne = false;
+	camera.allowLocomotiveTilt = false;
+	camera.allowLocomotiveBop = false;
+
 	// Set background color to dark blue
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
