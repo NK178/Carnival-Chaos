@@ -21,6 +21,8 @@ public:
 		GEO_QUAD,
 		GEO_SPHERE,
 		GEO_PLANE,
+		GEO_HAMMER1,
+		GEO_HAMMER2,
 
 		//Text
 		GEO_TEXT,

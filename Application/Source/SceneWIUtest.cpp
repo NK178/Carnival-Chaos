@@ -47,7 +47,7 @@ void SceneWIUtest::Init()
 
 	// Load the shader programs
 	m_programID = LoadShaders("Shader//Texture.vertexshader",
-							  "Shader//Text.fragmentshader");
+		"Shader//Text.fragmentshader");
 	glUseProgram(m_programID);
 
 	// Get a handle for our "MVP" uniform
@@ -112,7 +112,7 @@ void SceneWIUtest::Init()
 		m_parameters[U_MATERIAL_SHININESS]);
 
 	// Initialise camera properties
-	camera.Init(glm::vec3(-10,9,-10), glm::vec3(0,0,0), glm::vec3(0,1,0));
+	camera.Init(glm::vec3(-10, 9, -10), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 
 	// Init VBO here
 	for (int i = 0; i < NUM_GEOMETRY; ++i)
@@ -127,7 +127,13 @@ void SceneWIUtest::Init()
 	meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("STAMINA_BAR", glm::vec3(1, 1, 1), 1.f);
 	meshList[GEO_CUBE] = MeshBuilder::GenerateCube("Cube", glm::vec3(1, 1, 1), 1.f);
 	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Sphere", glm::vec3(1, 1, 1), 1.f);
+	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Sphere", glm::vec3(1, 1, 1), 1.f);
+	meshList[GEO_HAMMER1] = MeshBuilder::GenerateOBJMTL("war hammer", "Models//lava_hammer.obj", "Models//lava_hammer.mtl");
+	meshList[GEO_HAMMER1]->textureID = LoadTGA("Images//hammer.tga");
+	meshList[GEO_HAMMER2] = MeshBuilder::GenerateOBJMTL("mallet", "Models//mallet.obj", "Models//mallet.mtl");
+	meshList[GEO_HAMMER2]->textureID = LoadTGA("Images//Mallet_BaseColor.tga");
 
+	//skybox
 	meshList[GEO_LEFT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
 	meshList[GEO_LEFT]->textureID = LoadTGA("Images//nightsky_lfD.tga");
 	meshList[GEO_RIGHT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
@@ -373,6 +379,28 @@ void SceneWIUtest::Render()
 	//RenderMesh(meshList[GEO_PLANE], true);
 	//modelStack.PopMatrix();
 
+	modelStack.PushMatrix();
+	modelStack.Translate(0, 0, 0);
+	modelStack.Rotate(90.f, 0, 0, 1.f);
+	modelStack.Scale(0.2f, 0.2f, 0.2f);
+	meshList[GEO_HAMMER1]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_HAMMER1]->material.kDiffuse = glm::vec3(0.8f,0.8f, 0.8f);
+	meshList[GEO_HAMMER1]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_HAMMER1]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_HAMMER1], true);
+	modelStack.PopMatrix();
+
+
+	modelStack.PushMatrix();
+	modelStack.Translate(0, 0, -15);
+	modelStack.Rotate(90.f, 0, 0, 1.f);
+	modelStack.Scale(0.2f, 0.2f, 0.2f);
+	meshList[GEO_HAMMER2]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_HAMMER2]->material.kDiffuse = glm::vec3(0.8f, 0.8f, 0.8f);
+	meshList[GEO_HAMMER2]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_HAMMER2]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_HAMMER2], true);
+	modelStack.PopMatrix();
 
 	for (int i = 0; i < cubelist.size(); i++) {
 		modelStack.PushMatrix();
