@@ -317,6 +317,11 @@ void SceneBalloonPop::Init()
 
 
 void SceneBalloonPop::HandleDartInput() {
+	// Prevent shooting during countdown or if objectives haven't been read
+	if (!m_isObjectiveRead || countdownTime > 0 || m_isGameOver || m_hasWon) {
+		return;  // Don't process input
+	}
+
 	// Update cooldown timer
 	if (m_shootCooldown > 0) {
 		return;  // Don't process input while on cooldown
@@ -376,11 +381,14 @@ void SceneBalloonPop::CheckDartCollisions() {
 					if (OverlapSphere2Sphere(dart.physics, DART_RADIUS,
 						balloon.physics, BALLOON_RADIUS, cd)) {
 						balloon.isPopped = true;
-						dart.isActive = false;  
+						dart.isActive = false;
 						playerScore++;
 
 						if (playerScore >= WIN_SCORE) {
+							// Set win condition flags
 							gameOver = true;
+							m_hasWon = true;
+							m_isGameOver = false;  // Ensure game over is false for win state
 						}
 						break;
 					}
@@ -398,7 +406,6 @@ void SceneBalloonPop::Update(double dt)
 		if (m_shootCooldown > 0) {
 			m_shootCooldown -= static_cast<float>(dt);
 		}
-		// Update game timer
 		gameTimer -= static_cast<float>(dt);
 		if (gameTimer <= 0 && playerScore < WIN_SCORE) {
 			gameOver = true;  // Only set gameOver to true if player hasn't reached WIN_SCORE
@@ -515,18 +522,28 @@ void SceneBalloonPop::Update(double dt)
 		}
 	}
 	else {
-		// Only allow restart if player lost (didn't reach WIN_SCORE)
 		if (KeyboardController::GetInstance()->IsKeyPressed('R') && playerScore < WIN_SCORE) {
+			// Reset game states
 			gameTimer = GAME_TIME_LIMIT;
 			playerScore = 0;
 			gameOver = false;
+			m_isGameOver = false;
+			m_hasWon = false;
 			m_isObjectiveRead = false;
 			countdownTime = 4.f;
+
+			// Clear and respawn balloons
 			balloons.clear();
 			for (int i = 0; i < 5; ++i) {
 				SpawnBalloon();
 			}
+
+			// Reset darts
+			for (auto& dart : darts) {
+				dart.isActive = false;
+			}
 		}
+		return;
 	}
 
 	float temp = 1.f / dt;
@@ -970,6 +987,13 @@ void SceneBalloonPop::Render()
 
 	RenderSkyBox();
 
+
+	// Render vertical line of crosshair
+	RenderMeshOnScreen(meshList[GEO_CROSSHAIR], 400, 300, 2, 20);  // Thin vertical line
+	// Render horizontal line of crosshair
+	RenderMeshOnScreen(meshList[GEO_CROSSHAIR], 400, 300, 20, 2);  // Thin horizontal line
+
+
 	if (gameOver && playerScore < WIN_SCORE) {
 		m_isGameOver = true;
 	}
@@ -986,6 +1010,9 @@ void SceneBalloonPop::Render()
 		RenderMeshOnScreen(meshList[GEO_KEY_E], 310, 200, 15, 15);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "Continue", glm::vec3(1, 1, 1), 20, 340, 190);
 	}
+
+
+
 
 	if (m_isObjectiveRead) {
 		if (countdownTime > 0) {
@@ -1046,10 +1073,7 @@ void SceneBalloonPop::Render()
 		RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
 	}
 
-	// Render vertical line of crosshair
-	RenderMeshOnScreen(meshList[GEO_CROSSHAIR], 400, 300, 2, 20);  // Thin vertical line
-	// Render horizontal line of crosshair
-	RenderMeshOnScreen(meshList[GEO_CROSSHAIR], 400, 300, 20, 2);  // Thin horizontal line
+
 
 	std::string temp("FPS:" + std::to_string(fps));
 	RenderTextOnScreen(meshList[GEO_FPS], temp.substr(0, 9), glm::vec3(0, 1, 0), 20, 620, 50);
