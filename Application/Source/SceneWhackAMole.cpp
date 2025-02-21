@@ -307,6 +307,21 @@ void SceneWhackAMole::Init()
 	attackorder.Push(NodeHammer(8, 6));
 	attackorder.Push(NodeHammer(8, 8));
 
+	//hammer positions on grid 
+	//Hammer 1 (3,6,9)
+	hammerspawnpts.push_back(glm::vec3(-100, 25, 58));
+	hammerspawnpts.push_back(glm::vec3(-100, 25, -8));
+	hammerspawnpts.push_back(glm::vec3(-100, 25, -74));
+
+	hammerspawnpts.push_back(glm::vec3(67, 10, 66));
+	hammerspawnpts.push_back(glm::vec3(0, 10, 66));
+	hammerspawnpts.push_back(glm::vec3(67, 10, 0));
+	hammerspawnpts.push_back(glm::vec3(0, 10, 0));
+	hammerspawnpts.push_back(glm::vec3(67, 10, -66));
+	hammerspawnpts.push_back(glm::vec3(0,  10, -66));
+
+
+
 	camera.allowJump = false;
 }
 
@@ -314,46 +329,41 @@ void SceneWhackAMole::Update(double dt)
 {
 	if (startcountdown > 0.f)
 		startcountdown -= dt;
-	else 
+	else
 		gamestart = true;
 	HandleKeyPress();
 	const float SPEED = 15.f;
 	int iter = 0;
-	//std::cout << "x: " << walllist[iter].pos.x << "y: " << walllist[iter].pos.y << "z: " << walllist[iter].pos.z << std::endl;
+	GameObject testobj = walllist[iter];
+	//std::cout << "x: " << testobj.pos.x << "y: " << testobj.pos.y << "z: " << testobj.pos.z << std::endl;
 	if (KeyboardController::GetInstance()->IsKeyDown('I'))
-		walllist[iter].pos.z -= static_cast<float>(dt) * SPEED;
+		testobj.pos.z -= static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('K'))
-		walllist[iter].pos.z += static_cast<float>(dt) * SPEED;
+		testobj.pos.z += static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('J'))
-		walllist[iter].pos.x -= static_cast<float>(dt) * SPEED;
+		testobj.pos.x -= static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('L'))
-		walllist[iter].pos.x += static_cast<float>(dt) * SPEED;
+		testobj.pos.x += static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('O'))
-		walllist[iter].pos.y -= static_cast<float>(dt) * SPEED;
+		testobj.pos.y -= static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('P'))
-		walllist[iter].pos.y += static_cast<float>(dt) * SPEED;
-	 
-	//std::cout << "x: " << cubelist[iter].pos.x << "y: " << cubelist[iter].pos.y << "z: " << cubelist[iter].pos.z << std::endl;
-	//if (KeyboardController::GetInstance()->IsKeyDown('I'))
-	//	cubelist[iter].pos.z -= static_cast<float>(dt) * SPEED;
-	//if (KeyboardController::GetInstance()->IsKeyDown('K'))
-	//	cubelist[iter].pos.z += static_cast<float>(dt) * SPEED;
-	//if (KeyboardController::GetInstance()->IsKeyDown('J'))
-	//	cubelist[iter].pos.x -= static_cast<float>(dt) * SPEED;
-	//if (KeyboardController::GetInstance()->IsKeyDown('L'))
-	//	cubelist[iter].pos.x += static_cast<float>(dt) * SPEED;
-	//if (KeyboardController::GetInstance()->IsKeyDown('O'))
-	//	cubelist[iter].pos.y -= static_cast<float>(dt) * SPEED;
-	//if (KeyboardController::GetInstance()->IsKeyDown('P'))
-	//	cubelist[iter].pos.y += static_cast<float>(dt) * SPEED;
+		testobj.pos.y += static_cast<float>(dt) * SPEED;
 
 	if (isattack) {
 		for (int j = 0; j < attackorder.size; j++) {
-			if (attackorder.GetCurrentPhase() == orderiter) 
+			if (attackorder.GetCurrentPhase() == orderiter)
 				inactionorder.Push(attackorder.Pop());
 		}
 	}
-
+	if (KeyboardController::GetInstance()->IsKeyDown('Y')){
+		testing = true;
+	}
+	
+	if (testing) {
+		if (testrot > -45)
+		testrot -= 60.f * dt;
+	}
+		
 
 	player[0].pos = camera.pos;
 	CollisionData cd;
@@ -441,6 +451,7 @@ void SceneWhackAMole::Render()
 	RenderMesh(meshList[GEO_SPHERE], false);
 	modelStack.PopMatrix();
 
+
 	for (int i = 0; i < cubelist.size(); i++) {
 		glm::vec3 material;
 		if (!cubelist[i].iscollide)
@@ -496,55 +507,74 @@ void SceneWhackAMole::Render()
 	RenderMesh(meshList[GEO_BACKBOARD], true);
 	modelStack.PopMatrix();
 
-	modelStack.PushMatrix();
-	modelStack.Translate(0, 0, 0);
-	modelStack.Rotate(90.f, 0, 0, 1.f);
-	modelStack.Scale(0.2f, 0.2f, 0.2f);
-	meshList[GEO_HAMMER1]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
-	meshList[GEO_HAMMER1]->material.kDiffuse = glm::vec3(0.8f,0.8f, 0.8f);
-	meshList[GEO_HAMMER1]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	meshList[GEO_HAMMER1]->material.kShininess = 1.0f;
-	RenderMesh(meshList[GEO_HAMMER1], true);
-	modelStack.PopMatrix();
+	//Hammer 1 rotation modelStack.Rotate(90.f, 1.f, 0, 0.f); modelStack.Scale(0.5f, 0.5f, 0.5f); modelStack.Translate(23, 0, 0); //pivot
 
-
-	modelStack.PushMatrix();
-	modelStack.Translate(0, 0, -15);
-	modelStack.Rotate(90.f, 0, 0, 1.f);
-	modelStack.Scale(0.2f, 0.2f, 0.2f);
-	meshList[GEO_HAMMER2]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
-	meshList[GEO_HAMMER2]->material.kDiffuse = glm::vec3(0.8f, 0.8f, 0.8f);
-	meshList[GEO_HAMMER2]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	meshList[GEO_HAMMER2]->material.kShininess = 1.0f;
-	RenderMesh(meshList[GEO_HAMMER2], true);
-	modelStack.PopMatrix();
-
-	modelStack.PushMatrix();
-	modelStack.Translate(0, 20, 0);
-	modelStack.Rotate(90.f, 0, 0, 1.f);
-	modelStack.Scale(100.f, 100.f, 100.f);
-	meshList[GEO_HAMMER3]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
-	meshList[GEO_HAMMER3]->material.kDiffuse = glm::vec3(0.8f, 0.8f, 0.8f);
-	meshList[GEO_HAMMER3]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	meshList[GEO_HAMMER3]->material.kShininess = 1.0f;
-	RenderMesh(meshList[GEO_HAMMER3], true);
-	modelStack.PopMatrix();
-
-	std::cout << inactionorder.size << std::endl;
-	if (isattack) {
-		for (int j = 0; j < inactionorder.size; j++) {
-			modelStack.PushMatrix();
-			modelStack.Translate(30 + j * 10, 0, 0);
-			modelStack.Rotate(90.f, 0, 0, 1.f);
-			modelStack.Scale(0.2f, 0.2f, 0.2f);
-			meshList[GEO_HAMMER1]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
-			meshList[GEO_HAMMER1]->material.kDiffuse = glm::vec3(0.8f, 0.8f, 0.8f);
-			meshList[GEO_HAMMER1]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-			meshList[GEO_HAMMER1]->material.kShininess = 1.0f;
-			RenderMesh(meshList[GEO_HAMMER1], true);
-			modelStack.PopMatrix();
-		}
+	for (int i = 0; i < hammerspawnpts.size(); i++) {
+		modelStack.PushMatrix();
+		modelStack.Translate(hammerspawnpts[i].x, hammerspawnpts[i].y + 20, hammerspawnpts[i].z);
+		modelStack.Rotate(testrot, 0, 0, 1.f); //Hammer 1 animation
+		modelStack.PushMatrix();
+		modelStack.Translate(23, 0, 0); //pivot
+		modelStack.Rotate(90.f, 1.f, 0, 0.f); //orientation
+		modelStack.Scale(0.5f, 0.5f, 0.5f);
+		meshList[GEO_HAMMER1]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+		meshList[GEO_HAMMER1]->material.kDiffuse = glm::vec3(0.8f,0.8f, 0.8f);
+		meshList[GEO_HAMMER1]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+		meshList[GEO_HAMMER1]->material.kShininess = 1.0f;
+		RenderMesh(meshList[GEO_HAMMER1], true);
+		modelStack.PopMatrix();
+		modelStack.PopMatrix();
 	}
+
+	//modelStack.PushMatrix();
+	//modelStack.Translate(0, 0, 0);
+	//modelStack.Rotate(90.f, 0, 0, 1.f);
+	//modelStack.Scale(0.2f, 0.2f, 0.2f);
+	//meshList[GEO_HAMMER1]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+	//meshList[GEO_HAMMER1]->material.kDiffuse = glm::vec3(0.8f,0.8f, 0.8f);
+	//meshList[GEO_HAMMER1]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	//meshList[GEO_HAMMER1]->material.kShininess = 1.0f;
+	//RenderMesh(meshList[GEO_HAMMER1], true);
+	//modelStack.PopMatrix();
+
+
+	//modelStack.PushMatrix();
+	//modelStack.Translate(0, 0, -15);
+	//modelStack.Rotate(90.f, 0, 0, 1.f);
+	//modelStack.Scale(0.2f, 0.2f, 0.2f);
+	//meshList[GEO_HAMMER2]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+	//meshList[GEO_HAMMER2]->material.kDiffuse = glm::vec3(0.8f, 0.8f, 0.8f);
+	//meshList[GEO_HAMMER2]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	//meshList[GEO_HAMMER2]->material.kShininess = 1.0f;
+	//RenderMesh(meshList[GEO_HAMMER2], true);
+	//modelStack.PopMatrix();
+
+	//modelStack.PushMatrix();
+	//modelStack.Translate(0, 20, 0);
+	//modelStack.Rotate(90.f, 0, 0, 1.f);
+	//modelStack.Scale(100.f, 100.f, 100.f);
+	//meshList[GEO_HAMMER3]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+	//meshList[GEO_HAMMER3]->material.kDiffuse = glm::vec3(0.8f, 0.8f, 0.8f);
+	//meshList[GEO_HAMMER3]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	//meshList[GEO_HAMMER3]->material.kShininess = 1.0f;
+	//RenderMesh(meshList[GEO_HAMMER3], true);
+	//modelStack.PopMatrix();
+
+	//std::cout << inactionorder.size << std::endl;//////
+	//if (isattack) {
+	//	for (int j = 0; j < inactionorder.size; j++) {
+	//		modelStack.PushMatrix();
+	//		modelStack.Translate(30 + j * 10, 0, 0);
+	//		modelStack.Rotate(90.f, 0, 0, 1.f);
+	//		modelStack.Scale(0.2f, 0.2f, 0.2f);
+	//		meshList[GEO_HAMMER1]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+	//		meshList[GEO_HAMMER1]->material.kDiffuse = glm::vec3(0.8f, 0.8f, 0.8f);
+	//		meshList[GEO_HAMMER1]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	//		meshList[GEO_HAMMER1]->material.kShininess = 1.0f;
+	//		RenderMesh(meshList[GEO_HAMMER1], true);
+	//		modelStack.PopMatrix();
+	//	}
+	//}
 
 	if (!gamestart) {
 		if (startcountdown < 1.f)

@@ -141,7 +141,7 @@ private:
 	void RenderSkyBox();
 
 	//Queue 
-	struct NodeHammer {
+	struct NodeHammer {  //TO EDIT (ACCEPT GLM::VEC3 POS, ORIENTATION ROT, ANIM ROT, SCALE VEC
 		NodeHammer* next;
 		int phase;
 		int position;
@@ -229,13 +229,14 @@ private:
 		glm::vec3 boxextent{10.f,10.f,10.f};
 		Player(int id, int type) : GameObject(id,type) {}
 	};
-	
 
 
 	bool activate = false;
 	std::vector<HammerCollide> cubelist;
 	std::vector<Walls> walllist;
 	std::vector<Player> player;
+	std::vector<glm::vec3> hammerspawnpts;
+
 	Queue attackorder;
 	Queue inactionorder;
 	int orderiter = 1;
@@ -243,6 +244,11 @@ private:
 	float attackcooldown = 3.f;
 	bool isattack = true;
 	bool gamestart = true; //TO CHANGE
+
+	//TO CHANGE
+	float testrot = 90.f;
+	bool testing = false;
+
 };
 
 #endif
