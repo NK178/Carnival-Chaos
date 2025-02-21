@@ -13,7 +13,7 @@
 
 void CSceneManager::Init() {
     // Initialize with first scene
-    activeScene = new SceneArchery;
+    activeScene = new SceneHole;
     currentSceneType = SCENE_MAIN_MENU;
     loadingScreen = new LoadingScreen;
     activeScene->Init();
