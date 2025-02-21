@@ -138,8 +138,8 @@ void SceneWhackAMole::Init()
 	meshList[GEO_HAMMER1]->textureID = LoadTGA("Images//hammer.tga");
 	meshList[GEO_HAMMER2] = MeshBuilder::GenerateOBJMTL("mallet", "Models//mallet.obj", "Models//mallet.mtl");
 	meshList[GEO_HAMMER2]->textureID = LoadTGA("Images//Mallet_BaseColor.tga");
-	//meshList[GEO_HAMMER3] = MeshBuilder::GenerateOBJMTL("mallet2", "Models//mallet2.obj", "Models//mallet2.mtl");
-	//meshList[GEO_HAMMER3]->textureID = LoadTGA("Images//Mallet2_BaseColor.tga");
+	meshList[GEO_HAMMER3] = MeshBuilder::GenerateOBJMTL("mallet3", "Models//mallet3.obj", "Models//mallet3.mtl");
+	meshList[GEO_HAMMER3]->textureID = LoadTGA("Images//mallet_color.tga");
 
 	//skybox
 	meshList[GEO_LEFT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
@@ -275,6 +275,37 @@ void SceneWhackAMole::Init()
 	for (int i = 0; i < walllist.size(); i++) {
 		walllist[i].mass = 0.f;
 	}
+	//phase, position
+	attackorder.Push(NodeHammer(1, 5));
+	attackorder.Push(NodeHammer(2, 4));
+	attackorder.Push(NodeHammer(2, 6));
+	attackorder.Push(NodeHammer(3, 1));
+	attackorder.Push(NodeHammer(3, 5));
+	attackorder.Push(NodeHammer(3, 9));
+	attackorder.Push(NodeHammer(4, 1));
+	attackorder.Push(NodeHammer(4, 3));
+	attackorder.Push(NodeHammer(4, 7));
+	attackorder.Push(NodeHammer(4, 9));
+	attackorder.Push(NodeHammer(5, 1));
+	attackorder.Push(NodeHammer(5, 3));
+	attackorder.Push(NodeHammer(5, 4));
+	attackorder.Push(NodeHammer(5, 8));
+	attackorder.Push(NodeHammer(5, 9));
+	attackorder.Push(NodeHammer(6, 1));
+	attackorder.Push(NodeHammer(6, 3));
+	attackorder.Push(NodeHammer(6, 5));
+	attackorder.Push(NodeHammer(6, 7));
+	attackorder.Push(NodeHammer(6, 9));
+	attackorder.Push(NodeHammer(7, 1));
+	attackorder.Push(NodeHammer(7, 4));
+	attackorder.Push(NodeHammer(7, 5));
+	attackorder.Push(NodeHammer(7, 6));
+	attackorder.Push(NodeHammer(7, 8));
+	attackorder.Push(NodeHammer(8, 2));
+	attackorder.Push(NodeHammer(8, 4));
+	attackorder.Push(NodeHammer(8, 5));
+	attackorder.Push(NodeHammer(8, 6));
+	attackorder.Push(NodeHammer(8, 8));
 
 	camera.allowJump = false;
 }
@@ -285,7 +316,6 @@ void SceneWhackAMole::Update(double dt)
 		startcountdown -= dt;
 	else 
 		gamestart = true;
-	
 	HandleKeyPress();
 	const float SPEED = 15.f;
 	int iter = 0;
@@ -316,6 +346,13 @@ void SceneWhackAMole::Update(double dt)
 	//	cubelist[iter].pos.y -= static_cast<float>(dt) * SPEED;
 	//if (KeyboardController::GetInstance()->IsKeyDown('P'))
 	//	cubelist[iter].pos.y += static_cast<float>(dt) * SPEED;
+
+	if (isattack) {
+		for (int j = 0; j < attackorder.size; j++) {
+			if (attackorder.GetCurrentPhase() == orderiter) 
+				inactionorder.Push(attackorder.Pop());
+		}
+	}
 
 
 	player[0].pos = camera.pos;
@@ -482,16 +519,32 @@ void SceneWhackAMole::Render()
 	RenderMesh(meshList[GEO_HAMMER2], true);
 	modelStack.PopMatrix();
 
-	//modelStack.PushMatrix();
-	//modelStack.Translate(0, 0, -30);
-	//modelStack.Rotate(90.f, 0, 0, 1.f);
-	//modelStack.Scale(0.2f, 0.2f, 0.2f);
-	//meshList[GEO_HAMMER3]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
-	//meshList[GEO_HAMMER3]->material.kDiffuse = glm::vec3(0.8f, 0.8f, 0.8f);
-	//meshList[GEO_HAMMER3]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	//meshList[GEO_HAMMER3]->material.kShininess = 1.0f;
-	//RenderMesh(meshList[GEO_HAMMER3], true);
-	//modelStack.PopMatrix();
+	modelStack.PushMatrix();
+	modelStack.Translate(0, 20, 0);
+	modelStack.Rotate(90.f, 0, 0, 1.f);
+	modelStack.Scale(100.f, 100.f, 100.f);
+	meshList[GEO_HAMMER3]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_HAMMER3]->material.kDiffuse = glm::vec3(0.8f, 0.8f, 0.8f);
+	meshList[GEO_HAMMER3]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_HAMMER3]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_HAMMER3], true);
+	modelStack.PopMatrix();
+
+	std::cout << inactionorder.size << std::endl;
+	if (isattack) {
+		for (int j = 0; j < inactionorder.size; j++) {
+			modelStack.PushMatrix();
+			modelStack.Translate(30 + j * 10, 0, 0);
+			modelStack.Rotate(90.f, 0, 0, 1.f);
+			modelStack.Scale(0.2f, 0.2f, 0.2f);
+			meshList[GEO_HAMMER1]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+			meshList[GEO_HAMMER1]->material.kDiffuse = glm::vec3(0.8f, 0.8f, 0.8f);
+			meshList[GEO_HAMMER1]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+			meshList[GEO_HAMMER1]->material.kShininess = 1.0f;
+			RenderMesh(meshList[GEO_HAMMER1], true);
+			modelStack.PopMatrix();
+		}
+	}
 
 	if (!gamestart) {
 		if (startcountdown < 1.f)

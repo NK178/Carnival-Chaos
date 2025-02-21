@@ -126,21 +126,94 @@ private:
 	FPCamera camera;
 	int projType = 1; // fix to 0 for orthographic, 1 for projection
 
-	MatrixStack modelStack, viewStack, projectionStack;	
+	MatrixStack modelStack, viewStack, projectionStack;
 
 	static const int NUM_LIGHTS = 3;
 	Light light[NUM_LIGHTS];
 	bool enableLight;
 
 	Application app;
-	
+
 	void RenderMeshOnScreen(Mesh* mesh, float x, float y, float sizex, float sizey);
 	void RenderText(Mesh* mesh, std::string text, glm::vec3 color);
 	void RenderTextOnScreen(Mesh* mesh, std::string text, glm::vec3 color, float size, float x, float y);
 	void Material(GEOMETRY_TYPE obj, float AmR, float AmG, float AmB, float DifA, float DifG, float DifB, float SpA, float SpG, float SpB, float Shiny);
 	void RenderSkyBox();
 
+	//Queue 
+	struct NodeHammer {
+		NodeHammer* next;
+		int phase;
+		int position;
+		NodeHammer() { next = nullptr; phase = position = 0; };
+		NodeHammer(int phase, int position) : phase(phase), position(position) { next = nullptr; }
+	};
+	struct Queue {
+		int size;
+		NodeHammer* head, * current, * tail;
+		Queue() {
+			head = current = tail = nullptr;
+			size = 0;
+		}
+		~Queue() {
+			if (head != nullptr) {
+				while (head != nullptr) {
+					current = head;
+					head = head->next;
+					delete current;
+				}
+			}
+		}
+		int GetCurrentPhase(void) {
+			if (head != nullptr)
+				return head->phase;
+			else
+				return 0;
+		}
+		void Push(NodeHammer input) {
+			NodeHammer* newnode = new NodeHammer(input.phase, input.position);
 
+			if (head == nullptr) 
+				head = tail = current = newnode;
+			else {
+				current = tail;
+				tail = newnode;
+				current->next = tail;
+				tail->next = nullptr;
+			}
+			size++;
+		}		
+		NodeHammer Pop(void){
+			NodeHammer returning;
+			if (head == current) {
+				returning = *head;
+				delete head;
+				head = tail = current = nullptr;
+			}
+			else if (head != nullptr) {
+				returning = *head;
+				current = head;
+				head = head->next;
+				delete current;
+			}
+			else
+				std::cout << "Queue Empty " << std::endl;
+			size--;
+			return returning;
+		}		
+		void Print(void)
+		{
+			if (head != nullptr) {
+				current = head;
+				while (current != nullptr) {
+					std::cout << current->phase << " " << current->position << std::endl;
+					current = current->next;
+				}
+			}
+			std::cout << std::endl;
+		}
+		
+	};
 	struct HammerCollide : public GameObject {
 		bool iscollide = false;
 		glm::vec3 boxextent{ 33.f, 3.5f, 33.f };
@@ -156,15 +229,19 @@ private:
 		glm::vec3 boxextent{10.f,10.f,10.f};
 		Player(int id, int type) : GameObject(id,type) {}
 	};
-
+	
 
 
 	bool activate = false;
 	std::vector<HammerCollide> cubelist;
 	std::vector<Walls> walllist;
 	std::vector<Player> player;
-
+	Queue attackorder;
+	Queue inactionorder;
+	int orderiter = 1;
 	float startcountdown = 4.f;
+	float attackcooldown = 3.f;
+	bool isattack = true;
 	bool gamestart = true; //TO CHANGE
 };
 
