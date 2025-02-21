@@ -39,7 +39,11 @@ SceneBalloonPop::SceneBalloonPop() :
 	m_powerChargeRate(2.0f),
 	m_isChargingShot(false),
 	m_dartsLeft(1000),
-	m_shootCooldown(0.0f)  // Initialize cooldown timer to 0
+	m_shootCooldown(0.0f),  // Initialize cooldown timer to 0
+	m_isGameOver(false),
+	m_hasWon(false),
+	m_isObjectiveRead(false),
+	countdownTime(4.0f)
 
 {
 	// Additional initialization if needed
@@ -197,6 +201,17 @@ void SceneBalloonPop::Init()
 	// 16 x 16 is the number of columns and rows for the text
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Images//calibri.tga");
+	meshList[GEO_TEXT2] = MeshBuilder::GenerateText("text2", 16, 16);
+	meshList[GEO_TEXT2]->textureID = LoadTGA("Images//yugothicuisemibold.tga");
+	meshList[GEO_FPS] = MeshBuilder::GenerateText("fpstext", 16, 16);
+	meshList[GEO_FPS]->textureID = LoadTGA("Images//bizudgothic.tga");
+
+	meshList[GEO_KEY_E] = MeshBuilder::GenerateQuad("KeyE", glm::vec3(1.f, 1.f, 1.f), 2.f);
+	meshList[GEO_KEY_E]->textureID = LoadTGA("Images//keyboard_key_e.tga");
+	meshList[GEO_KEY_R] = MeshBuilder::GenerateQuad("KeyE", glm::vec3(1.f, 1.f, 1.f), 2.f);
+	meshList[GEO_KEY_R]->textureID = LoadTGA("Images//keyboard_key_r.tga");
+
+	meshList[GEO_UI] = MeshBuilder::GenerateQuad("UIBox", glm::vec3(0.12f, 0.12f, 0.12f), 10.f);
 
 	meshList[GEO_CRATE] = MeshBuilder::GenerateOBJ("Crate",
 		"Models//cube_low.obj");
@@ -298,8 +313,6 @@ void SceneBalloonPop::Init()
 	glUniform1f(m_parameters[U_LIGHT2_EXPONENT], light[2].exponent);
 
 	enableLight = true;
-
-
 }
 
 
@@ -510,6 +523,18 @@ void SceneBalloonPop::Update(double dt)
 			balloons.clear();
 			for (int i = 0; i < 5; ++i) {
 				SpawnBalloon();
+			}
+		}
+	}
+
+	float temp = 1.f / dt;
+	fps = glm::round(temp * 100.f) / 100.f;
+
+	if (m_isObjectiveRead) {
+		if (countdownTime > 0) {
+			countdownTime -= dt; // decrease countdown time
+			if (countdownTime < 0) {
+				countdownTime = 0; // ensure countdown does not go below 0
 			}
 		}
 	}
@@ -924,7 +949,6 @@ void SceneBalloonPop::Render()
 		}
 	}
 
-
 	// Render all balloons
 	for (const auto& balloon : balloons) {
 		if (!balloon.isPopped) {
@@ -950,7 +974,6 @@ void SceneBalloonPop::Render()
 	RenderSkyBox();
 
 
-
 	// Render UI
 	std::string scoreText = "Score: " + std::to_string(playerScore) + "/" + std::to_string(WIN_SCORE);
 	RenderTextOnScreen(meshList[GEO_TEXT], scoreText, glm::vec3(1, 1, 0), 25, 10, 550);
@@ -966,7 +989,8 @@ void SceneBalloonPop::Render()
 	// Render horizontal line of crosshair
 	RenderMeshOnScreen(meshList[GEO_CROSSHAIR], 400, 300, 20, 2);  // Thin horizontal line
 
-
+	std::string temp("FPS:" + std::to_string(fps));
+	RenderTextOnScreen(meshList[GEO_FPS], temp.substr(0, 9), glm::vec3(0, 1, 0), 20, 620, 50);
 }
 
 void SceneBalloonPop::RenderMesh(Mesh* mesh, bool enableLight)

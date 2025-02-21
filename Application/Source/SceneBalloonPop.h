@@ -31,6 +31,11 @@ public:
 
 		//Text
 		GEO_TEXT,
+		GEO_TEXT2,
+		GEO_KEY_E,
+		GEO_KEY_R,
+		GEO_FPS,
+		GEO_UI,
 
 		//SKybox
 		GEO_LEFT,
@@ -141,6 +146,13 @@ private:
 	void Material(GEOMETRY_TYPE obj, float AmR, float AmG, float AmB, float DifA, float DifG, float DifB, float SpA, float SpG, float SpB, float Shiny);
 	void RenderSkyBox();
 
+	float fps = 0;
+
+	bool m_isGameOver;
+	bool m_hasWon;
+
+	bool m_isObjectiveRead;
+	float countdownTime;
 
 	struct Balloon {
 		PhysicsObject physics;
