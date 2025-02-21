@@ -342,8 +342,6 @@ void SceneArchery::Init()
 
 	// Left target
 	targets.push_back(Target(2, glm::vec3(-20, 0, -20), TARGET_RADIUS));
-
-
 }
 
 void SceneArchery::RestartGame()
