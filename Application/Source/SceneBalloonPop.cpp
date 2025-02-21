@@ -520,6 +520,8 @@ void SceneBalloonPop::Update(double dt)
 			gameTimer = GAME_TIME_LIMIT;
 			playerScore = 0;
 			gameOver = false;
+			m_isObjectiveRead = false;
+			countdownTime = 4.f;
 			balloons.clear();
 			for (int i = 0; i < 5; ++i) {
 				SpawnBalloon();
@@ -915,8 +917,6 @@ void SceneBalloonPop::Render()
 	RenderMesh(meshList[GEO_PRESENT], true);
 	modelStack.PopMatrix();
 
-
-
 	// Render all active darts
 	for (const auto& dart : darts) {
 		if (dart.isActive) {
@@ -968,22 +968,84 @@ void SceneBalloonPop::Render()
 		}
 	}
 
-	
-	/*RenderTextOnScreen(meshList[GEO_TEXT], "Stamina", glm::vec3(0, 1, 0), 40, 0, 0);*/
-
 	RenderSkyBox();
 
-
-	// Render UI
-	std::string scoreText = "Score: " + std::to_string(playerScore) + "/" + std::to_string(WIN_SCORE);
-	RenderTextOnScreen(meshList[GEO_TEXT], scoreText, glm::vec3(1, 1, 0), 25, 10, 550);
-
-	std::string timeText = "Time: " + std::to_string(static_cast<int>(gameTimer));
-	RenderTextOnScreen(meshList[GEO_TEXT], timeText, glm::vec3(1, 1, 1), 25, 10, 520);
-
 	if (gameOver && playerScore < WIN_SCORE) {
-		RenderMeshOnScreen(meshList[GEO_GAMEOVER], 400, 300, 400, 300);
+		m_isGameOver = true;
 	}
+
+	if (!m_isObjectiveRead) {
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 30);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- BALLOON POP -", glm::vec3(1, 1, 0), 25, 220, 430);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Hit the balloons with", glm::vec3(1, 1, 1), 15, 230, 400);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "your arrows!", glm::vec3(1, 1, 1), 15, 320, 370);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Get 10 points before", glm::vec3(1, 1, 1), 15, 230, 340);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "30 seconds is up!", glm::vec3(1, 1, 1), 15, 280, 310);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Press LMB to shoot!", glm::vec3(1, 1, 1), 15, 240, 280);
+
+		RenderMeshOnScreen(meshList[GEO_KEY_E], 310, 200, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Continue", glm::vec3(1, 1, 1), 20, 340, 190);
+	}
+
+	if (m_isObjectiveRead) {
+		if (countdownTime > 0) {
+			std::string countdownText;
+			if (countdownTime > 3.0f) {
+				countdownText = "3..";
+			}
+			else if (countdownTime > 2.0f) {
+				countdownText = "2..";
+			}
+			else if (countdownTime > 1.0f) {
+				countdownText = "1..";
+			}
+			else {
+				countdownText = "GO!";
+			}
+			RenderTextOnScreen(meshList[GEO_TEXT2], countdownText, glm::vec3(1, 1, 1), 50, 350, 300);
+		}
+		else if (m_hasWon) {
+			RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
+			RenderTextOnScreen(meshList[GEO_TEXT2], "YOU WON!", glm::vec3(0, 1, 0), 50, 220, 350);
+			RenderTextOnScreen(meshList[GEO_TEXT2], "You've beat", glm::vec3(1, 1, 1), 20, 295, 300);
+			RenderTextOnScreen(meshList[GEO_TEXT2], "Archery Game!", glm::vec3(1, 1, 1), 20, 210, 270);
+
+			RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
+			RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
+		}
+		else {
+			// Render UI
+			RenderMeshOnScreen(meshList[GEO_UI], 45, 535, 55, 6);
+			std::string scoreText = "Score: " + std::to_string(playerScore) + "/" + std::to_string(WIN_SCORE);
+			RenderTextOnScreen(meshList[GEO_TEXT2], scoreText, glm::vec3(1, 1, 0), 20, 10, 540);
+
+			std::string timeText = "Time: " + std::to_string(static_cast<int>(gameTimer));
+			RenderTextOnScreen(meshList[GEO_TEXT2], timeText, glm::vec3(1, 1, 1), 20, 10, 510);
+		}
+	}
+
+	if (m_isGameOver) {
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "GAME OVER!", glm::vec3(1, 0, 0), 40, 210, 370);
+
+		RenderTextOnScreen(meshList[GEO_TEXT2], "You ran out of time!", glm::vec3(1, 1, 1), 20, 215, 320);
+
+		RenderMeshOnScreen(meshList[GEO_KEY_R], 350, 270, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Retry", glm::vec3(1, 1, 1), 20, 390, 260);
+		RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
+	}
+
+	if (m_hasWon) {
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "YOU WON!", glm::vec3(0, 1, 0), 50, 220, 350);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "You've beat", glm::vec3(1, 1, 1), 20, 295, 300);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Balloon Pop Game!", glm::vec3(1, 1, 1), 20, 240, 270);
+
+		RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
+	}
+
 	// Render vertical line of crosshair
 	RenderMeshOnScreen(meshList[GEO_CROSSHAIR], 400, 300, 2, 20);  // Thin vertical line
 	// Render horizontal line of crosshair
@@ -991,6 +1053,7 @@ void SceneBalloonPop::Render()
 
 	std::string temp("FPS:" + std::to_string(fps));
 	RenderTextOnScreen(meshList[GEO_FPS], temp.substr(0, 9), glm::vec3(0, 1, 0), 20, 620, 50);
+
 }
 
 void SceneBalloonPop::RenderMesh(Mesh* mesh, bool enableLight)
@@ -1038,7 +1101,6 @@ void SceneBalloonPop::RenderMesh(Mesh* mesh, bool enableLight)
 	}
 
 }
-
 
 void SceneBalloonPop::Exit()
 {
@@ -1109,7 +1171,16 @@ void SceneBalloonPop::HandleKeyPress()
 
 		glUniform1i(m_parameters[U_LIGHT0_TYPE], light[0].type);
 	}
-
+	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E)) {
+		if (m_hasWon)
+		{
+			// go back to scene main
+		}
+		else
+		{
+			m_isObjectiveRead = true; // set to true when the objective is read
+		}
+	}
 }
 
 

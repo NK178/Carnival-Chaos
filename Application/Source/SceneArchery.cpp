@@ -354,6 +354,7 @@ void SceneArchery::RestartGame()
 	m_arrowPower = 0.0f;
 	m_isChargingShot = false;
 	m_isObjectiveRead = false;
+	countdownTime = 4.0f;
 
 	// Reset all arrows
 	for (auto& arrow : arrows) {
@@ -852,9 +853,6 @@ void SceneArchery::Render()
 	float maxWidth = 150.0f;
 	float scaledWidth = maxWidth * powerPercentage;
 
-	// Render the power bar with the scaled width
-	RenderMeshOnScreen(meshList[GEO_QUAD], 570 + scaledWidth / 2, 30, scaledWidth, 20);
-
 	if (!m_isObjectiveRead) {
 		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 40);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "- ARCHERY -", glm::vec3(1, 1, 0), 25, 280, 480);
@@ -916,12 +914,15 @@ void SceneArchery::Render()
 				10, 510);            // Position bottom right
 
 			// Display numerical power value
-			std::string powerText = std::to_string(static_cast<int>(m_arrowPower));
+			std::string powerText = std::to_string(static_cast<int>(m_arrowPower)); // remove power text
 			RenderTextOnScreen(meshList[GEO_TEXT],
 				powerText,
 				glm::vec3(1, 1, 1),  // White color
 				20,                   // Size
 				150, 510);            // Position 
+
+			// Render the power bar with the scaled width
+			RenderMeshOnScreen(meshList[GEO_QUAD], 150 + scaledWidth / 2, 520, scaledWidth, 20);
 
 			// Render Arrows Left Text
 			std::string arrowsText = "Arrows Left: " + std::to_string(m_arrowsLeft);
@@ -950,7 +951,7 @@ void SceneArchery::Render()
 		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "YOU WON!", glm::vec3(0, 1, 0), 50, 220, 350);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "You've beat", glm::vec3(1, 1, 1), 20, 295, 300);
-		RenderTextOnScreen(meshList[GEO_TEXT2], "   Archery Game!", glm::vec3(1, 1, 1), 20, 210, 270);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "   Archery Game!", glm::vec3(1, 1, 1), 20, 215, 270);
 
 		RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
