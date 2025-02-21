@@ -16,6 +16,8 @@ public:
     glm::vec3 up;
     float camheight;
 
+    glm::vec3 prevPos;
+
     FPCamera();
     ~FPCamera();
 

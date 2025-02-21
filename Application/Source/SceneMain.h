@@ -159,6 +159,9 @@ private:
 		bool isMultiLine;                    
 	};
 
+	int cutsceneStage = 1;
+	float tempCompensation;
+
 	std::vector<DialogueLine> enterMainSceneLines = {
 		{{"Hmm... What's this?"}, false},
 		{{"A carnival? In the middle of town?!"}, false},
