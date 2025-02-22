@@ -277,83 +277,49 @@ void SceneWhackAMole::Init()
 	}
 	////phase, position
 	// phase, position, hammer type
-	attackorder.Push(NodeHammer(1, 5, GEO_HAMMER3));
-	attackorder.Push(NodeHammer(2, 4, GEO_HAMMER2));
+	//hammer 3  (1,4,7)
+	attackorder.Push(NodeHammer(1, 5, GEO_HAMMER2));
+	attackorder.Push(NodeHammer(2, 4, GEO_HAMMER3));
 	attackorder.Push(NodeHammer(2, 6, GEO_HAMMER1));
-	attackorder.Push(NodeHammer(3, 1, GEO_HAMMER2));
-	attackorder.Push(NodeHammer(3, 5, GEO_HAMMER3));
+	attackorder.Push(NodeHammer(3, 1, GEO_HAMMER3));
+	attackorder.Push(NodeHammer(3, 5, GEO_HAMMER2));
 	attackorder.Push(NodeHammer(3, 9, GEO_HAMMER1));
-	attackorder.Push(NodeHammer(4, 1, GEO_HAMMER2));
+	attackorder.Push(NodeHammer(4, 1, GEO_HAMMER3));
 	attackorder.Push(NodeHammer(4, 3, GEO_HAMMER1));
-	attackorder.Push(NodeHammer(4, 7, GEO_HAMMER2));
+	attackorder.Push(NodeHammer(4, 7, GEO_HAMMER3));
 	attackorder.Push(NodeHammer(4, 9, GEO_HAMMER1));
-	attackorder.Push(NodeHammer(5, 1, GEO_HAMMER2));
+	attackorder.Push(NodeHammer(5, 1, GEO_HAMMER3));
 	attackorder.Push(NodeHammer(5, 3, GEO_HAMMER1));
-	attackorder.Push(NodeHammer(5, 4, GEO_HAMMER2));
-	attackorder.Push(NodeHammer(5, 8, GEO_HAMMER3));
+	attackorder.Push(NodeHammer(5, 4, GEO_HAMMER3));
+	attackorder.Push(NodeHammer(5, 8, GEO_HAMMER2));
 	attackorder.Push(NodeHammer(5, 9, GEO_HAMMER1));
-	attackorder.Push(NodeHammer(6, 1, GEO_HAMMER2));
+	attackorder.Push(NodeHammer(6, 1, GEO_HAMMER3));
 	attackorder.Push(NodeHammer(6, 3, GEO_HAMMER1));
-	attackorder.Push(NodeHammer(6, 5, GEO_HAMMER3));
-	attackorder.Push(NodeHammer(6, 7, GEO_HAMMER2));
+	attackorder.Push(NodeHammer(6, 5, GEO_HAMMER2));
+	attackorder.Push(NodeHammer(6, 7, GEO_HAMMER3));
 	attackorder.Push(NodeHammer(6, 9, GEO_HAMMER1));
-	attackorder.Push(NodeHammer(7, 1, GEO_HAMMER2));
-	attackorder.Push(NodeHammer(7, 4, GEO_HAMMER2));
-	attackorder.Push(NodeHammer(7, 5, GEO_HAMMER3));
+	attackorder.Push(NodeHammer(7, 1, GEO_HAMMER3));
+	attackorder.Push(NodeHammer(7, 4, GEO_HAMMER3));
+	attackorder.Push(NodeHammer(7, 5, GEO_HAMMER2));
 	attackorder.Push(NodeHammer(7, 6, GEO_HAMMER1));
-	attackorder.Push(NodeHammer(7, 8, GEO_HAMMER3));
-	attackorder.Push(NodeHammer(8, 2, GEO_HAMMER3));
-	attackorder.Push(NodeHammer(8, 4, GEO_HAMMER2));
-	attackorder.Push(NodeHammer(8, 5, GEO_HAMMER3));
+	attackorder.Push(NodeHammer(7, 8, GEO_HAMMER2));
+	attackorder.Push(NodeHammer(8, 2, GEO_HAMMER2));
+	attackorder.Push(NodeHammer(8, 4, GEO_HAMMER3));
+	attackorder.Push(NodeHammer(8, 5, GEO_HAMMER2));
 	attackorder.Push(NodeHammer(8, 6, GEO_HAMMER1));
-	attackorder.Push(NodeHammer(8, 8, GEO_HAMMER3));
+	attackorder.Push(NodeHammer(8, 8, GEO_HAMMER2));
 
-	//attackorder.Push(NodeHammer(1, 5));
-	//attackorder.Push(NodeHammer(2, 4));
-	//attackorder.Push(NodeHammer(2, 6));
-	//attackorder.Push(NodeHammer(3, 1));
-	//attackorder.Push(NodeHammer(3, 5));
-	//attackorder.Push(NodeHammer(3, 9));
-	//attackorder.Push(NodeHammer(4, 1));
-	//attackorder.Push(NodeHammer(4, 3));
-	//attackorder.Push(NodeHammer(4, 7));
-	//attackorder.Push(NodeHammer(4, 9));
-	//attackorder.Push(NodeHammer(5, 1));
-	//attackorder.Push(NodeHammer(5, 3));
-	//attackorder.Push(NodeHammer(5, 4));
-	//attackorder.Push(NodeHammer(5, 8));
-	//attackorder.Push(NodeHammer(5, 9));
-	//attackorder.Push(NodeHammer(6, 1));
-	//attackorder.Push(NodeHammer(6, 3));
-	//attackorder.Push(NodeHammer(6, 5));
-	//attackorder.Push(NodeHammer(6, 7));
-	//attackorder.Push(NodeHammer(6, 9));
-	//attackorder.Push(NodeHammer(7, 1));
-	//attackorder.Push(NodeHammer(7, 4));
-	//attackorder.Push(NodeHammer(7, 5));
-	//attackorder.Push(NodeHammer(7, 6));
-	//attackorder.Push(NodeHammer(7, 8));
-	//attackorder.Push(NodeHammer(8, 2));
-	//attackorder.Push(NodeHammer(8, 4));
-	//attackorder.Push(NodeHammer(8, 5));
-	//attackorder.Push(NodeHammer(8, 6));
-	//attackorder.Push(NodeHammer(8, 8));
 
 	//hammer positions on grid 
 	//Hammer 1 (3,6,9)
-	hammerspawnpts.push_back(glm::vec3(130, 25, 66)); // 
-
-	hammerspawnpts.push_back(glm::vec3(0, 25, 66));
+	hammerspawnpts.push_back(glm::vec3(130, 25, 66));
+	hammerspawnpts.push_back(glm::vec3(0, 25, 110)); //
 	hammerspawnpts.push_back(glm::vec3(-100, 25, 58));
-
-	hammerspawnpts.push_back(glm::vec3(130, 25, 0)); // 
-
-	hammerspawnpts.push_back(glm::vec3(0, 25, 0));
+	hammerspawnpts.push_back(glm::vec3(130, 25, 0));  
+	hammerspawnpts.push_back(glm::vec3(0, 25, 44)); //
 	hammerspawnpts.push_back(glm::vec3(-100, 25, -8));
-
-	hammerspawnpts.push_back(glm::vec3(130, 25, -66)); // 
-
-	hammerspawnpts.push_back(glm::vec3(0,  25, -66));
+	hammerspawnpts.push_back(glm::vec3(130, 25, -66)); 
+	hammerspawnpts.push_back(glm::vec3(0,  25, -22)); // 
 	hammerspawnpts.push_back(glm::vec3(-100, 25, -74));
 
 
@@ -387,34 +353,36 @@ void SceneWhackAMole::Update(double dt)
 
 	if (isattack) { //NEED TO FIX ORDER ISSUE  (use some bool trigger to add extra hammers) 
 		for (int j = 0; j < attackorder.size; j++) {
-			if (orderiter != 3) {
+			if (attackorder.size != 0) {
 				if (attackorder.GetCurrentPhase() == orderiter)
 					inactionorder.push_back(attackorder.Pop());
-				else
-					orderiter++;
-				//if (orderiter == 1 /*|| orderiter == 2*/)
-				//	orderiter++;
 			}
 		}
 	}
 
 	//TESTING CODE
 	if (KeyboardController::GetInstance()->IsKeyDown('Y')) {
-		testing = true;
+		gamestart = true;
 	}
-
-	if (testing) {
-		for (int j = 0; j < inactionorder.size(); j++) { //do the stuff
-			if (testrot < 110)
-				testrot += 60.f * dt;
+	//Game logic 
+	if (gamestart) {
+		if (isattack) {
+			if (hammerrot < 110) {
+				hammerrot += 60.f * dt;
+			}
+			else
+				isattack = false;
+		}
+		else {
+			attackcooldown -= dt;
+			if (attackcooldown < 0.f) {
+				orderiter++;
+				isattack = true;
+				hammerrot = 0.f;
+				attackcooldown = 3.f;
+			}
 		}
 	}
-
-	//if (testing) {
-	//	if (testrot < 110)
-	//		testrot += 60.f * dt;
-	//}
-
 
 
 	player[0].pos = camera.pos;
@@ -560,85 +528,81 @@ void SceneWhackAMole::Render()
 	RenderMesh(meshList[GEO_BACKBOARD], true);
 	modelStack.PopMatrix();
 
-
-
-	//if (isattack) {
-	//	for (int j = 0; j < inactionorder.size(); j++) {
-	//		GEOMETRY_TYPE model = inactionorder[j].type;
-	//		glm::vec3 scale = inactionorder[j].scale, pos = inactionorder[j].position, pivot = inactionorder[j].pivot;
-	//		float orientangle = inactionorder[j].orientateangle;
-	//		
-	//		modelStack.PushMatrix();
-	//		modelStack.Translate(pos.x, pos.y, pos.z);
-	//		modelStack.Rotate(testrot, 0, 0, 1.f); //animation
-	//		if (model == GEO_HAMMER1)			//for hammer 1 only 
-	//			modelStack.Rotate(90.f, 0.f, 0, 1.f); //keep upright
-
-	//		modelStack.PushMatrix();
-	//		modelStack.Translate(pivot.x, pivot.y,pivot.z);
-	//		modelStack.Rotate(orientangle,1.f,0,0);
-	//		modelStack.Scale(scale.x, scale.y,scale.z);
-	//		meshList[model]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
-	//		meshList[model]->material.kDiffuse = glm::vec3(0.8f, 0.8f, 0.8f);
-	//		meshList[model]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	//		meshList[model]->material.kShininess = 1.0f;
-	//		RenderMesh(meshList[model], true);
-	//		modelStack.PopMatrix();
-	//		modelStack.PopMatrix();
-	//	}
-	//}
-
-
-
-
-
-
-
-	for (int i = 0; i < hammerspawnpts.size(); i++) {
-
-		int grid = i + 1;
-		if (grid == 1 || grid == 4 || grid == 7) {
+	//attacking anims
+	if (isattack) {
+		for (int j = 0; j < inactionorder.size(); j++) {
+			GEOMETRY_TYPE model = inactionorder[j].type;
+			glm::vec3 scale = inactionorder[j].scale, pos = inactionorder[j].position, pivot = inactionorder[j].pivot;
+			float orientangle = inactionorder[j].orientateangle;
 
 			modelStack.PushMatrix();
-			modelStack.Translate(hammerspawnpts[i].x, hammerspawnpts[i].y, hammerspawnpts[i].z);
-			modelStack.Rotate(testrot, 0, 0, 1.f); //animation
-			//modelStack.Rotate(90.f, 0.f, 0, 1.f); //keep upright
+			modelStack.Translate(pos.x, pos.y, pos.z);
+			if (model != GEO_HAMMER2)
+				modelStack.Rotate(inactionorder[j].flipangle * hammerrot, 0, 0, 1.f); //animation
+			else
+				modelStack.Rotate(inactionorder[j].flipangle * hammerrot, 1.f, 0, 0.f); //animation
 
-			//modelStack.PushMatrix();
-			//modelStack.Translate(0, 8, 0); //pivot		
-			//modelStack.Rotate(-90.f, 1.f, 0, 0.f); //orientation
-			//modelStack.Scale(0.6f, 0.6f, 0.6f); //scale
-			//meshList[GEO_HAMMER2]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
-			//meshList[GEO_HAMMER2]->material.kDiffuse = glm::vec3(0.8f, 0.8f, 0.8f);
-			//meshList[GEO_HAMMER2]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-			//meshList[GEO_HAMMER2]->material.kShininess = 1.0f;
-			//RenderMesh(meshList[GEO_HAMMER2], true);
-			//modelStack.PopMatrix();
-
-			//modelStack.PushMatrix();
-			//modelStack.Translate(23, 0, 0); //pivot
-			//modelStack.Rotate(90.f, 1.f, 0, 0.f); //orientation
-			//modelStack.Scale(0.5f, 0.5f, 0.5f); //scale
-			//meshList[GEO_HAMMER1]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
-			//meshList[GEO_HAMMER1]->material.kDiffuse = glm::vec3(0.8f,0.8f, 0.8f);
-			//meshList[GEO_HAMMER1]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-			//meshList[GEO_HAMMER1]->material.kShininess = 1.0f;
-			//RenderMesh(meshList[GEO_HAMMER1], true);
-			//modelStack.PopMatrix();
-
+			if (model == GEO_HAMMER1)			//for hammer 1 only 
+				modelStack.Rotate(90.f, 0.f, 0, 1.f); //keep upright
 			modelStack.PushMatrix();
-			modelStack.Translate(0, 0, 0);
-			modelStack.Rotate(0.f, 0, 0, 1.f);
-			modelStack.Scale(250.f, 250.f, 250.f);
-			meshList[GEO_HAMMER3]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
-			meshList[GEO_HAMMER3]->material.kDiffuse = glm::vec3(0.8f, 0.8f, 0.8f);
-			meshList[GEO_HAMMER3]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-			meshList[GEO_HAMMER3]->material.kShininess = 1.0f;
-			RenderMesh(meshList[GEO_HAMMER3], true);
+			modelStack.Translate(pivot.x, pivot.y, pivot.z);
+			modelStack.Rotate(orientangle, 1.f, 0, 0);
+			if (model == GEO_HAMMER2)
+				modelStack.Rotate(-90.f, 0.f, 0.f, 1.f); //orientation
+			modelStack.Scale(scale.x, scale.y, scale.z);
+			meshList[model]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+			meshList[model]->material.kDiffuse = glm::vec3(0.8f, 0.8f, 0.8f);
+			meshList[model]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+			meshList[model]->material.kShininess = 1.0f;
+			RenderMesh(meshList[model], true);
 			modelStack.PopMatrix();
 			modelStack.PopMatrix();
 		}
 	}
+	else
+		inactionorder.clear();
+	//for (int i = 0; i < hammerspawnpts.size(); i++) {
+
+	//		modelStack.PushMatrix();
+	//		modelStack.Translate(hammerspawnpts[i].x, hammerspawnpts[i].y, hammerspawnpts[i].z);
+	//		modelStack.Rotate(-1 * hammerrot, 1.f, 0, 0.f); //animation
+	//		//modelStack.Rotate(90.f, 0.f, 0, 1.f); //keep upright
+
+	//		modelStack.PushMatrix();
+	//		modelStack.Translate(0, 8, 0); //pivot		
+	//		modelStack.Rotate(-90.f, 1.f, 0.f, 0.f); //
+	//		//modelStack.Rotate(-90.f, 0.f, 0, 1.f); //orientation
+	//		modelStack.Scale(0.7f, 0.7f, 0.7f); //scale
+	//		meshList[GEO_HAMMER2]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+	//		meshList[GEO_HAMMER2]->material.kDiffuse = glm::vec3(0.8f, 0.8f, 0.8f);
+	//		meshList[GEO_HAMMER2]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	//		meshList[GEO_HAMMER2]->material.kShininess = 1.0f;
+	//		RenderMesh(meshList[GEO_HAMMER2], true);
+	//		modelStack.PopMatrix();
+
+	//		//modelStack.PushMatrix();
+	//		//modelStack.Translate(23, 0, 0); //pivot
+	//		//modelStack.Rotate(90.f, 1.f, 0, 0.f); //orientation
+	//		//modelStack.Scale(0.5f, 0.5f, 0.5f); //scale
+	//		//meshList[GEO_HAMMER1]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+	//		//meshList[GEO_HAMMER1]->material.kDiffuse = glm::vec3(0.8f,0.8f, 0.8f);
+	//		//meshList[GEO_HAMMER1]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	//		//meshList[GEO_HAMMER1]->material.kShininess = 1.0f;
+	//		//RenderMesh(meshList[GEO_HAMMER1], true);
+	//		//modelStack.PopMatrix();
+
+	//		//modelStack.PushMatrix();
+	//		//modelStack.Translate(0, 0, 0);
+	//		//modelStack.Rotate(0.f, 0, 0, 1.f);
+	//		//modelStack.Scale(250.f, 250.f, 250.f);
+	//		//meshList[GEO_HAMMER2]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+	//		//meshList[GEO_HAMMER2]->material.kDiffuse = glm::vec3(0.8f, 0.8f, 0.8f);
+	//		//meshList[GEO_HAMMER2]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	//		//meshList[GEO_HAMMER2]->material.kShininess = 1.0f;
+	//		//RenderMesh(meshList[GEO_HAMMER2], true);
+	//		//modelStack.PopMatrix();
+	//		modelStack.PopMatrix();
+	//}
 
 
 	if (!gamestart) {
@@ -650,9 +614,11 @@ void SceneWhackAMole::Render()
 	else {
 		RenderMeshOnScreen(meshList[GEO_QUAD], 100, 20, 1.5*camera.GetStamina(),10);
 		RenderTextOnScreen(meshList[GEO_TEXT], "Stamina", glm::vec3(0, 1, 0), 40, 0, 30);
-
+		if (attackcooldown > 0.1f && !isattack) {
+			RenderTextOnScreen(meshList[GEO_TEXT], "Next Phase", glm::vec3(0, 1, 0), 20, 600, 330);
+			RenderTextOnScreen(meshList[GEO_TEXT],std::to_string(static_cast<int>(attackcooldown)) , glm::vec3(0, 1, 0), 30, 650, 300);
+		}
 	}
-
 }
 
 void SceneWhackAMole::RenderMesh(Mesh* mesh, bool enableLight)

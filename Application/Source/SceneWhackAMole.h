@@ -171,23 +171,22 @@ private:
 			next = nullptr;
 			this->phase = phase;
 			switch (grid) {
-			case 1: this->grid = grid; position = glm::vec3(67, 25, 66); break;
-			case 2: this->grid = grid; position = glm::vec3(0, 25, 66); break;
+			case 1: this->grid = grid; position = glm::vec3(130, 25, 66); break;
+			case 2: this->grid = grid; position = glm::vec3(0, 25, 110); break;
 			case 3: this->grid = grid; position = glm::vec3(-100, 25, 58); break;
-			case 4: this->grid = grid; position = glm::vec3(67, 25, 0); break;
-			case 5: this->grid = grid; position = glm::vec3(0, 25, 0); break;
+			case 4: this->grid = grid; position = glm::vec3(130, 25, 0); break;
+			case 5: this->grid = grid; position = glm::vec3(0, 25, 44); break;
 			case 6: this->grid = grid; position = glm::vec3(-100, 25, -8); break;
-			case 7: this->grid = grid; position = glm::vec3(67, 25, -66); break;
-			case 8: this->grid = grid; position = glm::vec3(0, 25, -66); break;
+			case 7: this->grid = grid; position = glm::vec3(130, 25, -66); break;
+			case 8: this->grid = grid; position = glm::vec3(0, 25, -22); break;
 			case 9: this->grid = grid; position = glm::vec3(-100, 25, -74); break;
 			default: this->grid = 0; position = glm::vec3(0, 0, 0); break;
 			}
 
-
 			switch (type) {
-			case GEO_HAMMER1: flipangle = 1; this->type = type; orientateangle = 90.f; scale = glm::vec3{ 0.5f,0.5f,0.5f }; pivot = glm::vec3{ 23,0,0 };  break;
-			case GEO_HAMMER2: flipangle = 1;  this->type = type; orientateangle = -90.f; scale = glm::vec3{ 0.6f,0.6f,0.6f }; pivot = glm::vec3{ 0,8,0 }; break;
-			case GEO_HAMMER3: flipangle = -1;  this->type = type; orientateangle = 0.f; scale = glm::vec3{ 250.f,250.f,250.f }; pivot = glm::vec3{ 0,0,0 }; break;
+			case GEO_HAMMER1: flipangle = -1; this->type = type; orientateangle = 90.f; scale = glm::vec3{ 0.5f,0.5f,0.5f }; pivot = glm::vec3{ 23,0,0 };  break;
+			case GEO_HAMMER2: flipangle = -1;  this->type = type; orientateangle = -90.f; scale = glm::vec3{ 0.7f,0.7f,0.7f }; pivot = glm::vec3{ 0,8,0 }; break;
+			case GEO_HAMMER3: flipangle = 1;  this->type = type; orientateangle = 0.f; scale = glm::vec3{ 250.f,250.f,250.f }; pivot = glm::vec3{ 0,0,0 }; break;
 			default: orientateangle = 0.f; break;
 			}
 		}
@@ -290,7 +289,7 @@ private:
 	bool gamestart = true; //TO CHANGE
 
 	//TO CHANGE
-	float testrot = 0.f;
+	float hammerrot = 0.f;
 	bool testing = false;
 
 
