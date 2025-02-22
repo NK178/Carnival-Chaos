@@ -171,7 +171,7 @@ bool OverlapAABB2Sphere(PhysicsObject& circle, float radius, PhysicsObject& box,
 }
 
 
-////////////////////////////////////////// SAT /////////////////////////////////////
+//////////////////////////////////////// SAT /////////////////////////////////////
 //bool SAT(PhysicsObject& obj1, const std::vector<glm::vec3>& polA, PhysicsObject& obj2, const std::vector<glm::vec3>& polB, CollisionData& cd)
 //{
 //	size_t sizeA = polA.size();

@@ -341,14 +341,19 @@ void SceneWhackAMole::Init()
 
 	//hammer positions on grid 
 	//Hammer 1 (3,6,9)
+	hammerspawnpts.push_back(glm::vec3(130, 25, 66)); // 
+
+	hammerspawnpts.push_back(glm::vec3(0, 25, 66));
 	hammerspawnpts.push_back(glm::vec3(-100, 25, 58));
-	hammerspawnpts.push_back(glm::vec3(67, 10, 66));
+
+	hammerspawnpts.push_back(glm::vec3(130, 25, 0)); // 
+
+	hammerspawnpts.push_back(glm::vec3(0, 25, 0));
 	hammerspawnpts.push_back(glm::vec3(-100, 25, -8));
-	hammerspawnpts.push_back(glm::vec3(0, 10, 66));
-	hammerspawnpts.push_back(glm::vec3(67, 10, 0));
-	hammerspawnpts.push_back(glm::vec3(0, 10, 0));
-	hammerspawnpts.push_back(glm::vec3(67, 10, -66));
-	hammerspawnpts.push_back(glm::vec3(0,  10, -66));
+
+	hammerspawnpts.push_back(glm::vec3(130, 25, -66)); // 
+
+	hammerspawnpts.push_back(glm::vec3(0,  25, -66));
 	hammerspawnpts.push_back(glm::vec3(-100, 25, -74));
 
 
@@ -380,21 +385,37 @@ void SceneWhackAMole::Update(double dt)
 	if (KeyboardController::GetInstance()->IsKeyDown('P'))
 		testobj.pos.y += static_cast<float>(dt) * SPEED;
 
-	if (isattack) {
+	if (isattack) { //NEED TO FIX ORDER ISSUE  (use some bool trigger to add extra hammers) 
 		for (int j = 0; j < attackorder.size; j++) {
-			if (attackorder.GetCurrentPhase() == orderiter)
-				inactionorder.push_back(attackorder.Pop());
+			if (orderiter != 3) {
+				if (attackorder.GetCurrentPhase() == orderiter)
+					inactionorder.push_back(attackorder.Pop());
+				else
+					orderiter++;
+				//if (orderiter == 1 /*|| orderiter == 2*/)
+				//	orderiter++;
+			}
 		}
 	}
-	if (KeyboardController::GetInstance()->IsKeyDown('Y')){
+
+	//TESTING CODE
+	if (KeyboardController::GetInstance()->IsKeyDown('Y')) {
 		testing = true;
 	}
-	
+
 	if (testing) {
-		if (testrot > -110)
-		testrot -= 60.f * dt;
+		for (int j = 0; j < inactionorder.size(); j++) { //do the stuff
+			if (testrot < 110)
+				testrot += 60.f * dt;
+		}
 	}
-		
+
+	//if (testing) {
+	//	if (testrot < 110)
+	//		testrot += 60.f * dt;
+	//}
+
+
 
 	player[0].pos = camera.pos;
 	CollisionData cd;
@@ -422,6 +443,7 @@ void SceneWhackAMole::Update(double dt)
 	player[0].UpdatePhysics(dt);
 
 	camera.Update(dt);
+
 
 }
 
@@ -540,123 +562,83 @@ void SceneWhackAMole::Render()
 
 
 
-	//Hammer 1 
-	// + //modelStack.Rotate(90.f, 0.f, 0, 1.f); //keep upright
-	//modelStack.Translate(23, 0, 0); //pivot
-	//modelStack.Rotate(90.f, 1.f, 0, 0.f); //orientation
-	//modelStack.Scale(0.5f, 0.5f, 0.5f); //scale
-	//Hammer 2
-	//modelStack.Translate(0, 8, 0); //pivot		
-	//modelStack.Rotate(-90.f, 1.f, 0, 0.f); //orientation
-	//modelStack.Scale(0.6f, 0.6f, 0.6f); //scale
-	//Hammer 3 
-	//modelStack.Translate(0, 0, 0); //pivot
-	//modelStack.Rotate(0.f, 0, 0, 1.f); //orientation
-	//modelStack.Scale(250.f, 250.f, 250.f); //scale
+	//if (isattack) {
+	//	for (int j = 0; j < inactionorder.size(); j++) {
+	//		GEOMETRY_TYPE model = inactionorder[j].type;
+	//		glm::vec3 scale = inactionorder[j].scale, pos = inactionorder[j].position, pivot = inactionorder[j].pivot;
+	//		float orientangle = inactionorder[j].orientateangle;
+	//		
+	//		modelStack.PushMatrix();
+	//		modelStack.Translate(pos.x, pos.y, pos.z);
+	//		modelStack.Rotate(testrot, 0, 0, 1.f); //animation
+	//		if (model == GEO_HAMMER1)			//for hammer 1 only 
+	//			modelStack.Rotate(90.f, 0.f, 0, 1.f); //keep upright
 
-	if (isattack) {
-		for (int j = 0; j < inactionorder.size(); j++) {
-			GEOMETRY_TYPE model = inactionorder[j].type;
-			glm::vec3 scale = inactionorder[j].scale, pos = inactionorder[j].position, pivot = inactionorder[j].pivot;
-			float orientangle = inactionorder[j].orientateangle;
-			
+	//		modelStack.PushMatrix();
+	//		modelStack.Translate(pivot.x, pivot.y,pivot.z);
+	//		modelStack.Rotate(orientangle,1.f,0,0);
+	//		modelStack.Scale(scale.x, scale.y,scale.z);
+	//		meshList[model]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+	//		meshList[model]->material.kDiffuse = glm::vec3(0.8f, 0.8f, 0.8f);
+	//		meshList[model]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	//		meshList[model]->material.kShininess = 1.0f;
+	//		RenderMesh(meshList[model], true);
+	//		modelStack.PopMatrix();
+	//		modelStack.PopMatrix();
+	//	}
+	//}
+
+
+
+
+
+
+
+	for (int i = 0; i < hammerspawnpts.size(); i++) {
+
+		int grid = i + 1;
+		if (grid == 1 || grid == 4 || grid == 7) {
+
 			modelStack.PushMatrix();
+			modelStack.Translate(hammerspawnpts[i].x, hammerspawnpts[i].y, hammerspawnpts[i].z);
 			modelStack.Rotate(testrot, 0, 0, 1.f); //animation
-			modelStack.Translate(pos.x, pos.y, pos.z);
+			//modelStack.Rotate(90.f, 0.f, 0, 1.f); //keep upright
+
+			//modelStack.PushMatrix();
+			//modelStack.Translate(0, 8, 0); //pivot		
+			//modelStack.Rotate(-90.f, 1.f, 0, 0.f); //orientation
+			//modelStack.Scale(0.6f, 0.6f, 0.6f); //scale
+			//meshList[GEO_HAMMER2]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+			//meshList[GEO_HAMMER2]->material.kDiffuse = glm::vec3(0.8f, 0.8f, 0.8f);
+			//meshList[GEO_HAMMER2]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+			//meshList[GEO_HAMMER2]->material.kShininess = 1.0f;
+			//RenderMesh(meshList[GEO_HAMMER2], true);
+			//modelStack.PopMatrix();
+
+			//modelStack.PushMatrix();
+			//modelStack.Translate(23, 0, 0); //pivot
+			//modelStack.Rotate(90.f, 1.f, 0, 0.f); //orientation
+			//modelStack.Scale(0.5f, 0.5f, 0.5f); //scale
+			//meshList[GEO_HAMMER1]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+			//meshList[GEO_HAMMER1]->material.kDiffuse = glm::vec3(0.8f,0.8f, 0.8f);
+			//meshList[GEO_HAMMER1]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+			//meshList[GEO_HAMMER1]->material.kShininess = 1.0f;
+			//RenderMesh(meshList[GEO_HAMMER1], true);
+			//modelStack.PopMatrix();
 
 			modelStack.PushMatrix();
-			modelStack.Translate(pivot.x, pivot.y,pivot.z);
-			modelStack.Rotate(orientangle,1.f,0,0);
-			modelStack.Scale(scale.x, scale.y,scale.z);
-			meshList[model]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
-			meshList[model]->material.kDiffuse = glm::vec3(0.8f, 0.8f, 0.8f);
-			meshList[model]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-			meshList[model]->material.kShininess = 1.0f;
-			RenderMesh(meshList[model], true);
+			modelStack.Translate(0, 0, 0);
+			modelStack.Rotate(0.f, 0, 0, 1.f);
+			modelStack.Scale(250.f, 250.f, 250.f);
+			meshList[GEO_HAMMER3]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+			meshList[GEO_HAMMER3]->material.kDiffuse = glm::vec3(0.8f, 0.8f, 0.8f);
+			meshList[GEO_HAMMER3]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+			meshList[GEO_HAMMER3]->material.kShininess = 1.0f;
+			RenderMesh(meshList[GEO_HAMMER3], true);
 			modelStack.PopMatrix();
 			modelStack.PopMatrix();
 		}
 	}
-
-
-	//for (int i = 0; i < hammerspawnpts.size(); i++) {
-
-
-	//	
-
-	//	modelStack.PushMatrix();
-	//	modelStack.Translate(hammerspawnpts[i].x, hammerspawnpts[i].y, hammerspawnpts[i].z);
-	//	modelStack.Rotate(testrot, 0, 0, 1.f); //animation
-	//	//modelStack.Rotate(90.f, 0.f, 0, 1.f); //keep upright
-
-	//	//modelStack.PushMatrix();
-	//	//modelStack.Translate(0, 8, 0); //pivot		
-	//	//modelStack.Rotate(-90.f, 1.f, 0, 0.f); //orientation
-	//	//modelStack.Scale(0.6f, 0.6f, 0.6f); //scale
-	//	//meshList[GEO_HAMMER2]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
-	//	//meshList[GEO_HAMMER2]->material.kDiffuse = glm::vec3(0.8f, 0.8f, 0.8f);
-	//	//meshList[GEO_HAMMER2]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	//	//meshList[GEO_HAMMER2]->material.kShininess = 1.0f;
-	//	//RenderMesh(meshList[GEO_HAMMER2], true);
-	//	//modelStack.PopMatrix();
-
-	//	//modelStack.PushMatrix();
-	//	//modelStack.Translate(23, 0, 0); //pivot
-	//	//modelStack.Rotate(90.f, 1.f, 0, 0.f); //orientation
-	//	//modelStack.Scale(0.5f, 0.5f, 0.5f); //scale
-	//	//meshList[GEO_HAMMER1]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
-	//	//meshList[GEO_HAMMER1]->material.kDiffuse = glm::vec3(0.8f,0.8f, 0.8f);
-	//	//meshList[GEO_HAMMER1]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	//	//meshList[GEO_HAMMER1]->material.kShininess = 1.0f;
-	//	//RenderMesh(meshList[GEO_HAMMER1], true);
-	//	//modelStack.PopMatrix();
-
-	//	modelStack.PushMatrix();
-	//	modelStack.Translate(0, 0, 0); 
-	//	modelStack.Rotate(0.f, 0, 0, 1.f);
-	//	modelStack.Scale(250.f, 250.f, 250.f);
-	//	meshList[GEO_HAMMER3]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
-	//	meshList[GEO_HAMMER3]->material.kDiffuse = glm::vec3(0.8f,0.8f, 0.8f);
-	//	meshList[GEO_HAMMER3]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	//	meshList[GEO_HAMMER3]->material.kShininess = 1.0f;
-	//	RenderMesh(meshList[GEO_HAMMER3], true);
-	//	modelStack.PopMatrix();
-	//	modelStack.PopMatrix();
-	//}
-
-	//modelStack.PushMatrix();
-	//modelStack.Translate(0, 0, 0);
-	//modelStack.Rotate(90.f, 0, 0, 1.f);
-	//modelStack.Scale(0.2f, 0.2f, 0.2f);
-	//meshList[GEO_HAMMER1]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
-	//meshList[GEO_HAMMER1]->material.kDiffuse = glm::vec3(0.8f,0.8f, 0.8f);
-	//meshList[GEO_HAMMER1]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	//meshList[GEO_HAMMER1]->material.kShininess = 1.0f;
-	//RenderMesh(meshList[GEO_HAMMER1], true);
-	//modelStack.PopMatrix();
-
-
-	//modelStack.PushMatrix();
-	//modelStack.Translate(0, 0, -15);
-	//modelStack.Rotate(90.f, 0, 0, 1.f);
-	//modelStack.Scale(0.2f, 0.2f, 0.2f);
-	//meshList[GEO_HAMMER2]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
-	//meshList[GEO_HAMMER2]->material.kDiffuse = glm::vec3(0.8f, 0.8f, 0.8f);
-	//meshList[GEO_HAMMER2]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	//meshList[GEO_HAMMER2]->material.kShininess = 1.0f;
-	//RenderMesh(meshList[GEO_HAMMER2], true);
-	//modelStack.PopMatrix();
-
-	//modelStack.PushMatrix();
-	//modelStack.Translate(0, 20, 0);
-	//modelStack.Rotate(90.f, 0, 0, 1.f);
-	//modelStack.Scale(100.f, 100.f, 100.f);
-	//meshList[GEO_HAMMER3]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
-	//meshList[GEO_HAMMER3]->material.kDiffuse = glm::vec3(0.8f, 0.8f, 0.8f);
-	//meshList[GEO_HAMMER3]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	//meshList[GEO_HAMMER3]->material.kShininess = 1.0f;
-	//RenderMesh(meshList[GEO_HAMMER3], true);
-	//modelStack.PopMatrix();
 
 
 	if (!gamestart) {

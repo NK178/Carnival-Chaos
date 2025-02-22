@@ -163,6 +163,7 @@ private:
 		glm::vec3 pivot;
 		glm::vec3 scale;
 		float orientateangle;
+		int flipangle;
 		GEOMETRY_TYPE type;
 
 		NodeHammer() { next = nullptr; phase = 0, position = glm::vec3(0, 0, 0);  };
@@ -170,22 +171,23 @@ private:
 			next = nullptr;
 			this->phase = phase;
 			switch (grid) {
-			case 1: this->grid = grid; position = glm::vec3(-100, 25, 58); break;
-			case 2: this->grid = grid; position = glm::vec3(67, 10, 66); break;
-			case 3: this->grid = grid; position = glm::vec3(-100, 25, -8); break;
-			case 4: this->grid = grid; position = glm::vec3(0, 10, 66); break;
-			case 5: this->grid = grid; position = glm::vec3(67, 10, 0); break;
-			case 6: this->grid = grid; position = glm::vec3(0, 10, 0); break;
-			case 7: this->grid = grid; position = glm::vec3(67, 10, -66); break;
-			case 8: this->grid = grid; position = glm::vec3(0, 10, -66); break;
+			case 1: this->grid = grid; position = glm::vec3(67, 25, 66); break;
+			case 2: this->grid = grid; position = glm::vec3(0, 25, 66); break;
+			case 3: this->grid = grid; position = glm::vec3(-100, 25, 58); break;
+			case 4: this->grid = grid; position = glm::vec3(67, 25, 0); break;
+			case 5: this->grid = grid; position = glm::vec3(0, 25, 0); break;
+			case 6: this->grid = grid; position = glm::vec3(-100, 25, -8); break;
+			case 7: this->grid = grid; position = glm::vec3(67, 25, -66); break;
+			case 8: this->grid = grid; position = glm::vec3(0, 25, -66); break;
 			case 9: this->grid = grid; position = glm::vec3(-100, 25, -74); break;
 			default: this->grid = 0; position = glm::vec3(0, 0, 0); break;
 			}
 
+
 			switch (type) {
-			case GEO_HAMMER1: this->type = type; orientateangle = 90.f; scale = glm::vec3{ 0.5f,0.5f,0.5f }; pivot = glm::vec3{ 23,0,0 };  break;
-			case GEO_HAMMER2: this->type = type; orientateangle = -90.f; scale = glm::vec3{ 0.6f,0.6f,0.6f }; pivot = glm::vec3{ 0,8,0 }; break;
-			case GEO_HAMMER3: this->type = type; orientateangle = 0.f; scale = glm::vec3{ 250.f,250.f,250.f }; pivot = glm::vec3{0,0,0 }; break;
+			case GEO_HAMMER1: flipangle = 1; this->type = type; orientateangle = 90.f; scale = glm::vec3{ 0.5f,0.5f,0.5f }; pivot = glm::vec3{ 23,0,0 };  break;
+			case GEO_HAMMER2: flipangle = 1;  this->type = type; orientateangle = -90.f; scale = glm::vec3{ 0.6f,0.6f,0.6f }; pivot = glm::vec3{ 0,8,0 }; break;
+			case GEO_HAMMER3: flipangle = -1;  this->type = type; orientateangle = 0.f; scale = glm::vec3{ 250.f,250.f,250.f }; pivot = glm::vec3{ 0,0,0 }; break;
 			default: orientateangle = 0.f; break;
 			}
 		}
@@ -281,8 +283,7 @@ private:
 	std::vector<NodeHammer> inactionorder;
 	Queue attackorder;
 	
-	//Queue inactionorder;
-	int orderiter = 1;
+	int orderiter = 1; //TO CHANGE
 	float startcountdown = 4.f;
 	float attackcooldown = 3.f;
 	bool isattack = true;
