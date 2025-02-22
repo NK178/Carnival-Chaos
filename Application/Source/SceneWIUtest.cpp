@@ -266,7 +266,7 @@ void SceneWIUtest::Update(double dt)
 
 
 	obb_worldvertices = obblist[0].vertices;
-	obb_worldvertices = UpdateverticesinYaxis(obblist[0], obb_worldvertices);
+	Updatevertices(obblist[0], obb_worldvertices);
 	if (KeyboardController::GetInstance()->IsKeyPressed('T')) {
 		iter += 1;
 		if (iter > 7)
@@ -381,40 +381,6 @@ void SceneWIUtest::Render()
 	//RenderMesh(meshList[GEO_PLANE], true);
 	//modelStack.PopMatrix();
 
-	modelStack.PushMatrix();
-	modelStack.Translate(0, 0, 0);
-	modelStack.Rotate(90.f, 0, 0, 1.f);
-	modelStack.Scale(0.2f, 0.2f, 0.2f);
-	meshList[GEO_HAMMER1]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
-	meshList[GEO_HAMMER1]->material.kDiffuse = glm::vec3(0.8f,0.8f, 0.8f);
-	meshList[GEO_HAMMER1]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	meshList[GEO_HAMMER1]->material.kShininess = 1.0f;
-	RenderMesh(meshList[GEO_HAMMER1], true);
-	modelStack.PopMatrix();
-
-
-	modelStack.PushMatrix();
-	modelStack.Translate(0, 0, -15);
-	modelStack.Rotate(90.f, 0, 0, 1.f);
-	modelStack.Scale(0.2f, 0.2f, 0.2f);
-	meshList[GEO_HAMMER2]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
-	meshList[GEO_HAMMER2]->material.kDiffuse = glm::vec3(0.8f, 0.8f, 0.8f);
-	meshList[GEO_HAMMER2]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	meshList[GEO_HAMMER2]->material.kShininess = 1.0f;
-	RenderMesh(meshList[GEO_HAMMER2], true);
-	modelStack.PopMatrix();
-
-	//modelStack.PushMatrix();
-	//modelStack.Translate(0, 0, -30);
-	//modelStack.Rotate(90.f, 0, 0, 1.f);
-	//modelStack.Scale(0.2f, 0.2f, 0.2f);
-	//meshList[GEO_HAMMER3]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
-	//meshList[GEO_HAMMER3]->material.kDiffuse = glm::vec3(0.8f, 0.8f, 0.8f);
-	//meshList[GEO_HAMMER3]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	//meshList[GEO_HAMMER3]->material.kShininess = 1.0f;
-	//RenderMesh(meshList[GEO_HAMMER3], true);
-	//modelStack.PopMatrix();
-
 	for (int i = 0; i < cubelist.size(); i++) {
 		modelStack.PushMatrix();
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -445,7 +411,7 @@ void SceneWIUtest::Render()
 	modelStack.PushMatrix();
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	modelStack.Translate(obblist[0].pos.x, obblist[0].pos.y, obblist[0].pos.z);
-	modelStack.Rotate(obblist[0].angleDeg, 0, 1, 0);
+	modelStack.Rotate(obblist[0].angleDeg, 0,1,0);
 	modelStack.Scale(2 * cubelist[0].boxextent.x, 2 * cubelist[0].boxextent.y, 2 * cubelist[0].boxextent.z);
 	meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
 	meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);

@@ -140,13 +140,55 @@ private:
 	void Material(GEOMETRY_TYPE obj, float AmR, float AmG, float AmB, float DifA, float DifG, float DifB, float SpA, float SpG, float SpB, float Shiny);
 	void RenderSkyBox();
 
+	//Hammer 1 
+	// + //modelStack.Rotate(90.f, 0.f, 0, 1.f); //keep upright
+	//modelStack.Translate(23, 0, 0); //pivot
+	//modelStack.Rotate(90.f, 1.f, 0, 0.f); //orientation
+	//modelStack.Scale(0.5f, 0.5f, 0.5f); //scale
+	//Hammer 2
+	//modelStack.Translate(0, 8, 0); //pivot		
+	//modelStack.Rotate(-90.f, 1.f, 0, 0.f); //orientation
+	//modelStack.Scale(0.6f, 0.6f, 0.6f); //scale
+	//Hammer 3 
+	//modelStack.Translate(0, 0, 0); //pivot
+	//modelStack.Rotate(0.f, 0, 0, 1.f); //orientation
+	//modelStack.Scale(250.f, 250.f, 250.f); //scale
+
+
 	//Queue 
-	struct NodeHammer {  //TO EDIT (ACCEPT GLM::VEC3 POS, ORIENTATION ROT, ANIM ROT, SCALE VEC
+	struct NodeHammer {  
 		NodeHammer* next;
-		int phase;
-		int position;
-		NodeHammer() { next = nullptr; phase = position = 0; };
-		NodeHammer(int phase, int position) : phase(phase), position(position) { next = nullptr; }
+		int phase, grid;
+		glm::vec3 position;
+		glm::vec3 pivot;
+		glm::vec3 scale;
+		float orientateangle;
+		GEOMETRY_TYPE type;
+
+		NodeHammer() { next = nullptr; phase = 0, position = glm::vec3(0, 0, 0);  };
+		NodeHammer(int phase, int grid, GEOMETRY_TYPE type){ 
+			next = nullptr;
+			this->phase = phase;
+			switch (grid) {
+			case 1: this->grid = grid; position = glm::vec3(-100, 25, 58); break;
+			case 2: this->grid = grid; position = glm::vec3(67, 10, 66); break;
+			case 3: this->grid = grid; position = glm::vec3(-100, 25, -8); break;
+			case 4: this->grid = grid; position = glm::vec3(0, 10, 66); break;
+			case 5: this->grid = grid; position = glm::vec3(67, 10, 0); break;
+			case 6: this->grid = grid; position = glm::vec3(0, 10, 0); break;
+			case 7: this->grid = grid; position = glm::vec3(67, 10, -66); break;
+			case 8: this->grid = grid; position = glm::vec3(0, 10, -66); break;
+			case 9: this->grid = grid; position = glm::vec3(-100, 25, -74); break;
+			default: this->grid = 0; position = glm::vec3(0, 0, 0); break;
+			}
+
+			switch (type) {
+			case GEO_HAMMER1: this->type = type; orientateangle = 90.f; scale = glm::vec3{ 0.5f,0.5f,0.5f }; pivot = glm::vec3{ 23,0,0 };  break;
+			case GEO_HAMMER2: this->type = type; orientateangle = -90.f; scale = glm::vec3{ 0.6f,0.6f,0.6f }; pivot = glm::vec3{ 0,8,0 }; break;
+			case GEO_HAMMER3: this->type = type; orientateangle = 0.f; scale = glm::vec3{ 250.f,250.f,250.f }; pivot = glm::vec3{0,0,0 }; break;
+			default: orientateangle = 0.f; break;
+			}
+		}
 	};
 	struct Queue {
 		int size;
@@ -171,7 +213,7 @@ private:
 				return 0;
 		}
 		void Push(NodeHammer input) {
-			NodeHammer* newnode = new NodeHammer(input.phase, input.position);
+			NodeHammer* newnode = new NodeHammer(input.phase, input.grid,input.type);
 
 			if (head == nullptr) 
 				head = tail = current = newnode;
@@ -206,7 +248,7 @@ private:
 			if (head != nullptr) {
 				current = head;
 				while (current != nullptr) {
-					std::cout << current->phase << " " << current->position << std::endl;
+					std::cout << current->phase << std::endl;
 					current = current->next;
 				}
 			}
@@ -236,9 +278,10 @@ private:
 	std::vector<Walls> walllist;
 	std::vector<Player> player;
 	std::vector<glm::vec3> hammerspawnpts;
-
+	std::vector<NodeHammer> inactionorder;
 	Queue attackorder;
-	Queue inactionorder;
+	
+	//Queue inactionorder;
 	int orderiter = 1;
 	float startcountdown = 4.f;
 	float attackcooldown = 3.f;
@@ -246,8 +289,10 @@ private:
 	bool gamestart = true; //TO CHANGE
 
 	//TO CHANGE
-	float testrot = 90.f;
+	float testrot = 0.f;
 	bool testing = false;
+
+
 
 };
 

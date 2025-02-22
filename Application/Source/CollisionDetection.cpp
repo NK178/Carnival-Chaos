@@ -1,6 +1,26 @@
 #include "CollisionDetection.h"
 #include <iostream>
 
+//TO CHANGE SPLIT INTO EACH OWN FUNCTION
+void Updatevertices(PhysicsObject& obj, std::vector<glm::vec3>& vertices)
+{
+	float radian = glm::radians(obj.angleDeg);
+	float x, z;
+	for (int i = 0; i < vertices.size(); i++) {
+		glm::vec3 newvec = vertices[i];
+		float oldX{ vertices[i].x }, oldY{ vertices[i].y }, oldZ{ vertices[i].z };
+		//glm::mat3x3 rotx(1,0,0, 0,cos(radian),-sin(radian), 0,sin(radian),cos(radian));
+		glm::mat3x3 roty(cos(radian), 0, sin(radian), 0,1,0, -sin(radian), 0, cos(radian));
+		//glm::mat3x3 rotz(cos(radian), -sin(radian), 0, sin(radian), cos(radian),0,0,0,1);
+
+		//newvec = newvec * rotx;
+		newvec = newvec * roty;
+		//newvec = newvec * rotz;
+		newvec += obj.pos;
+		vertices[i] = newvec;
+	}
+}
+
 std::vector<glm::vec3> UpdateverticesinYaxis(PhysicsObject& obj, const std::vector<glm::vec3>& vertices)
 {
 	std::vector<glm::vec3> newvertices;
@@ -151,7 +171,7 @@ bool OverlapAABB2Sphere(PhysicsObject& circle, float radius, PhysicsObject& box,
 }
 
 
-//////////////////////////////////////// SAT /////////////////////////////////////
+////////////////////////////////////////// SAT /////////////////////////////////////
 //bool SAT(PhysicsObject& obj1, const std::vector<glm::vec3>& polA, PhysicsObject& obj2, const std::vector<glm::vec3>& polB, CollisionData& cd)
 //{
 //	size_t sizeA = polA.size();
@@ -277,7 +297,7 @@ bool OverlapAABB2Sphere(PhysicsObject& circle, float radius, PhysicsObject& box,
 //		if (MinB > MaxA || MinA > MaxB)
 //			return false;
 //		else {
-//			float ActualMax, ActualMin;
+//			float ActualMax, ActualMin;		
 //			if (MaxA > MaxB)
 //				ActualMax = MaxB;
 //			else
