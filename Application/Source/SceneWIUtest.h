@@ -145,14 +145,6 @@ private:
 		Sphere(int id, int r, int type) : radius(r), GameObject(id, type) {}
 	};
 
-	//vertices.push_back(glm::vec3(-1.5f, 1.5f, 1.5f));    // Vertex 0
-	//vertices.push_back(glm::vec3(1.5f, 1.5f, 1.5f));    // Vertex 1
-	//vertices.push_back(glm::vec3(-1.5f, -1.5f, 1.5f));    // Vertex 2
-	//vertices.push_back(glm::vec3(1.5f, -1.5f, 1.5f));    // Vertex 3
-	//vertices.push_back(glm::vec3(-1.5f, 1.5f, -1.5f));    // Vertex 4
-	//vertices.push_back(glm::vec3(1.5f, 1.5f, -1.5f));    // Vertex 5
-	//vertices.push_back(glm::vec3(-1.5f, -1.5f, -1.5f));    // Vertex 6
-	//vertices.push_back(glm::vec3(1.5f, -1.5f, -1.5f));    // Vertex 7
 
 	struct OBB : public GameObject {
 		std::vector<glm::vec3> vertices; 
@@ -167,30 +159,36 @@ private:
 			vertices.push_back(glm::vec3(-1.5f, -1.5f, -1.5f));    // Vertex 6
 			vertices.push_back(glm::vec3(1.5f, -1.5f, -1.5f));    // Vertex 7
 
-			//vertices.push_back(glm::vec3(1.5f, 1.5f, -1.5f));    // Vertex 3
-			//vertices.push_back(glm::vec3(-1.5f, 1.5f, -1.5f));    // Vertex 2
-			//vertices.push_back(glm::vec3(-1.5f, 1.5f, 1.5f));    // Vertex 0
-			//vertices.push_back(glm::vec3(1.5f, 1.5f, 1.5f));    // Vertex 1
-			////vertices.push_back(glm::vec3(-1.5f, -1.5f, 1.5f));    // Vertex 2
-			////vertices.push_back(glm::vec3(1.5f, -1.5f, 1.5f));    // Vertex 3
-			////vertices.push_back(glm::vec3(1.5f, -1.5f, -1.5f));    // Vertex 4
-
-			//vertices.push_back(glm::vec3(-1.5f, -1.5f, -1.5f));    // Vertex 7
 		}
 	};
 
-
+	//try again
+	struct OBBV2 : public GameObject { 
+		std::vector<glm::vec3> normals;
+		glm::vec3 boxextent{ 5.f,5.f,5.f };
+		OBBV2(int id, int type) : GameObject(id, type) {
+			normals.push_back(glm::vec3(0, 1, 0));
+			normals.push_back(glm::vec3(0, -1, 0));
+			normals.push_back(glm::vec3(1, 0, 0));
+			normals.push_back(glm::vec3(-1, 0, 0));
+			normals.push_back(glm::vec3(0, 0, 1));
+			normals.push_back(glm::vec3(0, 0, -1));
+		}
+	};
+	std::vector<std::vector<glm::vec3>> worldnormals;
 	std::vector<glm::vec3> obb_worldvertices;
 	bool activate = false;
 	std::vector<Cube> cubelist;
 	std::vector<Sphere> spherelist;	
 	std::vector<OBB> obblist;
+	std::vector<OBBV2> obblistV2;
 
 	void SortCube2Collide(std::vector<GameObject> GOlist, std::vector<Cube> maincubelist, std::vector<Cube>& newcubelist);
 	//void CubeCollisions(std::vector<Cube>& Cubelist, CollisionData cd);
 	void CubeCollisions(std::vector<int> idlist, std::vector<Cube>& Cubelist, CollisionData cd);
 
 	int iter = 0;
+	int normaliter = 0;
 
 };
 

@@ -239,8 +239,16 @@ void SceneWIUtest::Init()
 	spherelist[1].mass = 0.f;
 
 	obblist.push_back(OBB(5, GameObject::CUBE));
-	obblist[0].pos = glm::vec3{ -15,3,-15 };
+	obblist[0].pos = glm::vec3{ -15,3,-30 };
 	obblist[0].angleDeg = 0;
+
+	obblistV2.push_back(OBBV2(300, GameObject::CUBE));
+	obblistV2.push_back(OBBV2(301, GameObject::CUBE));
+	obblistV2[0].pos = glm::vec3{ -15,3,-15 };
+	obblistV2[0].angleDeg = 0;
+	obblistV2[1].pos = glm::vec3{ -15,3,0 };
+	obblistV2[1].angleDeg = 0;
+
 
 	obb_worldvertices = obblist[0].vertices;
 
@@ -252,18 +260,25 @@ void SceneWIUtest::Update(double dt)
 	HandleKeyPress();
 	const float SPEED = 15.f;
 	if (KeyboardController::GetInstance()->IsKeyDown('I'))
-		obblist[0].pos.z -= static_cast<float>(dt) * SPEED;
+		obblistV2[0].pos.z -= static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('K'))
-		obblist[0].pos.z += static_cast<float>(dt) * SPEED;
+		obblistV2[0].pos.z += static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('J'))
-		obblist[0].pos.x -= static_cast<float>(dt) * SPEED;
+		obblistV2[0].pos.x -= static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('L'))
-		obblist[0].pos.x += static_cast<float>(dt) * SPEED;
+		obblistV2[0].pos.x += static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('O'))
-		obblist[0].pos.y -= static_cast<float>(dt) * SPEED;
+		obblistV2[0].pos.y -= static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('P'))
-		obblist[0].pos.y += static_cast<float>(dt) * SPEED;
-
+		obblistV2[0].pos.y += static_cast<float>(dt) * SPEED;
+	
+	//Update my normals 
+	worldnormals.clear();
+	for (int k = 0; k < obblistV2.size(); k++) {
+		std::vector<glm::vec3> temp = obblistV2[k].normals;
+		Updatevertices(obblistV2[k], temp);
+		worldnormals.push_back(temp);
+	}
 
 	obb_worldvertices = obblist[0].vertices;
 	Updatevertices(obblist[0], obb_worldvertices);
@@ -271,11 +286,15 @@ void SceneWIUtest::Update(double dt)
 		iter += 1;
 		if (iter > 7)
 			iter = iter % obblist[0].vertices.size();
+		normaliter += 1;
+		if (normaliter > 5)
+			normaliter = normaliter % obblistV2[0].normals.size();
 	}
 	//std::cout << "Iter: " << iter << " " << obb_worldvertices[iter].x << " " << obb_worldvertices[iter].y << " " << obb_worldvertices[iter].z << std::endl;
 
 	if (KeyboardController::GetInstance()->IsKeyPressed('R')) {
 		obblist[0].angularVel += 50.f;
+		obblistV2[0].angularVel += 50.f;
 	}
 
 
@@ -288,6 +307,10 @@ void SceneWIUtest::Update(double dt)
 	
 	if (OverlapAABB2Sphere(spherelist[1], spherelist[1].radius, cubelist[1], cubelist[1].pos - cubelist[1].boxextent, cubelist[1].pos + cubelist[1].boxextent, cd))
 		ResolveCollision(cd);
+
+	if (SATV1(obblistV2[0],worldnormals[0], obblistV2[0].boxextent, obblistV2[1], worldnormals[1], obblistV2[1].boxextent,cd))
+		ResolveCollision(cd);
+	//std::cout << obblistV2[0].pos.x << " " << obblistV2[0].pos.y << " " << obblistV2[0].pos.z << std::endl;
 
 	cubelist[1].angularVel = 20.f;
 	if (KeyboardController::GetInstance()->IsKeyPressed('G')) {
@@ -308,6 +331,9 @@ void SceneWIUtest::Update(double dt)
 	}
 	for (int i = 0; i < obblist.size(); i++) {
 		obblist[i].UpdatePhysics(dt);
+	}
+	for (int i = 0; i < obblistV2.size(); i++) {
+		obblistV2[i].UpdatePhysics(dt);
 	}
 	//camera.AddForce(glm::vec3(1, 0, 0) * 50.f);
 
@@ -396,18 +422,55 @@ void SceneWIUtest::Render()
 		modelStack.PopMatrix();
 	}
 
-	for (int i = 0; i < spherelist.size(); i++) {
+	//for (int i = 0; i < spherelist.size(); i++) {
+	//	modelStack.PushMatrix();
+	//	modelStack.Translate(spherelist[i].pos.x, spherelist[i].pos.y, spherelist[i].pos.z);
+	//	modelStack.Scale(spherelist[i].radius, spherelist[i].radius, spherelist[i].radius);
+	//	meshList[GEO_SPHERE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+	//	meshList[GEO_SPHERE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	//	meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	//	meshList[GEO_SPHERE]->material.kShininess = 1.0f;
+	//	RenderMesh(meshList[GEO_SPHERE], true);
+	//	modelStack.PopMatrix();
+	//}
+
+	////////////////////////////////////////////OBB V2 
+	for (int n = 0; n < obblistV2.size(); n++) {
 		modelStack.PushMatrix();
-		modelStack.Translate(spherelist[i].pos.x, spherelist[i].pos.y, spherelist[i].pos.z);
-		modelStack.Scale(spherelist[i].radius, spherelist[i].radius, spherelist[i].radius);
-		meshList[GEO_SPHERE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-		meshList[GEO_SPHERE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-		meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-		meshList[GEO_SPHERE]->material.kShininess = 1.0f;
-		RenderMesh(meshList[GEO_SPHERE], true);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		modelStack.Translate(obblistV2[n].pos.x, obblistV2[n].pos.y, obblistV2[n].pos.z);
+		modelStack.Rotate(obblistV2[n].angleDeg, 0, 1, 0);
+		modelStack.Scale(obblistV2[n].boxextent.x, obblistV2[n].boxextent.y, obblistV2[n].boxextent.z);
+		meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+		meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+		meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+		meshList[GEO_CUBE]->material.kShininess = 1.0f;
+		RenderMesh(meshList[GEO_CUBE], true);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		modelStack.PopMatrix();
 	}
 
+	for (int j = 0; j < worldnormals.size(); j++) {
+		for (int i = 0; i < obblistV2[j].normals.size(); i++) {
+			glm::vec3 diffuse, ambient;
+			if (j == iter)
+				diffuse = ambient = glm::vec3(1.f, 0.1f, 0.1f);
+			else
+				diffuse = ambient = glm::vec3(1.f, 1.f, 1.f);
+			modelStack.PushMatrix();
+			modelStack.Translate(worldnormals[j][i].x, worldnormals[j][i].y, worldnormals[j][i].z);
+			modelStack.Scale(0.1, 0.1, 0.1);
+			meshList[GEO_SPHERE]->material.kAmbient = ambient;
+			meshList[GEO_SPHERE]->material.kDiffuse = diffuse;
+			meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+			meshList[GEO_SPHERE]->material.kShininess = 2.0f;
+			RenderMesh(meshList[GEO_SPHERE], true);
+			modelStack.PopMatrix();
+		}
+	}
+
+
+	///////////////////////////////////////////////////////OBB V1 
 	modelStack.PushMatrix();
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	modelStack.Translate(obblist[0].pos.x, obblist[0].pos.y, obblist[0].pos.z);

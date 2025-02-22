@@ -12,7 +12,7 @@
 void CSceneManager::Init() {
     // Initialize with first scene
     //activeScene = new MainMenu();
-    activeScene = new SceneWhackAMole;
+    activeScene = new SceneWIUtest;
     currentSceneType = SCENE_MAIN_MENU;
     activeScene->Init();
 }

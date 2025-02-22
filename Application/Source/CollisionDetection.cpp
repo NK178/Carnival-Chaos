@@ -5,7 +5,6 @@
 void Updatevertices(PhysicsObject& obj, std::vector<glm::vec3>& vertices)
 {
 	float radian = glm::radians(obj.angleDeg);
-	float x, z;
 	for (int i = 0; i < vertices.size(); i++) {
 		glm::vec3 newvec = vertices[i];
 		float oldX{ vertices[i].x }, oldY{ vertices[i].y }, oldZ{ vertices[i].z };
@@ -18,6 +17,24 @@ void Updatevertices(PhysicsObject& obj, std::vector<glm::vec3>& vertices)
 		//newvec = newvec * rotz;
 		newvec += obj.pos;
 		vertices[i] = newvec;
+	}
+}
+
+void Updatenormals(PhysicsObject& obj, std::vector<glm::vec3>& normals)
+{
+	float radian = glm::radians(obj.angleDeg);
+	for (int i = 0; i < normals.size(); i++) {
+		glm::vec3 newvec = normals[i];
+		float oldX{ normals[i].x }, oldY{ normals[i].y }, oldZ{ normals[i].z };
+		glm::mat3x3 rotx(1,0,0, 0,cos(radian),-sin(radian), 0,sin(radian),cos(radian));
+		glm::mat3x3 roty(cos(radian), 0, sin(radian), 0, 1, 0, -sin(radian), 0, cos(radian));
+		glm::mat3x3 rotz(cos(radian), -sin(radian), 0, sin(radian), cos(radian),0,0,0,1);
+
+		newvec = newvec * rotx;
+		newvec = newvec * roty;
+		newvec = newvec * rotz;
+		newvec += obj.pos;
+		normals[i] = newvec;
 	}
 }
 
@@ -168,6 +185,159 @@ bool OverlapAABB2Sphere(PhysicsObject& circle, float radius, PhysicsObject& box,
 	}
 	else
 		return false;
+}
+
+//////////////////////////////////////// SAT V1  ////////////////////////////////////
+bool SATV1(PhysicsObject& obj1, const std::vector<glm::vec3>& normalsA, const glm::vec3& boxextentA, PhysicsObject& obj2, const std::vector<glm::vec3>& normalsB, const glm::vec3& boxextentB, CollisionData& cd)
+{
+	std::vector<glm::vec3> vertlistA;
+	std::vector<glm::vec3> vertlistB;
+	//HARD CODE 8 vertices 
+	for (int x = -1; x <= 1; x += 2)
+		for (int y = -1; y <= 1; y += 2)
+			for (int z = -1; z <= 1; z += 2)
+				vertlistA.push_back(glm::vec3(x * boxextentA.x, y * boxextentA.y, z * boxextentA.z));
+	for (int x = -1; x <= 1; x += 2)
+		for (int y = -1; y <= 1; y += 2)
+			for (int z = -1; z <= 1; z += 2)
+				vertlistB.push_back(glm::vec3(x * boxextentB.x, y * boxextentB.y, z * boxextentB.z));
+	float overlap = std::numeric_limits<float>::infinity();
+	glm::vec3 minNormal = glm::vec3(0, 0, 0);
+	size_t sizeA = vertlistA.size();
+	size_t sizeB = vertlistB.size();
+	size_t normalsizeA = normalsA.size();
+	size_t normalsizeB = normalsB.size();
+
+
+
+	//PolyA
+	for (size_t j = 0; j < normalsizeA; ++j)
+	{
+		std::vector<float> MinMaxA;	
+		std::vector<float> MinMaxB;
+	
+		//2) Map the point to the Seperating Axis) 
+		for (int i = 0; i < sizeA; i++) {
+			MinMaxA.push_back(glm::dot(vertlistA[i],normalsA[j]));
+		}
+		for (int i = 0; i < sizeB; i++) {
+			MinMaxB.push_back(glm::dot(vertlistB[i], normalsA[j]));
+		}
+	
+		//3) find the min max value of both 
+		float MaxA = MinMaxA[0];
+		float MinA = MinMaxA[0];
+		for (int i = 1; i < MinMaxA.size(); i++) {
+			if (MinMaxA[i] > MaxA) 
+				MaxA = MinMaxA[i];
+			else if (MinMaxA[i] < MinA) 
+				MinA = MinMaxA[i];
+		}
+	
+		float MaxB = MinMaxB[0];
+		float MinB = MinMaxB[0];
+		for (int i = 1; i < MinMaxB.size(); i++) {
+			if (MinMaxB[i] > MaxB) 
+				MaxB = MinMaxB[i];
+			else if (MinMaxB[i] < MinB) 
+				MinB = MinMaxB[i];
+		}
+	
+		//4) with MaxA, MinA, MaxB, MinB, check collison 
+		if (MinB > MaxA || MinA > MaxB)
+			return false;
+		else {
+			float ActualMax, ActualMin;
+			if (MaxA > MaxB)
+				ActualMax = MaxB;
+			else
+				ActualMax = MaxA;
+			if (MinA > MinB)
+				ActualMin = MinA;
+			else
+				ActualMin = MinB;
+			float currentoverlap = ActualMax - ActualMin;
+	
+			//clamp penetration if too large 
+			if (currentoverlap > 1.0f)
+				currentoverlap = 1.0f;
+			if (overlap > currentoverlap) {  //only updates when a min penetration distance is found 
+				overlap = currentoverlap;
+				if (MinA < MinB)
+					minNormal = normalsA[j] * -1.f;
+				else
+					minNormal = normalsA[j];
+			}
+		}
+	
+	}
+
+	//PolyB
+	for (size_t j = 0; j < normalsizeB; ++j)
+	{
+		std::vector<float> MinMaxA;
+		std::vector<float> MinMaxB;
+
+		//2) Map the point to the Seperating Axis) 
+		for (int i = 0; i < sizeA; i++) {
+			MinMaxA.push_back(glm::dot(vertlistA[i], normalsB[j]));
+		}
+		for (int i = 0; i < sizeB; i++) {
+			MinMaxB.push_back(glm::dot(vertlistB[i], normalsB[j]));
+		}
+
+		//3) find the min max value of both 
+		float MaxA = MinMaxA[0];
+		float MinA = MinMaxA[0];
+		for (int i = 1; i < MinMaxA.size(); i++) {
+			if (MinMaxA[i] > MaxA)
+				MaxA = MinMaxA[i];
+			else if (MinMaxA[i] < MinA)
+				MinA = MinMaxA[i];
+		}
+
+		float MaxB = MinMaxB[0];
+		float MinB = MinMaxB[0];
+		for (int i = 1; i < MinMaxB.size(); i++) {
+			if (MinMaxB[i] > MaxB)
+				MaxB = MinMaxB[i];
+			else if (MinMaxB[i] < MinB)
+				MinB = MinMaxB[i];
+		}
+
+		//4) with MaxA, MinA, MaxB, MinB, check collison 
+		if (MinB > MaxA || MinA > MaxB)
+			return false;
+		else {
+			float ActualMax, ActualMin;
+			if (MaxA > MaxB)
+				ActualMax = MaxB;
+			else
+				ActualMax = MaxA;
+			if (MinA > MinB)
+				ActualMin = MinA;
+			else
+				ActualMin = MinB;
+			float currentoverlap = ActualMax - ActualMin;
+
+			//clamp penetration if too large 
+			if (currentoverlap > 1.0f)
+				currentoverlap = 1.0f;
+			if (overlap > currentoverlap) {  //only updates when a min penetration distance is found 
+				overlap = currentoverlap;
+				if (MinA < MinB)
+					minNormal = normalsB[j] * -1.f;
+				else
+					minNormal = normalsB[j];
+			}
+		}
+
+	}
+	cd.pObj1 = &obj1;
+	cd.pObj2 = &obj2;
+	cd.normal = minNormal;
+	cd.pd = overlap;
+	return true;
 }
 
 
