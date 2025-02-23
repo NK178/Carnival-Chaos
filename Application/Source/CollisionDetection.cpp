@@ -8,13 +8,9 @@ void Updatevertices(PhysicsObject& obj, std::vector<glm::vec3>& vertices)
 	for (int i = 0; i < vertices.size(); i++) {
 		glm::vec3 newvec = vertices[i];
 		float oldX{ vertices[i].x }, oldY{ vertices[i].y }, oldZ{ vertices[i].z };
-		//glm::mat3x3 rotx(1,0,0, 0,cos(radian),-sin(radian), 0,sin(radian),cos(radian));
 		glm::mat3x3 roty(cos(radian), 0, sin(radian), 0,1,0, -sin(radian), 0, cos(radian));
-		//glm::mat3x3 rotz(cos(radian), -sin(radian), 0, sin(radian), cos(radian),0,0,0,1);
 
-		//newvec = newvec * rotx;
 		newvec = newvec * roty;
-		//newvec = newvec * rotz;
 		newvec += obj.pos;
 		vertices[i] = newvec;
 	}
@@ -26,35 +22,33 @@ void Updatenormals(PhysicsObject& obj, std::vector<glm::vec3>& normals)
 	for (int i = 0; i < normals.size(); i++) {
 		glm::vec3 newvec = normals[i];
 		float oldX{ normals[i].x }, oldY{ normals[i].y }, oldZ{ normals[i].z };
-		glm::mat3x3 rotx(1,0,0, 0,cos(radian),-sin(radian), 0,sin(radian),cos(radian));
 		glm::mat3x3 roty(cos(radian), 0, sin(radian), 0, 1, 0, -sin(radian), 0, cos(radian));
-		glm::mat3x3 rotz(cos(radian), -sin(radian), 0, sin(radian), cos(radian),0,0,0,1);
 
-		newvec = newvec * rotx;
 		newvec = newvec * roty;
-		newvec = newvec * rotz;
-		newvec += obj.pos;
 		normals[i] = newvec;
 	}
 }
 
-std::vector<glm::vec3> UpdateverticesinYaxis(PhysicsObject& obj, const std::vector<glm::vec3>& vertices)
-{
-	std::vector<glm::vec3> newvertices;
-	float radian = glm::radians(-obj.angleDeg);
-	float x, z;
-	for (int i = 0; i < vertices.size(); i++) {
-		glm::vec3 newvec = vertices[i];
-		float oldX{ vertices[i].x }, oldY{ vertices[i].y }, oldZ{ vertices[i].z };
-		newvec.x = cos(radian) * oldX - sin(radian) * oldZ;
-		newvec.z = sin(radian) * oldX + cos(radian) * oldZ;
+////TO REMOVE
+//void Updatenormals(PhysicsObject& obj, std::vector<glm::vec3>& normals)
+//{
+//	float radian = glm::radians(obj.angleDeg);
+//	for (int i = 0; i < normals.size(); i++) {
+//		glm::vec3 newvec = normals[i];
+//		float oldX{ normals[i].x }, oldY{ normals[i].y }, oldZ{ normals[i].z };
+//		glm::mat3x3 rotx(1,0,0, 0,cos(radian),-sin(radian), 0,sin(radian),cos(radian));
+//		glm::mat3x3 roty(cos(radian), 0, sin(radian), 0, 1, 0, -sin(radian), 0, cos(radian));
+//		glm::mat3x3 rotz(cos(radian), -sin(radian), 0, sin(radian), cos(radian),0,0,0,1);
+//
+//		newvec = newvec * rotx;
+//		newvec = newvec * roty;
+//		newvec = newvec * rotz;
+//		newvec += obj.pos;
+//		normals[i] = newvec;
+//	}
+//}
 
-		newvec += obj.pos;
-		newvertices.push_back(newvec);
-	}
 
-	return newvertices;
-}
 
 void ResolveCollision(CollisionData& cd)
 {
@@ -188,27 +182,16 @@ bool OverlapAABB2Sphere(PhysicsObject& circle, float radius, PhysicsObject& box,
 }
 
 //////////////////////////////////////// SAT V1  ////////////////////////////////////
-bool SATV1(PhysicsObject& obj1, const std::vector<glm::vec3>& normalsA, const glm::vec3& boxextentA, PhysicsObject& obj2, const std::vector<glm::vec3>& normalsB, const glm::vec3& boxextentB, CollisionData& cd)
+bool SATV1(PhysicsObject& obj1, const std::vector<glm::vec3>& normalsA, const std::vector<glm::vec3>& verticesA, PhysicsObject& obj2, const std::vector<glm::vec3>& normalsB, const std::vector<glm::vec3>& verticesB, CollisionData& cd)
 {
-	std::vector<glm::vec3> vertlistA;
-	std::vector<glm::vec3> vertlistB;
-	//HARD CODE 8 vertices 
-	for (int x = -1; x <= 1; x += 2)
-		for (int y = -1; y <= 1; y += 2)
-			for (int z = -1; z <= 1; z += 2)
-				vertlistA.push_back(glm::vec3(x * boxextentA.x, y * boxextentA.y, z * boxextentA.z));
-	for (int x = -1; x <= 1; x += 2)
-		for (int y = -1; y <= 1; y += 2)
-			for (int z = -1; z <= 1; z += 2)
-				vertlistB.push_back(glm::vec3(x * boxextentB.x, y * boxextentB.y, z * boxextentB.z));
+	std::vector<glm::vec3> vertlistA = verticesA;
+	std::vector<glm::vec3> vertlistB = verticesB;
 	float overlap = std::numeric_limits<float>::infinity();
 	glm::vec3 minNormal = glm::vec3(0, 0, 0);
 	size_t sizeA = vertlistA.size();
 	size_t sizeB = vertlistB.size();
 	size_t normalsizeA = normalsA.size();
 	size_t normalsizeB = normalsB.size();
-
-
 
 	//PolyA
 	for (size_t j = 0; j < normalsizeA; ++j)

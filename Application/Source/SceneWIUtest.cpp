@@ -1,4 +1,4 @@
-		#pragma once
+#pragma once
 #include "SceneWIUtest.h"
 #include <iostream>
 #include "GL\glew.h"
@@ -238,9 +238,7 @@ void SceneWIUtest::Init()
 	spherelist[1].pos = glm::vec3{ -15,3,0 };
 	spherelist[1].mass = 0.f;
 
-	obblist.push_back(OBB(5, GameObject::CUBE));
-	obblist[0].pos = glm::vec3{ -15,3,-30 };
-	obblist[0].angleDeg = 0;
+
 
 	obblistV2.push_back(OBBV2(300, GameObject::CUBE));
 	obblistV2.push_back(OBBV2(301, GameObject::CUBE));
@@ -249,8 +247,12 @@ void SceneWIUtest::Init()
 	obblistV2[1].pos = glm::vec3{ -15,3,0 };
 	obblistV2[1].angleDeg = 0;
 
+	obblist.push_back(OBB(5, GameObject::CUBE));
+	obblist.push_back(OBB(6, GameObject::CUBE));
+	obblist[0].pos = glm::vec3{ -30,3,-30 };
+	obblist[1].pos = glm::vec3{ -30,3,-20 };
+	obblist[0].angleDeg = 0;
 
-	obb_worldvertices = obblist[0].vertices;
 
 }
 
@@ -260,32 +262,54 @@ void SceneWIUtest::Update(double dt)
 	HandleKeyPress();
 	const float SPEED = 15.f;
 	if (KeyboardController::GetInstance()->IsKeyDown('I'))
-		obblistV2[0].pos.z -= static_cast<float>(dt) * SPEED;
+		obblist[0].pos.x -= static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('K'))
-		obblistV2[0].pos.z += static_cast<float>(dt) * SPEED;
+		obblist[0].pos.x += static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('J'))
-		obblistV2[0].pos.x -= static_cast<float>(dt) * SPEED;
+		obblist[0].pos.z -= static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('L'))
-		obblistV2[0].pos.x += static_cast<float>(dt) * SPEED;
+		obblist[0].pos.z += static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('O'))
-		obblistV2[0].pos.y -= static_cast<float>(dt) * SPEED;
+		obblist[0].pos.y -= static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('P'))
-		obblistV2[0].pos.y += static_cast<float>(dt) * SPEED;
+		obblist[0].pos.y += static_cast<float>(dt) * SPEED;
 	
-	//Update my normals 
+	//Update my stuff 
 	worldnormals.clear();
+	worldvertices.clear();
+	//normals
 	for (int k = 0; k < obblistV2.size(); k++) {
 		std::vector<glm::vec3> temp = obblistV2[k].normals;
-		Updatevertices(obblistV2[k], temp);
+		Updatenormals(obblistV2[k], temp);
 		worldnormals.push_back(temp);
 	}
+	//vertices 
+	for (int k = 0; k < obblistV2.size(); k++) {
+		std::vector<glm::vec3> temp = obblistV2[k].vertices;
+		Updatevertices(obblistV2[k], temp);
+		worldvertices.push_back(temp);
+	}
+	//////////////////////////OBB V1 Test 
+	V1worldnormals.clear();
+	V1worldvertices.clear();
+	//normals
+	for (int k = 0; k < obblist.size(); k++) {
+		std::vector<glm::vec3> temp = obblist[k].normals;
+		Updatenormals(obblist[k], temp);
+		V1worldnormals.push_back(temp);
+	}
+	//vertices 
+	for (int k = 0; k < obblist.size(); k++) {
+		std::vector<glm::vec3> temp = obblist[k].verticebuffer;
+		Updatevertices(obblist[k], temp);
+		V1worldvertices.push_back(temp);
+	}
 
-	obb_worldvertices = obblist[0].vertices;
-	Updatevertices(obblist[0], obb_worldvertices);
+
 	if (KeyboardController::GetInstance()->IsKeyPressed('T')) {
 		iter += 1;
 		if (iter > 7)
-			iter = iter % obblist[0].vertices.size();
+			iter = iter % obblist[0].verticebuffer.size();
 		normaliter += 1;
 		if (normaliter > 5)
 			normaliter = normaliter % obblistV2[0].normals.size();
@@ -294,9 +318,10 @@ void SceneWIUtest::Update(double dt)
 
 	if (KeyboardController::GetInstance()->IsKeyPressed('R')) {
 		obblist[0].angularVel += 50.f;
-		obblistV2[0].angularVel += 50.f;
+		obblistV2[0].angleDeg = 30.f;
+		//obblistV2[0].angularVel += 50.f;
 	}
-
+	
 
 	CollisionData cd;
 	if (OverlapAABB2AABB(cubelist[1], cubelist[1].boxextent, cubelist[0], cubelist[0].boxextent, cd)) 
@@ -308,8 +333,15 @@ void SceneWIUtest::Update(double dt)
 	if (OverlapAABB2Sphere(spherelist[1], spherelist[1].radius, cubelist[1], cubelist[1].pos - cubelist[1].boxextent, cubelist[1].pos + cubelist[1].boxextent, cd))
 		ResolveCollision(cd);
 
-	if (SATV1(obblistV2[0],worldnormals[0], obblistV2[0].boxextent, obblistV2[1], worldnormals[1], obblistV2[1].boxextent,cd))
+	//V1 testing
+	if (SATV1(obblist[0], V1worldnormals[0], V1worldvertices[0], obblist[1], V1worldnormals[1], V1worldvertices[1], cd))
+		std::cout << "colliding" << std::endl;
+		//ResolveCollision(cd);
+
+	//V2 works 
+	if (SATV1(obblistV2[0], worldnormals[0], worldvertices[0], obblistV2[1], worldnormals[1], worldvertices[1], cd))
 		ResolveCollision(cd);
+
 	//std::cout << obblistV2[0].pos.x << " " << obblistV2[0].pos.y << " " << obblistV2[0].pos.z << std::endl;
 
 	cubelist[1].angularVel = 20.f;
@@ -407,20 +439,20 @@ void SceneWIUtest::Render()
 	//RenderMesh(meshList[GEO_PLANE], true);
 	//modelStack.PopMatrix();
 
-	for (int i = 0; i < cubelist.size(); i++) {
-		modelStack.PushMatrix();
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		modelStack.Translate(cubelist[i].pos.x, cubelist[i].pos.y, cubelist[i].pos.z);
-		modelStack.Rotate(cubelist[i].angleDeg, 0, 1, 0);
-		modelStack.Scale(2*cubelist[i].boxextent.x, 2*cubelist[i].boxextent.y, 2*cubelist[i].boxextent.z);
-		meshList[GEO_CUBE]->material.kAmbient = glm::vec3(1.f, 0.1f, 0.1f);
-		meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(1.f, 0.1f, 0.1f);
-		meshList[GEO_CUBE]->material.kSpecular = glm::vec3(1.f, 0.2f, 0.2f);
-		meshList[GEO_CUBE]->material.kShininess = 2.0f;
-		RenderMesh(meshList[GEO_CUBE], true);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		modelStack.PopMatrix();
-	}
+	//for (int i = 0; i < cubelist.size(); i++) {
+	//	modelStack.PushMatrix();
+	//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//	modelStack.Translate(cubelist[i].pos.x, cubelist[i].pos.y, cubelist[i].pos.z);
+	//	modelStack.Rotate(cubelist[i].angleDeg, 0, 1, 0);
+	//	modelStack.Scale(2*cubelist[i].boxextent.x, 2*cubelist[i].boxextent.y, 2*cubelist[i].boxextent.z);
+	//	meshList[GEO_CUBE]->material.kAmbient = glm::vec3(1.f, 0.1f, 0.1f);
+	//	meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(1.f, 0.1f, 0.1f);
+	//	meshList[GEO_CUBE]->material.kSpecular = glm::vec3(1.f, 0.2f, 0.2f);
+	//	meshList[GEO_CUBE]->material.kShininess = 2.0f;
+	//	RenderMesh(meshList[GEO_CUBE], true);
+	//	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	//	modelStack.PopMatrix();
+	//}
 
 	//for (int i = 0; i < spherelist.size(); i++) {
 	//	modelStack.PushMatrix();
@@ -440,7 +472,7 @@ void SceneWIUtest::Render()
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		modelStack.Translate(obblistV2[n].pos.x, obblistV2[n].pos.y, obblistV2[n].pos.z);
 		modelStack.Rotate(obblistV2[n].angleDeg, 0, 1, 0);
-		modelStack.Scale(obblistV2[n].boxextent.x, obblistV2[n].boxextent.y, obblistV2[n].boxextent.z);
+		modelStack.Scale(2 * cubelist[0].boxextent.x, 2 * cubelist[0].boxextent.y, 2 * cubelist[0].boxextent.z);
 		meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
 		meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
 		meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
@@ -450,15 +482,15 @@ void SceneWIUtest::Render()
 		modelStack.PopMatrix();
 	}
 
-	for (int j = 0; j < worldnormals.size(); j++) {
-		for (int i = 0; i < obblistV2[j].normals.size(); i++) {
+	for (int j = 0; j < worldvertices.size(); j++) {
+		for (int i = 0; i < obblistV2[j].vertices.size(); i++) {
 			glm::vec3 diffuse, ambient;
 			if (j == iter)
 				diffuse = ambient = glm::vec3(1.f, 0.1f, 0.1f);
 			else
 				diffuse = ambient = glm::vec3(1.f, 1.f, 1.f);
 			modelStack.PushMatrix();
-			modelStack.Translate(worldnormals[j][i].x, worldnormals[j][i].y, worldnormals[j][i].z);
+			modelStack.Translate(worldvertices[j][i].x, worldvertices[j][i].y, worldvertices[j][i].z);
 			modelStack.Scale(0.1, 0.1, 0.1);
 			meshList[GEO_SPHERE]->material.kAmbient = ambient;
 			meshList[GEO_SPHERE]->material.kDiffuse = diffuse;
@@ -469,36 +501,36 @@ void SceneWIUtest::Render()
 		}
 	}
 
-
 	///////////////////////////////////////////////////////OBB V1 
-	modelStack.PushMatrix();
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	modelStack.Translate(obblist[0].pos.x, obblist[0].pos.y, obblist[0].pos.z);
-	modelStack.Rotate(obblist[0].angleDeg, 0,1,0);
-	modelStack.Scale(2 * cubelist[0].boxextent.x, 2 * cubelist[0].boxextent.y, 2 * cubelist[0].boxextent.z);
-	meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-	meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-	meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	meshList[GEO_CUBE]->material.kShininess = 1.0f;
-	RenderMesh(meshList[GEO_CUBE], true);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	modelStack.PopMatrix();
-
-	for (int j = 0; j < obb_worldvertices.size(); j++) {
-		glm::vec3 diffuse, ambient; 
-		if (j == iter)
-			diffuse = ambient = glm::vec3(1.f, 0.1f, 0.1f);
-		else 
-			diffuse = ambient = glm::vec3(1.f, 1.f, 1.f);
+	for (int j = 0; j < obblist.size(); j++) {
 		modelStack.PushMatrix();
-		modelStack.Translate(obb_worldvertices[j].x, obb_worldvertices[j].y, obb_worldvertices[j].z);
-		modelStack.Scale(0.1, 0.1, 0.1);
-		meshList[GEO_SPHERE]->material.kAmbient = ambient;
-		meshList[GEO_SPHERE]->material.kDiffuse = diffuse;
-		meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-		meshList[GEO_SPHERE]->material.kShininess = 2.0f;
-		RenderMesh(meshList[GEO_SPHERE], true);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		modelStack.Translate(obblist[j].pos.x, obblist[j].pos.y, obblist[j].pos.z);
+		modelStack.Rotate(obblist[j].angleDeg, 0, 1, 0);
+		modelStack.Scale(2 * cubelist[0].boxextent.x, 2 * cubelist[0].boxextent.y, 2 * cubelist[0].boxextent.z);
+		meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+		meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+		meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+		meshList[GEO_CUBE]->material.kShininess = 1.0f;
+		RenderMesh(meshList[GEO_CUBE], true);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		modelStack.PopMatrix();
+		for (int i = 0; i < obblist[j].verticebuffer.size(); i++) {
+			glm::vec3 diffuse, ambient;
+			if (j == iter)
+				diffuse = ambient = glm::vec3(1.f, 0.1f, 0.1f);
+			else
+				diffuse = ambient = glm::vec3(1.f, 1.f, 1.f);
+			modelStack.PushMatrix();
+			modelStack.Translate(V1worldvertices[j][i].x, V1worldvertices[j][i].y, V1worldvertices[j][i].z);
+			modelStack.Scale(0.1, 0.1, 0.1);
+			meshList[GEO_SPHERE]->material.kAmbient = ambient;
+			meshList[GEO_SPHERE]->material.kDiffuse = diffuse;
+			meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+			meshList[GEO_SPHERE]->material.kShininess = 2.0f;
+			RenderMesh(meshList[GEO_SPHERE], true);
+			modelStack.PopMatrix();
+		}
 	}	
 
 	RenderTextOnScreen(meshList[GEO_TEXT], "Stamina", glm::vec3(0, 1, 0), 40, 0, 0);
