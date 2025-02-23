@@ -26,6 +26,8 @@ bool OverlapSphere2Sphere(PhysicsObject& obj1, float r1, PhysicsObject& obj2, fl
 
 bool OverlapAABB2Sphere(PhysicsObject& circle, float radius, PhysicsObject& box, glm::vec3 boxMin, glm::vec3 boxMax, CollisionData& cd);
 
+bool OverlapSphere2Cylinder(PhysicsObject& sphere, float sphradius, PhysicsObject& cylinder, float cyradius, float height, CollisionData& cd);
+
 bool SATV1(PhysicsObject& obj1, const std::vector<glm::vec3>& normalsA, const std::vector<glm::vec3>& verticesA, PhysicsObject& obj2,
 	const std::vector<glm::vec3>& normalsB, const std::vector<glm::vec3>& verticesB, CollisionData& cd);
 

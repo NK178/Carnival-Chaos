@@ -21,6 +21,7 @@ public:
 		GEO_QUAD,
 		GEO_SPHERE,
 		GEO_PLANE,
+		GEO_CYLINDER,
 		GEO_HAMMER1,
 		GEO_HAMMER2,
 		GEO_HAMMER3,
@@ -148,6 +149,11 @@ private:
 		float radius;
 		Sphere(int id, int r, int type) : radius(r), GameObject(id, type) {}
 	};
+	struct Cylinder : public GameObject {
+		float height;
+		float radius;
+		Cylinder(int id, int type, int h, int r) : radius(r), height(h), GameObject(id, type) {}
+	};
 
 	struct OBB : public GameObject {
 		std::vector<glm::vec3> verticebuffer; //eg. 8
@@ -215,6 +221,7 @@ private:
 	bool activate = false;
 	std::vector<Cube> cubelist;
 	std::vector<Sphere> spherelist;	
+	std::vector<Cylinder> cylinderlist;	
 	std::vector<OBB> obblist;
 	std::vector<OBBV2> obblistV2;
 

@@ -29,26 +29,6 @@ void Updatenormals(PhysicsObject& obj, std::vector<glm::vec3>& normals)
 	}
 }
 
-////TO REMOVE
-//void Updatenormals(PhysicsObject& obj, std::vector<glm::vec3>& normals)
-//{
-//	float radian = glm::radians(obj.angleDeg);
-//	for (int i = 0; i < normals.size(); i++) {
-//		glm::vec3 newvec = normals[i];
-//		float oldX{ normals[i].x }, oldY{ normals[i].y }, oldZ{ normals[i].z };
-//		glm::mat3x3 rotx(1,0,0, 0,cos(radian),-sin(radian), 0,sin(radian),cos(radian));
-//		glm::mat3x3 roty(cos(radian), 0, sin(radian), 0, 1, 0, -sin(radian), 0, cos(radian));
-//		glm::mat3x3 rotz(cos(radian), -sin(radian), 0, sin(radian), cos(radian),0,0,0,1);
-//
-//		newvec = newvec * rotx;
-//		newvec = newvec * roty;
-//		newvec = newvec * rotz;
-//		newvec += obj.pos;
-//		normals[i] = newvec;
-//	}
-//}
-
-
 
 void ResolveCollision(CollisionData& cd)
 {
@@ -179,6 +159,39 @@ bool OverlapAABB2Sphere(PhysicsObject& circle, float radius, PhysicsObject& box,
 	}
 	else
 		return false;
+}
+
+/////// TO FIX 
+///////////////////////////////// CYLINDER TO SPHERE  ///////////////////////////////////////
+bool OverlapSphere2Cylinder(PhysicsObject& sphere, float sphradius, PhysicsObject& cylinder, float cyradius, float height, CollisionData& cd)
+{
+	glm::vec3 dispvec = sphere.pos - cylinder.pos;
+	glm::vec3 normal = { 0,0,0 };
+	float halfheight = height * 0.5f;
+	float spmaxheight = sphere.pos.y + sphradius;
+	float spminheight = sphere.pos.y - sphradius;
+	dispvec.y = 0; //compare on a horizontal aspect
+	float length = glm::length(dispvec);
+	std::cout << length << std::endl;
+	std::cout << std::endl;
+	std::cout << sphradius + cyradius << std::endl;
+	if (length <= sphradius + cyradius) {
+		if (spmaxheight >= cylinder.pos.y - halfheight && spminheight <= cylinder.pos.y + halfheight) {
+			cd.pObj1 = &sphere;
+			cd.pObj2 = &cylinder;
+			if (length > 0.0f) 
+				normal = glm::normalize(dispvec);
+			else 
+				if (cylinder.pos.y > sphere.pos.y)
+					normal = glm::vec3(0.0f, -1.0f, 0.0f);
+				else 
+					normal = glm::vec3(0.0f, 1.0f, 0.0f);
+			cd.normal = normal;
+			cd.pd = (sphradius + cyradius) - length;
+			return true;
+		}
+	}
+	return false;
 }
 
 //////////////////////////////////////// SAT V1  ////////////////////////////////////
