@@ -285,8 +285,10 @@ private:
 	int orderiter = 1; //TO CHANGE
 	float startcountdown = 4.f;
 	float attackcooldown = 3.f;
+	float attackchecktimer = 1.f;
 	bool isattack = true;
 	bool gamestart = true; //TO CHANGE
+	bool isplayerhit = false;
 
 	//TO CHANGE
 	float hammerrot = 0.f;
