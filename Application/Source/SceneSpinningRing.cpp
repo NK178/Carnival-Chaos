@@ -425,14 +425,15 @@ void SceneSpinningRing::Render()
 	modelStack.PopMatrix();
 
 	if (!isObjectiveRead) { // Render Objective
-		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
-		RenderTextOnScreen(meshList[GEO_TEXT2], "- SPINNING RING -", glm::vec3(1, 1, 0), 25, 200, 400);
-		RenderTextOnScreen(meshList[GEO_TEXT2], "Avoid the spinning walls and", glm::vec3(1, 1, 1), 15, 195, 350);
-		RenderTextOnScreen(meshList[GEO_TEXT2], "beams by jumping over them!", glm::vec3(1, 1, 1), 15, 205, 320);
-		RenderTextOnScreen(meshList[GEO_TEXT2], "Survive until the timer ends!", glm::vec3(1, 1, 1), 15, 190, 270);
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 30);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- SPINNING RING -", glm::vec3(1, 1, 0), 25, 200, 430);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Avoid the spinning walls and", glm::vec3(1, 1, 1), 13, 195, 380);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "beams by jumping over them!", glm::vec3(1, 1, 1), 14, 205, 350);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Don't fall into the lava!", glm::vec3(1, 1, 1), 14, 210, 300);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Survive until the timer ends!", glm::vec3(1, 1, 1), 14, 190, 250);
 
-		RenderMeshOnScreen(meshList[GEO_KEY_E], 310, 220, 15, 15);
-		RenderTextOnScreen(meshList[GEO_TEXT2], "Continue", glm::vec3(1, 1, 1), 20, 340, 210);
+		RenderMeshOnScreen(meshList[GEO_KEY_E], 310, 210, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Continue", glm::vec3(1, 1, 1), 20, 340, 200);
 	}
 
 	if (isObjectiveRead) { // Render Countdown

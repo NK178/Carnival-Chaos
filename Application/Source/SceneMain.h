@@ -276,7 +276,7 @@ private:
 	void RenderObjectives();
 	void UpdateDialogue(double dt);
 	void RenderDialogue();
-	void StartScene(); 
+	//void StartScene(); 
 
 	void RenderMeshOnScreen(Mesh* mesh, float x, float y, float sizex, float sizey);
 	void RenderText(Mesh* mesh, std::string text, glm::vec3 color);
