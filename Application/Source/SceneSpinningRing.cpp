@@ -254,12 +254,9 @@ void SceneSpinningRing::Init()
 	wallSideList.push_back(spinningWallSide(1, GameObject::CUBE));
 	wallSideList.push_back(spinningWallSide(2, GameObject::CUBE));
 	wallSideList.push_back(spinningWallSide(3, GameObject::CUBE));
-	wallSideList.push_back(spinningWallSide(4, GameObject::CUBE));
 
+	wallTopList.push_back(spinningWallTop(4, GameObject::CUBE));
 	wallTopList.push_back(spinningWallTop(5, GameObject::CUBE));
-	wallTopList.push_back(spinningWallTop(6, GameObject::CUBE));
-	wallTopList.push_back(spinningWallTop(7, GameObject::CUBE));
-	wallTopList.push_back(spinningWallTop(8, GameObject::CUBE));
 
 	beamList.push_back(spinningBeam(9, GameObject::CUBE));
 	beamList.push_back(spinningBeam(10, GameObject::CUBE));
@@ -441,6 +438,20 @@ void SceneSpinningRing::Render()
 	meshList[GEO_CYLINDER]->material.kShininess = 1.0f;
 	RenderMesh(meshList[GEO_CYLINDER], true);
 	modelStack.PopMatrix();
+
+	for (int j = 0; j < worldvertices.size(); j++) {
+		for (int i = 0; i < wallSideList[j].vertices.size(); i++) {
+			modelStack.PushMatrix();
+			modelStack.Translate(worldvertices[j][i].x, worldvertices[j][i].y, worldvertices[j][i].z);
+			modelStack.Scale(0.1, 0.1, 0.1);
+			meshList[GEO_SPHERE]->material.kAmbient;
+			meshList[GEO_SPHERE]->material.kDiffuse;
+			meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+			meshList[GEO_SPHERE]->material.kShininess = 2.0f;
+			RenderMesh(meshList[GEO_SPHERE], true);
+			modelStack.PopMatrix();
+		}
+	}
 
 	if (!isObjectiveRead) { // Render Objective
 		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 30);
