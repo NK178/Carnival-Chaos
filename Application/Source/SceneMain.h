@@ -39,6 +39,7 @@ public:
 		GEO_KEY_E,
 		GEO_KEY_F,
 		GEO_KEY_Q,
+		GEO_UI,
 
 		//Skybox
 		GEO_LEFT,
@@ -276,7 +277,7 @@ private:
 	void RenderObjectives();
 	void UpdateDialogue(double dt);
 	void RenderDialogue();
-	void StartScene(); 
+	//void StartScene(); 
 
 	void RenderMeshOnScreen(Mesh* mesh, float x, float y, float sizex, float sizey);
 	void RenderText(Mesh* mesh, std::string text, glm::vec3 color);
