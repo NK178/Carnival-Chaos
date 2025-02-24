@@ -450,7 +450,7 @@ void SceneBalloonPop::Update(double dt)
 						}
 					}
 				}
-
+				// doesnt start before countdown anymore
 				// Check for collisions
 				CheckDartCollisions();
 
