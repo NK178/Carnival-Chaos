@@ -312,6 +312,17 @@ void SceneFinal::Render()
 	RenderMesh(meshList[GEO_PLANE], true);
 	modelStack.PopMatrix();
 
+	modelStack.PushMatrix();
+	modelStack.Translate(0.f, 0.f, 0.f);
+	modelStack.Scale(2.f, 2.f, 2.f);
+	modelStack.Rotate(0.f, 0, 1, 0);
+	meshList[GEO_CAR]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+	meshList[GEO_CAR]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_CAR]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_CAR]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_CAR], false);
+	modelStack.PopMatrix();
+
 
 
 

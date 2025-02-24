@@ -846,6 +846,22 @@ Mesh* MeshBuilder::GenerateCar(const std::string& meshName, glm::vec3 color, flo
 	v.pos = glm::vec3(-6.f, 0.f, -8.f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
 	v.pos = glm::vec3(6.f, 0.f, -8.f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
 
+	v.pos = glm::vec3(-6.f, 2.f, -8.f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(-6.f, 2.f, 8.f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(-6.f, 0.f, 8.f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
+
+	v.pos = glm::vec3(-6.f, 2.f, -8.f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(-6.f, 0.f, 8.f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(-6.f, 0.f, -8.f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
+
+	v.pos = glm::vec3(6.f, 2.f, -8.f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(6.f, 2.f, 8.f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(6.f, 0.f, 8.f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
+
+	v.pos = glm::vec3(6.f, 2.f, -8.f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(6.f, 0.f, 8.f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
+	v.pos = glm::vec3(6.f, 0.f, -8.f);	v.normal = glm::vec3(0, 0, 1);	vertex_buffer_data.push_back(v);
+
 	for (unsigned i = 0; i < 36; ++i)
 	{
 		index_buffer_data.push_back(i);
