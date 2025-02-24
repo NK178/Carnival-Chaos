@@ -165,6 +165,7 @@
     <ClCompile Include="Source\PhysicsObject.cpp" />
     <ClCompile Include="Source\SceneArchery.cpp" />
     <ClCompile Include="Source\SceneBalloonPop.cpp" />
+    <ClCompile Include="Source\SceneFinal.cpp" />
     <ClCompile Include="Source\SceneHole.cpp" />
     <ClCompile Include="Source\SceneMain.cpp" />
     <ClCompile Include="Source\SceneSpinningRing.cpp" />
@@ -194,6 +195,7 @@
     <ClInclude Include="Source\Scene.h" />
     <ClInclude Include="Source\SceneArchery.h" />
     <ClInclude Include="Source\SceneBalloonPop.h" />
+    <ClInclude Include="Source\SceneFinal.h" />
     <ClInclude Include="Source\SceneHole.h" />
     <ClInclude Include="Source\SceneMain.h" />
     <ClInclude Include="Source\SceneSpinningRing.h" />
