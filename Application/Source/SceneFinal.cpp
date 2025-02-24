@@ -19,8 +19,15 @@
 #include "LoadTGA.h"
 
 
-SceneFinal::SceneFinal()
+SceneFinal::SceneFinal() :
+	camSpeed(0.0f),
+	camAcceleration(15.0f),
+	camDeceleration(30.0f),
+	naturalDecel(5.0f),
+	maxSpeed(50.0f),
+	turnRate(90.0f)
 {
+	
 }
 
 SceneFinal::~SceneFinal()
@@ -136,7 +143,7 @@ void SceneFinal::Init()
 	meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("STAMINA_BAR", glm::vec3(1, 1, 1), 1.f);
 
 	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Sphere", glm::vec3(1, 1, 1), 1.f);
-	
+
 
 	//skybox
 	meshList[GEO_LEFT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
@@ -144,19 +151,26 @@ void SceneFinal::Init()
 	meshList[GEO_RIGHT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
 	meshList[GEO_RIGHT]->textureID = LoadTGA("Images//stadium.tga");
 	meshList[GEO_TOP] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_TOP]->textureID = LoadTGA("Images//stadiumsky.tga");
+	meshList[GEO_TOP]->textureID = LoadTGA("Images//skystadium.tga");
 	meshList[GEO_BOTTOM] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
 	meshList[GEO_BOTTOM]->textureID = LoadTGA("Images//stadium.tga");
 	meshList[GEO_FRONT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
 	meshList[GEO_FRONT]->textureID = LoadTGA("Images//stadium.tga");
 	meshList[GEO_BACK] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
+
 	meshList[GEO_BACK]->textureID = LoadTGA("Images//stadium.tga");
 
 	// 16 x 16 is the number of columns and rows for the text
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Images//calibri.tga");
 
-	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 1000.0f);
+	meshList[GEO_FENCE] = MeshBuilder::GenerateOBJ("Fence", "Models//wall_OBJ.obj");
+	meshList[GEO_FENCE]->textureID = LoadTGA("Images//duvar.tga");
+
+	meshList[GEO_BUMPERCAR] = MeshBuilder::GenerateOBJ("Car", "Models//ATV.obj");
+	meshList[GEO_BUMPERCAR]->textureID = LoadTGA("Images//cart.tga");
+
+	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.4f, 1000.0f);
 	projectionStack.LoadMatrix(projection);
 
 	glUniform1i(m_parameters[U_NUMLIGHTS], NUM_LIGHTS);
@@ -234,14 +248,65 @@ void SceneFinal::Init()
 
 }
 
-void SceneFinal::Update(double dt)
-{
+void SceneFinal::Update(double dt) {
+	// Forward/Backward movement
+	if (KeyboardController::GetInstance()->IsKeyDown('W')) {
+		camSpeed = std::min<float>(camSpeed + camAcceleration * dt, maxSpeed);
+	}
+	else if (KeyboardController::GetInstance()->IsKeyDown('S')) {
+		camSpeed = std::max<float>(camSpeed - camDeceleration * dt, -maxSpeed * 0.5f);
+	}
+	else {
+		// Natural deceleration
+		if (camSpeed > 0) {
+			camSpeed = std::max<float>(0.0f, camSpeed - naturalDecel * dt);
+		}
+		else if (camSpeed < 0) {
+			camSpeed = std::min<float>(0.0f, camSpeed + naturalDecel * dt);
+		}
+	}
 
-	HandleKeyPress();
-	
+	// Turning (affected by speed)
+	float turnFactor = 1.0f - (std::abs(camSpeed) / maxSpeed) * 0.7f;
 
+	if (KeyboardController::GetInstance()->IsKeyDown('A')) {
+		// Calculate rotation around Y axis using lookAt
+		glm::vec3 direction = camera.target - camera.pos;
+		float angle = turnRate * turnFactor * dt;
+
+		// Rotate the direction vector
+		float cs = cos(glm::radians(angle));
+		float sn = sin(glm::radians(angle));
+		float newX = direction.x * cs - direction.z * sn;
+		float newZ = direction.x * sn + direction.z * cs;
+		direction.x = newX;
+		direction.z = newZ;
+
+		camera.target = camera.pos + direction;
+	}
+	else if (KeyboardController::GetInstance()->IsKeyDown('D')) {
+		// Same as above but negative angle
+		glm::vec3 direction = camera.target - camera.pos;
+		float angle = -turnRate * turnFactor * dt;
+
+		float cs = cos(glm::radians(angle));
+		float sn = sin(glm::radians(angle));
+		float newX = direction.x * cs - direction.z * sn;
+		float newZ = direction.x * sn + direction.z * cs;
+		direction.x = newX;
+		direction.z = newZ;
+
+		camera.target = camera.pos + direction;
+	}
+
+	// Move camera based on speed and direction
+   glm::vec3 direction = glm::normalize(camera.target - camera.pos);
+// Only use X and Z components for movement, maintain Y height
+     camera.pos += glm::vec3(direction.x * camSpeed * (float)dt, 
+                        0.0f,  // Keep Y constant 
+                        direction.z * camSpeed * (float)dt);
+camera.target = camera.pos + direction;
 	camera.Update(dt);
-
 }
 
 void SceneFinal::Render()
@@ -296,24 +361,86 @@ void SceneFinal::Render()
 
 	modelStack.PushMatrix();
 	modelStack.Translate(light[0].position.x, light[0].position.y, light[0].position.z);
-	modelStack.Scale(0.1f, 0.1f, 0.1f);
+	modelStack.Scale(0.4f, 0.4f, 0.4f);
 	RenderMesh(meshList[GEO_SPHERE], false);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
 	modelStack.Scale(100.f, 1.f, 100.f);
 	modelStack.Rotate(-90.f, 1, 0, 0);
-	meshList[GEO_PLANE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-	meshList[GEO_PLANE]->material.kDiffuse = glm::vec3(0.5f,0.5f, 0.5f);
+	meshList[GEO_PLANE]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+	meshList[GEO_PLANE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
 	meshList[GEO_PLANE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
 	meshList[GEO_PLANE]->material.kShininess = 1.0f;
 	RenderMesh(meshList[GEO_PLANE], true);
 	modelStack.PopMatrix();
 
 
+	// Front wall
+	modelStack.PushMatrix();
+	modelStack.Translate(0, 0, 100);  // Position at front edge
+	modelStack.Scale(10.0f, 3.0f, 2.0f);  // Scale for full width
+	meshList[GEO_FENCE]->material.kAmbient = glm::vec3(0.7f, 0.7f, 0.7f);
+	meshList[GEO_FENCE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_FENCE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_FENCE]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_FENCE], true);
+	modelStack.PopMatrix();
+
+	// Back wall
+	modelStack.PushMatrix();
+	modelStack.Translate(0, 0, -100);  // Position at back edge
+	modelStack.Scale(10.0f, 3.0f, 2.0f);  // Scale for full width
+	meshList[GEO_FENCE]->material.kAmbient = glm::vec3(0.7f, 0.7f, 0.7f);
+	meshList[GEO_FENCE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_FENCE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_FENCE]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_FENCE], true);
+	modelStack.PopMatrix();
+
+	// Left wall
+	modelStack.PushMatrix();
+	modelStack.Translate(-100, 0, 0);  // Position at left edge
+	modelStack.Rotate(90, 0, 1, 0);    // Rotate to face inward
+	modelStack.Scale(10.0f, 3.0f, 2.0f);  // Scale for full width
+	meshList[GEO_FENCE]->material.kAmbient = glm::vec3(0.7f, 0.7f, 0.7f);
+	meshList[GEO_FENCE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_FENCE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_FENCE]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_FENCE], true);
+	modelStack.PopMatrix();
+
+	// Right wall
+	modelStack.PushMatrix();
+	modelStack.Translate(100, 0, 0);   // Position at right edge
+	modelStack.Rotate(90, 0, 1, 0);    // Rotate to face inward
+	modelStack.Scale(10.0f, 3.0f, 2.0f);  // Scale for full width
+	meshList[GEO_FENCE]->material.kAmbient = glm::vec3(0.7f, 0.7f, 0.7f);
+	meshList[GEO_FENCE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_FENCE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_FENCE]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_FENCE], true);
+	modelStack.PopMatrix();
 
 
-	
+
+	modelStack.PushMatrix();
+	// Use camera position for car position, but keep the y coordinate fixed
+	modelStack.Translate(camera.pos.x, 1, camera.pos.z);
+
+	// Calculate rotation based on camera direction
+	glm::vec3 direction = glm::normalize(camera.target - camera.pos);
+	float rotation = atan2(direction.x, direction.z) * (180.0f / 3.14159f);
+	modelStack.Rotate(rotation + 180.0f, 0, 1, 0);    // Added 180 degrees to face forward
+
+	modelStack.Scale(0.2f, 0.25f, 0.2f);  // Keep existing scale
+	meshList[GEO_BUMPERCAR]->material.kAmbient = glm::vec3(0.7f, 0.7f, 0.7f);
+	meshList[GEO_BUMPERCAR]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_BUMPERCAR]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_BUMPERCAR]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_BUMPERCAR], true);
+	modelStack.PopMatrix();
+
 
 	RenderTextOnScreen(meshList[GEO_TEXT], "Stamina", glm::vec3(0, 1, 0), 40, 0, 0);
 
@@ -595,5 +722,4 @@ void SceneFinal::RenderSkyBox() {
 	RenderMesh(meshList[GEO_BOTTOM], false);
 	modelStack.PopMatrix();
 }
-
 

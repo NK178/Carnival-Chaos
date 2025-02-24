@@ -21,6 +21,8 @@ public:
 		GEO_SPHERE,
 		GEO_QUAD,
 		GEO_PLANE,
+		GEO_FENCE,
+		GEO_BUMPERCAR,
 	
 		//Text
 		GEO_TEXT,
@@ -141,7 +143,12 @@ private:
 
 	int fps = 0;
 	
-
+	float camSpeed;           // Current speed
+	float camAcceleration;    // Acceleration rate
+	float camDeceleration;    // Braking rate
+	float naturalDecel;       // Natural slowdown
+	float maxSpeed;          // Maximum speed
+	float turnRate;          // How fast we can turn
 
 
 };
