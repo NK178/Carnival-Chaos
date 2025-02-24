@@ -286,8 +286,9 @@ void SceneFinal::Update(double dt) {
 	PhysicsObject frontFence;
 	frontFence.pos = glm::vec3(0, 0, 100);
 	frontFence.mass = 0.0f;
-	glm::vec3 fenceExtent(20.0f, 6.0f, 4.0f);
-	glm::vec3 carExtent(4.0f, 2.0f, 4.0f);
+	// Match the fence scale from render: (10.0f, 3.0f, 2.0f)
+	// For front/back fences, multiply x scale by 10 to match actual width
+	glm::vec3 frontBackFenceExtent(100.0f, 3.0f, 2.0f);
 
 	PhysicsObject backFence;
 	backFence.pos = glm::vec3(0, 0, -100);
@@ -296,19 +297,21 @@ void SceneFinal::Update(double dt) {
 	PhysicsObject leftFence;
 	leftFence.pos = glm::vec3(-100, 0, 0);
 	leftFence.mass = 0.0f;
-	glm::vec3 sideFenceExtent(4.0f, 6.0f, 20.0f);
+	// For left/right fences, swap x and z due to 90-degree rotation
+	glm::vec3 leftRightFenceExtent(2.0f, 3.0f, 100.0f);
 
 	PhysicsObject rightFence;
 	rightFence.pos = glm::vec3(100, 0, 0);
 	rightFence.mass = 0.0f;
 
-	CollisionData cd;
-	if (OverlapAABB2AABB(carPhysics, carExtent, frontFence, fenceExtent, cd) ||
-		OverlapAABB2AABB(carPhysics, carExtent, backFence, fenceExtent, cd) ||
-		OverlapAABB2AABB(carPhysics, carExtent, leftFence, sideFenceExtent, cd) ||
-		OverlapAABB2AABB(carPhysics, carExtent, rightFence, sideFenceExtent, cd)) {
+	// Keep car extent relatively small for better collision response
+	glm::vec3 carExtent(2.0f, 2.0f, 2.0f);
 
-		// On collision, resolve it
+	CollisionData cd;
+	if (OverlapAABB2AABB(carPhysics, carExtent, frontFence, frontBackFenceExtent, cd) ||
+		OverlapAABB2AABB(carPhysics, carExtent, backFence, frontBackFenceExtent, cd) ||
+		OverlapAABB2AABB(carPhysics, carExtent, leftFence, leftRightFenceExtent, cd) ||
+		OverlapAABB2AABB(carPhysics, carExtent, rightFence, leftRightFenceExtent, cd)) {
 		ResolveCollision(cd);
 	}
 
