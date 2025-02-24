@@ -220,6 +220,7 @@ private:
 	bool showEnterFinalTentText;
 	bool isFinalChallengeCompleted;
 
+	// Collisions
 	struct playerBox : public GameObject {
 		glm::vec3 playerDimensions{ 1.5f,7.f,1.5f };
 		playerBox(int id, int type) : GameObject(id, type) {}
@@ -233,6 +234,11 @@ private:
 	struct finalTentBox : public GameObject {
 		glm::vec3 tentDimensions{ 15.f,20.f,15.f };
 		finalTentBox(int id, int type) : GameObject(id, type) {}
+	};
+
+	struct sideFenceBox : public GameObject {
+		glm::vec3 fenceDimensions{ 15.f,20.f,15.f };
+		sideFenceBox(int id, int type) : GameObject(id, type) {}
 	};
 
 	std::vector<playerBox> player;
