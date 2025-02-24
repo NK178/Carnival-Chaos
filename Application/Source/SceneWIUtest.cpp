@@ -264,17 +264,17 @@ void SceneWIUtest::Update(double dt)
 	HandleKeyPress();
 	const float SPEED = 15.f;
 	if (KeyboardController::GetInstance()->IsKeyDown('I'))
-		spherelist[0].pos.x -= static_cast<float>(dt) * SPEED;
+		obblistV2[0].pos.x -= static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('K'))
-		spherelist[0].pos.x += static_cast<float>(dt) * SPEED;
+		obblistV2[0].pos.x += static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('J'))
-		spherelist[0].pos.z -= static_cast<float>(dt) * SPEED;
+		obblistV2[0].pos.z -= static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('L'))
-		spherelist[0].pos.z += static_cast<float>(dt) * SPEED;
+		obblistV2[0].pos.z += static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('O'))
-		spherelist[0].pos.y -= static_cast<float>(dt) * SPEED;
+		obblistV2[0].pos.y -= static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('P'))
-		spherelist[0].pos.y += static_cast<float>(dt) * SPEED;
+		obblistV2[0].pos.y += static_cast<float>(dt) * SPEED;
 	
 	//Update my stuff 
 	worldnormals.clear();
@@ -306,6 +306,24 @@ void SceneWIUtest::Update(double dt)
 		Updatevertices(obblist[k], temp);
 		V1worldvertices.push_back(temp);
 	}
+	if (KeyboardController::GetInstance()->IsKeyPressed('Q')) {
+		std::cout << "OBB V2 NORMALS(THE ONE WITH HARDCODED NORMALS)" << std::endl;
+		for (int k = 0; k < obblistV2.size(); k++) {
+			std::cout << "Obj" << k + 1 << std::endl;
+			for (int i = 0; i < obblistV2[k].normals.size(); i++) {
+				std::cout << "n" << i + 1 << " x: " << worldnormals[k][i].x << " y: " << worldnormals[k][i].y << " z: " << worldnormals[k][i].z << std::endl;
+			}
+		}
+		std::cout << "OBB V1 NORMALS(THE ONE WITH DYNAMIC NORMAL CALCULATION)" << std::endl;
+		for (int k = 0; k < obblist.size(); k++) {
+			std::cout << "Obj" << k + 1 << std::endl;
+			for (int i = 0; i < obblist[k].normals.size(); i++) {
+				std::cout << "n" << i + 1 << " x: " << V1worldnormals[k][i].x << " y: " << V1worldnormals[k][i].y << " z: " << V1worldnormals[k][i].z << std::endl;
+			}
+		}
+	}
+
+
 
 
 	if (KeyboardController::GetInstance()->IsKeyPressed('T')) {
@@ -316,7 +334,6 @@ void SceneWIUtest::Update(double dt)
 		if (normaliter > 5)
 			normaliter = normaliter % obblistV2[0].normals.size();
 	}
-	//std::cout << "Iter: " << iter << " " << obb_worldvertices[iter].x << " " << obb_worldvertices[iter].y << " " << obb_worldvertices[iter].z << std::endl;
 
 	if (KeyboardController::GetInstance()->IsKeyPressed('R')) {
 		obblist[0].angularVel += 50.f;
@@ -341,12 +358,12 @@ void SceneWIUtest::Update(double dt)
 
 
 	//V1 testing
-	if (SATV1(obblist[0], V1worldnormals[0], V1worldvertices[0], obblist[1], V1worldnormals[1], V1worldvertices[1], cd))
+	if (SAT(obblist[0], V1worldnormals[0], V1worldvertices[0], obblist[1], V1worldnormals[1], V1worldvertices[1], cd))
 		std::cout << "colliding" << std::endl;
 		//ResolveCollision(cd);
 
 	//V2 works 
-	if (SATV1(obblistV2[0], worldnormals[0], worldvertices[0], obblistV2[1], worldnormals[1], worldvertices[1], cd))
+	if (SAT(obblistV2[0], worldnormals[0], worldvertices[0], obblistV2[1], worldnormals[1], worldvertices[1], cd))
 		ResolveCollision(cd);
 
 	//std::cout << obblistV2[0].pos.x << " " << obblistV2[0].pos.y << " " << obblistV2[0].pos.z << std::endl;
@@ -461,19 +478,19 @@ void SceneWIUtest::Render()
 	//	modelStack.PopMatrix();
 	//}
 
-	for (int i = 0; i < spherelist.size(); i++) {
-		modelStack.PushMatrix();
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		modelStack.Translate(spherelist[i].pos.x, spherelist[i].pos.y, spherelist[i].pos.z);
-		modelStack.Scale(2 * spherelist[i].radius, 2* spherelist[i].radius, 2*spherelist[i].radius);
-		meshList[GEO_SPHERE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-		meshList[GEO_SPHERE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-		meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-		meshList[GEO_SPHERE]->material.kShininess = 1.0f;
-		RenderMesh(meshList[GEO_SPHERE], true);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		modelStack.PopMatrix();
-	}
+	//for (int i = 0; i < spherelist.size(); i++) {
+	//	modelStack.PushMatrix();
+	//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//	modelStack.Translate(spherelist[i].pos.x, spherelist[i].pos.y, spherelist[i].pos.z);
+	//	modelStack.Scale(2 * spherelist[i].radius, 2* spherelist[i].radius, 2*spherelist[i].radius);
+	//	meshList[GEO_SPHERE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+	//	meshList[GEO_SPHERE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	//	meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	//	meshList[GEO_SPHERE]->material.kShininess = 1.0f;
+	//	RenderMesh(meshList[GEO_SPHERE], true);
+	//	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	//	modelStack.PopMatrix();
+	//}
 
 	//Cylidner 
 	modelStack.PushMatrix();

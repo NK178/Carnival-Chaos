@@ -135,7 +135,7 @@ private:
 	void RenderTextOnScreen(Mesh* mesh, std::string text, glm::vec3 color, float size, float x, float y);
 	void Material(GEOMETRY_TYPE obj, float AmR, float AmG, float AmB, float DifA, float DifG, float DifB, float SpA, float SpG, float SpB, float Shiny);
 	void RenderSkyBox();
-	static glm::vec3 Calculatenormal(const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2) {
+	static glm::vec3 Calculatenormal(glm::vec3 v0, glm::vec3 v1, glm::vec3 v2) {
 		glm::vec3 edge1 = v1 - v0;
 		glm::vec3 edge2 = v2 - v0;
 		return glm::normalize(glm::cross(edge1, edge2)); 
@@ -160,21 +160,46 @@ private:
 		std::vector<glm::vec3> indexbuffer;
 		std::vector<glm::vec3> normals;
 		OBB(int id, int type) : GameObject(id, type) {
-			verticebuffer.push_back(glm::vec3(-1.5f, 1.5f, 1.5f));   
-			verticebuffer.push_back(glm::vec3(1.5f, 1.5f, 1.5f));    
-			verticebuffer.push_back(glm::vec3(-1.5f, -1.5f, 1.5f));  
-			verticebuffer.push_back(glm::vec3(1.5f, -1.5f, 1.5f));   
-			verticebuffer.push_back(glm::vec3(-1.5f, 1.5f, -1.5f));  
-			verticebuffer.push_back(glm::vec3(1.5f, 1.5f, -1.5f));   
-			verticebuffer.push_back(glm::vec3(-1.5f, -1.5f, -1.5f)); 
-			verticebuffer.push_back(glm::vec3(1.5f, -1.5f, -1.5f));  
+
+			//verticebuffer.push_back(glm::vec3(-1.5f, 1.5f, 1.5f));   
+			//verticebuffer.push_back(glm::vec3(1.5f, 1.5f, 1.5f));    
+			//verticebuffer.push_back(glm::vec3(-1.5f, -1.5f, 1.5f));  
+			//verticebuffer.push_back(glm::vec3(1.5f, -1.5f, 1.5f));   
+			//verticebuffer.push_back(glm::vec3(-1.5f, 1.5f, -1.5f));  
+			//verticebuffer.push_back(glm::vec3(1.5f, 1.5f, -1.5f));   
+			//verticebuffer.push_back(glm::vec3(-1.5f, -1.5f, -1.5f)); 
+			//verticebuffer.push_back(glm::vec3(1.5f, -1.5f, -1.5f));  
+
+			verticebuffer.push_back(glm::vec3(-1.5f, 1.5f, 1.5f));   //0
+			verticebuffer.push_back(glm::vec3(1.5f, 1.5f, 1.5f));    //1
+			verticebuffer.push_back(glm::vec3(-1.5f, -1.5f, 1.5f));  //2 
+			verticebuffer.push_back(glm::vec3(1.5f, -1.5f, 1.5f));   //3
+			verticebuffer.push_back(glm::vec3(-1.5f, 1.5f, -1.5f));  //4
+			verticebuffer.push_back(glm::vec3(1.5f, 1.5f, -1.5f));   //5
+			verticebuffer.push_back(glm::vec3(-1.5f, -1.5f, -1.5f)); //6
+			verticebuffer.push_back(glm::vec3(1.5f, -1.5f, -1.5f));  //7
+
+			//normals.push_back(glm::vec3(0, 1, 0));
+			//normals.push_back(glm::vec3(0, -1, 0));
+			//normals.push_back(glm::vec3(1, 0, 0));
+			//normals.push_back(glm::vec3(-1, 0, 0));
+			//normals.push_back(glm::vec3(0, 0, 1));
+			//normals.push_back(glm::vec3(0, 0, -1));
 
 			indexbuffer.push_back(glm::vec3{ 0,1,2 });
+			indexbuffer.push_back(glm::vec3{ 4,5,6 });
+			indexbuffer.push_back(glm::vec3{ 0,4,2});
+			indexbuffer.push_back(glm::vec3{ 1,5,2 });
+			indexbuffer.push_back(glm::vec3{ 0,1,4 });
+			indexbuffer.push_back(glm::vec3{ 2,3,6 });	
+
+	/*		indexbuffer.push_back(glm::vec3{ 0,1,2 });
 			indexbuffer.push_back(glm::vec3{ 4,5,6 });
 			indexbuffer.push_back(glm::vec3{ 0,4,3 });
 			indexbuffer.push_back(glm::vec3{ 1,5,2 });
 			indexbuffer.push_back(glm::vec3{ 0,1,4 });
-			indexbuffer.push_back(glm::vec3{ 2,3,6 });				
+			indexbuffer.push_back(glm::vec3{ 2,3,6 });*/
+
 
 			for (int i = 0; i < indexbuffer.size(); i++) {
 				int v0index = indexbuffer[i][0];
