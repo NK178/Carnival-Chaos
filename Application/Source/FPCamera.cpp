@@ -115,34 +115,7 @@ void FPCamera::Update(double dt)
 	//glm::clamp the angle somewhere 
 
 	bool isMoving = false;
-	//Movement
-	if (allowMovement)
-	{
-		if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_W)) {
-			pos += front * ZOOM_SPEED * static_cast<float>(dt);
-			target += view * ZOOM_SPEED * static_cast<float>(dt);
-			if (bop != 0.f && bopflag)
-				pos.y += bop;
-			isDirty = isMoving = true;
-		}
-		if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_S)) {
-			pos -= front * ZOOM_SPEED * static_cast<float>(dt);
-			target -= view * ZOOM_SPEED * static_cast<float>(dt);
-			if (bop != 0.f && bopflag)
-				pos.y += bop;
-			isDirty = isMoving = true;
-		}
-		if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_A)) {
-			pos -= right * ZOOM_SPEED * static_cast<float>(dt);
-			target -= right * ZOOM_SPEED * static_cast<float>(dt);
-			isDirty = isMoving = true;
-		}
-		if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_D)) {
-			pos += right * ZOOM_SPEED * static_cast<float>(dt);
-			target += right * ZOOM_SPEED * static_cast<float>(dt);
-			isDirty = isMoving = true;
-		}
-	}
+	
 
 	/////////////////////////////////////// bad implentation 
 	//Jump 
@@ -313,6 +286,35 @@ void FPCamera::Update(double dt)
 		up.x *= 0.9;
 		up.z *= 0.9;
 	}*/
+
+	//Movement
+	if (allowMovement)
+	{
+		if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_W)) {
+			pos += front * ZOOM_SPEED * static_cast<float>(dt);
+			target += view * ZOOM_SPEED * static_cast<float>(dt);
+			if (bop != 0.f && bopflag)
+				pos.y += bop;
+			isDirty = isMoving = true;
+		}
+		if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_S)) {
+			pos -= front * ZOOM_SPEED * static_cast<float>(dt);
+			target -= view * ZOOM_SPEED * static_cast<float>(dt);
+			if (bop != 0.f && bopflag)
+				pos.y += bop;
+			isDirty = isMoving = true;
+		}
+		if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_A)) {
+			pos -= right * ZOOM_SPEED * static_cast<float>(dt);
+			target -= right * ZOOM_SPEED * static_cast<float>(dt);
+			isDirty = isMoving = true;
+		}
+		if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_D)) {
+			pos += right * ZOOM_SPEED * static_cast<float>(dt);
+			target += right * ZOOM_SPEED * static_cast<float>(dt);
+			isDirty = isMoving = true;
+		}
+	}
 
 	if (allowLocomotiveTilt)
 	{
