@@ -1231,6 +1231,10 @@ void SceneMain::UpdateDialogue(double dt) {
 				if (currentLineIndex >= signDialogueLines.size()) {
 					isSignDialogueActive = false;
 					readSign = false;
+					camera.enableFNAF = false;
+					camera.allowMovement = true;
+					camera.allowJump = true;
+					camera.allowLocomotiveTilt = true;
 				}
 				else {
 					isTyping = true;
@@ -1300,7 +1304,6 @@ void SceneMain::RenderObjectives() {
 
 	int visibleObjectives = 1; 
 	if (hasReadSign) {
-		camera.allowMovement = true;
 		visibleObjectives++;
 		if (completedGames == 6) {
 			visibleObjectives++;
@@ -1513,6 +1516,9 @@ void SceneMain::HandleKeyPress()
 	if (KeyboardController::GetInstance()->IsKeyPressed('F') && showSignText)
 	{
 		camera.allowMovement = false;
+		camera.enableFNAF = true;
+		camera.allowJump = false;
+		camera.allowLocomotiveTilt = false;
 		readSign = true;
 		hasReadSign = true;
 	}
