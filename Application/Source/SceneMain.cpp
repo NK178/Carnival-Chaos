@@ -59,7 +59,7 @@ void SceneMain::Init()
 
 	// Load the shader programs
 	m_programID = LoadShaders("Shader//Texture.vertexshader",
-							  "Shader//Text.fragmentshader");
+		"Shader//Text.fragmentshader");
 	glUseProgram(m_programID);
 
 	// Get a handle for our "MVP" uniform
@@ -124,7 +124,7 @@ void SceneMain::Init()
 		m_parameters[U_MATERIAL_SHININESS]);
 
 	// Initialise camera properties
-	camera.Init(glm::vec3(-50,10,-90), glm::vec3(0,0,0), glm::vec3(0,1,0));
+	camera.Init(glm::vec3(-50, 10, -90), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 
 	// Init VBO here
 	for (int i = 0; i < NUM_GEOMETRY; ++i)
@@ -145,7 +145,7 @@ void SceneMain::Init()
 	meshList[GEO_RIGHT]->textureID = LoadTGA("Images//hills_rt.tga");
 	meshList[GEO_TOP] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
 	meshList[GEO_TOP]->textureID = LoadTGA("Images//hills_up.tga");
-	meshList[GEO_BOTTOM] = MeshBuilder::GenerateQuad("Plane",glm::vec3(1.f, 1.f, 1.f), 100.f);
+	meshList[GEO_BOTTOM] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
 	meshList[GEO_BOTTOM]->textureID = LoadTGA("Images//hills_dn.tga");
 	meshList[GEO_FRONT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
 	meshList[GEO_FRONT]->textureID = LoadTGA("Images//hills_bk.tga");
@@ -179,7 +179,7 @@ void SceneMain::Init()
 	meshList[GEO_BACK3]->textureID = LoadTGA("Images//midnight-silence_ft.tga");
 
 	// 16 x 16 is the number of columns and rows for the text
-	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16,16);
+	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Images//calibri.tga");
 	meshList[GEO_FPS] = MeshBuilder::GenerateText("fpstext", 16, 16);
 	meshList[GEO_FPS]->textureID = LoadTGA("Images//bizudgothic.tga");
@@ -188,6 +188,8 @@ void SceneMain::Init()
 	meshList[GEO_KEY_E]->textureID = LoadTGA("Images//keyboard_key_e.tga");
 	meshList[GEO_KEY_F] = MeshBuilder::GenerateQuad("KeyF", glm::vec3(1.f, 1.f, 1.f), 2.f);
 	meshList[GEO_KEY_F]->textureID = LoadTGA("Images//keyboard_key_f.tga");
+	meshList[GEO_KEY_Q] = MeshBuilder::GenerateQuad("KeyQ", glm::vec3(1.f, 1.f, 1.f), 2.f);
+	meshList[GEO_KEY_Q]->textureID = LoadTGA("Images//keyboard_key_q.tga");
 
 	meshList[GEO_TENT] = MeshBuilder::GenerateOBJ("Tent", "Models//circus_tent.obj");
 	meshList[GEO_TENT]->textureID = LoadTGA("Images//circus_tent.tga");
@@ -233,7 +235,7 @@ void SceneMain::Init()
 	light[1].exponent = 3.f;
 	light[1].spotDirection = glm::vec3(0.f, 1.f, 0.f);
 
-	light[2].position = glm::vec3(-50,4,0);
+	light[2].position = glm::vec3(-50, 4, 0);
 	light[2].color = glm::vec3(1, 1, 1);
 	light[2].type = Light::LIGHT_POINT;
 	light[2].power = 1.f;
@@ -278,29 +280,96 @@ void SceneMain::Init()
 	enableLight = true;
 
 	// collisions
-	player.push_back(playerBox(1, GameObject::CUBE));
-	tentList.push_back(tentBoxes(2, GameObject::CUBE));
-	tentList.push_back(tentBoxes(3, GameObject::CUBE));
-	tentList.push_back(tentBoxes(4, GameObject::CUBE));
-	tentList.push_back(tentBoxes(5, GameObject::CUBE));
-	tentList.push_back(tentBoxes(6, GameObject::CUBE));
-	tentList.push_back(tentBoxes(7, GameObject::CUBE));
-	finalTent.push_back(finalTentBox(8, GameObject::CUBE));
+	{
+		// player & tent collisions
+		{
+			player.push_back(playerBox(1, GameObject::CUBE));
+			tentList.push_back(tentBoxes(2, GameObject::CUBE));
+			tentList.push_back(tentBoxes(3, GameObject::CUBE));
+			tentList.push_back(tentBoxes(4, GameObject::CUBE));
+			tentList.push_back(tentBoxes(5, GameObject::CUBE));
+			tentList.push_back(tentBoxes(6, GameObject::CUBE));
+			tentList.push_back(tentBoxes(7, GameObject::CUBE));
+			finalTent.push_back(finalTentBox(8, GameObject::CUBE));
 
-	player[0].pos = camera.pos;
-	tentList[0].pos = glm::vec3{ 30, 3, -40 };
-	tentList[1].pos = glm::vec3{ 30, 3, 0 };
-	tentList[2].pos = glm::vec3{ 30, 3, 40 };
-	tentList[3].pos = glm::vec3{ -30, 3, -40 };
-	tentList[4].pos = glm::vec3{ -30, 3, 0 };
-	tentList[5].pos = glm::vec3{ -30, 3, 40 };
-	finalTent[0].pos = glm::vec3{ 0.f, 0.f, 70.f };
+			player[0].pos = camera.pos;
+			tentList[0].pos = glm::vec3{ 30, 3, -40 };
+			tentList[1].pos = glm::vec3{ 30, 3, 0 };
+			tentList[2].pos = glm::vec3{ 30, 3, 40 };
+			tentList[3].pos = glm::vec3{ -30, 3, -40 };
+			tentList[4].pos = glm::vec3{ -30, 3, 0 };
+			tentList[5].pos = glm::vec3{ -30, 3, 40 };
+			finalTent[0].pos = glm::vec3{ 0.f, 0.f, 70.f };
 
-	for (int i = 0; i < tentList.size(); i++) {
-		tentList[i].mass = 0.f;
+			for (int i = 0; i < tentList.size(); i++) {
+				tentList[i].mass = 0.f;
+			}
+
+			finalTent[0].mass = 0.f;
+		}
+
+		// side fence collisions
+		{
+			sideFenceList.push_back(sideFenceBox(9, GameObject::CUBE));
+			sideFenceList.push_back(sideFenceBox(10, GameObject::CUBE));
+			sideFenceList.push_back(sideFenceBox(11, GameObject::CUBE));
+			sideFenceList.push_back(sideFenceBox(12, GameObject::CUBE));
+			sideFenceList.push_back(sideFenceBox(13, GameObject::CUBE));
+			sideFenceList.push_back(sideFenceBox(14, GameObject::CUBE));
+			sideFenceList.push_back(sideFenceBox(15, GameObject::CUBE));
+			sideFenceList.push_back(sideFenceBox(16, GameObject::CUBE));
+
+
+			sideFenceList[0].pos = glm::vec3{ 62.f, 0.f, -60.f };
+			sideFenceList[1].pos = glm::vec3{ 62.f, 0.f, -20.f };
+			sideFenceList[2].pos = glm::vec3{ 62.f, 0.f, 20.f };
+			sideFenceList[3].pos = glm::vec3{ 62.f, 0.f, 60.f };
+			sideFenceList[4].pos = glm::vec3{ -62.f, 0.f, -60.f };
+			sideFenceList[5].pos = glm::vec3{ -62.f, 0.f, -20.f };
+			sideFenceList[6].pos = glm::vec3{ -62.f, 0.f, 20.f };
+			sideFenceList[7].pos = glm::vec3{ -62.f, 0.f, 60.f };
+
+			for (int i = 0; i < sideFenceList.size(); i++) {
+				sideFenceList[i].mass = 0.f;
+			}
+		}
+
+		// front fence collisions
+		{
+			frontFenceList.push_back(frontFenceBox(17, GameObject::CUBE));
+			frontFenceList.push_back(frontFenceBox(18, GameObject::CUBE));
+			frontFenceList.push_back(frontFenceBox(19, GameObject::CUBE));
+			frontFenceList.push_back(frontFenceBox(20, GameObject::CUBE));
+			frontFenceList.push_back(frontFenceBox(21, GameObject::CUBE));
+
+			frontFenceList[0].pos = glm::vec3{ 40.f, 0.f, 80.f };
+			frontFenceList[1].pos = glm::vec3{ 0.f, 0.f, 80.f };
+			frontFenceList[2].pos = glm::vec3{ -40.f, 0.f, 80.f };
+			frontFenceList[3].pos = glm::vec3{ 40.f, 0.f, -80.f };
+			frontFenceList[4].pos = glm::vec3{ -40.f, 0.f, -80.f };
+
+			for (int i = 0; i < frontFenceList.size(); i++) {
+				frontFenceList[i].mass = 0.f;
+			}
+		}
+
+		// boundary collisions
+		{
+			frontBoundary.push_back(frontBoundaryBox(22, GameObject::CUBE));
+			sideBoundary.push_back(sideBoundaryBox(23, GameObject::CUBE));
+			sideBoundary.push_back(sideBoundaryBox(24, GameObject::CUBE));
+
+			frontBoundary[0].pos = glm::vec3{ 0.f, 0.f, -100.f };
+			sideBoundary[0].pos = glm::vec3{ 62.f, 0.f, -90.f }; 
+			sideBoundary[1].pos = glm::vec3{ -62.f, 0.f, -90.f };
+
+			for (int i = 0; i < sideBoundary.size(); i++) {
+				sideBoundary[i].mass = 0.f;
+			}
+
+			frontBoundary[0].mass = 0.f;
+		}
 	}
-
-	finalTent[0].mass = 0.f;
 
 	// Typewriting Dialogue
 	isTyping = false; 
@@ -340,6 +409,7 @@ void SceneMain::Init()
 	dialogueTimer = 0;
 
 	cutsceneStage = -1;
+	cutsceneSkipped = false;
 }
 
 void SceneMain::Update(double dt)
@@ -416,33 +486,80 @@ void SceneMain::Update(double dt)
 		break;
 	}
 
+	// camera
 	camera.Update(dt);
 	player[0].pos = camera.pos;
+	glm::vec3 viewDir = glm::normalize(camera.target - camera.pos);
 
 	// Collision
-	CollisionData cd;
-	for (int i = 0; i < tentList.size(); i++) {
-		if (OverlapAABB2AABB(player[0], player[0].playerDimensions, tentList[i], tentList[i].tentDimensions, cd)) {
-			ResolveCollision(cd);
-			camera.pos = player[0].pos;
-		}
-	}
-
-	if (CheckAllTentsCompleted()) {
-		for (int i = 0; i < finalTent.size(); i++) {
-			if (OverlapAABB2AABB(player[0], player[0].playerDimensions, finalTent[i], finalTent[i].tentDimensions, cd)) {
+	{
+		CollisionData cd;
+		for (int i = 0; i < tentList.size(); i++) {
+			if (OverlapAABB2AABB(player[0], player[0].playerDimensions, tentList[i], tentList[i].tentDimensions, cd)) {
 				ResolveCollision(cd);
 				camera.pos = player[0].pos;
+				camera.target = camera.pos + viewDir * 1.2f;
 			}
 		}
-	}
 
-	for (int i = 0; i < tentList.size(); i++) {
-		tentList[i].UpdatePhysics(dt);
-	}
+		if (CheckAllTentsCompleted()) {
+			if (OverlapAABB2AABB(player[0], player[0].playerDimensions, finalTent[0], finalTent[0].tentDimensions, cd)) {
+				ResolveCollision(cd);
+				camera.pos = player[0].pos;
+				camera.target = camera.pos + viewDir * 1.2f;
+			}
+		}
 
-	player[0].UpdatePhysics(dt);
-	finalTent[0].UpdatePhysics(dt);
+		for (int i = 0; i < sideFenceList.size(); i++) {
+			if (OverlapAABB2AABB(player[0], player[0].playerDimensions, sideFenceList[i], sideFenceList[i].fenceDimensions, cd)) {
+				ResolveCollision(cd);
+				camera.pos = player[0].pos;
+				camera.target = camera.pos + viewDir * 1.2f;
+			}
+		}
+
+		for (int i = 0; i < frontFenceList.size(); i++) {
+			if (OverlapAABB2AABB(player[0], player[0].playerDimensions, frontFenceList[i], frontFenceList[i].fenceDimensions, cd)) {
+				ResolveCollision(cd);
+				camera.pos = player[0].pos;
+				camera.target = camera.pos + viewDir * 1.2f;
+			}
+		}
+
+		for (int i = 0; i < sideBoundary.size(); i++) {
+			if (OverlapAABB2AABB(player[0], player[0].playerDimensions, sideBoundary[i], sideBoundary[i].boundaryDimensions, cd)) {
+				ResolveCollision(cd);
+				camera.pos = player[0].pos;
+				camera.target = camera.pos + viewDir * 1.2f;
+			}
+		}
+
+        if (OverlapAABB2AABB(player[0], player[0].playerDimensions, frontBoundary[0], frontBoundary[0].boundaryDimensions, cd)) {
+			ResolveCollision(cd);
+			camera.pos = player[0].pos;
+			camera.target = camera.pos + viewDir * 1.2f;
+		}
+
+		for (int i = 0; i < tentList.size(); i++) {
+			tentList[i].UpdatePhysics(dt);
+		}
+
+		for (int i = 0; i < sideFenceList.size(); i++) {
+			sideFenceList[i].UpdatePhysics(dt);
+		}
+
+		for (int i = 0; i < frontFenceList.size(); i++) {
+			frontFenceList[i].UpdatePhysics(dt);
+		}
+
+		for (int i = 0; i < sideBoundary.size(); i++) {
+			sideBoundary[i].UpdatePhysics(dt);
+		}
+
+		player[0].UpdatePhysics(dt);
+		finalTent[0].UpdatePhysics(dt);
+		frontBoundary[0].UpdatePhysics(dt);
+	}
 
 	// Interaction between Sign and Tents
 	{
@@ -924,6 +1041,62 @@ void SceneMain::Render()
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		modelStack.PopMatrix();
 	}
+
+	for (int n = 0; n < sideFenceList.size(); n++) {
+		modelStack.PushMatrix();
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		modelStack.Translate(sideFenceList[n].pos.x, sideFenceList[n].pos.y, sideFenceList[n].pos.z);
+		modelStack.Rotate(sideFenceList[n].angleDeg, 0, 1, 0);
+		modelStack.Scale(2 * sideFenceList[n].fenceDimensions.x, 2 * sideFenceList[n].fenceDimensions.y, 2 * sideFenceList[n].fenceDimensions.z);
+		meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+		meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+		meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+		meshList[GEO_CUBE]->material.kShininess = 1.0f;
+		RenderMesh(meshList[GEO_CUBE], true);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		modelStack.PopMatrix();
+	}
+	for (int n = 0; n < frontFenceList.size(); n++) {
+		modelStack.PushMatrix();
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		modelStack.Translate(frontFenceList[n].pos.x, frontFenceList[n].pos.y, frontFenceList[n].pos.z);
+		modelStack.Rotate(frontFenceList[n].angleDeg, 0, 1, 0);
+		modelStack.Scale(2 * frontFenceList[n].fenceDimensions.x, 2 * frontFenceList[n].fenceDimensions.y, 2 * frontFenceList[n].fenceDimensions.z);
+		meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+		meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+		meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+		meshList[GEO_CUBE]->material.kShininess = 1.0f;
+		RenderMesh(meshList[GEO_CUBE], true);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		modelStack.PopMatrix();
+	}
+	for (int n = 0; n < sideBoundary.size(); n++) {
+		modelStack.PushMatrix();
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		modelStack.Translate(sideBoundary[n].pos.x, sideBoundary[n].pos.y, sideBoundary[n].pos.z);
+		modelStack.Rotate(sideBoundary[n].angleDeg, 0, 1, 0);
+		modelStack.Scale(2 * sideBoundary[n].boundaryDimensions.x, 2 * sideBoundary[n].boundaryDimensions.y, 2 * sideBoundary[n].boundaryDimensions.z);
+		meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+		meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+		meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+		meshList[GEO_CUBE]->material.kShininess = 1.0f;
+		RenderMesh(meshList[GEO_CUBE], true);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		modelStack.PopMatrix();
+	}
+
+	modelStack.PushMatrix();
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	modelStack.Translate(frontBoundary[0].pos.x, frontBoundary[0].pos.y, frontBoundary[0].pos.z);
+	modelStack.Rotate(frontBoundary[0].angleDeg, 0, 1, 0);
+	modelStack.Scale(2 * frontBoundary[0].boundaryDimensions.x, 2 * frontBoundary[0].boundaryDimensions.y, 2 * frontBoundary[0].boundaryDimensions.z);
+	meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+	meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_CUBE]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_CUBE], true);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	modelStack.PopMatrix();
 }
 
 bool SceneMain::CheckAllTentsCompleted()
@@ -968,18 +1141,20 @@ void SceneMain::RenderDialogue() {
 		const DialogueLine& currentDialogue = signDialogueLines[currentLineIndex];
 
 		if (currentDialogue.isMultiLine) {
-			if (currentDialogue.textLines.size() > 0) {
-				std::string textToRender = currentDialogue.textLines[0].substr(0, currentCharIndex);
-				RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 550);
+			std::string textToRender = currentText.substr(0, currentCharIndex);
+			size_t newlinePos = textToRender.find('\n');
+			if (newlinePos != std::string::npos) {
+				std::string firstLine = textToRender.substr(0, newlinePos);
+				std::string secondLine = textToRender.substr(newlinePos + 1);
+				RenderTextOnScreen(meshList[GEO_TEXT], firstLine, glm::vec3(1, 1, 1), 20, 10, 550);
+				RenderTextOnScreen(meshList[GEO_TEXT], secondLine, glm::vec3(1, 1, 1), 20, 10, 530);
 			}
-
-			if (currentDialogue.textLines.size() > 1) {
-				std::string textToRender = currentDialogue.textLines[1].substr(0, currentCharIndex);
-				RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 530);
+			else {
+				RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 550);
 			}
 		}
 		else {
-			std::string textToRender = currentDialogue.textLines[0].substr(0, currentCharIndex);
+			std::string textToRender = currentText.substr(0, currentCharIndex);
 			RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 550);
 		}
 	}
@@ -988,18 +1163,20 @@ void SceneMain::RenderDialogue() {
 		const DialogueLine& currentDialogue = enterMainSceneLines[currentLineIndex];
 
 		if (currentDialogue.isMultiLine) {
-			if (currentDialogue.textLines.size() > 0) {
-				std::string textToRender = currentDialogue.textLines[0].substr(0, currentCharIndex);
-				RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 550);
+			std::string textToRender = currentText.substr(0, currentCharIndex);
+			size_t newlinePos = textToRender.find('\n');
+			if (newlinePos != std::string::npos) {
+				std::string firstLine = textToRender.substr(0, newlinePos);
+				std::string secondLine = textToRender.substr(newlinePos + 1);
+				RenderTextOnScreen(meshList[GEO_TEXT], firstLine, glm::vec3(1, 1, 1), 20, 10, 550);
+				RenderTextOnScreen(meshList[GEO_TEXT], secondLine, glm::vec3(1, 1, 1), 20, 10, 530);
 			}
-
-			if (currentDialogue.textLines.size() > 1) {
-				std::string textToRender = currentDialogue.textLines[1].substr(0, currentCharIndex);
-				RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 530);
+			else {
+				RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 550);
 			}
 		}
 		else {
-			std::string textToRender = currentDialogue.textLines[0].substr(0, currentCharIndex);
+			std::string textToRender = currentText.substr(0, currentCharIndex);
 			RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 550);
 		}
 	}
@@ -1012,11 +1189,30 @@ void SceneMain::UpdateDialogue(double dt) {
 		dialogueTimer = 0;
 		isTyping = true; // Start typing the first line
 		typewriterTimer = 0.0f;
-		currentText = signDialogueLines[currentLineIndex].textLines[0];
+		const DialogueLine& currentDialogue = signDialogueLines[currentLineIndex];
+		if (currentDialogue.isMultiLine) {
+			// Store both lines
+			currentText = currentDialogue.textLines[0] + "\n" + currentDialogue.textLines[1];
+		}
+		else {
+			currentText = currentDialogue.textLines[0];
+		}
 		currentCharIndex = 0;
 	}
 
 	if (isSignDialogueActive) {
+		if (KeyboardController::GetInstance()->IsKeyPressed('E')) {
+			if (isTyping) {
+				// Skip rendering the current text
+				currentCharIndex = currentText.length();
+				isTyping = false;
+			}
+			else {
+				// Skip to the next line
+				dialogueTimer = TEXT_DISPLAY_TIME;
+			}
+		}
+
 		if (isTyping) {
 			typewriterTimer += dt;
 			if (typewriterTimer >= 0.05f) { // Adjust the typing speed here
@@ -1026,15 +1222,10 @@ void SceneMain::UpdateDialogue(double dt) {
 					isTyping = false;
 				}
 			}
-
-			if (KeyboardController::GetInstance()->IsKeyPressed('E')) {
-				isTyping = false;
-				currentCharIndex = currentText.length();
-			}
 		}
 		else {
 			dialogueTimer += dt;
-			if (dialogueTimer >= TEXT_DISPLAY_TIME || KeyboardController::GetInstance()->IsKeyPressed('E')) {
+			if (dialogueTimer >= TEXT_DISPLAY_TIME) {
 				dialogueTimer = 0;
 				currentLineIndex++;
 				if (currentLineIndex >= signDialogueLines.size()) {
@@ -1044,7 +1235,13 @@ void SceneMain::UpdateDialogue(double dt) {
 				else {
 					isTyping = true;
 					typewriterTimer = 0.0f;
-					currentText = signDialogueLines[currentLineIndex].textLines[0];
+					const DialogueLine& currentDialogue = signDialogueLines[currentLineIndex];
+					if (currentDialogue.isMultiLine) {
+						currentText = currentDialogue.textLines[0] + "\n" + currentDialogue.textLines[1];
+					}
+					else {
+						currentText = currentDialogue.textLines[0];
+					}
 					currentCharIndex = 0;
 				}
 			}
@@ -1061,15 +1258,10 @@ void SceneMain::UpdateDialogue(double dt) {
 					isTyping = false;
 				}
 			}
-
-			if (KeyboardController::GetInstance()->IsKeyPressed('E')) {
-				isTyping = false;
-				currentCharIndex = currentText.length();
-			}
 		}
 		else {
 			dialogueTimer += dt;
-			if (dialogueTimer >= TEXT_DISPLAY_TIME || KeyboardController::GetInstance()->IsKeyPressed('E')) {
+			if (dialogueTimer >= TEXT_DISPLAY_TIME) {
 				dialogueTimer = 0;
 				currentLineIndex++;
 				if (currentLineIndex >= enterMainSceneLines.size()) {
@@ -1079,7 +1271,13 @@ void SceneMain::UpdateDialogue(double dt) {
 				else {
 					isTyping = true;
 					typewriterTimer = 0.0f;
-					currentText = enterMainSceneLines[currentLineIndex].textLines[0];
+					const DialogueLine& currentDialogue = enterMainSceneLines[currentLineIndex];
+					if (currentDialogue.isMultiLine) {
+						currentText = currentDialogue.textLines[0] + "\n" + currentDialogue.textLines[1];
+					}
+					else {
+						currentText = currentDialogue.textLines[0];
+					}
 					currentCharIndex = 0;
 				}
 			}
@@ -1259,8 +1457,7 @@ void SceneMain::HandleKeyPress()
 	//	// Change to black background
 	//	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	//}
-	if (KeyboardController::GetInstance()->IsKeyPressed('Q'))
-	{
+	if (KeyboardController::GetInstance()->IsKeyPressed('Q') && !cutsceneSkipped) {
 		// Skip cutscene
 		cutsceneStage = 4;
 		camera.enableFNAF = false;
@@ -1275,16 +1472,16 @@ void SceneMain::HandleKeyPress()
 		isEnterMainSceneDialogueActive = false;
 		hasPlayedEnterMainSceneDialogue = true;
 
-		camera.pos = glm::vec3(-3,10,-70);
+		camera.pos = glm::vec3(-3, 10, -70);
 		camera.target = glm::vec3(0, 10, -70);
 
-		//// Teleport player to specific camera position
-		//camera.pos = glm::vec3(30.f, 3.f, -80.f); 
-		//camera.target = glm::vec3(30.f, 3.f, -70.f);
-
-		//cutsceneSkipped = true; // Set the flag to indicate the cutscene has been skipped
+		cutsceneSkipped = true; // Set the flag to indicate the cutscene has been skipped
 	}
-
+	if (KeyboardController::GetInstance()->IsKeyPressed('Q') && isSignDialogueActive) {
+		// Skip the entire sign dialogue
+		isSignDialogueActive = false;
+		readSign = false;
+	}
 	static bool isRightUp = false;
 	if (!isRightUp && MouseController::GetInstance()->IsButtonDown(GLFW_MOUSE_BUTTON_RIGHT))
 	{
