@@ -21,7 +21,7 @@
 
 SceneFinal::SceneFinal()
 {
-	
+
 }
 
 SceneFinal::~SceneFinal()
@@ -267,7 +267,7 @@ void SceneFinal::Update(double dt) {
 	carPhysics.vel.y = 0;
 	float plrCarTotalVel = sqrt((carPhysics.vel.x * carPhysics.vel.x) + (carPhysics.vel.z * carPhysics.vel.z));
 	std::cout << plrCarTotalVel << std::endl;
-	
+
 	// Handle turning
 	if (KeyboardController::GetInstance()->IsKeyDown('A')) {
 		carPhysics.angularVel = KeyboardController::GetInstance()->IsKeyDown('S') ? CAR_TURN_RATE * -plrCarTotalVel / 100 : CAR_TURN_RATE * plrCarTotalVel / 100;
@@ -380,15 +380,15 @@ void SceneFinal::Render()
 	}
 
 
-	modelStack.PushMatrix();
-	RenderMesh(meshList[GEO_AXES], false);
-	modelStack.PopMatrix();
+	//modelStack.PushMatrix();
+	//RenderMesh(meshList[GEO_AXES], false);
+	//modelStack.PopMatrix();
 
-	modelStack.PushMatrix();
-	modelStack.Translate(light[0].position.x, light[0].position.y, light[0].position.z);
-	modelStack.Scale(0.4f, 0.4f, 0.4f);
-	RenderMesh(meshList[GEO_SPHERE], false);
-	modelStack.PopMatrix();
+	//modelStack.PushMatrix();
+	//modelStack.Translate(light[0].position.x, light[0].position.y, light[0].position.z);
+	//modelStack.Scale(0.4f, 0.4f, 0.4f);
+	//RenderMesh(meshList[GEO_SPHERE], false);
+	//modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
 	modelStack.Scale(100.f, 1.f, 100.f);
@@ -752,4 +752,3 @@ void SceneFinal::RenderSkyBox() {
 	RenderMesh(meshList[GEO_BOTTOM], false);
 	modelStack.PopMatrix();
 }
-
