@@ -10,7 +10,8 @@ public:
 	enum COLLISIONTYPE {
 		CUBE = 1,
 		SPHERE = 2,
-		CAMERA = 3,
+		CYLINDER = 3,
+		CAMERA = 4,
 	};
 	GameObject(int ID, int type);
 	~GameObject();

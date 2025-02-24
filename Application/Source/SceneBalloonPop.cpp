@@ -399,122 +399,136 @@ void SceneBalloonPop::Update(double dt)
 {
 	HandleKeyPress();
 	if (!gameOver) {
-
-		if (m_shootCooldown > 0) {
-			m_shootCooldown -= static_cast<float>(dt);
-		}
-		gameTimer -= static_cast<float>(dt);
-		if (gameTimer <= 0 && playerScore < WIN_SCORE) {
-			gameOver = true;  // Only set gameOver to true if player hasn't reached WIN_SCORE
-			return;
-		}
-		HandleDartInput();
-
-		// Update all active darts
-		for (auto& dart : darts) {
-			if (dart.isActive) {  // Remove the !dart.isStuck check since darts won't stick anymore
-				// Apply gravity - reduced strength
-				dart.physics.AddForce(glm::vec3(0, -9.81f * 0.05f, 0));
-
-				// Apply minimal air resistance
-				glm::vec3 airResistance = -dart.physics.vel * 0.01f;
-				dart.physics.AddForce(airResistance);
-
-				// Update physics
-				dart.Update(static_cast<float>(dt));
-
-				// Floor collision now makes dart disappear
-				if (dart.physics.pos.y < 1.0f) {
-					dart.isActive = false;  // Make dart disappear instead of sticking
-				}
-
-				// Wall collisions now make dart disappear
-				const float WALL_X = 120.0f;
-				const float WALL_Z = 120.0f;
-
-				if (std::abs(dart.physics.pos.x) > WALL_X ||
-					std::abs(dart.physics.pos.z) > WALL_Z) {
-					dart.isActive = false;  // Make dart disappear instead of bouncing
+		// Update countdown if objectives have been read
+		if (m_isObjectiveRead) {
+			if (countdownTime > 0) {
+				countdownTime -= dt; // decrease countdown time
+				if (countdownTime < 0) {
+					countdownTime = 0; // ensure countdown does not go below 0
 				}
 			}
-		}
-
-		// Check for collisions
-		CheckDartCollisions();
-
-		// Update spawn timer
-		spawnTimer -= static_cast<float>(dt);
-		if (spawnTimer <= 0) {
-			SpawnBalloon();
-			spawnTimer = SPAWN_INTERVAL;
-		}
-
-		// Update balloons
-		for (auto& balloon : balloons) {
-			if (!balloon.isPopped) {
-				// Basic upward force
-				balloon.physics.AddForce(glm::vec3(0, BALLOON_UP_FORCE, 0));
-
-				// Add sine wave motion to create floating effect
-				float time = static_cast<float>(glfwGetTime());
-				float wobbleX = BALLOON_WOBBLE_FORCE * sin(time + balloon.timeAlive);
-				float wobbleZ = BALLOON_WOBBLE_FORCE * cos(time * 0.5f + balloon.timeAlive);
-
-				// Add wobble forces
-				balloon.physics.AddForce(glm::vec3(wobbleX, 0, wobbleZ));
-
-				// Add rightward force that varies with height
-				float rightForce = BALLOON_RIGHT_FORCE * (1.0f + 0.5f * sin(time * 2.0f + balloon.timeAlive));
-				balloon.physics.AddForce(glm::vec3(rightForce, 0, 0));
-
-				// Random movement to prevent synchronization
-				float randX = (rand() % 200 - 100) / 100.0f;
-				float randZ = (rand() % 200 - 100) / 100.0f;
-				balloon.physics.AddForce(glm::vec3(randX, 0, randZ));
-
-				// Update balloon's time alive
-				balloon.timeAlive += static_cast<float>(dt);
-
-				// Wall repulsion forces 
-				const float WALL_REPULSION = 500.0f;
-				const float BOUNCE_FACTOR = 1.7f;
-
-				// X-axis walls
-				if (balloon.physics.pos.x < -120.0f) {
-					balloon.physics.pos.x = -120.0f;
-					balloon.physics.vel.x *= -BOUNCE_FACTOR;
-					balloon.physics.AddForce(glm::vec3(WALL_REPULSION, 0, 0));
-				}
-				if (balloon.physics.pos.x > 120.0f) {
-					balloon.physics.pos.x = 120.0f;
-					balloon.physics.vel.x *= -BOUNCE_FACTOR;
-					balloon.physics.AddForce(glm::vec3(-WALL_REPULSION, 0, 0));
+			// Only start the game timer after countdown is finished
+			else {
+				if (m_shootCooldown > 0) {
+					m_shootCooldown -= static_cast<float>(dt);
 				}
 
-				// Z-axis walls
-				if (balloon.physics.pos.z < -120.0f) {
-					balloon.physics.pos.z = -120.0f;
-					balloon.physics.vel.z *= -BOUNCE_FACTOR;
-					balloon.physics.AddForce(glm::vec3(0, 0, WALL_REPULSION));
-				}
-				if (balloon.physics.pos.z > 120.0f) {
-					balloon.physics.pos.z = 120.0f;
-					balloon.physics.vel.z *= -BOUNCE_FACTOR;
-					balloon.physics.AddForce(glm::vec3(0, 0, -WALL_REPULSION));
+				// Update game timer only after countdown is complete
+				gameTimer -= static_cast<float>(dt);
+				if (gameTimer <= 0 && playerScore < WIN_SCORE) {
+					gameOver = true;  // Only set gameOver to true if player hasn't reached WIN_SCORE
+					return;
 				}
 
-				// Ceiling behavior
-				if (balloon.physics.pos.y > CEILING_HEIGHT) {
-					balloon.physics.pos.y = CEILING_HEIGHT;
-					balloon.physics.vel.y *= -0.5f;
-					balloon.physics.AddForce(glm::vec3(0, -10.0f, 0));
+				HandleDartInput();
+
+				// Update all active darts
+				for (auto& dart : darts) {
+					if (dart.isActive) {
+						// Apply gravity - reduced strength
+						dart.physics.AddForce(glm::vec3(0, -9.81f * 0.05f, 0));
+
+						// Apply minimal air resistance
+						glm::vec3 airResistance = -dart.physics.vel * 0.01f;
+						dart.physics.AddForce(airResistance);
+
+						// Update physics
+						dart.Update(static_cast<float>(dt));
+
+						// Floor collision now makes dart disappear
+						if (dart.physics.pos.y < 1.0f) {
+							dart.isActive = false;
+						}
+
+						// Wall collisions now make dart disappear
+						const float WALL_X = 120.0f;
+						const float WALL_Z = 120.0f;
+
+						if (std::abs(dart.physics.pos.x) > WALL_X ||
+							std::abs(dart.physics.pos.z) > WALL_Z) {
+							dart.isActive = false;
+						}
+					}
+				}
+				// doesnt start before countdown anymore
+				// Check for collisions
+				CheckDartCollisions();
+
+				// Update spawn timer
+				spawnTimer -= static_cast<float>(dt);
+				if (spawnTimer <= 0) {
+					SpawnBalloon();
+					spawnTimer = SPAWN_INTERVAL;
 				}
 
-				// Update physics
-				balloon.physics.UpdatePhysics(static_cast<float>(dt));
+				// Update balloons
+				for (auto& balloon : balloons) {
+					if (!balloon.isPopped) {
+						// Basic upward force
+						balloon.physics.AddForce(glm::vec3(0, BALLOON_UP_FORCE, 0));
 
-				// More gentle damping to maintain movement
-				balloon.physics.vel *= 0.99f;
+						// Add sine wave motion to create floating effect
+						float time = static_cast<float>(glfwGetTime());
+						float wobbleX = BALLOON_WOBBLE_FORCE * sin(time + balloon.timeAlive);
+						float wobbleZ = BALLOON_WOBBLE_FORCE * cos(time * 0.5f + balloon.timeAlive);
+
+						// Add wobble forces
+						balloon.physics.AddForce(glm::vec3(wobbleX, 0, wobbleZ));
+
+						// Add rightward force that varies with height
+						float rightForce = BALLOON_RIGHT_FORCE * (1.0f + 0.5f * sin(time * 2.0f + balloon.timeAlive));
+						balloon.physics.AddForce(glm::vec3(rightForce, 0, 0));
+
+						// Random movement to prevent synchronization
+						float randX = (rand() % 200 - 100) / 100.0f;
+						float randZ = (rand() % 200 - 100) / 100.0f;
+						balloon.physics.AddForce(glm::vec3(randX, 0, randZ));
+
+						// Update balloon's time alive
+						balloon.timeAlive += static_cast<float>(dt);
+
+						// Wall repulsion forces 
+						const float WALL_REPULSION = 500.0f;
+						const float BOUNCE_FACTOR = 1.7f;
+
+						// X-axis walls
+						if (balloon.physics.pos.x < -120.0f) {
+							balloon.physics.pos.x = -120.0f;
+							balloon.physics.vel.x *= -BOUNCE_FACTOR;
+							balloon.physics.AddForce(glm::vec3(WALL_REPULSION, 0, 0));
+						}
+						if (balloon.physics.pos.x > 120.0f) {
+							balloon.physics.pos.x = 120.0f;
+							balloon.physics.vel.x *= -BOUNCE_FACTOR;
+							balloon.physics.AddForce(glm::vec3(-WALL_REPULSION, 0, 0));
+						}
+
+						// Z-axis walls
+						if (balloon.physics.pos.z < -120.0f) {
+							balloon.physics.pos.z = -120.0f;
+							balloon.physics.vel.z *= -BOUNCE_FACTOR;
+							balloon.physics.AddForce(glm::vec3(0, 0, WALL_REPULSION));
+						}
+						if (balloon.physics.pos.z > 120.0f) {
+							balloon.physics.pos.z = 120.0f;
+							balloon.physics.vel.z *= -BOUNCE_FACTOR;
+							balloon.physics.AddForce(glm::vec3(0, 0, -WALL_REPULSION));
+						}
+
+						// Ceiling behavior
+						if (balloon.physics.pos.y > CEILING_HEIGHT) {
+							balloon.physics.pos.y = CEILING_HEIGHT;
+							balloon.physics.vel.y *= -0.5f;
+							balloon.physics.AddForce(glm::vec3(0, -10.0f, 0));
+						}
+
+						// Update physics
+						balloon.physics.UpdatePhysics(static_cast<float>(dt));
+
+						// More gentle damping to maintain movement
+						balloon.physics.vel *= 0.99f;
+					}
+				}
 			}
 		}
 	}
@@ -545,15 +559,6 @@ void SceneBalloonPop::Update(double dt)
 
 	float temp = 1.f / dt;
 	fps = glm::round(temp * 100.f) / 100.f;
-
-	if (m_isObjectiveRead) {
-		if (countdownTime > 0) {
-			countdownTime -= dt; // decrease countdown time
-			if (countdownTime < 0) {
-				countdownTime = 0; // ensure countdown does not go below 0
-			}
-		}
-	}
 
 	camera.Update(dt);
 }
