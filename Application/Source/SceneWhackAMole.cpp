@@ -260,10 +260,12 @@ void SceneWhackAMole::Init()
 	walllist.push_back(Walls(102, GameObject::CUBE, glm::vec3{ 100.f, 50.f, 1.f }));
 	walllist.push_back(Walls(103, GameObject::CUBE, glm::vec3{ 1.f, 50.f, 100.f }));
 	walllist.push_back(Walls(103, GameObject::CUBE, glm::vec3{ 1.f, 50.f, 100.f }));
+	walllist.push_back(Walls(104, GameObject::CUBE, glm::vec3{ 100.f, 1.f, 100.f }));
 	walllist[0].pos = glm::vec3{ 0,0,-100};
 	walllist[1].pos = glm::vec3{ 0,0,100 };
 	walllist[2].pos = glm::vec3{ -100,0,0 };
 	walllist[3].pos = glm::vec3{ 100,0,0 };
+	walllist[4].pos = glm::vec3{ 0,0,0 };
 
 	//Player 
 	player.push_back(Player(999, GameObject::CUBE));
@@ -331,6 +333,7 @@ void SceneWhackAMole::Update(double dt)
 	if (KeyboardController::GetInstance()->IsKeyDown('P'))
 		testobj.pos.y += static_cast<float>(dt) * SPEED;
 
+	CollisionData cd;
 	//Game logic 
 	if (gamestart) {
 		if (isattack) {
@@ -362,15 +365,6 @@ void SceneWhackAMole::Update(double dt)
 			}
 		}
 
-		player[0].pos = camera.pos;
-		CollisionData cd;
-		for (int i = 0; i < walllist.size(); i++) {
-			if (OverlapAABB2AABB(player[0], player[0].boxextent, walllist[i], walllist[i].boxextent, cd)) {
-				ResolveCollision(cd);
-				camera.pos = player[0].pos;
-			}
-		}
-
 		//Detect hit 
 		if (isattack && attackchecktimer < 0.1f) {
 			for (int i = 0; i < inactionorder.size(); i++) {
@@ -384,6 +378,23 @@ void SceneWhackAMole::Update(double dt)
 			}
 		}
 	}
+	glm::vec3 oldpos = camera.pos;
+	glm::vec3 oldtarget = camera.target;
+	if (iscameramove)
+		camera.Update(dt);
+	player[0].pos = camera.pos;
+	for (int i = 0; i < walllist.size(); i++) {
+		if (OverlapAABB2AABB(player[0], player[0].boxextent, walllist[i], walllist[i].boxextent, cd)) {
+			ResolveCollision(cd);
+			camera.pos = oldpos;
+			//camera.target = oldtarget;
+			glm::vec3 newView = glm::normalize(oldtarget - oldpos);
+			camera.target = camera.pos + newView;
+		}
+	}
+
+
+
 	//Game start and game end logic
 	if (startcountdown > 0.f)
 		startcountdown -= dt;
@@ -404,9 +415,6 @@ void SceneWhackAMole::Update(double dt)
 		walllist[i].UpdatePhysics(dt);
 	}
 	player[0].UpdatePhysics(dt);
-
-	if (iscameramove)
-		camera.Update(dt);
 
 
 }
