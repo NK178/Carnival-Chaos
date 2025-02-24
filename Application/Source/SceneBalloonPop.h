@@ -24,9 +24,18 @@ public:
 		GEO_CRATE,
 		GEO_BALLOONS,
 		GEO_PRESENT,
+		GEO_BALLOON,
+		GEO_CROSSHAIR,
+		GEO_DART,
+		GEO_GAMEOVER,
 
 		//Text
 		GEO_TEXT,
+		GEO_TEXT2,
+		GEO_KEY_E,
+		GEO_KEY_R,
+		GEO_FPS,
+		GEO_UI,
 
 		//SKybox
 		GEO_LEFT,
@@ -136,6 +145,98 @@ private:
 	void RenderTextOnScreen(Mesh* mesh, std::string text, glm::vec3 color, float size, float x, float y);
 	void Material(GEOMETRY_TYPE obj, float AmR, float AmG, float AmB, float DifA, float DifG, float DifB, float SpA, float SpG, float SpB, float Shiny);
 	void RenderSkyBox();
+
+	float fps = 0;
+
+	bool m_isGameOver;
+	bool m_hasWon;
+
+	bool m_isObjectiveRead;
+	float countdownTime;
+
+	struct Balloon {
+		PhysicsObject physics;
+		bool isPopped;
+		float timeAlive;
+
+		Balloon() : isPopped(false), timeAlive(0.0f) {
+			physics.mass = 0.1f;  // Light mass for balloon
+			physics.bounciness = 0.5f;
+		}
+	};
+
+	std::vector<Balloon> balloons;
+	float gameTimer;
+	int playerScore;
+	bool gameOver;
+	const float GAME_TIME_LIMIT = 30.0f;
+	const int WIN_SCORE = 10;
+	const float SPAWN_INTERVAL = 2.0f;
+	float spawnTimer;
+
+	// Add these constants
+	const float BALLOON_UP_FORCE = 5.0f;        // Increased upward force
+	const float BALLOON_RIGHT_FORCE = 2.0f;     // Increased rightward force
+	const float BALLOON_WOBBLE_FORCE = 1.0f;    // Force for side-to-side movement
+	const float CEILING_HEIGHT = 50.0f;
+	const float FLOOR_HEIGHT = 5.0f;
+
+
+	const float DART_RADIUS = 3.0f;
+	const float BALLOON_RADIUS = 5.0f;
+	const int MAX_DARTS = 1000;
+
+	float m_shootCooldown;        // Current cooldown timer
+	const float SHOOT_COOLDOWN_DURATION = 1.0f;  // One second cooldown
+
+	void SpawnBalloon() {
+		Balloon newBalloon;
+		// Random position at bottom of stage
+		newBalloon.physics.pos = glm::vec3(
+			-100.0f + static_cast<float>(rand() % 200), // Random x between -100 and 100
+			FLOOR_HEIGHT,  // Start at floor height
+			-40.0f + static_cast<float>(rand() % 80)    // Random z between -40 and 40
+		);
+		balloons.push_back(newBalloon);
+	}
+
+	class Dart {
+	public:
+		bool isActive;
+		PhysicsObject physics;
+		float mass;
+
+		Dart() : isActive(false), mass(1.0f) {
+			physics.mass = mass;
+		}
+
+		void Fire(const glm::vec3& pos, const glm::vec3& dir, float speed) {
+			physics.pos = pos;
+			physics.vel = dir * speed;
+			isActive = true;
+		}
+
+		void Update(float dt) {
+			if (isActive) {
+				// Add gravity
+				physics.AddForce(glm::vec3(0, -9.81f * mass, 0));
+				physics.UpdatePhysics(dt);
+			}
+		}
+	};
+
+
+	std::vector<Dart> darts;
+	float m_dartPower;
+	float m_maxDartPower;
+	float m_powerChargeRate;
+	bool m_isChargingShot;
+	int m_dartsLeft;
+
+	void HandleDartInput();
+	void FireDart();
+	void CheckDartCollisions();
+
 
 
 };

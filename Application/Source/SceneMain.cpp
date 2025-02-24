@@ -28,6 +28,16 @@ SceneMain::~SceneMain()
 
 void SceneMain::Init()
 {
+	tempCompensation = 0;
+	camera.enableFNAF = true;
+	camera.allowMovement = false;
+	camera.allowJump = false;
+	camera.allowSprint = false;
+	camera.allowCrouch = false;
+	camera.allowProne = false;
+	camera.allowLocomotiveTilt = false;
+	camera.allowLocomotiveBop = false;
+
 	// Set background color to dark blue
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
@@ -283,6 +293,10 @@ void SceneMain::Init()
 		cubeList[i].mass = 0.f;
 	}
 
+	isTyping = false; 
+	typewriterTimer = 0.0f; 
+	currentText = "";
+	currentCharIndex = 0;
 	isEnterMainSceneDialogueActive = true; 
 	hasPlayedEnterMainSceneDialogue = false;
 
@@ -313,6 +327,8 @@ void SceneMain::Init()
 	isSignDialogueActive = false;
 	currentLineIndex = 0;
 	dialogueTimer = 0;
+
+	cutsceneStage = -1;
 }
 
 void SceneMain::Update(double dt)
@@ -336,9 +352,65 @@ void SceneMain::Update(double dt)
 	//light[0].spotDirection = -glm::normalize (camera.target - camera.pos);
 	//light[0].position = camera.pos;
 
+	std::cout << camera.pos.x << std::endl;
+
+	switch (cutsceneStage)
+	{
+	case 0:
+		camera.pos.x = -50;
+		camera.pos.y = 10;
+		camera.pos.z = -90;
+		cutsceneStage = 1;
+		break;
+	case -1:
+		camera.pos.x = -50;
+		camera.pos.y = 10;
+		camera.pos.z = -90;
+		cutsceneStage = 0;
+		break;
+	case 1:
+		camera.pos.x += abs(camera.pos.x + 10) / 2 * dt;
+		camera.pos.z += 1 * dt;
+
+		if (camera.pos.x > -10.005)
+		{
+			cutsceneStage = 2;
+		}
+		break;
+	case 2:
+		camera.pos.x += abs(72.15 + camera.pos.z) * dt;
+		tempCompensation = abs(camera.pos.z + 70) / 2;
+		camera.pos.z += tempCompensation * dt;
+
+		if (camera.pos.x > -3)
+		{
+			cutsceneStage = 3;
+		}
+		break;
+	case 3:
+		camera.pos.x += abs(camera.pos.x + 1) / 2 * dt;
+		camera.pos.z += tempCompensation * abs(camera.pos.x + 2.5) * dt;
+
+		if (camera.pos.z > -69)
+		{
+			cutsceneStage = 4;
+			camera.enableFNAF = false;
+			camera.allowMovement = true;
+			camera.allowJump = true;
+			camera.allowSprint = false;
+			camera.allowCrouch = true;
+			camera.allowProne = false;
+			camera.allowLocomotiveTilt = true;
+			camera.allowLocomotiveBop = false;
+		}
+
+		break;
+	}
+
+
+
 	camera.Update(dt);
 	player[0].pos = camera.pos;
-	std::cout << "x: " << player[0].pos.x << " y: " << player[0].pos.y << " z: " << player[0].pos.z << std::endl;
 	CollisionData cd;
 	for (int i = 0; i < cubeList.size(); i++) {
 		if (OverlapAABB2AABB(player[0], player[0].playerDimensions, cubeList[i], cubeList[i].tentDimensions, cd))
@@ -471,7 +543,7 @@ void SceneMain::Render()
 	//modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Scale(150.f, 1.f, 150.f);
+	modelStack.Scale(150.f, 1.f, 200.f);
 	modelStack.Rotate(-90.f, 1, 0, 0);
 	meshList[GEO_PLANE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
 	meshList[GEO_PLANE]->material.kDiffuse = glm::vec3(0.5f,0.5f, 0.5f);
@@ -750,26 +822,64 @@ void SceneMain::Render()
 		modelStack.Scale(2.f, 2.f, 2.f);
 		RenderMesh(meshList[GEO_HOUSE], true);
 		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Translate(100.f, 0.f, -65.f);
+		modelStack.Rotate(-185.f, 0, 1, 0);
+		modelStack.Scale(2.f, 2.f, 2.f);
+		RenderMesh(meshList[GEO_HOUSE], true);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Translate(-110.f, 0.f, -65.f);
+		modelStack.Rotate(-185.f, 0, 1, 0);
+		modelStack.Scale(2.f, 2.f, 2.f);
+		RenderMesh(meshList[GEO_HOUSE], true);
+		modelStack.PopMatrix();
 	}
 
 	// Render Road
-	modelStack.PushMatrix();
-	modelStack.Translate(-110.f, 1.f, -105.f);
-	modelStack.Rotate(90.f, 0, 1, 0);
-	modelStack.Scale(1.f, 1.f, 1.f);
-	meshList[GEO_ROAD]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
-	meshList[GEO_ROAD]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-	meshList[GEO_ROAD]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	meshList[GEO_ROAD]->material.kShininess = 1.0f;
-	RenderMesh(meshList[GEO_ROAD], true);
-	modelStack.PopMatrix();
+	{
+		meshList[GEO_ROAD]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+		meshList[GEO_ROAD]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+		meshList[GEO_ROAD]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+		meshList[GEO_ROAD]->material.kShininess = 1.0f;
+
+		modelStack.PushMatrix();
+		modelStack.Translate(140.f, 1.f, -100.f);
+		modelStack.Rotate(41.5f, 0, 1, 0);
+		modelStack.Scale(4.f, 3.f, 4.f);
+		RenderMesh(meshList[GEO_ROAD], true);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Translate(50.f, 1.f, -100.f);
+		modelStack.Rotate(41.5f, 0, 1, 0);
+		modelStack.Scale(4.f, 3.f, 4.f);
+		RenderMesh(meshList[GEO_ROAD], true);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Translate(-40.f, 1.f, -100.f);
+		modelStack.Rotate(41.5f, 0, 1, 0);
+		modelStack.Scale(4.f, 3.f, 4.f);
+		RenderMesh(meshList[GEO_ROAD], true);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Translate(-130.f, 1.f, -100.f);
+		modelStack.Rotate(41.5f, 0, 1, 0);
+		modelStack.Scale(4.f, 3.f, 4.f);
+		RenderMesh(meshList[GEO_ROAD], true);
+		modelStack.PopMatrix();
+	}
 
 	RenderUI();
 	RenderDialogue();
 	RenderObjectives();
 
 	std::string temp("FPS:" + std::to_string(fps));
-	RenderTextOnScreen(meshList[GEO_TEXT], temp.substr(0, 9), glm::vec3(0, 1, 0), 20, 620, 50);
+	RenderTextOnScreen(meshList[GEO_FPS], temp.substr(0, 9), glm::vec3(0, 1, 0), 20, 620, 50);
 }
 
 void SceneMain::RenderUI()
@@ -801,131 +911,126 @@ void SceneMain::RenderUI()
 	}
 }
 
-void SceneMain::UpdateDialogue(double dt)
-{
-	if (readSign && !isSignDialogueActive)
-	{
-		isSignDialogueActive = true;
-		currentLineIndex = 0;
-		dialogueTimer = 0;
-	}
+void SceneMain::RenderDialogue() {
+	if (isSignDialogueActive && currentLineIndex < signDialogueLines.size()) {
+		const DialogueLine& currentDialogue = signDialogueLines[currentLineIndex];
 
-	if (isSignDialogueActive)
-	{
-		dialogueTimer += dt;
-
-		if (dialogueTimer >= TEXT_DISPLAY_TIME)
-		{
-			dialogueTimer = 0;
-			currentLineIndex++;
-
-			if (currentLineIndex >= signDialogueLines.size())
-			{
-				isSignDialogueActive = false;
-				readSign = false;
+		if (currentDialogue.isMultiLine) {
+			if (currentDialogue.textLines.size() > 0) {
+				std::string textToRender = currentDialogue.textLines[0].substr(0, currentCharIndex);
+				RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 550);
 			}
+
+			if (currentDialogue.textLines.size() > 1) {
+				std::string textToRender = currentDialogue.textLines[1].substr(0, currentCharIndex);
+				RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 530);
+			}
+		}
+		else {
+			std::string textToRender = currentDialogue.textLines[0].substr(0, currentCharIndex);
+			RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 550);
 		}
 	}
 
-	if (isEnterMainSceneDialogueActive && !hasPlayedEnterMainSceneDialogue)
-	{
-		dialogueTimer += dt;
+	if (isEnterMainSceneDialogueActive && currentLineIndex < enterMainSceneLines.size()) {
+		const DialogueLine& currentDialogue = enterMainSceneLines[currentLineIndex];
 
-		if (dialogueTimer >= TEXT_DISPLAY_TIME)
-		{
-			dialogueTimer = 0;
-			currentLineIndex++;
-
-			if (currentLineIndex >= enterMainSceneLines.size())
-			{
-				isEnterMainSceneDialogueActive = false;
-				hasPlayedEnterMainSceneDialogue = true; 
+		if (currentDialogue.isMultiLine) {
+			if (currentDialogue.textLines.size() > 0) {
+				std::string textToRender = currentDialogue.textLines[0].substr(0, currentCharIndex);
+				RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 550);
 			}
+
+			if (currentDialogue.textLines.size() > 1) {
+				std::string textToRender = currentDialogue.textLines[1].substr(0, currentCharIndex);
+				RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 530);
+			}
+		}
+		else {
+			std::string textToRender = currentDialogue.textLines[0].substr(0, currentCharIndex);
+			RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 550);
 		}
 	}
 }
 
-void SceneMain::RenderDialogue()
-{
-	if (isSignDialogueActive && currentLineIndex < signDialogueLines.size())
-	{
-		const DialogueLine& currentDialogue = signDialogueLines[currentLineIndex];
+void SceneMain::UpdateDialogue(double dt) {
+	if (readSign && !isSignDialogueActive) {
+		isSignDialogueActive = true;
+		currentLineIndex = 0;
+		dialogueTimer = 0;
+		isTyping = true; // Start typing the first line
+		typewriterTimer = 0.0f;
+		currentText = signDialogueLines[currentLineIndex].textLines[0];
+		currentCharIndex = 0;
+	}
 
-		if (currentDialogue.isMultiLine)
-		{
-			if (currentDialogue.textLines.size() > 0) {
-				RenderTextOnScreen(
-					meshList[GEO_TEXT],
-					currentDialogue.textLines[0],
-					glm::vec3(1, 1, 1),
-					20,
-					10,
-					550
-				);
+	if (isSignDialogueActive) {
+		if (isTyping) {
+			typewriterTimer += dt;
+			if (typewriterTimer >= 0.05f) { // Adjust the typing speed here
+				typewriterTimer = 0.0f;
+				currentCharIndex++;
+				if (currentCharIndex >= currentText.length()) {
+					isTyping = false;
+				}
 			}
 
-			if (currentDialogue.textLines.size() > 1) {
-				RenderTextOnScreen(
-					meshList[GEO_TEXT],
-					currentDialogue.textLines[1],
-					glm::vec3(1, 1, 1),
-					20,
-					10,
-					530
-				);
+			if (KeyboardController::GetInstance()->IsKeyPressed('E')) {
+				isTyping = false;
+				currentCharIndex = currentText.length();
 			}
 		}
-		else
-		{
-			RenderTextOnScreen(
-				meshList[GEO_TEXT],
-				currentDialogue.textLines[0],
-				glm::vec3(1, 1, 1),
-				20,
-				10,
-				550
-			);
+		else {
+			dialogueTimer += dt;
+			if (dialogueTimer >= TEXT_DISPLAY_TIME || KeyboardController::GetInstance()->IsKeyPressed('E')) {
+				dialogueTimer = 0;
+				currentLineIndex++;
+				if (currentLineIndex >= signDialogueLines.size()) {
+					isSignDialogueActive = false;
+					readSign = false;
+				}
+				else {
+					isTyping = true;
+					typewriterTimer = 0.0f;
+					currentText = signDialogueLines[currentLineIndex].textLines[0];
+					currentCharIndex = 0;
+				}
+			}
 		}
 	}
 
-	if (isEnterMainSceneDialogueActive && currentLineIndex < enterMainSceneLines.size())
-	{
-		const DialogueLine& currentDialogue = enterMainSceneLines[currentLineIndex];
-
-		if (currentDialogue.isMultiLine)
-		{
-			if (currentDialogue.textLines.size() > 0) {
-				RenderTextOnScreen(
-					meshList[GEO_TEXT],
-					currentDialogue.textLines[0],
-					glm::vec3(1, 1, 1),
-					20,
-					10,
-					550
-				);
+	if (isEnterMainSceneDialogueActive && !hasPlayedEnterMainSceneDialogue) {
+		if (isTyping) {
+			typewriterTimer += dt;
+			if (typewriterTimer >= 0.05f) { // Adjust the typing speed here
+				typewriterTimer = 0.0f;
+				currentCharIndex++;
+				if (currentCharIndex >= currentText.length()) {
+					isTyping = false;
+				}
 			}
 
-			if (currentDialogue.textLines.size() > 1) {
-				RenderTextOnScreen(
-					meshList[GEO_TEXT],
-					currentDialogue.textLines[1],
-					glm::vec3(1, 1, 1),
-					20,
-					10,
-					530
-				);
+			if (KeyboardController::GetInstance()->IsKeyPressed('E')) {
+				isTyping = false;
+				currentCharIndex = currentText.length();
 			}
 		}
-		else
-		{
-			RenderTextOnScreen(
-				meshList[GEO_TEXT],
-				currentDialogue.textLines[0],
-				glm::vec3(1, 1, 1),
-				20,
-				10,
-				550
-			);
+		else {
+			dialogueTimer += dt;
+			if (dialogueTimer >= TEXT_DISPLAY_TIME || KeyboardController::GetInstance()->IsKeyPressed('E')) {
+				dialogueTimer = 0;
+				currentLineIndex++;
+				if (currentLineIndex >= enterMainSceneLines.size()) {
+					isEnterMainSceneDialogueActive = false;
+					hasPlayedEnterMainSceneDialogue = true;
+				}
+				else {
+					isTyping = true;
+					typewriterTimer = 0.0f;
+					currentText = enterMainSceneLines[currentLineIndex].textLines[0];
+					currentCharIndex = 0;
+				}
+			}
 		}
 	}
 }
@@ -945,6 +1050,7 @@ void SceneMain::RenderObjectives() {
 
 	int visibleObjectives = 1; 
 	if (hasReadSign) {
+		camera.allowMovement = true;
 		visibleObjectives++;
 		if (completedGames == 6) {
 			visibleObjectives++;
@@ -1132,6 +1238,7 @@ void SceneMain::HandleKeyPress()
 
 	if (KeyboardController::GetInstance()->IsKeyPressed('F') && showSignText)
 	{
+		camera.allowMovement = false;
 		readSign = true;
 		hasReadSign = true;
 	}
@@ -1155,7 +1262,7 @@ void SceneMain::HandleKeyPress()
 	if (KeyboardController::GetInstance()->IsKeyPressed('E') && showEnterFinalTentText)
 	{
 		// logic to complete the final challenge
-		isFinalChallengeCompleted = true; 
+		isFinalChallengeCompleted = true;
 	}
 }
 

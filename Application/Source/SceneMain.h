@@ -159,6 +159,9 @@ private:
 		bool isMultiLine;                    
 	};
 
+	int cutsceneStage = -1;
+	float tempCompensation;
+
 	std::vector<DialogueLine> enterMainSceneLines = {
 		{{"Hmm... What's this?"}, false},
 		{{"A carnival? In the middle of town?!"}, false},
@@ -187,6 +190,10 @@ private:
 	int currentLineIndex = 0;
 	float dialogueTimer = 0;
 	const float TEXT_DISPLAY_TIME = 4.0f;
+	bool isTyping;
+	float typewriterTimer; 
+	std::string currentText; 
+	int currentCharIndex;
 
 	bool isEnterMainSceneDialogueActive;
 	bool hasPlayedEnterMainSceneDialogue;
@@ -227,10 +234,13 @@ private:
 
 	float fps = 0;
 
+	bool isSceneLoaded; 
+
 	void RenderUI();
 	void RenderObjectives();
 	void UpdateDialogue(double dt);
 	void RenderDialogue();
+	void StartScene(); 
 
 	void RenderMeshOnScreen(Mesh* mesh, float x, float y, float sizex, float sizey);
 	void RenderText(Mesh* mesh, std::string text, glm::vec3 color);

@@ -6,7 +6,7 @@
 
 //Include GLFW
 #include <GLFW/glfw3.h>
-#include <iostream>
+#include "Application.h"
 
 float FPCamera::currentPitch = 0.f;
 
@@ -79,12 +79,22 @@ void FPCamera::Reset()
 {
 }
 
+void FPCamera::setWalkSpeed(float speed)
+{
+	walkSpeed = speed;
+}
+
+void FPCamera::setRunSpeed(float speed)
+{
+	runSpeed = speed;
+}
+
 void FPCamera::Update(double dt)
 {
 
 	static const float ROTATE_SPEED = 100.0f;
-	static const float DEFAULT_SPEED = 30.f;
-	static float ZOOM_SPEED = DEFAULT_SPEED;
+	float DEFAULT_SPEED = walkSpeed;
+	float ZOOM_SPEED = DEFAULT_SPEED;
 	static const float DEFAULT_SWAY = 1.6f;
 	static float SWAY_SPEED = DEFAULT_SWAY;
 	static float SWAY_AMPLITUDE = 0.1f;
@@ -231,7 +241,7 @@ void FPCamera::Update(double dt)
 		}
 	}
 	if (KeyboardController::GetInstance()->IsKeyDown(GLFW_KEY_LEFT_SHIFT) && staminaflag && !crouchflag && allowSprint) {
-		ZOOM_SPEED = 100.f;
+		ZOOM_SPEED = runSpeed;
 		sprintstamina -= 2.f;
 		heightresetflag = false;
 		runflag = true;
@@ -328,8 +338,16 @@ void FPCamera::Update(double dt)
 		bop = glm::sin(boptimer * BOP_SPEED) * BOP_AMPLITUDE;
 	}
 
+	
 	double deltaX = MouseController::GetInstance()->GetMouseDeltaX();
 	float angleX = -deltaX * ROTATE_SPEED * 0.05 * static_cast<float>(dt);
+
+	if (enableFNAF)
+	{
+		Application::SetPointerStatus(true);
+
+		angleX = 0;
+	}
 	glm::mat4 yaw = glm::rotate(
 		glm::mat4(1.f), // matrix to modify
 		glm::radians(angleX), // rotation angle in degree and
@@ -339,6 +357,12 @@ void FPCamera::Update(double dt)
 
 	double deltaY = MouseController::GetInstance()->GetMouseDeltaY();
 	float angleY = deltaY * ROTATE_SPEED * 0.05 * static_cast<float>(dt);
+
+	if (enableFNAF)
+	{
+		angleY = 0;
+	}
+
 	glm::mat4 pitch = glm::rotate(
 		glm::mat4(1.f), // matrix to modify
 		glm::clamp(glm::radians(angleY), -1.5f, 1.5f), // rotation angle in degree and
@@ -346,15 +370,29 @@ void FPCamera::Update(double dt)
 	);
 	glm::vec3 pitchView = pitch * glm::vec4(view, 0.f);
 	target = pos + pitchView + yawView;
-	isDirty = true;
-	this->Refresh();
-
-	//std::cout << pitchView.x << std::endl;
-
-	
 
 	multDebugX = pitchView.z > 0 ? 1 : -1;
 	multDebugZ = pitchView.x > 0 ? -1 : 1;
+	
+	isDirty = true;
+	this->Refresh();
+
+	if (enableFNAF)
+	{
+		glm::vec3 velocity = pos - prevPos;
+		if (glm::length(velocity) > 0.001f) //please don't divide by 0 lol
+		{
+			glm::vec3 newForward = glm::normalize(velocity);
+			forward = glm::mix(forward, newForward, 1.f); //smoothly adjust direction
+			target = pos + forward;
+		}
+	}
+	
+	prevPos = pos;
+
+
+
+
 	UpdatePhysics(dt);
 	
 }

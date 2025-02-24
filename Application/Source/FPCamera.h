@@ -16,6 +16,8 @@ public:
     glm::vec3 up;
     float camheight;
 
+    glm::vec3 prevPos;
+
     FPCamera();
     ~FPCamera();
 
@@ -28,8 +30,12 @@ public:
     void RotateCamera(float dt);
     void RotateAboutCamera(glm::vec3 rotpt, float angle);
 
+    void setWalkSpeed(float speed);
+    void setRunSpeed(float speed);
+
     //bools for camera mechanics
 
+    bool enableFNAF = false;
     bool allowMovement = true; // 
     bool allowJump = true; // 
     bool allowSprint = true; // 
@@ -72,6 +78,9 @@ private:
     bool staminaflag;
     bool runflag;
     bool heightresetflag = false;
+
+    float walkSpeed = 30;
+    float runSpeed = 100;
 
     signed short int multDebugX, multDebugZ;
 

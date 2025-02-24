@@ -19,6 +19,8 @@
 
 #include <iostream>
 
+
+
 SceneBalloonPop::SceneBalloonPop() :
 	m_vertexArrayID(0),
 	m_programID(0),
@@ -31,7 +33,18 @@ SceneBalloonPop::SceneBalloonPop() :
 	projectionStack(),
 	light(),  // This will default construct all lights in the array
 	enableLight(false),
-	app()
+	app(),
+	m_dartPower(0.0f),
+	m_maxDartPower(100.0f),
+	m_powerChargeRate(2.0f),
+	m_isChargingShot(false),
+	m_dartsLeft(1000),
+	m_shootCooldown(0.0f),  // Initialize cooldown timer to 0
+	m_isGameOver(false),
+	m_hasWon(false),
+	m_isObjectiveRead(false),
+	countdownTime(4.0f)
+
 {
 	// Additional initialization if needed
 	for (int i = 0; i < NUM_GEOMETRY; ++i) {
@@ -42,6 +55,21 @@ SceneBalloonPop::SceneBalloonPop() :
 	for (int i = 0; i < U_TOTAL; ++i) {
 		m_parameters[i] = 0;
 	}
+
+	// Initialize game variables
+	gameTimer = GAME_TIME_LIMIT;
+	playerScore = 0;
+	gameOver = false;
+	spawnTimer = 0.0f;
+
+	// Spawn initial balloons
+	for (int i = 0; i < 5; ++i) {
+		SpawnBalloon();
+	}
+	// Initialize darts
+	for (int i = 0; i < MAX_DARTS; ++i) {
+		darts.push_back(Dart());
+	}
 }
 
 SceneBalloonPop::~SceneBalloonPop()
@@ -50,6 +78,16 @@ SceneBalloonPop::~SceneBalloonPop()
 
 void SceneBalloonPop::Init()
 {
+
+	camera.enableFNAF = false;
+	camera.allowMovement = false;
+	camera.allowJump = false;
+	camera.allowSprint = false;
+	camera.allowCrouch = false;
+	camera.allowProne = false;
+	camera.allowLocomotiveTilt = false;
+	camera.allowLocomotiveBop = false;
+
 	// Set background color to dark blue
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
@@ -163,6 +201,17 @@ void SceneBalloonPop::Init()
 	// 16 x 16 is the number of columns and rows for the text
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Images//calibri.tga");
+	meshList[GEO_TEXT2] = MeshBuilder::GenerateText("text2", 16, 16);
+	meshList[GEO_TEXT2]->textureID = LoadTGA("Images//yugothicuisemibold.tga");
+	meshList[GEO_FPS] = MeshBuilder::GenerateText("fpstext", 16, 16);
+	meshList[GEO_FPS]->textureID = LoadTGA("Images//bizudgothic.tga");
+
+	meshList[GEO_KEY_E] = MeshBuilder::GenerateQuad("KeyE", glm::vec3(1.f, 1.f, 1.f), 2.f);
+	meshList[GEO_KEY_E]->textureID = LoadTGA("Images//keyboard_key_e.tga");
+	meshList[GEO_KEY_R] = MeshBuilder::GenerateQuad("KeyE", glm::vec3(1.f, 1.f, 1.f), 2.f);
+	meshList[GEO_KEY_R]->textureID = LoadTGA("Images//keyboard_key_r.tga");
+
+	meshList[GEO_UI] = MeshBuilder::GenerateQuad("UIBox", glm::vec3(0.12f, 0.12f, 0.12f), 10.f);
 
 	meshList[GEO_CRATE] = MeshBuilder::GenerateOBJ("Crate",
 		"Models//cube_low.obj");
@@ -175,6 +224,19 @@ void SceneBalloonPop::Init()
 	meshList[GEO_PRESENT] = MeshBuilder::GenerateOBJ("Present",
 		"Models//uploads_files_4008356_GiftBox_obj.obj");
 	meshList[GEO_PRESENT]->textureID = LoadTGA("Images//present.tga");
+
+	meshList[GEO_BALLOON] = MeshBuilder::GenerateOBJ("Balloon",
+		"Models//Balloon.obj");
+	meshList[GEO_BALLOON]->textureID = LoadTGA("Images//BalloonAlbedo.tga");
+
+	meshList[GEO_DART] = MeshBuilder::GenerateOBJ("Dart",
+		"Models//dart.obj");
+	meshList[GEO_DART]->textureID = LoadTGA("Images//arrow.tga");
+
+	meshList[GEO_GAMEOVER] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 2.f);
+	meshList[GEO_GAMEOVER]->textureID = LoadTGA("Images//balloonpopgameover.tga");
+
+	meshList[GEO_CROSSHAIR] = MeshBuilder::GenerateQuad("Crosshair", glm::vec3(1, 1, 1), 1.f);
 
 	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 1000.0f);
 	projectionStack.LoadMatrix(projection);
@@ -248,39 +310,252 @@ void SceneBalloonPop::Init()
 	glUniform1f(m_parameters[U_LIGHT2_EXPONENT], light[2].exponent);
 
 	enableLight = true;
+}
 
 
+void SceneBalloonPop::HandleDartInput() {
+	// Prevent shooting during countdown or if objectives haven't been read
+	if (!m_isObjectiveRead || countdownTime > 0 || m_isGameOver || m_hasWon) {
+		return;  // Don't process input
+	}
+
+	// Update cooldown timer
+	if (m_shootCooldown > 0) {
+		return;  // Don't process input while on cooldown
+	}
+
+	if (MouseController::GetInstance()->IsButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
+		if (!m_isChargingShot) {
+			m_isChargingShot = true;
+			m_dartPower = 0.0f;
+		}
+		else {
+			m_dartPower = std::min<float>(m_dartPower + m_powerChargeRate, m_maxDartPower);
+		}
+	}
+	else if (MouseController::GetInstance()->IsButtonUp(GLFW_MOUSE_BUTTON_LEFT)) {
+		if (m_isChargingShot) {
+			FireDart();
+			m_isChargingShot = false;
+			m_dartPower = 0.0f;
+			m_shootCooldown = SHOOT_COOLDOWN_DURATION;  // Start cooldown after firing
+		}
+	}
+}
+
+
+void SceneBalloonPop::FireDart() {
+	if (m_dartsLeft <= 0) return;
+
+	for (auto& dart : darts) {
+		if (!dart.isActive) {
+			m_dartsLeft--;
+
+			// Calculate fire direction from camera view direction
+			glm::vec3 forward = camera.target - camera.pos;
+			glm::vec3 fireDirection = glm::normalize(forward);
+
+			// Keep the existing Fire() implementation
+			const float DART_BASE_SPEED = 180.0f;
+			dart.Fire(camera.pos, fireDirection, DART_BASE_SPEED);
+
+			// Keep the existing upward force for arc trajectory
+			const float INITIAL_UP_FORCE = 10.0f;
+			dart.physics.AddForce(glm::vec3(0, INITIAL_UP_FORCE, 0));
+
+			break;
+		}
+	}
+}
+
+void SceneBalloonPop::CheckDartCollisions() {
+	for (auto& dart : darts) {
+		if (dart.isActive) {
+			for (auto& balloon : balloons) {
+				if (!balloon.isPopped) {
+					CollisionData cd;
+					// Check sphere to sphere collision
+					if (OverlapSphere2Sphere(dart.physics, DART_RADIUS,
+						balloon.physics, BALLOON_RADIUS, cd)) {
+						balloon.isPopped = true;
+						dart.isActive = false;
+						playerScore++;
+
+						if (playerScore >= WIN_SCORE) {
+							// Set win condition flags
+							gameOver = true;
+							m_hasWon = true;
+							m_isGameOver = false;  // Ensure game over is false for win state
+						}
+						break;
+					}
+				}
+			}
+		}
+	}
 }
 
 void SceneBalloonPop::Update(double dt)
 {
 	HandleKeyPress();
+	if (!gameOver) {
 
-	/*if (KeyboardController::GetInstance()->IsKeyDown('I'))
-		light[0].position.z -= static_cast<float>(dt) * 5.f;
-	if (KeyboardController::GetInstance()->IsKeyDown('K'))
-		light[0].position.z += static_cast<float>(dt) * 5.f;
-	if (KeyboardController::GetInstance()->IsKeyDown('J'))
-		light[0].position.x -= static_cast<float>(dt) * 5.f;
-	if (KeyboardController::GetInstance()->IsKeyDown('L'))
-		light[0].position.x += static_cast<float>(dt) * 5.f;
-	if (KeyboardController::GetInstance()->IsKeyDown('O'))
-		light[0].position.y -= static_cast<float>(dt) * 5.f;
-	if (KeyboardController::GetInstance()->IsKeyDown('P'))
-		light[0].position.y += static_cast<float>(dt) * 5.f;*/
+		if (m_shootCooldown > 0) {
+			m_shootCooldown -= static_cast<float>(dt);
+		}
+		gameTimer -= static_cast<float>(dt);
+		if (gameTimer <= 0 && playerScore < WIN_SCORE) {
+			gameOver = true;  // Only set gameOver to true if player hasn't reached WIN_SCORE
+			return;
+		}
+		HandleDartInput();
 
-		//light[0].spotDirection = -glm::normalize (camera.target - camera.pos);
-		//light[0].position = camera.pos;
+		// Update all active darts
+		for (auto& dart : darts) {
+			if (dart.isActive) {  // Remove the !dart.isStuck check since darts won't stick anymore
+				// Apply gravity - reduced strength
+				dart.physics.AddForce(glm::vec3(0, -9.81f * 0.05f, 0));
 
-		/*if (MouseController::GetInstance()->IsButtonPressed(GLFW_MOUSE_BUTTON_LEFT))
-		{
-				CSceneManager::GetInstance().ChangeScene(CSceneManager::SCENE_ARCHERY);
-				std::cout << "Scene change called!" << std::endl;
+				// Apply minimal air resistance
+				glm::vec3 airResistance = -dart.physics.vel * 0.01f;
+				dart.physics.AddForce(airResistance);
 
-		}*/
+				// Update physics
+				dart.Update(static_cast<float>(dt));
+
+				// Floor collision now makes dart disappear
+				if (dart.physics.pos.y < 1.0f) {
+					dart.isActive = false;  // Make dart disappear instead of sticking
+				}
+
+				// Wall collisions now make dart disappear
+				const float WALL_X = 120.0f;
+				const float WALL_Z = 120.0f;
+
+				if (std::abs(dart.physics.pos.x) > WALL_X ||
+					std::abs(dart.physics.pos.z) > WALL_Z) {
+					dart.isActive = false;  // Make dart disappear instead of bouncing
+				}
+			}
+		}
+
+		// Check for collisions
+		CheckDartCollisions();
+
+		// Update spawn timer
+		spawnTimer -= static_cast<float>(dt);
+		if (spawnTimer <= 0) {
+			SpawnBalloon();
+			spawnTimer = SPAWN_INTERVAL;
+		}
+
+		// Update balloons
+		for (auto& balloon : balloons) {
+			if (!balloon.isPopped) {
+				// Basic upward force
+				balloon.physics.AddForce(glm::vec3(0, BALLOON_UP_FORCE, 0));
+
+				// Add sine wave motion to create floating effect
+				float time = static_cast<float>(glfwGetTime());
+				float wobbleX = BALLOON_WOBBLE_FORCE * sin(time + balloon.timeAlive);
+				float wobbleZ = BALLOON_WOBBLE_FORCE * cos(time * 0.5f + balloon.timeAlive);
+
+				// Add wobble forces
+				balloon.physics.AddForce(glm::vec3(wobbleX, 0, wobbleZ));
+
+				// Add rightward force that varies with height
+				float rightForce = BALLOON_RIGHT_FORCE * (1.0f + 0.5f * sin(time * 2.0f + balloon.timeAlive));
+				balloon.physics.AddForce(glm::vec3(rightForce, 0, 0));
+
+				// Random movement to prevent synchronization
+				float randX = (rand() % 200 - 100) / 100.0f;
+				float randZ = (rand() % 200 - 100) / 100.0f;
+				balloon.physics.AddForce(glm::vec3(randX, 0, randZ));
+
+				// Update balloon's time alive
+				balloon.timeAlive += static_cast<float>(dt);
+
+				// Wall repulsion forces 
+				const float WALL_REPULSION = 500.0f;
+				const float BOUNCE_FACTOR = 1.7f;
+
+				// X-axis walls
+				if (balloon.physics.pos.x < -120.0f) {
+					balloon.physics.pos.x = -120.0f;
+					balloon.physics.vel.x *= -BOUNCE_FACTOR;
+					balloon.physics.AddForce(glm::vec3(WALL_REPULSION, 0, 0));
+				}
+				if (balloon.physics.pos.x > 120.0f) {
+					balloon.physics.pos.x = 120.0f;
+					balloon.physics.vel.x *= -BOUNCE_FACTOR;
+					balloon.physics.AddForce(glm::vec3(-WALL_REPULSION, 0, 0));
+				}
+
+				// Z-axis walls
+				if (balloon.physics.pos.z < -120.0f) {
+					balloon.physics.pos.z = -120.0f;
+					balloon.physics.vel.z *= -BOUNCE_FACTOR;
+					balloon.physics.AddForce(glm::vec3(0, 0, WALL_REPULSION));
+				}
+				if (balloon.physics.pos.z > 120.0f) {
+					balloon.physics.pos.z = 120.0f;
+					balloon.physics.vel.z *= -BOUNCE_FACTOR;
+					balloon.physics.AddForce(glm::vec3(0, 0, -WALL_REPULSION));
+				}
+
+				// Ceiling behavior
+				if (balloon.physics.pos.y > CEILING_HEIGHT) {
+					balloon.physics.pos.y = CEILING_HEIGHT;
+					balloon.physics.vel.y *= -0.5f;
+					balloon.physics.AddForce(glm::vec3(0, -10.0f, 0));
+				}
+
+				// Update physics
+				balloon.physics.UpdatePhysics(static_cast<float>(dt));
+
+				// More gentle damping to maintain movement
+				balloon.physics.vel *= 0.99f;
+			}
+		}
+	}
+	else {
+		if (KeyboardController::GetInstance()->IsKeyPressed('R') && playerScore < WIN_SCORE) {
+			// Reset game states
+			gameTimer = GAME_TIME_LIMIT;
+			playerScore = 0;
+			gameOver = false;
+			m_isGameOver = false;
+			m_hasWon = false;
+			m_isObjectiveRead = false;
+			countdownTime = 4.f;
+
+			// Clear and respawn balloons
+			balloons.clear();
+			for (int i = 0; i < 5; ++i) {
+				SpawnBalloon();
+			}
+
+			// Reset darts
+			for (auto& dart : darts) {
+				dart.isActive = false;
+			}
+		}
+		return;
+	}
+
+	float temp = 1.f / dt;
+	fps = glm::round(temp * 100.f) / 100.f;
+
+	if (m_isObjectiveRead) {
+		if (countdownTime > 0) {
+			countdownTime -= dt; // decrease countdown time
+			if (countdownTime < 0) {
+				countdownTime = 0; // ensure countdown does not go below 0
+			}
+		}
+	}
 
 	camera.Update(dt);
-
 }
 
 void SceneBalloonPop::Render()
@@ -329,9 +604,9 @@ void SceneBalloonPop::Render()
 	}
 
 
-	modelStack.PushMatrix();
-	RenderMesh(meshList[GEO_AXES], false);
-	modelStack.PopMatrix();
+	//modelStack.PushMatrix();
+	//RenderMesh(meshList[GEO_AXES], false);
+	//modelStack.PopMatrix();
 
 	//modelStack.PushMatrix();
 	//modelStack.Translate(light[1].position.x, light[1].position.y, light[1].position.z);
@@ -656,10 +931,150 @@ void SceneBalloonPop::Render()
 	RenderMesh(meshList[GEO_PRESENT], true);
 	modelStack.PopMatrix();
 
+	// Render all active darts
+	for (const auto& dart : darts) {
+		if (dart.isActive) {
+			modelStack.PushMatrix();
+			modelStack.Translate(
+				dart.physics.pos.x,
+				dart.physics.pos.y,
+				dart.physics.pos.z
+			);
 
-	/*RenderTextOnScreen(meshList[GEO_TEXT], "Stamina", glm::vec3(0, 1, 0), 40, 0, 0);*/
+			// Get direction from player to dart
+			glm::vec3 directionFromPlayer = glm::normalize(dart.physics.pos - camera.pos);
+
+			// Calculate angle to face away from player
+			float angle = atan2(directionFromPlayer.x, directionFromPlayer.z);
+			modelStack.Rotate(glm::degrees(angle), 0, 1, 0);
+
+			// Add pitch based on velocity to show proper trajectory
+			glm::vec3 velocity = dart.physics.vel;
+			float pitch = atan2(velocity.y, sqrt(velocity.x * velocity.x + velocity.z * velocity.z));
+			modelStack.Rotate(glm::degrees(pitch), 1, 0, 0);
+
+			modelStack.Scale(0.5f, 0.5f, 0.5f);
+			meshList[GEO_DART]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+			meshList[GEO_DART]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+			meshList[GEO_DART]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+			meshList[GEO_DART]->material.kShininess = 1.0f;
+			RenderMesh(meshList[GEO_DART], true);
+			modelStack.PopMatrix();
+		}
+	}
+
+	// Render all balloons
+	for (const auto& balloon : balloons) {
+		if (!balloon.isPopped) {
+			modelStack.PushMatrix();
+			modelStack.Translate(
+				balloon.physics.pos.x,
+				balloon.physics.pos.y,
+				balloon.physics.pos.z
+			);
+			modelStack.Scale(1.5f, 1.5f, 1.5f);
+			meshList[GEO_BALLOON]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+			meshList[GEO_BALLOON]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+			meshList[GEO_BALLOON]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+			meshList[GEO_BALLOON]->material.kShininess = 1.0f;
+			RenderMesh(meshList[GEO_BALLOON], true);
+			modelStack.PopMatrix();
+		}
+	}
 
 	RenderSkyBox();
+
+
+	// Render vertical line of crosshair
+	RenderMeshOnScreen(meshList[GEO_CROSSHAIR], 400, 300, 2, 20);  // Thin vertical line
+	// Render horizontal line of crosshair
+	RenderMeshOnScreen(meshList[GEO_CROSSHAIR], 400, 300, 20, 2);  // Thin horizontal line
+
+
+	if (gameOver && playerScore < WIN_SCORE) {
+		m_isGameOver = true;
+	}
+
+	if (!m_isObjectiveRead) {
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 30);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- BALLOON POP -", glm::vec3(1, 1, 0), 25, 220, 430);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Hit the balloons with", glm::vec3(1, 1, 1), 15, 230, 380);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "your arrows!", glm::vec3(1, 1, 1), 15, 320, 350);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Get 10 points before", glm::vec3(1, 1, 1), 15, 230, 320);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "30 seconds is up!", glm::vec3(1, 1, 1), 15, 280, 290);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Press LMB to shoot!", glm::vec3(1, 1, 1), 15, 240, 260);
+
+		RenderMeshOnScreen(meshList[GEO_KEY_E], 310, 200, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Continue", glm::vec3(1, 1, 1), 20, 340, 190);
+	}
+
+
+
+
+	if (m_isObjectiveRead) {
+		if (countdownTime > 0) {
+			std::string countdownText;
+			if (countdownTime > 3.0f) {
+				countdownText = "3..";
+			}
+			else if (countdownTime > 2.0f) {
+				countdownText = "2..";
+			}
+			else if (countdownTime > 1.0f) {
+				countdownText = "1..";
+			}
+			else {
+				countdownText = "GO!";
+			}
+			RenderTextOnScreen(meshList[GEO_TEXT2], countdownText, glm::vec3(1, 1, 1), 50, 350, 300);
+		}
+		else if (m_hasWon) {
+			RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
+			RenderTextOnScreen(meshList[GEO_TEXT2], "YOU WON!", glm::vec3(0, 1, 0), 50, 220, 350);
+			RenderTextOnScreen(meshList[GEO_TEXT2], "You've beat", glm::vec3(1, 1, 1), 20, 295, 300);
+			RenderTextOnScreen(meshList[GEO_TEXT2], "Balloon Pop Game!", glm::vec3(1, 1, 1), 20, 210, 270);
+
+			RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
+			RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
+		}
+		else {
+			// Render UI
+			RenderMeshOnScreen(meshList[GEO_UI], 45, 535, 55, 6);
+			std::string scoreText = "Score: " + std::to_string(playerScore) + "/" + std::to_string(WIN_SCORE);
+			RenderTextOnScreen(meshList[GEO_TEXT2], scoreText, glm::vec3(1, 1, 0), 20, 10, 540);
+
+			std::string timeText = "Time: " + std::to_string(static_cast<int>(gameTimer));
+			RenderTextOnScreen(meshList[GEO_TEXT2], timeText, glm::vec3(1, 1, 1), 20, 10, 510);
+		}
+	}
+
+	if (m_isGameOver) {
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "GAME OVER!", glm::vec3(1, 0, 0), 40, 210, 370);
+
+		RenderTextOnScreen(meshList[GEO_TEXT2], "You ran out of time!", glm::vec3(1, 1, 1), 20, 215, 320);
+
+		RenderMeshOnScreen(meshList[GEO_KEY_R], 350, 270, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Retry", glm::vec3(1, 1, 1), 20, 390, 260);
+		RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
+	}
+
+	if (m_hasWon) {
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "YOU WON!", glm::vec3(0, 1, 0), 50, 220, 350);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "You've beat", glm::vec3(1, 1, 1), 20, 295, 300);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Balloon Pop Game!", glm::vec3(1, 1, 1), 20, 240, 270);
+
+		RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
+	}
+
+
+
+	std::string temp("FPS:" + std::to_string(fps));
+	RenderTextOnScreen(meshList[GEO_FPS], temp.substr(0, 9), glm::vec3(0, 1, 0), 20, 620, 50);
+
 }
 
 void SceneBalloonPop::RenderMesh(Mesh* mesh, bool enableLight)
@@ -707,7 +1122,6 @@ void SceneBalloonPop::RenderMesh(Mesh* mesh, bool enableLight)
 	}
 
 }
-
 
 void SceneBalloonPop::Exit()
 {
@@ -778,7 +1192,16 @@ void SceneBalloonPop::HandleKeyPress()
 
 		glUniform1i(m_parameters[U_LIGHT0_TYPE], light[0].type);
 	}
-
+	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E)) {
+		if (m_hasWon)
+		{
+			// go back to scene main
+		}
+		else
+		{
+			m_isObjectiveRead = true; // set to true when the objective is read
+		}
+	}
 }
 
 
