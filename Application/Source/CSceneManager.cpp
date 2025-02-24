@@ -7,12 +7,13 @@
 #include "SceneWhackAMole.h"
 #include "SceneWIUtest.h"
 #include "MainMenu.h"
+#include "SceneFinal.h"
 // Include other scene headers
 
 void CSceneManager::Init() {
     // Initialize with first scene
     //activeScene = new MainMenu();
-    activeScene = new SceneMain;
+    activeScene = new SceneFinal;
     currentSceneType = SCENE_CARNIVAL;
     activeScene->Init();
 }
