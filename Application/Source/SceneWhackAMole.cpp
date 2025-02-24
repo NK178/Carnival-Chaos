@@ -378,23 +378,20 @@ void SceneWhackAMole::Update(double dt)
 			}
 		}
 	}
-	glm::vec3 oldpos = camera.pos;
-	glm::vec3 oldtarget = camera.target;
-	if (iscameramove)
-		camera.Update(dt);
+	//if (KeyboardController::GetInstance()->IsKeyDown('T')) {
+	//	player[0].AddImpulse(glm::vec3(0, 1, 0) * 25.f);
+	//}
+	//player[0].AddForce(glm::vec3(0, -1, 0) * 20.f);
 	player[0].pos = camera.pos;
+	glm::vec3 viewDir = glm::normalize(camera.target - camera.pos);
 	for (int i = 0; i < walllist.size(); i++) {
 		if (OverlapAABB2AABB(player[0], player[0].boxextent, walllist[i], walllist[i].boxextent, cd)) {
 			ResolveCollision(cd);
-			camera.pos = oldpos;
-			//camera.target = oldtarget;
-			glm::vec3 newView = glm::normalize(oldtarget - oldpos);
-			camera.target = camera.pos + newView;
+			camera.pos = player[0].pos;
+			camera.target = camera.pos + viewDir * 1.2f;
 		}
 	}
-
-
-
+	
 	//Game start and game end logic
 	if (startcountdown > 0.f)
 		startcountdown -= dt;
@@ -409,12 +406,14 @@ void SceneWhackAMole::Update(double dt)
 	if (KeyboardController::GetInstance()->IsKeyDown('R')) {
 		InitGame();
 	}
-
-
 	for (int i = 0; i < walllist.size(); i++) {
 		walllist[i].UpdatePhysics(dt);
 	}
 	player[0].UpdatePhysics(dt);
+	if (iscameramove)
+		camera.Update(dt);
+
+
 
 
 }
