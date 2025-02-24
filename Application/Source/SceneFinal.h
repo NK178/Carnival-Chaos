@@ -149,6 +149,9 @@ private:
 	int fps = 0;
 	
 	PhysicsObject carPhysics;
+	PhysicsObject m_cpu;
+	char AIsteer = 'S';
+	char AImove = 'F';
 	const float CAR_FORCE = 300.0f; // Adjust based on desired acceleration
 	const float CAR_TURN_RATE = 180.0f; // Degrees per second
 	const float CAR_DRAG = 0.95f; // Air resistance factor

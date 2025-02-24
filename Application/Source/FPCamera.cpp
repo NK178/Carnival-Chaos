@@ -393,10 +393,8 @@ void FPCamera::Update(double dt)
 	prevPos = pos;
 
 
-
-
 	UpdatePhysics(dt);
-	
+
 }
 
 glm::vec3 FPCamera::GetView(void)
