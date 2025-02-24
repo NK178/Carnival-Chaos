@@ -138,6 +138,7 @@ private:
 	void RenderText(Mesh* mesh, std::string text, glm::vec3 color);
 	void RenderTextOnScreen(Mesh* mesh, std::string text, glm::vec3 color, float size, float x, float y);
 	void Material(GEOMETRY_TYPE obj, float AmR, float AmG, float AmB, float DifA, float DifG, float DifB, float SpA, float SpG, float SpB, float Shiny);
+	void InitGame();
 	void RenderSkyBox();
 
 	//Hammer 1 
@@ -255,6 +256,16 @@ private:
 			}
 			std::cout << std::endl;
 		}
+		void Clear(void) {
+			if (head != nullptr) {
+				current = head;
+				while (current != nullptr) {
+					head = current->next;
+					delete current;
+					current = head;
+				}
+			}
+		}
 		
 	};
 	struct HammerCollide : public GameObject {
@@ -269,7 +280,7 @@ private:
 		}
 	};
 	struct Player : public GameObject {
-		glm::vec3 boxextent{10.f,10.f,10.f};
+		glm::vec3 boxextent{2.f,10.f,2.f};
 		Player(int id, int type) : GameObject(id,type) {}
 	};
 
@@ -282,17 +293,15 @@ private:
 	std::vector<NodeHammer> inactionorder;
 	Queue attackorder;
 	
-	int orderiter = 1; //TO CHANGE
+	int orderiter = 1; 
 	float startcountdown = 4.f;
 	float attackcooldown = 3.f;
-	float attackchecktimer = 1.f;
-	bool isattack = true;
-	bool gamestart = true; //TO CHANGE
-	bool isplayerhit = false;
-
-	//TO CHANGE
+	float attackchecktimer = 0.1f;
 	float hammerrot = 0.f;
-	bool testing = false;
+	bool isattack = true;
+	bool gamestart = false; 
+	bool isplayerhit = false;
+	bool iscameramove = true;
 
 
 

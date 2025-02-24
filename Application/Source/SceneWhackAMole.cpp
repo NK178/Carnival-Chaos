@@ -309,21 +309,6 @@ void SceneWhackAMole::Init()
 	attackorder.Push(NodeHammer(8, 6, GEO_HAMMER1));
 	attackorder.Push(NodeHammer(8, 8, GEO_HAMMER2));
 
-
-	//hammer positions on grid 
-	//Hammer 1 (3,6,9)
-	hammerspawnpts.push_back(glm::vec3(130, 25, 66));
-	hammerspawnpts.push_back(glm::vec3(0, 25, 110)); //
-	hammerspawnpts.push_back(glm::vec3(-100, 25, 58));
-	hammerspawnpts.push_back(glm::vec3(130, 25, 0));  
-	hammerspawnpts.push_back(glm::vec3(0, 25, 44)); //
-	hammerspawnpts.push_back(glm::vec3(-100, 25, -8));
-	hammerspawnpts.push_back(glm::vec3(130, 25, -66)); 
-	hammerspawnpts.push_back(glm::vec3(0,  25, -22)); // 
-	hammerspawnpts.push_back(glm::vec3(-100, 25, -74));
-
-
-
 	camera.allowJump = false;
 }
 
@@ -345,17 +330,6 @@ void SceneWhackAMole::Update(double dt)
 		testobj.pos.y -= static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('P'))
 		testobj.pos.y += static_cast<float>(dt) * SPEED;
-
-	//TO FIX 
-	if (startcountdown > 0.f)
-		startcountdown -= dt;
-	else
-		gamestart = true;
-
-	//TESTING CODE
-	if (KeyboardController::GetInstance()->IsKeyDown('Y')) {
-		gamestart = true;
-	}
 
 	//Game logic 
 	if (gamestart) {
@@ -380,7 +354,7 @@ void SceneWhackAMole::Update(double dt)
 		else {
 			attackcooldown -= dt;
 			if (attackcooldown < 0.f) {
-				attackchecktimer = 1.f;
+				attackchecktimer = 0.1f;
 				orderiter++;
 				isattack = true;
 				hammerrot = 0.f;
@@ -398,7 +372,7 @@ void SceneWhackAMole::Update(double dt)
 		}
 
 		//Detect hit 
-		if (isattack && attackchecktimer < 0.9f) {
+		if (isattack && attackchecktimer < 0.1f) {
 			for (int i = 0; i < inactionorder.size(); i++) {
 				int iter = inactionorder[i].grid - 1; //to do index 0 
 				if (OverlapAABB2AABB(player[0], player[0].boxextent, cubelist[iter], cubelist[iter].boxextent, cd)) {
@@ -410,32 +384,29 @@ void SceneWhackAMole::Update(double dt)
 			}
 		}
 	}
-
+	//Game start and game end logic
+	if (startcountdown > 0.f)
+		startcountdown -= dt;
+	else if (!isplayerhit)
+		gamestart = true;
 
 	if (isplayerhit) {
-		std::cout << "Game Over " << std::endl;
 		gamestart = false;
+		iscameramove = false;
 	}
 
-	//
-
-	//for (int i = 0; i < cubelist.size(); i++) {
-	//	if (OverlapAABB2AABB(player[0], player[0].boxextent, cubelist[i], cubelist[i].boxextent, cd))
-	//		cubelist[i].iscollide = true;
-	//	else
-	//		cubelist[i].iscollide = false;
-	//}
-
-
-	for (int i = 0; i < cubelist.size(); i++) {
-		cubelist[i].UpdatePhysics(dt);
+	if (KeyboardController::GetInstance()->IsKeyDown('R')) {
+		InitGame();
 	}
+
+
 	for (int i = 0; i < walllist.size(); i++) {
 		walllist[i].UpdatePhysics(dt);
 	}
 	player[0].UpdatePhysics(dt);
 
-	camera.Update(dt);
+	if (iscameramove)
+		camera.Update(dt);
 
 
 }
@@ -587,7 +558,7 @@ void SceneWhackAMole::Render()
 	else
 		inactionorder.clear();
 
-	if (!gamestart) {
+	if (!gamestart && !isplayerhit) {
 		if (startcountdown < 1.f)
 			RenderTextOnScreen(meshList[GEO_TEXT], "Start!", glm::vec3(0, 1, 0), 40, 350, 400);
 		else
@@ -604,7 +575,7 @@ void SceneWhackAMole::Render()
 
 	if (isplayerhit) {
 		RenderTextOnScreen(meshList[GEO_TEXT], "Game Over!", glm::vec3(1, 0, 0), 40, 200, 400);
-		RenderTextOnScreen(meshList[GEO_TEXT], "Press R to restart", glm::vec3(1, 0, 0), 40, 200, 350);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Press R to restart", glm::vec3(1, 0, 0), 40, 80, 350);
 	}
 }
 
@@ -836,6 +807,60 @@ void SceneWhackAMole::Material(GEOMETRY_TYPE obj, float AmR, float AmG, float Am
 	meshList[obj]->material.kDiffuse = glm::vec3(DifA, DifG, DifB);
 	meshList[obj]->material.kSpecular = glm::vec3(SpA, SpG, SpB);
 	meshList[obj]->material.kShininess = Shiny;
+}
+
+void SceneWhackAMole::InitGame()
+{
+	camera.pos = glm::vec3(0, 9, 0);
+	camera.target = glm::vec3(-1, 9, 0);
+	camera.up = glm::vec3(0, 1, 0);
+
+	orderiter = 1;
+	startcountdown = 4.f;
+	attackcooldown = 3.f;
+	attackchecktimer = 0.1f;
+	hammerrot = 0.f;
+	isattack = true;
+	gamestart = false;
+	isplayerhit = false;
+	iscameramove = true;
+
+	//refresh
+	attackorder.Clear(); 
+	inactionorder.clear();
+	attackorder.Push(NodeHammer(1, 5, GEO_HAMMER2));
+	attackorder.Push(NodeHammer(2, 4, GEO_HAMMER3));
+	attackorder.Push(NodeHammer(2, 6, GEO_HAMMER1));
+	attackorder.Push(NodeHammer(3, 1, GEO_HAMMER3));
+	attackorder.Push(NodeHammer(3, 5, GEO_HAMMER2));
+	attackorder.Push(NodeHammer(3, 9, GEO_HAMMER1));
+	attackorder.Push(NodeHammer(4, 1, GEO_HAMMER3));
+	attackorder.Push(NodeHammer(4, 3, GEO_HAMMER1));
+	attackorder.Push(NodeHammer(4, 7, GEO_HAMMER3));
+	attackorder.Push(NodeHammer(4, 9, GEO_HAMMER1));
+	attackorder.Push(NodeHammer(5, 1, GEO_HAMMER3));
+	attackorder.Push(NodeHammer(5, 3, GEO_HAMMER1));
+	attackorder.Push(NodeHammer(5, 4, GEO_HAMMER3));
+	attackorder.Push(NodeHammer(5, 8, GEO_HAMMER2));
+	attackorder.Push(NodeHammer(5, 9, GEO_HAMMER1));
+	attackorder.Push(NodeHammer(6, 1, GEO_HAMMER3));
+	attackorder.Push(NodeHammer(6, 3, GEO_HAMMER1));
+	attackorder.Push(NodeHammer(6, 5, GEO_HAMMER2));
+	attackorder.Push(NodeHammer(6, 7, GEO_HAMMER3));
+	attackorder.Push(NodeHammer(6, 9, GEO_HAMMER1));
+	attackorder.Push(NodeHammer(7, 1, GEO_HAMMER3));
+	attackorder.Push(NodeHammer(7, 4, GEO_HAMMER3));
+	attackorder.Push(NodeHammer(7, 5, GEO_HAMMER2));
+	attackorder.Push(NodeHammer(7, 6, GEO_HAMMER1));
+	attackorder.Push(NodeHammer(7, 8, GEO_HAMMER2));
+	attackorder.Push(NodeHammer(8, 2, GEO_HAMMER2));
+	attackorder.Push(NodeHammer(8, 4, GEO_HAMMER3));
+	attackorder.Push(NodeHammer(8, 5, GEO_HAMMER2));
+	attackorder.Push(NodeHammer(8, 6, GEO_HAMMER1));
+	attackorder.Push(NodeHammer(8, 8, GEO_HAMMER2));
+
+
+
 }
 
 void SceneWhackAMole::RenderSkyBox() {
