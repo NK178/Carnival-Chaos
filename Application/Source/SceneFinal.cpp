@@ -264,13 +264,16 @@ void SceneFinal::Update(double dt) {
 	else if (KeyboardController::GetInstance()->IsKeyDown('S')) {
 		carPhysics.AddForce(-forward * CAR_FORCE * 0.5f); // Reverse at half force
 	}
-
+	carPhysics.vel.y = 0;
+	float plrCarTotalVel = sqrt((carPhysics.vel.x * carPhysics.vel.x) + (carPhysics.vel.z * carPhysics.vel.z));
+	std::cout << plrCarTotalVel << std::endl;
+	
 	// Handle turning
 	if (KeyboardController::GetInstance()->IsKeyDown('A')) {
-		carPhysics.angularVel = CAR_TURN_RATE;
+		carPhysics.angularVel = KeyboardController::GetInstance()->IsKeyDown('S') ? CAR_TURN_RATE * -plrCarTotalVel / 100 : CAR_TURN_RATE * plrCarTotalVel / 100;
 	}
 	else if (KeyboardController::GetInstance()->IsKeyDown('D')) {
-		carPhysics.angularVel = -CAR_TURN_RATE;
+		carPhysics.angularVel = KeyboardController::GetInstance()->IsKeyDown('S') ? -CAR_TURN_RATE * -plrCarTotalVel / 100 : -CAR_TURN_RATE * plrCarTotalVel / 100;
 	}
 	else {
 		carPhysics.angularVel = 0;
