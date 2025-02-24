@@ -14,8 +14,7 @@ struct CollisionData {
 
 //Updates ur vertices LIVE
 void Updatevertices(PhysicsObject& obj, std::vector<glm::vec3>& vertices);
-
-std::vector<glm::vec3> UpdateverticesinYaxis(PhysicsObject& obj, const std::vector<glm::vec3>& vertices);
+void Updatenormals(PhysicsObject& obj, std::vector<glm::vec3>& normals);
 
 
 //Resolve 2 moving objects	
@@ -27,7 +26,11 @@ bool OverlapSphere2Sphere(PhysicsObject& obj1, float r1, PhysicsObject& obj2, fl
 
 bool OverlapAABB2Sphere(PhysicsObject& circle, float radius, PhysicsObject& box, glm::vec3 boxMin, glm::vec3 boxMax, CollisionData& cd);
 
-bool SAT(PhysicsObject& obj1, const std::vector<glm::vec3>& polA, PhysicsObject& obj2, const std::vector<glm::vec3>& polB, CollisionData& cd);
+bool OverlapSphere2Cylinder(PhysicsObject& sphere, float sphradius, PhysicsObject& cylinder, float cyradius, float height, CollisionData& cd);
+
+bool SAT(PhysicsObject& obj1, const std::vector<glm::vec3>& normalsA, const std::vector<glm::vec3>& verticesA, PhysicsObject& obj2,
+	const std::vector<glm::vec3>& normalsB, const std::vector<glm::vec3>& verticesB, CollisionData& cd);
+
 
 
 //

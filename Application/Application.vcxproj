@@ -168,6 +168,7 @@
     <ClCompile Include="Source\SceneHole.cpp" />
     <ClCompile Include="Source\SceneMain.cpp" />
     <ClCompile Include="Source\SceneSpinningRing.cpp" />
+    <ClCompile Include="Source\SceneWhackAMole.cpp" />
     <ClCompile Include="Source\SceneWIUtest.cpp" />
     <ClCompile Include="Source\shader.cpp" />
   </ItemGroup>
@@ -196,6 +197,7 @@
     <ClInclude Include="Source\SceneHole.h" />
     <ClInclude Include="Source\SceneMain.h" />
     <ClInclude Include="Source\SceneSpinningRing.h" />
+    <ClInclude Include="Source\SceneWhackAMole.h" />
     <ClInclude Include="Source\SceneWIUtest.h" />
     <ClInclude Include="Source\shader.hpp" />
     <ClInclude Include="Source\Vertex.h" />

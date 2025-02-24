@@ -21,6 +21,10 @@ public:
 		GEO_QUAD,
 		GEO_SPHERE,
 		GEO_PLANE,
+		GEO_CYLINDER,
+		GEO_HAMMER1,
+		GEO_HAMMER2,
+		GEO_HAMMER3,
 
 		//Text
 		GEO_TEXT,
@@ -131,7 +135,11 @@ private:
 	void RenderTextOnScreen(Mesh* mesh, std::string text, glm::vec3 color, float size, float x, float y);
 	void Material(GEOMETRY_TYPE obj, float AmR, float AmG, float AmB, float DifA, float DifG, float DifB, float SpA, float SpG, float SpB, float Shiny);
 	void RenderSkyBox();
-
+	static glm::vec3 Calculatenormal(glm::vec3 v0, glm::vec3 v1, glm::vec3 v2) {
+		glm::vec3 edge1 = v1 - v0;
+		glm::vec3 edge2 = v2 - v0;
+		return glm::normalize(glm::cross(edge1, edge2)); 
+	}
 
 	struct Cube : public GameObject {
 		glm::vec3 boxextent{ 1.5f,1.5f,1.5f };
@@ -141,9 +149,86 @@ private:
 		float radius;
 		Sphere(int id, int r, int type) : radius(r), GameObject(id, type) {}
 	};
+	struct Cylinder : public GameObject {
+		float height;
+		float radius;
+		Cylinder(int id, int type, int h, int r) : radius(r), height(h), GameObject(id, type) {}
+	};
+
 	struct OBB : public GameObject {
-		std::vector<glm::vec3> vertices; 
+		std::vector<glm::vec3> verticebuffer; //eg. 8
+		std::vector<glm::vec3> indexbuffer;
+		std::vector<glm::vec3> normals;
 		OBB(int id, int type) : GameObject(id, type) {
+
+			//verticebuffer.push_back(glm::vec3(-1.5f, 1.5f, 1.5f));   
+			//verticebuffer.push_back(glm::vec3(1.5f, 1.5f, 1.5f));    
+			//verticebuffer.push_back(glm::vec3(-1.5f, -1.5f, 1.5f));  
+			//verticebuffer.push_back(glm::vec3(1.5f, -1.5f, 1.5f));   
+			//verticebuffer.push_back(glm::vec3(-1.5f, 1.5f, -1.5f));  
+			//verticebuffer.push_back(glm::vec3(1.5f, 1.5f, -1.5f));   
+			//verticebuffer.push_back(glm::vec3(-1.5f, -1.5f, -1.5f)); 
+			//verticebuffer.push_back(glm::vec3(1.5f, -1.5f, -1.5f));  
+
+			verticebuffer.push_back(glm::vec3(-1.5f, 1.5f, 1.5f));   //0
+			verticebuffer.push_back(glm::vec3(1.5f, 1.5f, 1.5f));    //1
+			verticebuffer.push_back(glm::vec3(-1.5f, -1.5f, 1.5f));  //2 
+			verticebuffer.push_back(glm::vec3(1.5f, -1.5f, 1.5f));   //3
+			verticebuffer.push_back(glm::vec3(-1.5f, 1.5f, -1.5f));  //4
+			verticebuffer.push_back(glm::vec3(1.5f, 1.5f, -1.5f));   //5
+			verticebuffer.push_back(glm::vec3(-1.5f, -1.5f, -1.5f)); //6
+			verticebuffer.push_back(glm::vec3(1.5f, -1.5f, -1.5f));  //7
+
+			//normals.push_back(glm::vec3(0, 1, 0));
+			//normals.push_back(glm::vec3(0, -1, 0));
+			//normals.push_back(glm::vec3(1, 0, 0));
+			//normals.push_back(glm::vec3(-1, 0, 0));
+			//normals.push_back(glm::vec3(0, 0, 1));
+			//normals.push_back(glm::vec3(0, 0, -1));
+
+			indexbuffer.push_back(glm::vec3{ 0,1,2 });
+			indexbuffer.push_back(glm::vec3{ 4,5,6 });
+			indexbuffer.push_back(glm::vec3{ 0,4,2});
+			indexbuffer.push_back(glm::vec3{ 1,5,2 });
+			indexbuffer.push_back(glm::vec3{ 0,1,4 });
+			indexbuffer.push_back(glm::vec3{ 2,3,6 });	
+
+	/*		indexbuffer.push_back(glm::vec3{ 0,1,2 });
+			indexbuffer.push_back(glm::vec3{ 4,5,6 });
+			indexbuffer.push_back(glm::vec3{ 0,4,3 });
+			indexbuffer.push_back(glm::vec3{ 1,5,2 });
+			indexbuffer.push_back(glm::vec3{ 0,1,4 });
+			indexbuffer.push_back(glm::vec3{ 2,3,6 });*/
+
+
+			for (int i = 0; i < indexbuffer.size(); i++) {
+				int v0index = indexbuffer[i][0];
+				int v1index = indexbuffer[i][1];
+				int v2index = indexbuffer[i][2];
+
+				glm::vec3 v0 = verticebuffer[v0index];
+				glm::vec3 v1 = verticebuffer[v1index];
+				glm::vec3 v2 = verticebuffer[v2index];
+					
+				glm::vec3 normal = Calculatenormal(v0, v1, v2);
+				normals.push_back(normal);
+			}
+		}
+	};
+
+	//try again
+	struct OBBV2 : public GameObject { 
+		std::vector<glm::vec3> normals;
+		std::vector<glm::vec3> vertices;
+
+		OBBV2(int id, int type) : GameObject(id, type) {
+			normals.push_back(glm::vec3(0, 1, 0));
+			normals.push_back(glm::vec3(0, -1, 0));
+			normals.push_back(glm::vec3(1, 0, 0));
+			normals.push_back(glm::vec3(-1, 0, 0));
+			normals.push_back(glm::vec3(0, 0, 1));
+			normals.push_back(glm::vec3(0, 0, -1));
+
 			vertices.push_back(glm::vec3(-1.5f, 1.5f, 1.5f));    // Vertex 0
 			vertices.push_back(glm::vec3(1.5f, 1.5f, 1.5f));    // Vertex 1
 			vertices.push_back(glm::vec3(-1.5f, -1.5f, 1.5f));    // Vertex 2
@@ -154,17 +239,23 @@ private:
 			vertices.push_back(glm::vec3(1.5f, -1.5f, -1.5f));    // Vertex 7
 		}
 	};
-
+	std::vector<std::vector<glm::vec3>> worldnormals;
+	std::vector<std::vector<glm::vec3>> worldvertices;
+	std::vector<std::vector<glm::vec3>> V1worldnormals;
+	std::vector<std::vector<glm::vec3>> V1worldvertices;
 	bool activate = false;
 	std::vector<Cube> cubelist;
 	std::vector<Sphere> spherelist;	
+	std::vector<Cylinder> cylinderlist;	
 	std::vector<OBB> obblist;
+	std::vector<OBBV2> obblistV2;
 
 	void SortCube2Collide(std::vector<GameObject> GOlist, std::vector<Cube> maincubelist, std::vector<Cube>& newcubelist);
 	//void CubeCollisions(std::vector<Cube>& Cubelist, CollisionData cd);
 	void CubeCollisions(std::vector<int> idlist, std::vector<Cube>& Cubelist, CollisionData cd);
 
-	//testing
+	int iter = 0;
+	int normaliter = 0;
 
 };
 
