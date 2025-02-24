@@ -262,7 +262,7 @@ void SceneHole::Update(double dt)
 		HandleKeyPress();
 
 		wallDisp -= dt * 60;
-		std::cout << camera.pos.z << "\n\n\n";
+		//std::cout << camera.pos.z << "\n\n\n";
 		if (!((camera.pos.x > -170 && camera.pos.x < -130) && (camera.pos.z < 20 && camera.pos.z > -20)))
 		{
 			if (camera.pos.y < 0)
@@ -278,14 +278,14 @@ void SceneHole::Update(double dt)
 
 		if (camera.pos.y <= -100)
 		{
-			std::cout << "FAILED\n";
+			//std::cout << "FAILED\n";
 			gameResult = -1;
 		}
 		else
 		{
 			if (wallDisp <= -1200)
 			{
-				std::cout << "SUCCESS\n";
+				//std::cout << "SUCCESS\n";
 				gameResult = 1;
 			}
 		}
