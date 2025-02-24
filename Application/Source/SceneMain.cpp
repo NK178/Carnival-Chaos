@@ -363,8 +363,6 @@ void SceneMain::Update(double dt)
 	//light[0].spotDirection = -glm::normalize (camera.target - camera.pos);
 	//light[0].position = camera.pos;
 
-	std::cout << camera.pos.x << std::endl;
-
 	switch (cutsceneStage)
 	{
 	case 0:
@@ -1276,6 +1274,9 @@ void SceneMain::HandleKeyPress()
 
 		isEnterMainSceneDialogueActive = false;
 		hasPlayedEnterMainSceneDialogue = true;
+
+		camera.pos = glm::vec3(-3,10,-70);
+		camera.target = glm::vec3(0, 10, -70);
 
 		//// Teleport player to specific camera position
 		//camera.pos = glm::vec3(30.f, 3.f, -80.f); 
