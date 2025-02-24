@@ -291,7 +291,6 @@ void SceneMain::Init()
 	cubeList[4].pos = glm::vec3{ -30, 3, 0 };
 	cubeList[5].pos = glm::vec3{ -30, 3, 40 };
 
-	player[0].mass = 0.f;
 	for (int i = 0; i < cubeList.size(); i++) {
 		cubeList[i].mass = 0.f;
 	}
