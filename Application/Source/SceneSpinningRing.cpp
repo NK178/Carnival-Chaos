@@ -121,7 +121,7 @@ void SceneSpinningRing::Init()
 		m_parameters[U_MATERIAL_SHININESS]);
 
 	// Initialise camera properties
-	camera.Init(glm::vec3(-10,9,-10), glm::vec3(0,0,0), glm::vec3(0,1,0));
+	camera.Init(glm::vec3(-30,9,-20), glm::vec3(0,0,0), glm::vec3(0,1,0));
 
 	// Init VBO here
 	for (int i = 0; i < NUM_GEOMETRY; ++i)
@@ -251,10 +251,10 @@ void SceneSpinningRing::Init()
 
 	// Collisions
 	player.push_back(playerBox(1, GameObject::CUBE));
-	wallSideList.push_back(spinningWallSides(1, GameObject::CUBE));
-	wallSideList.push_back(spinningWallSides(2, GameObject::CUBE));
-	wallSideList.push_back(spinningWallSides(3, GameObject::CUBE));
-	wallSideList.push_back(spinningWallSides(4, GameObject::CUBE));
+	wallSideList.push_back(spinningWallSide(1, GameObject::CUBE));
+	wallSideList.push_back(spinningWallSide(2, GameObject::CUBE));
+	wallSideList.push_back(spinningWallSide(3, GameObject::CUBE));
+	wallSideList.push_back(spinningWallSide(4, GameObject::CUBE));
 
 	wallTopList.push_back(spinningWallTop(5, GameObject::CUBE));
 	wallTopList.push_back(spinningWallTop(6, GameObject::CUBE));
@@ -285,6 +285,10 @@ void SceneSpinningRing::Update(double dt)
 {
 	HandleKeyPress();
 
+	camera.Update(dt);
+	player[0].pos = camera.pos;
+	glm::vec3 viewDir = glm::normalize(camera.target - camera.pos);
+
 	// Collision
 	CollisionData cd;
 	worldnormals.clear();
@@ -303,14 +307,26 @@ void SceneSpinningRing::Update(double dt)
 	};
 
 	player[0].UpdatePhysics(dt);
-
-	/*for (int o = 0; o < wallSideList.size(); o++) {
+	// spinning wall side normals
+	for (int o = 0; o < wallSideList.size(); o++) {
 		std::vector<glm::vec3> temp = wallSideList[o].normals;
 		Updatenormals(wallSideList[o], temp);
-		wallSideList.push_back(temp);
-	}*/
+		worldnormals.push_back(temp);
+	}
+	// spinning wall side vertices
+	for (int o = 0; o < wallSideList.size(); o++) {
+		std::vector<glm::vec3> temp = wallSideList[o].normals;
+		Updatevertices(wallSideList[o], temp);
+		worldvertices.push_back(temp);
+	}
 
-	camera.Update(dt);
+	//for (int i = 0; i < wallSideList.size(); i++) {
+	//	if (OverlapAABB2AABB(player[0], player[0].playerDimensions, wallSideList[i], wallSideList[i].wallDimensions, cd)) {
+	//		ResolveCollision(cd);
+	//		camera.pos = player[0].pos;
+	//		camera.target = camera.pos + viewDir * 1.2f;
+	//	}
+	//}
 
 	// FPS
 	float temp = 1.f / dt;
@@ -393,25 +409,27 @@ void SceneSpinningRing::Render()
 	modelStack.PopMatrix();
 
 	// Render Spinners
-	modelStack.PushMatrix();
-	modelStack.Translate(0.f, 15.f, 0.f);
-	modelStack.Scale(30.f, 30.f, 50.f);
-	meshList[GEO_SPINNER]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
-	meshList[GEO_SPINNER]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-	meshList[GEO_SPINNER]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	meshList[GEO_SPINNER]->material.kShininess = 1.0f;
-	RenderMesh(meshList[GEO_SPINNER], true);
-	modelStack.PopMatrix();
+	{
+		modelStack.PushMatrix();
+		modelStack.Translate(0.f, 15.f, 0.f);
+		modelStack.Scale(30.f, 30.f, 50.f);
+		meshList[GEO_SPINNER]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+		meshList[GEO_SPINNER]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+		meshList[GEO_SPINNER]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+		meshList[GEO_SPINNER]->material.kShininess = 1.0f;
+		RenderMesh(meshList[GEO_SPINNER], true);
+		modelStack.PopMatrix();
 
-	modelStack.PushMatrix();
-	modelStack.Translate(0.f, 5.f, 0.f);
-	modelStack.Scale(50.f, 30.f, 50.f);
-	meshList[GEO_SPINNER2]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
-	meshList[GEO_SPINNER2]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-	meshList[GEO_SPINNER2]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	meshList[GEO_SPINNER2]->material.kShininess = 1.0f;
-	RenderMesh(meshList[GEO_SPINNER2], true);
-	modelStack.PopMatrix();
+		modelStack.PushMatrix();
+		modelStack.Translate(0.f, 5.f, 0.f);
+		modelStack.Scale(50.f, 30.f, 50.f);
+		meshList[GEO_SPINNER2]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+		meshList[GEO_SPINNER2]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+		meshList[GEO_SPINNER2]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+		meshList[GEO_SPINNER2]->material.kShininess = 1.0f;
+		RenderMesh(meshList[GEO_SPINNER2], true);
+		modelStack.PopMatrix();
+	}
 
 	// Render Platform
 	modelStack.PushMatrix();

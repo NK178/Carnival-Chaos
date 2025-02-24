@@ -39,6 +39,7 @@ public:
 		GEO_KEY_E,
 		GEO_KEY_F,
 		GEO_KEY_Q,
+		GEO_UI,
 
 		//Skybox
 		GEO_LEFT,
