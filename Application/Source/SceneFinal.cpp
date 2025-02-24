@@ -122,7 +122,7 @@ void SceneFinal::Init()
 		m_parameters[U_MATERIAL_SHININESS]);
 
 	// Initialise camera properties
-	camera.Init(glm::vec3(-10, 9, -10), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	camera.Init(glm::vec3(-10, 9, -10), glm::vec3(1, 0, 0), glm::vec3(0, 1, 0));
 
 	// Init VBO here
 	for (int i = 0; i < NUM_GEOMETRY; ++i)
@@ -245,7 +245,7 @@ void SceneFinal::Init()
 	carPhysics.bounciness = 0.3f;
 
 	// Initialize camera to follow car
-	camera.Init(glm::vec3(-10, 9, -15), carPhysics.pos, glm::vec3(0, 1, 0));
+	//camera.Init(glm::vec3(-10, 9, -15), carPhysics.pos, glm::vec3(0, 1, 0));
 
 }
 
@@ -266,7 +266,8 @@ void SceneFinal::Update(double dt) {
 	}
 	carPhysics.vel.y = 0;
 	float plrCarTotalVel = sqrt((carPhysics.vel.x * carPhysics.vel.x) + (carPhysics.vel.z * carPhysics.vel.z));
-	std::cout << plrCarTotalVel << std::endl;
+	float cpuCarTotalVel = sqrt((m_cpu.vel.x * m_cpu.vel.x) + (m_cpu.vel.z * m_cpu.vel.z));
+
 
 	// Handle turning
 	if (KeyboardController::GetInstance()->IsKeyDown('A')) {
@@ -279,11 +280,79 @@ void SceneFinal::Update(double dt) {
 		carPhysics.angularVel = 0;
 	}
 
+
+	float aiAngleRad = glm::radians(m_cpu.angleDeg);
+	glm::vec3 aiForward(-sin(aiAngleRad), 0, -cos(aiAngleRad));
+
+	glm::vec3 aiToPlayer = carPhysics.pos - m_cpu.pos;
+
+	float cross = (aiForward.x * aiToPlayer.z) - (aiForward.z * aiToPlayer.x);
+	float dot = glm::dot(aiForward, aiToPlayer);
+
+	std::cout << cross << std::endl;
+
+	if (dot > 0)
+	{
+		AImove = 'F';
+	}
+	else {
+		AImove = 'B';
+	}
+
+	if (AImove == 'F')
+	{
+		m_cpu.AddForce(aiForward * CAR_FORCE);
+
+		if (cross > 2)
+		{
+			AIsteer = 'R';
+		}
+		else if (cross < 2)
+		{
+			AIsteer = 'L';
+		}
+		else
+		{
+			AIsteer = 'N';
+		}
+	}
+	else if (AImove == 'B')
+	{
+		m_cpu.AddForce(-aiForward * CAR_FORCE);
+
+		if (cross > 2)
+		{
+			AIsteer = 'L';
+		}
+		else if (cross < 2)
+		{
+			AIsteer = 'R';
+		}
+		else
+		{
+			AIsteer = 'N';
+		}
+	}
+	if (AIsteer == 'L')
+	{
+		m_cpu.angularVel = AImove == 'B' ? CAR_TURN_RATE * -cpuCarTotalVel / 100 : CAR_TURN_RATE * cpuCarTotalVel / 100;
+	}
+	else if (AIsteer == 'R')
+	{
+		m_cpu.angularVel = AImove == 'B' ? -CAR_TURN_RATE * -cpuCarTotalVel / 100 : -CAR_TURN_RATE * cpuCarTotalVel / 100;
+	}
+	else
+	{
+		m_cpu.angularVel = 0;
+	}
+
 	// Apply drag force
 	carPhysics.vel *= CAR_DRAG;
+	m_cpu.vel *= CAR_DRAG;
 
 	// Update physics
 	carPhysics.UpdatePhysics(dt);
+	m_cpu.UpdatePhysics(dt);
 
 	// Check collisions with fences
 	PhysicsObject frontFence;
@@ -318,6 +387,13 @@ void SceneFinal::Update(double dt) {
 		ResolveCollision(cd);
 	}
 
+	if (OverlapAABB2AABB(m_cpu, carExtent, frontFence, frontBackFenceExtent, cd) ||
+		OverlapAABB2AABB(m_cpu, carExtent, backFence, frontBackFenceExtent, cd) ||
+		OverlapAABB2AABB(m_cpu, carExtent, leftFence, leftRightFenceExtent, cd) ||
+		OverlapAABB2AABB(m_cpu, carExtent, rightFence, leftRightFenceExtent, cd)) {
+		ResolveCollision(cd);
+	}
+
 	// Update camera to match driver's perspective
 	float driverHeight = 7.0f; // Height of driver's head above car base
 	float driverOffset = 0.0f; // Forward/back adjustment from car center
@@ -325,10 +401,15 @@ void SceneFinal::Update(double dt) {
 	// Position camera at driver's head position
 	camera.pos = carPhysics.pos + glm::vec3(0, driverHeight, 0);
 
+	glm::vec3 viewDir = camera.target - camera.pos;
+
 	// Calculate look target point (looking forward along car's direction)
 	glm::vec3 lookDirection = forward;
 	float lookAheadDistance = 10.0f; // How far ahead to look
-	camera.target = camera.pos + (lookDirection * lookAheadDistance);
+	//glm::vec3 fixedLookDirection = glm::vec3(0, 0, 1);
+	//float lookAheadDistance = 10.0f;
+	//camera.target = camera.pos + (lookDirection * lookAheadDistance);
+	camera.target = camera.pos + viewDir * 1.4f;
 
 
 	camera.Update(dt);
@@ -463,6 +544,17 @@ void SceneFinal::Render()
 	modelStack.PushMatrix();
 	modelStack.Translate(carPhysics.pos.x, carPhysics.pos.y, carPhysics.pos.z);
 	modelStack.Rotate(carPhysics.angleDeg, 0, 1, 0);
+	modelStack.Scale(0.2f, 0.25f, 0.2f);
+	meshList[GEO_BUMPERCAR]->material.kAmbient = glm::vec3(0.7f, 0.7f, 0.7f);
+	meshList[GEO_BUMPERCAR]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_BUMPERCAR]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_BUMPERCAR]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_BUMPERCAR], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(m_cpu.pos.x, 7, m_cpu.pos.z);
+	modelStack.Rotate(m_cpu.angleDeg, 0, 1, 0);
 	modelStack.Scale(0.2f, 0.25f, 0.2f);
 	meshList[GEO_BUMPERCAR]->material.kAmbient = glm::vec3(0.7f, 0.7f, 0.7f);
 	meshList[GEO_BUMPERCAR]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
