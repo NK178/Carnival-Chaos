@@ -236,9 +236,6 @@ void SceneBalloonPop::Init()
 	meshList[GEO_GAMEOVER] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 2.f);
 	meshList[GEO_GAMEOVER]->textureID = LoadTGA("Images//balloonpopgameover.tga");
 
-
-
-
 	meshList[GEO_CROSSHAIR] = MeshBuilder::GenerateQuad("Crosshair", glm::vec3(1, 1, 1), 1.f);
 
 	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 1000.0f);
