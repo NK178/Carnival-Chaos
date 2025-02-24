@@ -22,9 +22,7 @@ public:
 		GEO_SPHERE,
 		GEO_PLANE,
 		GEO_CYLINDER,
-		GEO_HAMMER1,
-		GEO_HAMMER2,
-		GEO_HAMMER3,
+		GEO_BEACHBALL,
 
 		//Text
 		GEO_TEXT,
@@ -138,7 +136,7 @@ private:
 
 	struct Sphere : public GameObject {
 		float radius;
-		Sphere(int id, int r, int type) : radius(r), GameObject(id, type) {}
+		Sphere(int id, float r, int type) : radius(r), GameObject(id, type) {}
 	};
 	struct Cylinder : public GameObject {
 		float height;

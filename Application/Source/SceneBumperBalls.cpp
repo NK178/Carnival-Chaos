@@ -127,15 +127,11 @@ void SceneBumperBalls::Init()
 	meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("STAMINA_BAR", glm::vec3(1, 1, 1), 1.f);
 	meshList[GEO_CUBE] = MeshBuilder::GenerateCube("Cube", glm::vec3(1, 1, 1), 1.f);
 	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Sphere", glm::vec3(1, 1, 1), 1.f);
-	//	meshList[GEO_CYLINDER] = MeshBuilder::GenerateCyclinder("Cylinder", glm::vec3(1, 1, 1), 20.f,1.5,5.f);
 	meshList[GEO_CYLINDER] = MeshBuilder::GenerateCylinder("Cylinder", glm::vec3(1, 1, 1), 20.f,1.f,1.f);
-	meshList[GEO_HAMMER1] = MeshBuilder::GenerateOBJMTL("war hammer", "Models//lava_hammer.obj", "Models//lava_hammer.mtl");
-	meshList[GEO_HAMMER1]->textureID = LoadTGA("Images//hammer.tga");
-	meshList[GEO_HAMMER2] = MeshBuilder::GenerateOBJMTL("mallet", "Models//mallet.obj", "Models//mallet.mtl");
-	meshList[GEO_HAMMER2]->textureID = LoadTGA("Images//Mallet_BaseColor.tga");
-	//meshList[GEO_HAMMER3] = MeshBuilder::GenerateOBJMTL("mallet2", "Models//mallet2.obj", "Models//mallet2.mtl");
-	//meshList[GEO_HAMMER3]->textureID = LoadTGA("Images//Mallet2_BaseColor.tga");
+	meshList[GEO_BEACHBALL] = MeshBuilder::GenerateOBJMTL("PlayerBall", "Models//beach-ball.obj", "Models//beach-ball.mtl");
+	meshList[GEO_BEACHBALL]->textureID = LoadTGA("Images//BeachBall_albedo.tga");
 
+	//GEO_BEACHBALL
 	//skybox
 	meshList[GEO_LEFT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
 	meshList[GEO_LEFT]->textureID = LoadTGA("Images//day-at-the-beach_rt.tga");
@@ -234,7 +230,6 @@ void SceneBumperBalls::Init()
 	spherelist[1].mass = 0.f;
 
 	cylinderlist.push_back(Cylinder(101, GameObject::CYLINDER,3.f,1.f));
-	spherelist[0].pos = glm::vec3{ 0,5,0 };
 
 }
 
@@ -351,6 +346,17 @@ void SceneBumperBalls::Render()
 	//meshList[GEO_PLANE]->material.kShininess = 1.0f;
 	//RenderMesh(meshList[GEO_PLANE], true);
 	//modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(0, 5, 0);
+	modelStack.Scale(0.1f, 0.1f, 0.1f);
+	meshList[GEO_BEACHBALL]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+	meshList[GEO_BEACHBALL]->material.kDiffuse = glm::vec3(0.5f,0.5f, 0.5f);
+	meshList[GEO_BEACHBALL]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_BEACHBALL]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_BEACHBALL], true);
+	modelStack.PopMatrix();
+
 
 	for (int i = 0; i < spherelist.size(); i++) {
 		modelStack.PushMatrix();

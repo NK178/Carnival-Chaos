@@ -142,7 +142,7 @@ private:
 	}
 
 	struct Cube : public GameObject {
-		glm::vec3 boxextent{ 1.5f,1.5f,1.5f };
+		glm::vec3 boxextent{ 0.2f,5.f,0.2f };
 		Cube(int id, int type) : GameObject(id, type) {}
 	};
 	struct Sphere : public GameObject {
