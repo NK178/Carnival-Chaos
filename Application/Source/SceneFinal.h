@@ -33,13 +33,18 @@ public:
 		GEO_UI,
 		GEO_CROSSHAIR,
 
-		//SKybox
+		//Skybox
 		GEO_LEFT,
 		GEO_RIGHT,
 		GEO_TOP,
 		GEO_BOTTOM,
 		GEO_FRONT,
 		GEO_BACK,
+
+		//Entities
+		GEO_CAR,
+
+
 		NUM_GEOMETRY,
 	};
 

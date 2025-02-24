@@ -141,6 +141,31 @@ private:
 	std::vector<std::vector<glm::vec3>> worldnormals;
 	std::vector<std::vector<glm::vec3>> worldvertices;
 
+	struct playerBox : public GameObject {
+		glm::vec3 playerDimensions{ 1.5f,7.f,1.5f };
+		playerBox(int id, int type) : GameObject(id, type) {}
+	};
+
+	struct spinningWallSides : public GameObject {
+		glm::vec3 spinningWallSideDimensions{ 1.5f,7.f,1.5f };
+		spinningWallSides(int id, int type) : GameObject(id, type) {}
+	};
+
+	struct spinningWallTop : public GameObject {
+		glm::vec3 spinningWallTopDimensions{ 1.5f,7.f,1.5f };
+		spinningWallTop(int id, int type) : GameObject(id, type) {}
+	};
+
+	struct spinningBeam: public GameObject {
+		glm::vec3 spinningBeamDimensions{ 1.5f,7.f,1.5f };
+		spinningBeam(int id, int type) : GameObject(id, type) {}
+	};
+
+	std::vector<playerBox> player;
+	std::vector<spinningWallSides> wallSideList;
+	std::vector<spinningWallTop> wallTopList;
+	std::vector<spinningBeam> beamList;
+
 	void HandleKeyPress();
 	void RenderMesh(Mesh* mesh, bool enableLight);
 

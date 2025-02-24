@@ -29,6 +29,15 @@ SceneSpinningRing::~SceneSpinningRing()
 
 void SceneSpinningRing::Init()
 {
+	camera.enableFNAF = false;
+	camera.allowMovement = true;
+	camera.allowJump = true;
+	camera.allowSprint = false;
+	camera.allowCrouch = false;
+	camera.allowProne = false;
+	camera.allowLocomotiveTilt = true;
+	camera.allowLocomotiveBop = false;
+
 	// Set background color to dark blue
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
@@ -232,27 +241,82 @@ void SceneSpinningRing::Init()
 	glUniform1f(m_parameters[U_LIGHT2_COSINNER], cosf(glm::radians<float>(light[2].cosInner)));
 	glUniform1f(m_parameters[U_LIGHT2_EXPONENT], light[2].exponent);
 
+	// Initialize Variables
 	enableLight = true;
 	isObjectiveRead = false; 
-	//remainingTime = 30.0f;
-	remainingTime = 1.0f;
+	remainingTime = 30.0f;
 	countdownTime = 4.0f;
 	playerWon = false;
 	playerLost = false;
+
+	// Collisions
+	player.push_back(playerBox(1, GameObject::CUBE));
+	wallSideList.push_back(spinningWallSides(1, GameObject::CUBE));
+	wallSideList.push_back(spinningWallSides(2, GameObject::CUBE));
+	wallSideList.push_back(spinningWallSides(3, GameObject::CUBE));
+	wallSideList.push_back(spinningWallSides(4, GameObject::CUBE));
+
+	wallTopList.push_back(spinningWallTop(5, GameObject::CUBE));
+	wallTopList.push_back(spinningWallTop(6, GameObject::CUBE));
+	wallTopList.push_back(spinningWallTop(7, GameObject::CUBE));
+	wallTopList.push_back(spinningWallTop(8, GameObject::CUBE));
+
+	beamList.push_back(spinningBeam(9, GameObject::CUBE));
+	beamList.push_back(spinningBeam(10, GameObject::CUBE));
+
+	// Collision Boxes Position
+	player[0].pos = camera.pos;
+	//wallTopList[0].pos = glm::vec3{ 0,0,0 };
+
+	for (int i = 0; i < wallSideList.size(); i++) {
+		wallSideList[i].mass = 0.f;
+	}
+
+	for (int j = 0; j < wallTopList.size(); j++) {
+		wallTopList[j].mass = 0.f;
+	}
+
+	for (int n = 0; n < beamList.size(); n++) {
+		beamList[n].mass = 0.f;
+	}
 }
 
 void SceneSpinningRing::Update(double dt)
 {
 	HandleKeyPress();
 
+	// Collision
 	CollisionData cd;
+	worldnormals.clear();
+	worldvertices.clear();
+		
+	for (int i = 0; i < wallSideList.size(); i++) {
+		wallSideList[i].UpdatePhysics(dt);
+	}
+
+	for (int j = 0; j < wallTopList.size(); j++) {
+		wallTopList[j].UpdatePhysics(dt);
+	}
+
+	for (int n = 0; n < beamList.size(); n++) {
+		beamList[n].UpdatePhysics(dt);
+	};
+
+	player[0].UpdatePhysics(dt);
+
+	/*for (int o = 0; o < wallSideList.size(); o++) {
+		std::vector<glm::vec3> temp = wallSideList[o].normals;
+		Updatenormals(wallSideList[o], temp);
+		wallSideList.push_back(temp);
+	}*/
 
 	camera.Update(dt);
 
+	// FPS
 	float temp = 1.f / dt;
 	fps = glm::round(temp * 100.f) / 100.f;
 
-
+	// Countdown Timer
 	if (isObjectiveRead) {
 		if (countdownTime > 0) {
 			countdownTime -= dt; // decrease countdown time
@@ -315,16 +379,6 @@ void SceneSpinningRing::Render()
 		}
 	}
 
-	//modelStack.PushMatrix();
-	//RenderMesh(meshList[GEO_AXES], false);
-	//modelStack.PopMatrix();
-
-	//modelStack.PushMatrix();
-	//modelStack.Translate(light[0].position.x, light[0].position.y, light[0].position.z);
-	//modelStack.Scale(0.1f, 0.1f, 0.1f);
-	//RenderMesh(meshList[GEO_SPHERE], false);
-	//modelStack.PopMatrix();
-
 	RenderSkyBox();
 
 	// Render Lava
@@ -370,7 +424,7 @@ void SceneSpinningRing::Render()
 	RenderMesh(meshList[GEO_CYLINDER], true);
 	modelStack.PopMatrix();
 
-	if (!isObjectiveRead) {
+	if (!isObjectiveRead) { // Render Objective
 		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "- SPINNING RING -", glm::vec3(1, 1, 0), 25, 200, 400);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "Avoid the spinning walls and", glm::vec3(1, 1, 1), 15, 195, 350);
@@ -381,7 +435,7 @@ void SceneSpinningRing::Render()
 		RenderTextOnScreen(meshList[GEO_TEXT2], "Continue", glm::vec3(1, 1, 1), 20, 340, 210);
 	}
 
-	if (isObjectiveRead) {
+	if (isObjectiveRead) { // Render Countdown
 		if (countdownTime > 0) {
 			std::string countdownText;
 			if (countdownTime > 3.0f) {
@@ -398,23 +452,24 @@ void SceneSpinningRing::Render()
 			}
 			RenderTextOnScreen(meshList[GEO_TEXT2], countdownText, glm::vec3(1, 1, 1), 50, 350, 300);
 		}
-		else if (playerWon) {
+		else if (playerWon) { // Render UI if player Wins
 			RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
 			RenderTextOnScreen(meshList[GEO_TEXT2], "YOU WON!", glm::vec3(0, 1, 0), 50, 220, 350);
-			RenderTextOnScreen(meshList[GEO_TEXT2], "You've beat", glm::vec3(1, 1, 1), 20, 295, 300);
+			RenderTextOnScreen(meshList[GEO_TEXT2], "You've beaten the", glm::vec3(1, 1, 1), 20, 240, 300);
 			RenderTextOnScreen(meshList[GEO_TEXT2], "Spinning Rings Game!", glm::vec3(1, 1, 1), 20, 210, 270);
 
 			RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
 			RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
 		}
-		else {
+		else { // Render Time Left
 			RenderMeshOnScreen(meshList[GEO_UI], 45, 560, 45, 3);
 			std::string timeText = "Time Left: " + std::to_string(static_cast<int>(remainingTime));
 			RenderTextOnScreen(meshList[GEO_TEXT2], timeText, glm::vec3(1, 1, 1), 20, 10, 550);
 		}
 	}
 
-	std::string temp("FPS:" + std::to_string(fps));
+	// Render FPS
+	std::string temp("FPS:" + std::to_string(fps)); 
 	RenderTextOnScreen(meshList[GEO_FPS], temp.substr(0, 9), glm::vec3(0, 1, 0), 20, 620, 50);
 }
 

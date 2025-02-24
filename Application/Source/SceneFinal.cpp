@@ -160,6 +160,8 @@ void SceneFinal::Init()
 
 	meshList[GEO_BACK]->textureID = LoadTGA("Images//stadium.tga");
 
+	meshList[GEO_CAR] = MeshBuilder::GenerateCar("AICar", glm::vec3(1.f, 1.f, 1.f), 0);
+
 	// 16 x 16 is the number of columns and rows for the text
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Images//calibri.tga");
@@ -373,6 +375,17 @@ void SceneFinal::Render()
 	meshList[GEO_PLANE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
 	meshList[GEO_PLANE]->material.kShininess = 1.0f;
 	RenderMesh(meshList[GEO_PLANE], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(0.f, 0.f, 0.f);
+	modelStack.Scale(2.f, 2.f, 2.f);
+	modelStack.Rotate(0.f, 0, 1, 0);
+	meshList[GEO_CAR]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+	meshList[GEO_CAR]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_CAR]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_CAR]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_CAR], false);
 	modelStack.PopMatrix();
 
 

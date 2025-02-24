@@ -216,6 +216,7 @@ private:
 	bool showEnterTentText[6];
 	bool tentCompleted[6];
 	glm::vec3 finalTentPosition;
+	bool CheckAllTentsCompleted();
 	bool showEnterFinalTentText;
 	bool isFinalChallengeCompleted;
 
@@ -225,12 +226,18 @@ private:
 	};
 
 	struct tentBoxes : public GameObject {
-		glm::vec3 tentDimensions{ 10.f,10.f,10.f };
+		glm::vec3 tentDimensions{ 10.f,15.f,10.f };
 		tentBoxes(int id, int type) : GameObject(id, type) {}
 	};
 
+	struct finalTentBox : public GameObject {
+		glm::vec3 tentDimensions{ 15.f,20.f,15.f };
+		finalTentBox(int id, int type) : GameObject(id, type) {}
+	};
+
 	std::vector<playerBox> player;
-	std::vector<tentBoxes> cubeList;
+	std::vector<tentBoxes> tentList;
+	std::vector<finalTentBox> finalTent;
 
 	Application app;
 

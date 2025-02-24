@@ -887,15 +887,6 @@ void SceneArchery::Render()
 			}
 			RenderTextOnScreen(meshList[GEO_TEXT2], countdownText, glm::vec3(1, 1, 1), 50, 350, 300);
 		}
-		else if (m_hasWon) {
-			RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
-			RenderTextOnScreen(meshList[GEO_TEXT2], "YOU WON!", glm::vec3(0, 1, 0), 50, 220, 350);
-			RenderTextOnScreen(meshList[GEO_TEXT2], "You've beat", glm::vec3(1, 1, 1), 20, 295, 300);
-			RenderTextOnScreen(meshList[GEO_TEXT2], "Archery Game!", glm::vec3(1, 1, 1), 20, 210, 270);
-
-			RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
-			RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
-		}
 		else {
 			// Render score counter
 			RenderMeshOnScreen(meshList[GEO_UI], 45, 520, 55, 10);
@@ -950,7 +941,7 @@ void SceneArchery::Render()
 	if (m_hasWon) {
 		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "YOU WON!", glm::vec3(0, 1, 0), 50, 220, 350);
-		RenderTextOnScreen(meshList[GEO_TEXT2], "You've beat", glm::vec3(1, 1, 1), 20, 295, 300);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "You've beaten the", glm::vec3(1, 1, 1), 20, 240, 300);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "   Archery Game!", glm::vec3(1, 1, 1), 20, 215, 270);
 
 		RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);

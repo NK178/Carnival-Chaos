@@ -20,6 +20,9 @@
 
 SceneMain::SceneMain()
 {
+	for (int i = 0; i < 6; i++) {
+		tentCompleted[i] = false;
+	}
 }
 
 SceneMain::~SceneMain()
@@ -276,26 +279,30 @@ void SceneMain::Init()
 
 	// collisions
 	player.push_back(playerBox(1, GameObject::CUBE));
-	cubeList.push_back(tentBoxes(2, GameObject::CUBE));
-	cubeList.push_back(tentBoxes(3, GameObject::CUBE));
-	cubeList.push_back(tentBoxes(4, GameObject::CUBE));
-	cubeList.push_back(tentBoxes(5, GameObject::CUBE));
-	cubeList.push_back(tentBoxes(6, GameObject::CUBE));
-	cubeList.push_back(tentBoxes(7, GameObject::CUBE));
+	tentList.push_back(tentBoxes(2, GameObject::CUBE));
+	tentList.push_back(tentBoxes(3, GameObject::CUBE));
+	tentList.push_back(tentBoxes(4, GameObject::CUBE));
+	tentList.push_back(tentBoxes(5, GameObject::CUBE));
+	tentList.push_back(tentBoxes(6, GameObject::CUBE));
+	tentList.push_back(tentBoxes(7, GameObject::CUBE));
+	finalTent.push_back(finalTentBox(8, GameObject::CUBE));
 
 	player[0].pos = camera.pos;
-	cubeList[0].pos = glm::vec3{ 30, 3, -40 };
-	cubeList[1].pos = glm::vec3{ 30, 3, 0 };
-	cubeList[2].pos = glm::vec3{ 30, 3, 40 };
-	cubeList[3].pos = glm::vec3{ -30, 3, -40 };
-	cubeList[4].pos = glm::vec3{ -30, 3, 0 };
-	cubeList[5].pos = glm::vec3{ -30, 3, 40 };
+	tentList[0].pos = glm::vec3{ 30, 3, -40 };
+	tentList[1].pos = glm::vec3{ 30, 3, 0 };
+	tentList[2].pos = glm::vec3{ 30, 3, 40 };
+	tentList[3].pos = glm::vec3{ -30, 3, -40 };
+	tentList[4].pos = glm::vec3{ -30, 3, 0 };
+	tentList[5].pos = glm::vec3{ -30, 3, 40 };
+	finalTent[0].pos = glm::vec3{ 0.f, 0.f, 70.f };
 
-	player[0].mass = 0.f;
-	for (int i = 0; i < cubeList.size(); i++) {
-		cubeList[i].mass = 0.f;
+	for (int i = 0; i < tentList.size(); i++) {
+		tentList[i].mass = 0.f;
 	}
 
+	finalTent[0].mass = 0.f;
+
+	// Typewriting Dialogue
 	isTyping = false; 
 	typewriterTimer = 0.0f; 
 	currentText = "";
@@ -303,6 +310,7 @@ void SceneMain::Init()
 	isEnterMainSceneDialogueActive = true; 
 	hasPlayedEnterMainSceneDialogue = false;
 
+	// Tent Position (for interaction use)
 	tentPositions[0] = glm::vec3(30.f, 0.f, -40.f); 
 	tentPositions[1] = glm::vec3(30.f, 0.f, 0.f);
 	tentPositions[2] = glm::vec3(30.f, 0.f, 40.f);
@@ -355,8 +363,6 @@ void SceneMain::Update(double dt)
 	//light[0].spotDirection = -glm::normalize (camera.target - camera.pos);
 	//light[0].position = camera.pos;
 
-	std::cout << camera.pos.x << std::endl;
-
 	switch (cutsceneStage)
 	{
 	case 0:
@@ -391,10 +397,10 @@ void SceneMain::Update(double dt)
 		}
 		break;
 	case 3:
-		camera.pos.x += abs(camera.pos.x + 1) / 2 * dt;
-		camera.pos.z += tempCompensation * abs(camera.pos.x + 2.5) * dt;
+		//camera.pos.x += abs(camera.pos.x + 1) / 2 * dt;
+		//camera.pos.z += tempCompensation * abs(camera.pos.x + 2.5) * dt;
 
-		if (camera.pos.z > -69)
+		if (1)
 		{
 			cutsceneStage = 4;
 			camera.enableFNAF = false;
@@ -412,78 +418,92 @@ void SceneMain::Update(double dt)
 
 	camera.Update(dt);
 	player[0].pos = camera.pos;
+
+	// Collision
 	CollisionData cd;
-	for (int i = 0; i < cubeList.size(); i++) {
-		if (OverlapAABB2AABB(player[0], player[0].playerDimensions, cubeList[i], cubeList[i].tentDimensions, cd)) {
+	for (int i = 0; i < tentList.size(); i++) {
+		if (OverlapAABB2AABB(player[0], player[0].playerDimensions, tentList[i], tentList[i].tentDimensions, cd)) {
 			ResolveCollision(cd);
 			camera.pos = player[0].pos;
 		}
 	}
 
-	std::cout << "x: " << player[0].pos.x << " y: " << player[0].pos.y << " z: " << player[0].pos.z;
+	if (CheckAllTentsCompleted()) {
+		for (int i = 0; i < finalTent.size(); i++) {
+			if (OverlapAABB2AABB(player[0], player[0].playerDimensions, finalTent[i], finalTent[i].tentDimensions, cd)) {
+				ResolveCollision(cd);
+				camera.pos = player[0].pos;
+			}
+		}
+	}
 
-	for (int i = 0; i < cubeList.size(); i++) {
-		cubeList[i].UpdatePhysics(dt);
+	for (int i = 0; i < tentList.size(); i++) {
+		tentList[i].UpdatePhysics(dt);
 	}
 
 	player[0].UpdatePhysics(dt);
+	finalTent[0].UpdatePhysics(dt);
 
-	float distance = glm::distance(camera.pos, signPosition);
-	if (distance < 12.0f) 
+	// Interaction between Sign and Tents
 	{
-		showSignText = true;
-	}
-	else
-	{
-		showSignText = false;
-	}
-
-	for (int i = 0; i < 6; i++)
-	{
-		float distanceToTent = glm::distance(camera.pos, tentPositions[i]);
-		if (distanceToTent < 18.0f) 
+		float distance = glm::distance(camera.pos, signPosition);
+		if (distance < 12.0f)
 		{
-			showEnterTentText[i] = true;
+			showSignText = true;
 		}
 		else
 		{
-			showEnterTentText[i] = false;
+			showSignText = false;
+		}
+
+		for (int i = 0; i < 6; i++)
+		{
+			float distanceToTent = glm::distance(camera.pos, tentPositions[i]);
+			if (distanceToTent < 22.0f)
+			{
+				showEnterTentText[i] = true;
+			}
+			else
+			{
+				showEnterTentText[i] = false;
+			}
+		}
+
+		bool allTentsCompleted = true;
+		for (int i = 0; i < 6; ++i)
+		{
+			if (!tentCompleted[i])
+			{
+				allTentsCompleted = false;
+				break;
+			}
+		}
+
+		if (allTentsCompleted)
+		{
+			float distanceToFinalTent = glm::distance(camera.pos, finalTentPosition);
+			if (distanceToFinalTent < 25.0f)
+			{
+				showEnterFinalTentText = true;
+			}
+			else
+			{
+				showEnterFinalTentText = false;
+			}
+		}
+
+		if (showReadSignText)
+		{
+			readSignTextTimer += dt;
+			if (readSignTextTimer >= READ_SIGN_TEXT_DISPLAY_TIME)
+			{
+				showReadSignText = false;
+				readSignTextTimer = 0.0f;
+			}
 		}
 	}
 
-	bool allTentsCompleted = true;
-	for (int i = 0; i < 6; ++i)
-	{
-		if (!tentCompleted[i])
-		{
-			allTentsCompleted = false;
-			break;
-		}
-	}
-
-	if (allTentsCompleted)
-	{
-		float distanceToFinalTent = glm::distance(camera.pos, finalTentPosition);
-		if (distanceToFinalTent < 25.0f) 
-		{
-			showEnterFinalTentText = true;
-		}
-		else
-		{
-			showEnterFinalTentText = false;
-		}
-	}
-
-	if (showReadSignText)
-	{
-		readSignTextTimer += dt;
-		if (readSignTextTimer >= READ_SIGN_TEXT_DISPLAY_TIME)
-		{
-			showReadSignText = false;
-			readSignTextTimer = 0.0f;
-		}
-	}
-
+	// FPS
 	float temp = 1.f / dt;
 	fps = glm::round(temp * 100.f) / 100.f;
 
@@ -603,13 +623,26 @@ void SceneMain::Render()
 				}
 			}
 
-			if (allTentsCompleted)
+			if (CheckAllTentsCompleted())
 			{
 				modelStack.PushMatrix();
 				modelStack.Translate(0.f, 0.f, 70.f);
 				modelStack.Rotate(90, 0, 1, 0);
 				modelStack.Scale(0.05f, 0.05f, 0.05f);
 				RenderMesh(meshList[GEO_TENT], true);
+				modelStack.PopMatrix();
+
+				modelStack.PushMatrix();
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+				modelStack.Translate(finalTent[0].pos.x, finalTent[0].pos.y, finalTent[0].pos.z);
+				modelStack.Rotate(finalTent[0].angleDeg, 0, 1, 0);
+				modelStack.Scale(2 * finalTent[0].tentDimensions.x, 2 * finalTent[0].tentDimensions.y, 2 * finalTent[0].tentDimensions.z);
+				meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+				meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+				meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+				meshList[GEO_CUBE]->material.kShininess = 1.0f;
+				RenderMesh(meshList[GEO_CUBE], true);
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 				modelStack.PopMatrix();
 			}
 		}
@@ -877,12 +910,12 @@ void SceneMain::Render()
 	std::string temp("FPS:" + std::to_string(fps));
 	RenderTextOnScreen(meshList[GEO_FPS], temp.substr(0, 9), glm::vec3(0, 1, 0), 20, 620, 50);
 
-	for (int n = 0; n < cubeList.size(); n++) {
+	for (int n = 0; n < tentList.size(); n++) {
 		modelStack.PushMatrix();
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		modelStack.Translate(cubeList[n].pos.x, cubeList[n].pos.y, cubeList[n].pos.z);
-		modelStack.Rotate(cubeList[n].angleDeg, 0, 1, 0);
-        modelStack.Scale(2 * cubeList[n].tentDimensions.x, 2 * cubeList[n].tentDimensions.y, 2 * cubeList[n].tentDimensions.z);
+		modelStack.Translate(tentList[n].pos.x, tentList[n].pos.y, tentList[n].pos.z);
+		modelStack.Rotate(tentList[n].angleDeg, 0, 1, 0);
+        modelStack.Scale(2 * tentList[n].tentDimensions.x, 2 * tentList[n].tentDimensions.y, 2 * tentList[n].tentDimensions.z);
 		meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
 		meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
 		meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
@@ -891,6 +924,14 @@ void SceneMain::Render()
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		modelStack.PopMatrix();
 	}
+}
+
+bool SceneMain::CheckAllTentsCompleted()
+{
+	for (int i = 0; i < 6; i++) {
+		if (!tentCompleted[i]) return false;
+	}
+	return true;
 }
 
 void SceneMain::RenderUI()
@@ -1218,6 +1259,31 @@ void SceneMain::HandleKeyPress()
 	//	// Change to black background
 	//	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	//}
+	if (KeyboardController::GetInstance()->IsKeyPressed('Q'))
+	{
+		// Skip cutscene
+		cutsceneStage = 4;
+		camera.enableFNAF = false;
+		camera.allowMovement = true;
+		camera.allowJump = true;
+		camera.allowSprint = false;
+		camera.allowCrouch = true;
+		camera.allowProne = false;
+		camera.allowLocomotiveTilt = true;
+		camera.allowLocomotiveBop = false;
+
+		isEnterMainSceneDialogueActive = false;
+		hasPlayedEnterMainSceneDialogue = true;
+
+		camera.pos = glm::vec3(-3,10,-70);
+		camera.target = glm::vec3(0, 10, -70);
+
+		//// Teleport player to specific camera position
+		//camera.pos = glm::vec3(30.f, 3.f, -80.f); 
+		//camera.target = glm::vec3(30.f, 3.f, -70.f);
+
+		//cutsceneSkipped = true; // Set the flag to indicate the cutscene has been skipped
+	}
 
 	static bool isRightUp = false;
 	if (!isRightUp && MouseController::GetInstance()->IsButtonDown(GLFW_MOUSE_BUTTON_RIGHT))
