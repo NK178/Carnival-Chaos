@@ -148,12 +148,10 @@ private:
 
 	int fps = 0;
 	
-	float camSpeed;           // Current speed
-	float camAcceleration;    // Acceleration rate
-	float camDeceleration;    // Braking rate
-	float naturalDecel;       // Natural slowdown
-	float maxSpeed;          // Maximum speed
-	float turnRate;          // How fast we can turn
+	PhysicsObject carPhysics;
+	const float CAR_FORCE = 300.0f; // Adjust based on desired acceleration
+	const float CAR_TURN_RATE = 180.0f; // Degrees per second
+	const float CAR_DRAG = 0.95f; // Air resistance factor
 
 
 };

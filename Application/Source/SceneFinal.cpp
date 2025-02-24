@@ -19,13 +19,7 @@
 #include "LoadTGA.h"
 
 
-SceneFinal::SceneFinal() :
-	camSpeed(0.0f),
-	camAcceleration(15.0f),
-	camDeceleration(30.0f),
-	naturalDecel(5.0f),
-	maxSpeed(50.0f),
-	turnRate(90.0f)
+SceneFinal::SceneFinal()
 {
 	
 }
@@ -160,7 +154,7 @@ void SceneFinal::Init()
 
 	meshList[GEO_BACK]->textureID = LoadTGA("Images//stadium.tga");
 
-	meshList[GEO_CAR] = MeshBuilder::GenerateCar("AICar", glm::vec3(1.f, 1.f, 1.f), 0);
+	//meshList[GEO_CAR] = MeshBuilder::GenerateCar("AICar", glm::vec3(1.f, 1.f, 1.f), 0);
 
 	// 16 x 16 is the number of columns and rows for the text
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
@@ -246,68 +240,91 @@ void SceneFinal::Init()
 	enableLight = true;
 
 
+	carPhysics.pos = glm::vec3(-10, 1, -10); // Starting position
+	carPhysics.mass = 1.0f;
+	carPhysics.bounciness = 0.3f;
 
+	// Initialize camera to follow car
+	camera.Init(glm::vec3(-10, 9, -15), carPhysics.pos, glm::vec3(0, 1, 0));
 
 }
 
 void SceneFinal::Update(double dt) {
-	// Forward/Backward movement
+	// Store old position for collision
+	glm::vec3 oldPos = carPhysics.pos;
+
+	// Calculate forward direction based on car's angle
+	float angleRad = glm::radians(carPhysics.angleDeg);
+	glm::vec3 forward(-sin(angleRad), 0, -cos(angleRad));
+
+	// Handle input for car movement
 	if (KeyboardController::GetInstance()->IsKeyDown('W')) {
-		camSpeed = std::min<float>(camSpeed + camAcceleration * dt, maxSpeed);
+		carPhysics.AddForce(forward * CAR_FORCE);
 	}
 	else if (KeyboardController::GetInstance()->IsKeyDown('S')) {
-		camSpeed = std::max<float>(camSpeed - camDeceleration * dt, -maxSpeed * 0.5f);
-	}
-	else {
-		// Natural deceleration
-		if (camSpeed > 0) {
-			camSpeed = std::max<float>(0.0f, camSpeed - naturalDecel * dt);
-		}
-		else if (camSpeed < 0) {
-			camSpeed = std::min<float>(0.0f, camSpeed + naturalDecel * dt);
-		}
+		carPhysics.AddForce(-forward * CAR_FORCE * 0.5f); // Reverse at half force
 	}
 
-	// Turning (affected by speed)
-	float turnFactor = 1.0f - (std::abs(camSpeed) / maxSpeed) * 0.7f;
-
+	// Handle turning
 	if (KeyboardController::GetInstance()->IsKeyDown('A')) {
-		// Calculate rotation around Y axis using lookAt
-		glm::vec3 direction = camera.target - camera.pos;
-		float angle = turnRate * turnFactor * dt;
-
-		// Rotate the direction vector
-		float cs = cos(glm::radians(angle));
-		float sn = sin(glm::radians(angle));
-		float newX = direction.x * cs - direction.z * sn;
-		float newZ = direction.x * sn + direction.z * cs;
-		direction.x = newX;
-		direction.z = newZ;
-
-		camera.target = camera.pos + direction;
+		carPhysics.angularVel = CAR_TURN_RATE;
 	}
 	else if (KeyboardController::GetInstance()->IsKeyDown('D')) {
-		// Same as above but negative angle
-		glm::vec3 direction = camera.target - camera.pos;
-		float angle = -turnRate * turnFactor * dt;
-
-		float cs = cos(glm::radians(angle));
-		float sn = sin(glm::radians(angle));
-		float newX = direction.x * cs - direction.z * sn;
-		float newZ = direction.x * sn + direction.z * cs;
-		direction.x = newX;
-		direction.z = newZ;
-
-		camera.target = camera.pos + direction;
+		carPhysics.angularVel = -CAR_TURN_RATE;
+	}
+	else {
+		carPhysics.angularVel = 0;
 	}
 
-	// Move camera based on speed and direction
-   glm::vec3 direction = glm::normalize(camera.target - camera.pos);
-// Only use X and Z components for movement, maintain Y height
-     camera.pos += glm::vec3(direction.x * camSpeed * (float)dt, 
-                        0.0f,  // Keep Y constant 
-                        direction.z * camSpeed * (float)dt);
-camera.target = camera.pos + direction;
+	// Apply drag force
+	carPhysics.vel *= CAR_DRAG;
+
+	// Update physics
+	carPhysics.UpdatePhysics(dt);
+
+	// Check collisions with fences
+	PhysicsObject frontFence;
+	frontFence.pos = glm::vec3(0, 0, 100);
+	frontFence.mass = 0.0f;
+	glm::vec3 fenceExtent(20.0f, 6.0f, 4.0f);
+	glm::vec3 carExtent(4.0f, 2.0f, 4.0f);
+
+	PhysicsObject backFence;
+	backFence.pos = glm::vec3(0, 0, -100);
+	backFence.mass = 0.0f;
+
+	PhysicsObject leftFence;
+	leftFence.pos = glm::vec3(-100, 0, 0);
+	leftFence.mass = 0.0f;
+	glm::vec3 sideFenceExtent(4.0f, 6.0f, 20.0f);
+
+	PhysicsObject rightFence;
+	rightFence.pos = glm::vec3(100, 0, 0);
+	rightFence.mass = 0.0f;
+
+	CollisionData cd;
+	if (OverlapAABB2AABB(carPhysics, carExtent, frontFence, fenceExtent, cd) ||
+		OverlapAABB2AABB(carPhysics, carExtent, backFence, fenceExtent, cd) ||
+		OverlapAABB2AABB(carPhysics, carExtent, leftFence, sideFenceExtent, cd) ||
+		OverlapAABB2AABB(carPhysics, carExtent, rightFence, sideFenceExtent, cd)) {
+
+		// On collision, resolve it
+		ResolveCollision(cd);
+	}
+
+	// Update camera to match driver's perspective
+	float driverHeight = 7.0f; // Height of driver's head above car base
+	float driverOffset = 0.0f; // Forward/back adjustment from car center
+
+	// Position camera at driver's head position
+	camera.pos = carPhysics.pos + glm::vec3(0, driverHeight, 0);
+
+	// Calculate look target point (looking forward along car's direction)
+	glm::vec3 lookDirection = forward;
+	float lookAheadDistance = 10.0f; // How far ahead to look
+	camera.target = camera.pos + (lookDirection * lookAheadDistance);
+
+
 	camera.Update(dt);
 }
 
@@ -377,7 +394,7 @@ void SceneFinal::Render()
 	RenderMesh(meshList[GEO_PLANE], true);
 	modelStack.PopMatrix();
 
-	modelStack.PushMatrix();
+	/*modelStack.PushMatrix();
 	modelStack.Translate(0.f, 0.f, 0.f);
 	modelStack.Scale(2.f, 2.f, 2.f);
 	modelStack.Rotate(0.f, 0, 1, 0);
@@ -386,7 +403,7 @@ void SceneFinal::Render()
 	meshList[GEO_CAR]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
 	meshList[GEO_CAR]->material.kShininess = 1.0f;
 	RenderMesh(meshList[GEO_CAR], false);
-	modelStack.PopMatrix();
+	modelStack.PopMatrix();*/
 
 
 	// Front wall
@@ -438,15 +455,9 @@ void SceneFinal::Render()
 
 
 	modelStack.PushMatrix();
-	// Use camera position for car position, but keep the y coordinate fixed
-	modelStack.Translate(camera.pos.x, 1, camera.pos.z);
-
-	// Calculate rotation based on camera direction
-	glm::vec3 direction = glm::normalize(camera.target - camera.pos);
-	float rotation = atan2(direction.x, direction.z) * (180.0f / 3.14159f);
-	modelStack.Rotate(rotation + 180.0f, 0, 1, 0);    // Added 180 degrees to face forward
-
-	modelStack.Scale(0.2f, 0.25f, 0.2f);  // Keep existing scale
+	modelStack.Translate(carPhysics.pos.x, carPhysics.pos.y, carPhysics.pos.z);
+	modelStack.Rotate(carPhysics.angleDeg, 0, 1, 0);
+	modelStack.Scale(0.2f, 0.25f, 0.2f);
 	meshList[GEO_BUMPERCAR]->material.kAmbient = glm::vec3(0.7f, 0.7f, 0.7f);
 	meshList[GEO_BUMPERCAR]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
 	meshList[GEO_BUMPERCAR]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
