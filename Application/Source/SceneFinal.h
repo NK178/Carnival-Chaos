@@ -21,6 +21,8 @@ public:
 		GEO_SPHERE,
 		GEO_QUAD,
 		GEO_PLANE,
+		GEO_FENCE,
+		GEO_BUMPERCAR,
 	
 		//Text
 		GEO_TEXT,
@@ -146,7 +148,10 @@ private:
 
 	int fps = 0;
 	
-
+	PhysicsObject carPhysics;
+	const float CAR_FORCE = 300.0f; // Adjust based on desired acceleration
+	const float CAR_TURN_RATE = 180.0f; // Degrees per second
+	const float CAR_DRAG = 0.95f; // Air resistance factor
 
 
 };
