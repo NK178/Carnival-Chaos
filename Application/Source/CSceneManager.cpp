@@ -5,6 +5,7 @@
 #include "SceneMain.h"
 #include "SceneHole.h"
 #include "SceneWhackAMole.h"
+#include "SceneSpinningRing.h"
 #include "SceneWIUtest.h"
 #include "MainMenu.h"
 #include "SceneFinal.h"
