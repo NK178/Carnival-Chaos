@@ -12,8 +12,8 @@
 void CSceneManager::Init() {
     // Initialize with first scene
     //activeScene = new MainMenu();
-    activeScene = new MainMenu;
-    currentSceneType = SCENE_MAIN_MENU;
+    activeScene = new SceneMain;
+    currentSceneType = SCENE_CARNIVAL;
     activeScene->Init();
 }
 

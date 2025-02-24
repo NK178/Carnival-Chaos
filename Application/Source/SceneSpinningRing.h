@@ -114,6 +114,33 @@ public:
 	virtual void Exit();
 
 private:
+
+	struct OBBV2 : public GameObject {
+		std::vector<glm::vec3> normals;
+		std::vector<glm::vec3> vertices;
+
+		OBBV2(int id, int type) : GameObject(id, type) {
+			normals.push_back(glm::vec3(0, 1, 0));
+			normals.push_back(glm::vec3(0, -1, 0));
+			normals.push_back(glm::vec3(1, 0, 0));
+			normals.push_back(glm::vec3(-1, 0, 0));
+			normals.push_back(glm::vec3(0, 0, 1));
+			normals.push_back(glm::vec3(0, 0, -1));
+
+			vertices.push_back(glm::vec3(-1.5f, 1.5f, 1.5f));    // Vertex 0
+			vertices.push_back(glm::vec3(1.5f, 1.5f, 1.5f));    // Vertex 1
+			vertices.push_back(glm::vec3(-1.5f, -1.5f, 1.5f));    // Vertex 2
+			vertices.push_back(glm::vec3(1.5f, -1.5f, 1.5f));    // Vertex 3
+			vertices.push_back(glm::vec3(-1.5f, 1.5f, -1.5f));    // Vertex 4
+			vertices.push_back(glm::vec3(1.5f, 1.5f, -1.5f));    // Vertex 5
+			vertices.push_back(glm::vec3(-1.5f, -1.5f, -1.5f));    // Vertex 6
+			vertices.push_back(glm::vec3(1.5f, -1.5f, -1.5f));    // Vertex 7
+		}
+	};
+
+	std::vector<std::vector<glm::vec3>> worldnormals;
+	std::vector<std::vector<glm::vec3>> worldvertices;
+
 	void HandleKeyPress();
 	void RenderMesh(Mesh* mesh, bool enableLight);
 
