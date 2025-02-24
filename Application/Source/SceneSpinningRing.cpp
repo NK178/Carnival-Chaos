@@ -255,8 +255,8 @@ void SceneSpinningRing::Init()
 	beamList.push_back(spinningBeam(9, GameObject::CUBE));
 	beamList.push_back(spinningBeam(10, GameObject::CUBE));
 
+	// Collision Boxes Position
 	player[0].pos = camera.pos;
-
 	wallTopList[0].pos = glm::vec3{ 0,0,0 };
 
 	for (int i = 0; i < wallSideList.size(); i++) {
@@ -293,7 +293,11 @@ void SceneSpinningRing::Update(double dt)
 		beamList[n].UpdatePhysics(dt);
 	};
 
-	//for (int k = 0; k < )
+	/*for (int o = 0; o < wallSideList.size(); o++) {
+		std::vector<glm::vec3> temp = wallSideList[o].normals;
+		Updatenormals(wallSideList[o], temp);
+		wallSideList.push_back(temp);
+	}*/
 
 	camera.Update(dt);
 
