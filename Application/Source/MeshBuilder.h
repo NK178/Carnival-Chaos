@@ -30,6 +30,8 @@ public:
 	static Mesh* GenerateHWall4(const std::string& meshName, glm::vec3 color);
 	static Mesh* GenerateHWall5(const std::string& meshName, glm::vec3 color);
 
+	static Mesh* GenerateCar(const std::string& meshName, glm::vec3 color, float dir);
+
 	// Step 7
 	static Mesh* GenerateOBJ(const std::string& meshName, const
 		std::string& file_path);

@@ -152,6 +152,8 @@ void SceneFinal::Init()
 	meshList[GEO_BACK] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
 	meshList[GEO_BACK]->textureID = LoadTGA("Images//stadium.tga");
 
+	meshList[GEO_CAR] = MeshBuilder::GenerateCar("AICar", glm::vec3(1.f, 1.f, 1.f), 0);
+
 	// 16 x 16 is the number of columns and rows for the text
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Images//calibri.tga");

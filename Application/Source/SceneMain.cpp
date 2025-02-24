@@ -391,10 +391,10 @@ void SceneMain::Update(double dt)
 		}
 		break;
 	case 3:
-		camera.pos.x += abs(camera.pos.x + 1) / 2 * dt;
-		camera.pos.z += tempCompensation * abs(camera.pos.x + 2.5) * dt;
+		//camera.pos.x += abs(camera.pos.x + 1) / 2 * dt;
+		//camera.pos.z += tempCompensation * abs(camera.pos.x + 2.5) * dt;
 
-		if (camera.pos.z > -69)
+		if (1)
 		{
 			cutsceneStage = 4;
 			camera.enableFNAF = false;
