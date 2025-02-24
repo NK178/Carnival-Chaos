@@ -18,6 +18,7 @@ public:
 		GEO_AXES,
 		//shapes
 		GEO_SPHERE,
+		GEO_CUBE,
 		GEO_QUAD,
 		GEO_PLANE,
 
@@ -32,6 +33,7 @@ public:
 		GEO_SIGN,
 		GEO_HOUSE,
 		GEO_ROAD,
+		GEO_MONEYBAG,
 
 		//GUI
 		GEO_KEY_E,
@@ -223,7 +225,7 @@ private:
 	};
 
 	struct tentBoxes : public GameObject {
-		glm::vec3 tentDimensions{ 30.f,30.f,30.f };
+		glm::vec3 tentDimensions{ 10.f,10.f,10.f };
 		tentBoxes(int id, int type) : GameObject(id, type) {}
 	};
 

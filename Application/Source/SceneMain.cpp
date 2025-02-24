@@ -131,6 +131,7 @@ void SceneMain::Init()
 
 	meshList[GEO_AXES] = MeshBuilder::GenerateAxes("Axes", 10000.f, 10000.f, 10000.f);
 	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Sun", glm::vec3(1.f, 1.f, 1.f), 1.f, 16, 16);
+	meshList[GEO_CUBE] = MeshBuilder::GenerateCube("Cube", glm::vec3(1, 1, 1), 1.f);
 	meshList[GEO_PLANE] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 2.f);
 	meshList[GEO_PLANE]->textureID = LoadTGA("Images//grass.tga");
 	meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("STAMINA_BAR", glm::vec3(1, 1, 1), 1.f);
@@ -189,14 +190,16 @@ void SceneMain::Init()
 	meshList[GEO_TENT]->textureID = LoadTGA("Images//circus_tent.tga");
 	meshList[GEO_SIGN] = MeshBuilder::GenerateOBJ("Sign", "Models//sign.obj");
 	meshList[GEO_SIGN]->textureID = LoadTGA("Images//sign.tga");
-	//meshList[GEO_TREE] = MeshBuilder::GenerateOBJMTL("Tree", "Models//tree.obj", "Models//tree.mtl");
-	//meshList[GEO_TREE]->textureID = LoadTGA("Images//tree.tga");
+	meshList[GEO_TREE] = MeshBuilder::GenerateOBJMTL("Tree", "Models//tree.obj", "Models//tree.mtl");
+	meshList[GEO_TREE]->textureID = LoadTGA("Images//tree.tga");
 	meshList[GEO_FENCE] = MeshBuilder::GenerateOBJMTL("Fence", "Models//fence.obj", "Models//fence.mtl");
 	meshList[GEO_FENCE]->textureID = LoadTGA("Images//fence.tga");
 	meshList[GEO_HOUSE] = MeshBuilder::GenerateOBJMTL("House", "Models//cottage_obj.obj", "Models//cottage_obj.mtl");
 	meshList[GEO_HOUSE]->textureID = LoadTGA("Images//cottage_diffuse.tga");
 	meshList[GEO_ROAD] = MeshBuilder::GenerateOBJMTL("Road", "Models//road.obj", "Models//road.mtl");
 	meshList[GEO_ROAD]->textureID = LoadTGA("Images//road.tga");
+	meshList[GEO_MONEYBAG] = MeshBuilder::GenerateOBJMTL("MoneyBag", "Models//moneybag.obj", "Models//moneybag.mtl");
+	meshList[GEO_MONEYBAG]->textureID = LoadTGA("Images//moneybag.tga");
 
 	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 1000.0f);
 	projectionStack.LoadMatrix(projection);
@@ -407,15 +410,17 @@ void SceneMain::Update(double dt)
 		break;
 	}
 
-
-
 	camera.Update(dt);
 	player[0].pos = camera.pos;
 	CollisionData cd;
 	for (int i = 0; i < cubeList.size(); i++) {
-		if (OverlapAABB2AABB(player[0], player[0].playerDimensions, cubeList[i], cubeList[i].tentDimensions, cd))
+		if (OverlapAABB2AABB(player[0], player[0].playerDimensions, cubeList[i], cubeList[i].tentDimensions, cd)) {
 			ResolveCollision(cd);
+			camera.pos = player[0].pos;
+		}
 	}
+
+	std::cout << "x: " << player[0].pos.x << " y: " << player[0].pos.y << " z: " << player[0].pos.z;
 
 	for (int i = 0; i < cubeList.size(); i++) {
 		cubeList[i].UpdatePhysics(dt);
@@ -531,16 +536,6 @@ void SceneMain::Render()
 	}
 
 	RenderSkyBox();
-
-	//modelStack.PushMatrix();
-	//RenderMesh(meshList[GEO_AXES], false);
-	//modelStack.PopMatrix();
-
-	//modelStack.PushMatrix();
-	//modelStack.Translate(light[0].position.x, light[0].position.y, light[0].position.z);
-	//modelStack.Scale(0.1f, 0.1f, 0.1f);
-	//RenderMesh(meshList[GEO_SPHERE], false);
-	//modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
 	modelStack.Scale(150.f, 1.f, 200.f);
@@ -794,48 +789,49 @@ void SceneMain::Render()
 		meshList[GEO_HOUSE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
 		meshList[GEO_HOUSE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
 		meshList[GEO_HOUSE]->material.kShininess = 1.0f;
+		{
+			modelStack.PushMatrix();
+			modelStack.Translate(30.f, 0.f, -165.f);
+			modelStack.Rotate(-5.f, 0, 1, 0);
+			modelStack.Scale(2.f, 2.f, 2.f);
+			RenderMesh(meshList[GEO_HOUSE], true);
+			modelStack.PopMatrix();
 
-		modelStack.PushMatrix();
-		modelStack.Translate(30.f, 0.f, -165.f);
-		modelStack.Rotate(-5.f, 0, 1, 0);
-		modelStack.Scale(2.f, 2.f, 2.f);
-		RenderMesh(meshList[GEO_HOUSE], true);
-		modelStack.PopMatrix();
+			modelStack.PushMatrix();
+			modelStack.Translate(100.f, 0.f, -165.f);
+			modelStack.Rotate(-5.f, 0, 1, 0);
+			modelStack.Scale(2.f, 2.f, 2.f);
+			RenderMesh(meshList[GEO_HOUSE], true);
+			modelStack.PopMatrix();
 
-		modelStack.PushMatrix();
-		modelStack.Translate(100.f, 0.f, -165.f);
-		modelStack.Rotate(-5.f, 0, 1, 0);
-		modelStack.Scale(2.f, 2.f, 2.f);
-		RenderMesh(meshList[GEO_HOUSE], true);
-		modelStack.PopMatrix();
+			modelStack.PushMatrix();
+			modelStack.Translate(-40.f, 0.f, -165.f);
+			modelStack.Rotate(-5.f, 0, 1, 0);
+			modelStack.Scale(2.f, 2.f, 2.f);
+			RenderMesh(meshList[GEO_HOUSE], true);
+			modelStack.PopMatrix();
 
-		modelStack.PushMatrix();
-		modelStack.Translate(-40.f, 0.f, -165.f);
-		modelStack.Rotate(-5.f, 0, 1, 0);
-		modelStack.Scale(2.f, 2.f, 2.f);
-		RenderMesh(meshList[GEO_HOUSE], true);
-		modelStack.PopMatrix();
+			modelStack.PushMatrix();
+			modelStack.Translate(-110.f, 0.f, -165.f);
+			modelStack.Rotate(-5.f, 0, 1, 0);
+			modelStack.Scale(2.f, 2.f, 2.f);
+			RenderMesh(meshList[GEO_HOUSE], true);
+			modelStack.PopMatrix();
 
-		modelStack.PushMatrix();
-		modelStack.Translate(-110.f, 0.f, -165.f);
-		modelStack.Rotate(-5.f, 0, 1, 0);
-		modelStack.Scale(2.f, 2.f, 2.f);
-		RenderMesh(meshList[GEO_HOUSE], true);
-		modelStack.PopMatrix();
+			modelStack.PushMatrix();
+			modelStack.Translate(100.f, 0.f, -65.f);
+			modelStack.Rotate(-185.f, 0, 1, 0);
+			modelStack.Scale(2.f, 2.f, 2.f);
+			RenderMesh(meshList[GEO_HOUSE], true);
+			modelStack.PopMatrix();
 
-		modelStack.PushMatrix();
-		modelStack.Translate(100.f, 0.f, -65.f);
-		modelStack.Rotate(-185.f, 0, 1, 0);
-		modelStack.Scale(2.f, 2.f, 2.f);
-		RenderMesh(meshList[GEO_HOUSE], true);
-		modelStack.PopMatrix();
-
-		modelStack.PushMatrix();
-		modelStack.Translate(-110.f, 0.f, -65.f);
-		modelStack.Rotate(-185.f, 0, 1, 0);
-		modelStack.Scale(2.f, 2.f, 2.f);
-		RenderMesh(meshList[GEO_HOUSE], true);
-		modelStack.PopMatrix();
+			modelStack.PushMatrix();
+			modelStack.Translate(-110.f, 0.f, -65.f);
+			modelStack.Rotate(-185.f, 0, 1, 0);
+			modelStack.Scale(2.f, 2.f, 2.f);
+			RenderMesh(meshList[GEO_HOUSE], true);
+			modelStack.PopMatrix();
+		}
 	}
 
 	// Render Road
@@ -880,6 +876,21 @@ void SceneMain::Render()
 
 	std::string temp("FPS:" + std::to_string(fps));
 	RenderTextOnScreen(meshList[GEO_FPS], temp.substr(0, 9), glm::vec3(0, 1, 0), 20, 620, 50);
+
+	for (int n = 0; n < cubeList.size(); n++) {
+		modelStack.PushMatrix();
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		modelStack.Translate(cubeList[n].pos.x, cubeList[n].pos.y, cubeList[n].pos.z);
+		modelStack.Rotate(cubeList[n].angleDeg, 0, 1, 0);
+        modelStack.Scale(2 * cubeList[n].tentDimensions.x, 2 * cubeList[n].tentDimensions.y, 2 * cubeList[n].tentDimensions.z);
+		meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+		meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+		meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+		meshList[GEO_CUBE]->material.kShininess = 1.0f;
+		RenderMesh(meshList[GEO_CUBE], true);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		modelStack.PopMatrix();
+	}
 }
 
 void SceneMain::RenderUI()
