@@ -270,6 +270,7 @@ void SceneWhackAMole::Init()
 	//Player 
 	player.push_back(Player(999, GameObject::CUBE));
 	player[0].pos = camera.pos;
+	player[0].target = camera.target;
 
 	for (int i = 0; i < cubelist.size(); i++) {
 		cubelist[i].mass = 0.f;
@@ -378,11 +379,23 @@ void SceneWhackAMole::Update(double dt)
 			}
 		}
 	}
-	//if (KeyboardController::GetInstance()->IsKeyDown('T')) {
-	//	player[0].AddImpulse(glm::vec3(0, 1, 0) * 25.f);
-	//}
-	//player[0].AddForce(glm::vec3(0, -1, 0) * 20.f);
-	player[0].pos = camera.pos;
+
+	////// TESTING FORCE UPWARDS
+	if (KeyboardController::GetInstance()->IsKeyPressed('T')) {
+		shockwave = true;
+		player[0].AddImpulse(glm::vec3(0, 1, 0) * 100.f);
+	}
+	if (!shockwave){
+		player[0].pos = camera.pos;
+		player[0].target = camera.target;
+	}
+	else {
+		camera.pos = player[0].pos;
+		camera.target = player[0].target;
+	}
+
+	player[0].accel = glm::vec3{ 0,-1,0 } *10.f;
+	
 	glm::vec3 viewDir = glm::normalize(camera.target - camera.pos);
 	for (int i = 0; i < walllist.size(); i++) {
 		if (OverlapAABB2AABB(player[0], player[0].boxextent, walllist[i], walllist[i].boxextent, cd)) {
@@ -403,9 +416,8 @@ void SceneWhackAMole::Update(double dt)
 		iscameramove = false;
 	}
 
-	if (KeyboardController::GetInstance()->IsKeyDown('R')) {
+	if (KeyboardController::GetInstance()->IsKeyDown('R')) 
 		InitGame();
-	}
 	for (int i = 0; i < walllist.size(); i++) {
 		walllist[i].UpdatePhysics(dt);
 	}
@@ -430,6 +442,11 @@ void SceneWhackAMole::Render()
 		camera.target.x, camera.target.y, camera.target.z,
 		camera.up.x, camera.up.y, camera.up.z
 	);
+	//viewStack.LookAt(
+	//	player[0].pos.x, player[0].pos.y, player[0].pos.z,
+	//	player[0].target.x, player[0].target.y, player[0].target.z,
+	//	camera.up.x, camera.up.y, camera.up.z
+	//);
 
 	// Load identity matrix into the model stack
 	modelStack.LoadIdentity();
