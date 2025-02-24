@@ -312,7 +312,6 @@ void SceneBalloonPop::Init()
 	enableLight = true;
 }
 
-
 void SceneBalloonPop::HandleDartInput() {
 	// Prevent shooting during countdown or if objectives haven't been read
 	if (!m_isObjectiveRead || countdownTime > 0 || m_isGameOver || m_hasWon) {
@@ -342,7 +341,6 @@ void SceneBalloonPop::HandleDartInput() {
 		}
 	}
 }
-
 
 void SceneBalloonPop::FireDart() {
 	if (m_dartsLeft <= 0) return;
@@ -1013,9 +1011,6 @@ void SceneBalloonPop::Render()
 		RenderTextOnScreen(meshList[GEO_TEXT2], "Continue", glm::vec3(1, 1, 1), 20, 340, 190);
 	}
 
-
-
-
 	if (m_isObjectiveRead) {
 		if (countdownTime > 0) {
 			std::string countdownText;
@@ -1032,15 +1027,6 @@ void SceneBalloonPop::Render()
 				countdownText = "GO!";
 			}
 			RenderTextOnScreen(meshList[GEO_TEXT2], countdownText, glm::vec3(1, 1, 1), 50, 350, 300);
-		}
-		else if (m_hasWon) {
-			RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
-			RenderTextOnScreen(meshList[GEO_TEXT2], "YOU WON!", glm::vec3(0, 1, 0), 50, 220, 350);
-			RenderTextOnScreen(meshList[GEO_TEXT2], "You've beat", glm::vec3(1, 1, 1), 20, 295, 300);
-			RenderTextOnScreen(meshList[GEO_TEXT2], "Balloon Pop Game!", glm::vec3(1, 1, 1), 20, 210, 270);
-
-			RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
-			RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
 		}
 		else {
 			// Render UI
@@ -1068,14 +1054,12 @@ void SceneBalloonPop::Render()
 	if (m_hasWon) {
 		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "YOU WON!", glm::vec3(0, 1, 0), 50, 220, 350);
-		RenderTextOnScreen(meshList[GEO_TEXT2], "You've beat", glm::vec3(1, 1, 1), 20, 295, 300);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "You've beaten the ", glm::vec3(1, 1, 1), 20, 240, 300);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "Balloon Pop Game!", glm::vec3(1, 1, 1), 20, 240, 270);
 
 		RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
 	}
-
-
 
 	std::string temp("FPS:" + std::to_string(fps));
 	RenderTextOnScreen(meshList[GEO_FPS], temp.substr(0, 9), glm::vec3(0, 1, 0), 20, 620, 50);
