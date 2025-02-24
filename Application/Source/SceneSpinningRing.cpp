@@ -29,6 +29,15 @@ SceneSpinningRing::~SceneSpinningRing()
 
 void SceneSpinningRing::Init()
 {
+	camera.enableFNAF = false;
+	camera.allowMovement = true;
+	camera.allowJump = true;
+	camera.allowSprint = false;
+	camera.allowCrouch = false;
+	camera.allowProne = false;
+	camera.allowLocomotiveTilt = true;
+	camera.allowLocomotiveBop = false;
+
 	// Set background color to dark blue
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
@@ -255,9 +264,9 @@ void SceneSpinningRing::Init()
 	beamList.push_back(spinningBeam(9, GameObject::CUBE));
 	beamList.push_back(spinningBeam(10, GameObject::CUBE));
 
+	// Collision Boxes Position
 	player[0].pos = camera.pos;
-
-	wallTopList[0].pos = glm::vec3{ 0,0,0 };
+	//wallTopList[0].pos = glm::vec3{ 0,0,0 };
 
 	for (int i = 0; i < wallSideList.size(); i++) {
 		wallSideList[i].mass = 0.f;
@@ -293,7 +302,13 @@ void SceneSpinningRing::Update(double dt)
 		beamList[n].UpdatePhysics(dt);
 	};
 
-	//for (int k = 0; k < )
+	player[0].UpdatePhysics(dt);
+
+	/*for (int o = 0; o < wallSideList.size(); o++) {
+		std::vector<glm::vec3> temp = wallSideList[o].normals;
+		Updatenormals(wallSideList[o], temp);
+		wallSideList.push_back(temp);
+	}*/
 
 	camera.Update(dt);
 
@@ -440,7 +455,7 @@ void SceneSpinningRing::Render()
 		else if (playerWon) { // Render UI if player Wins
 			RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
 			RenderTextOnScreen(meshList[GEO_TEXT2], "YOU WON!", glm::vec3(0, 1, 0), 50, 220, 350);
-			RenderTextOnScreen(meshList[GEO_TEXT2], "You've beat", glm::vec3(1, 1, 1), 20, 295, 300);
+			RenderTextOnScreen(meshList[GEO_TEXT2], "You've beaten the", glm::vec3(1, 1, 1), 20, 240, 300);
 			RenderTextOnScreen(meshList[GEO_TEXT2], "Spinning Rings Game!", glm::vec3(1, 1, 1), 20, 210, 270);
 
 			RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);

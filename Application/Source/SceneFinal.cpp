@@ -21,6 +21,7 @@
 
 SceneFinal::SceneFinal()
 {
+	
 }
 
 SceneFinal::~SceneFinal()
@@ -136,7 +137,7 @@ void SceneFinal::Init()
 	meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("STAMINA_BAR", glm::vec3(1, 1, 1), 1.f);
 
 	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Sphere", glm::vec3(1, 1, 1), 1.f);
-	
+
 
 	//skybox
 	meshList[GEO_LEFT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
@@ -144,21 +145,28 @@ void SceneFinal::Init()
 	meshList[GEO_RIGHT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
 	meshList[GEO_RIGHT]->textureID = LoadTGA("Images//stadium.tga");
 	meshList[GEO_TOP] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_TOP]->textureID = LoadTGA("Images//stadiumsky.tga");
+	meshList[GEO_TOP]->textureID = LoadTGA("Images//skystadium.tga");
 	meshList[GEO_BOTTOM] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
 	meshList[GEO_BOTTOM]->textureID = LoadTGA("Images//stadium.tga");
 	meshList[GEO_FRONT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
 	meshList[GEO_FRONT]->textureID = LoadTGA("Images//stadium.tga");
 	meshList[GEO_BACK] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
+
 	meshList[GEO_BACK]->textureID = LoadTGA("Images//stadium.tga");
 
-	meshList[GEO_CAR] = MeshBuilder::GenerateCar("AICar", glm::vec3(1.f, 1.f, 1.f), 0);
+	//meshList[GEO_CAR] = MeshBuilder::GenerateCar("AICar", glm::vec3(1.f, 1.f, 1.f), 0);
 
 	// 16 x 16 is the number of columns and rows for the text
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Images//calibri.tga");
 
-	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 1000.0f);
+	meshList[GEO_FENCE] = MeshBuilder::GenerateOBJ("Fence", "Models//wall_OBJ.obj");
+	meshList[GEO_FENCE]->textureID = LoadTGA("Images//duvar.tga");
+
+	meshList[GEO_BUMPERCAR] = MeshBuilder::GenerateOBJ("Car", "Models//ATV.obj");
+	meshList[GEO_BUMPERCAR]->textureID = LoadTGA("Images//cart.tga");
+
+	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.4f, 1000.0f);
 	projectionStack.LoadMatrix(projection);
 
 	glUniform1i(m_parameters[U_NUMLIGHTS], NUM_LIGHTS);
@@ -232,18 +240,95 @@ void SceneFinal::Init()
 	enableLight = true;
 
 
+	carPhysics.pos = glm::vec3(-10, 1, -10); // Starting position
+	carPhysics.mass = 1.0f;
+	carPhysics.bounciness = 0.3f;
 
+	// Initialize camera to follow car
+	camera.Init(glm::vec3(-10, 9, -15), carPhysics.pos, glm::vec3(0, 1, 0));
 
 }
 
-void SceneFinal::Update(double dt)
-{
+void SceneFinal::Update(double dt) {
+	// Store old position for collision
+	glm::vec3 oldPos = carPhysics.pos;
 
-	HandleKeyPress();
+	// Calculate forward direction based on car's angle
+	float angleRad = glm::radians(carPhysics.angleDeg);
+	glm::vec3 forward(-sin(angleRad), 0, -cos(angleRad));
+
+	// Handle input for car movement
+	if (KeyboardController::GetInstance()->IsKeyDown('W')) {
+		carPhysics.AddForce(forward * CAR_FORCE);
+	}
+	else if (KeyboardController::GetInstance()->IsKeyDown('S')) {
+		carPhysics.AddForce(-forward * CAR_FORCE * 0.5f); // Reverse at half force
+	}
+	carPhysics.vel.y = 0;
+	float plrCarTotalVel = sqrt((carPhysics.vel.x * carPhysics.vel.x) + (carPhysics.vel.z * carPhysics.vel.z));
+	std::cout << plrCarTotalVel << std::endl;
 	
+	// Handle turning
+	if (KeyboardController::GetInstance()->IsKeyDown('A')) {
+		carPhysics.angularVel = KeyboardController::GetInstance()->IsKeyDown('S') ? CAR_TURN_RATE * -plrCarTotalVel / 100 : CAR_TURN_RATE * plrCarTotalVel / 100;
+	}
+	else if (KeyboardController::GetInstance()->IsKeyDown('D')) {
+		carPhysics.angularVel = KeyboardController::GetInstance()->IsKeyDown('S') ? -CAR_TURN_RATE * -plrCarTotalVel / 100 : -CAR_TURN_RATE * plrCarTotalVel / 100;
+	}
+	else {
+		carPhysics.angularVel = 0;
+	}
+
+	// Apply drag force
+	carPhysics.vel *= CAR_DRAG;
+
+	// Update physics
+	carPhysics.UpdatePhysics(dt);
+
+	// Check collisions with fences
+	PhysicsObject frontFence;
+	frontFence.pos = glm::vec3(0, 0, 100);
+	frontFence.mass = 0.0f;
+	glm::vec3 fenceExtent(20.0f, 6.0f, 4.0f);
+	glm::vec3 carExtent(4.0f, 2.0f, 4.0f);
+
+	PhysicsObject backFence;
+	backFence.pos = glm::vec3(0, 0, -100);
+	backFence.mass = 0.0f;
+
+	PhysicsObject leftFence;
+	leftFence.pos = glm::vec3(-100, 0, 0);
+	leftFence.mass = 0.0f;
+	glm::vec3 sideFenceExtent(4.0f, 6.0f, 20.0f);
+
+	PhysicsObject rightFence;
+	rightFence.pos = glm::vec3(100, 0, 0);
+	rightFence.mass = 0.0f;
+
+	CollisionData cd;
+	if (OverlapAABB2AABB(carPhysics, carExtent, frontFence, fenceExtent, cd) ||
+		OverlapAABB2AABB(carPhysics, carExtent, backFence, fenceExtent, cd) ||
+		OverlapAABB2AABB(carPhysics, carExtent, leftFence, sideFenceExtent, cd) ||
+		OverlapAABB2AABB(carPhysics, carExtent, rightFence, sideFenceExtent, cd)) {
+
+		// On collision, resolve it
+		ResolveCollision(cd);
+	}
+
+	// Update camera to match driver's perspective
+	float driverHeight = 7.0f; // Height of driver's head above car base
+	float driverOffset = 0.0f; // Forward/back adjustment from car center
+
+	// Position camera at driver's head position
+	camera.pos = carPhysics.pos + glm::vec3(0, driverHeight, 0);
+
+	// Calculate look target point (looking forward along car's direction)
+	glm::vec3 lookDirection = forward;
+	float lookAheadDistance = 10.0f; // How far ahead to look
+	camera.target = camera.pos + (lookDirection * lookAheadDistance);
+
 
 	camera.Update(dt);
-
 }
 
 void SceneFinal::Render()
@@ -298,21 +383,21 @@ void SceneFinal::Render()
 
 	modelStack.PushMatrix();
 	modelStack.Translate(light[0].position.x, light[0].position.y, light[0].position.z);
-	modelStack.Scale(0.1f, 0.1f, 0.1f);
+	modelStack.Scale(0.4f, 0.4f, 0.4f);
 	RenderMesh(meshList[GEO_SPHERE], false);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
 	modelStack.Scale(100.f, 1.f, 100.f);
 	modelStack.Rotate(-90.f, 1, 0, 0);
-	meshList[GEO_PLANE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-	meshList[GEO_PLANE]->material.kDiffuse = glm::vec3(0.5f,0.5f, 0.5f);
+	meshList[GEO_PLANE]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+	meshList[GEO_PLANE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
 	meshList[GEO_PLANE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
 	meshList[GEO_PLANE]->material.kShininess = 1.0f;
 	RenderMesh(meshList[GEO_PLANE], true);
 	modelStack.PopMatrix();
 
-	modelStack.PushMatrix();
+	/*modelStack.PushMatrix();
 	modelStack.Translate(0.f, 0.f, 0.f);
 	modelStack.Scale(2.f, 2.f, 2.f);
 	modelStack.Rotate(0.f, 0, 1, 0);
@@ -321,12 +406,68 @@ void SceneFinal::Render()
 	meshList[GEO_CAR]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
 	meshList[GEO_CAR]->material.kShininess = 1.0f;
 	RenderMesh(meshList[GEO_CAR], false);
+	modelStack.PopMatrix();*/
+
+
+	// Front wall
+	modelStack.PushMatrix();
+	modelStack.Translate(0, 0, 100);  // Position at front edge
+	modelStack.Scale(10.0f, 3.0f, 2.0f);  // Scale for full width
+	meshList[GEO_FENCE]->material.kAmbient = glm::vec3(0.7f, 0.7f, 0.7f);
+	meshList[GEO_FENCE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_FENCE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_FENCE]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_FENCE], true);
+	modelStack.PopMatrix();
+
+	// Back wall
+	modelStack.PushMatrix();
+	modelStack.Translate(0, 0, -100);  // Position at back edge
+	modelStack.Scale(10.0f, 3.0f, 2.0f);  // Scale for full width
+	meshList[GEO_FENCE]->material.kAmbient = glm::vec3(0.7f, 0.7f, 0.7f);
+	meshList[GEO_FENCE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_FENCE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_FENCE]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_FENCE], true);
+	modelStack.PopMatrix();
+
+	// Left wall
+	modelStack.PushMatrix();
+	modelStack.Translate(-100, 0, 0);  // Position at left edge
+	modelStack.Rotate(90, 0, 1, 0);    // Rotate to face inward
+	modelStack.Scale(10.0f, 3.0f, 2.0f);  // Scale for full width
+	meshList[GEO_FENCE]->material.kAmbient = glm::vec3(0.7f, 0.7f, 0.7f);
+	meshList[GEO_FENCE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_FENCE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_FENCE]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_FENCE], true);
+	modelStack.PopMatrix();
+
+	// Right wall
+	modelStack.PushMatrix();
+	modelStack.Translate(100, 0, 0);   // Position at right edge
+	modelStack.Rotate(90, 0, 1, 0);    // Rotate to face inward
+	modelStack.Scale(10.0f, 3.0f, 2.0f);  // Scale for full width
+	meshList[GEO_FENCE]->material.kAmbient = glm::vec3(0.7f, 0.7f, 0.7f);
+	meshList[GEO_FENCE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_FENCE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_FENCE]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_FENCE], true);
 	modelStack.PopMatrix();
 
 
 
+	modelStack.PushMatrix();
+	modelStack.Translate(carPhysics.pos.x, carPhysics.pos.y, carPhysics.pos.z);
+	modelStack.Rotate(carPhysics.angleDeg, 0, 1, 0);
+	modelStack.Scale(0.2f, 0.25f, 0.2f);
+	meshList[GEO_BUMPERCAR]->material.kAmbient = glm::vec3(0.7f, 0.7f, 0.7f);
+	meshList[GEO_BUMPERCAR]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_BUMPERCAR]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_BUMPERCAR]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_BUMPERCAR], true);
+	modelStack.PopMatrix();
 
-	
 
 	RenderTextOnScreen(meshList[GEO_TEXT], "Stamina", glm::vec3(0, 1, 0), 40, 0, 0);
 
@@ -608,5 +749,4 @@ void SceneFinal::RenderSkyBox() {
 	RenderMesh(meshList[GEO_BOTTOM], false);
 	modelStack.PopMatrix();
 }
-
 
