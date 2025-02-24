@@ -128,7 +128,7 @@ void SceneWIUtest::Init()
 	meshList[GEO_CUBE] = MeshBuilder::GenerateCube("Cube", glm::vec3(1, 1, 1), 1.f);
 	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Sphere", glm::vec3(1, 1, 1), 1.f);
 	//	meshList[GEO_CYLINDER] = MeshBuilder::GenerateCyclinder("Cylinder", glm::vec3(1, 1, 1), 20.f,1.5,5.f);
-	meshList[GEO_CYLINDER] = MeshBuilder::GenerateCyclinder("Cylinder", glm::vec3(1, 1, 1), 20.f,1.f,1.f);
+	meshList[GEO_CYLINDER] = MeshBuilder::GenerateCylinder("Cylinder", glm::vec3(1, 1, 1), 20.f,1.f,1.f);
 	meshList[GEO_HAMMER1] = MeshBuilder::GenerateOBJMTL("war hammer", "Models//lava_hammer.obj", "Models//lava_hammer.mtl");
 	meshList[GEO_HAMMER1]->textureID = LoadTGA("Images//hammer.tga");
 	meshList[GEO_HAMMER2] = MeshBuilder::GenerateOBJMTL("mallet", "Models//mallet.obj", "Models//mallet.mtl");
