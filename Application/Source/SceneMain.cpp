@@ -189,14 +189,16 @@ void SceneMain::Init()
 	meshList[GEO_TENT]->textureID = LoadTGA("Images//circus_tent.tga");
 	meshList[GEO_SIGN] = MeshBuilder::GenerateOBJ("Sign", "Models//sign.obj");
 	meshList[GEO_SIGN]->textureID = LoadTGA("Images//sign.tga");
-	//meshList[GEO_TREE] = MeshBuilder::GenerateOBJMTL("Tree", "Models//tree.obj", "Models//tree.mtl");
-	//meshList[GEO_TREE]->textureID = LoadTGA("Images//tree.tga");
+	meshList[GEO_TREE] = MeshBuilder::GenerateOBJMTL("Tree", "Models//tree.obj", "Models//tree.mtl");
+	meshList[GEO_TREE]->textureID = LoadTGA("Images//tree.tga");
 	meshList[GEO_FENCE] = MeshBuilder::GenerateOBJMTL("Fence", "Models//fence.obj", "Models//fence.mtl");
 	meshList[GEO_FENCE]->textureID = LoadTGA("Images//fence.tga");
 	meshList[GEO_HOUSE] = MeshBuilder::GenerateOBJMTL("House", "Models//cottage_obj.obj", "Models//cottage_obj.mtl");
 	meshList[GEO_HOUSE]->textureID = LoadTGA("Images//cottage_diffuse.tga");
 	meshList[GEO_ROAD] = MeshBuilder::GenerateOBJMTL("Road", "Models//road.obj", "Models//road.mtl");
 	meshList[GEO_ROAD]->textureID = LoadTGA("Images//road.tga");
+	meshList[GEO_MONEYBAG] = MeshBuilder::GenerateOBJMTL("MoneyBag", "Models//moneybag.obj", "Models//moneybag.mtl");
+	meshList[GEO_MONEYBAG]->textureID = LoadTGA("Images//moneybag.tga");
 
 	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 1000.0f);
 	projectionStack.LoadMatrix(projection);
@@ -531,16 +533,6 @@ void SceneMain::Render()
 	}
 
 	RenderSkyBox();
-
-	//modelStack.PushMatrix();
-	//RenderMesh(meshList[GEO_AXES], false);
-	//modelStack.PopMatrix();
-
-	//modelStack.PushMatrix();
-	//modelStack.Translate(light[0].position.x, light[0].position.y, light[0].position.z);
-	//modelStack.Scale(0.1f, 0.1f, 0.1f);
-	//RenderMesh(meshList[GEO_SPHERE], false);
-	//modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
 	modelStack.Scale(150.f, 1.f, 200.f);

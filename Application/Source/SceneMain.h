@@ -32,6 +32,7 @@ public:
 		GEO_SIGN,
 		GEO_HOUSE,
 		GEO_ROAD,
+		GEO_MONEYBAG,
 
 		//GUI
 		GEO_KEY_E,
@@ -136,6 +137,29 @@ public:
 private:
 	void HandleKeyPress();
 	void RenderMesh(Mesh* mesh, bool enableLight);
+
+	struct OBBV2 : public GameObject {
+		std::vector<glm::vec3> normals;
+		std::vector<glm::vec3> vertices;
+
+		OBBV2(int id, int type) : GameObject(id, type) {
+			normals.push_back(glm::vec3(0, 1, 0));
+			normals.push_back(glm::vec3(0, -1, 0));
+			normals.push_back(glm::vec3(1, 0, 0));
+			normals.push_back(glm::vec3(-1, 0, 0));
+			normals.push_back(glm::vec3(0, 0, 1));
+			normals.push_back(glm::vec3(0, 0, -1));
+
+			vertices.push_back(glm::vec3(-1.5f, 1.5f, 1.5f));    // Vertex 0
+			vertices.push_back(glm::vec3(1.5f, 1.5f, 1.5f));    // Vertex 1
+			vertices.push_back(glm::vec3(-1.5f, -1.5f, 1.5f));    // Vertex 2
+			vertices.push_back(glm::vec3(1.5f, -1.5f, 1.5f));    // Vertex 3
+			vertices.push_back(glm::vec3(-1.5f, 1.5f, -1.5f));    // Vertex 4
+			vertices.push_back(glm::vec3(1.5f, 1.5f, -1.5f));    // Vertex 5
+			vertices.push_back(glm::vec3(-1.5f, -1.5f, -1.5f));    // Vertex 6
+			vertices.push_back(glm::vec3(1.5f, -1.5f, -1.5f));    // Vertex 7
+		}
+	};
 
 	unsigned m_vertexArrayID;
 	Mesh* meshList[NUM_GEOMETRY];
