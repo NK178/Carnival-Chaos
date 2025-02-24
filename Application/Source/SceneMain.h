@@ -38,6 +38,7 @@ public:
 		//GUI
 		GEO_KEY_E,
 		GEO_KEY_F,
+		GEO_KEY_Q,
 
 		//Skybox
 		GEO_LEFT,
@@ -220,6 +221,7 @@ private:
 	bool showEnterFinalTentText;
 	bool isFinalChallengeCompleted;
 
+	// Collisions
 	struct playerBox : public GameObject {
 		glm::vec3 playerDimensions{ 1.5f,7.f,1.5f };
 		playerBox(int id, int type) : GameObject(id, type) {}
@@ -235,15 +237,40 @@ private:
 		finalTentBox(int id, int type) : GameObject(id, type) {}
 	};
 
+	struct sideFenceBox : public GameObject {
+		glm::vec3 fenceDimensions{ 2.f,20.f,20.f };
+		sideFenceBox(int id, int type) : GameObject(id, type) {}
+	};
+
+	struct frontFenceBox : public GameObject {
+		glm::vec3 fenceDimensions{ 20.f,20.f,2.f };
+		frontFenceBox(int id, int type) : GameObject(id, type) {}
+	};
+
+	struct frontBoundaryBox : public GameObject {
+		glm::vec3 boundaryDimensions{ 60.f,20.f,2.f };
+		frontBoundaryBox(int id, int type) : GameObject(id, type) {}
+	};
+
+	struct sideBoundaryBox : public GameObject {
+		glm::vec3 boundaryDimensions{ 2.f,20.f,10.f };
+		sideBoundaryBox(int id, int type) : GameObject(id, type) {}
+	};
+
 	std::vector<playerBox> player;
 	std::vector<tentBoxes> tentList;
 	std::vector<finalTentBox> finalTent;
+	std::vector<sideFenceBox> sideFenceList;
+	std::vector<frontFenceBox> frontFenceList;
+	std::vector<frontBoundaryBox> frontBoundary;
+	std::vector<sideBoundaryBox> sideBoundary;
 
 	Application app;
 
 	float fps = 0;
 
 	bool isSceneLoaded; 
+	bool cutsceneSkipped;
 
 	void RenderUI();
 	void RenderObjectives();
