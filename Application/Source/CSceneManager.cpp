@@ -6,6 +6,7 @@
 #include "SceneHole.h"
 #include "SceneWhackAMole.h"
 #include "SceneSpinningRing.h"
+#include "SceneBumperBalls.h"
 #include "MainMenu.h"
 #include "SceneFinal.h"
 // Include other scene headers
@@ -13,7 +14,7 @@
 void CSceneManager::Init() {
     // Initialize with first scene
     //activeScene = new MainMenu();
-    activeScene = new SceneWhackAMole;
+    activeScene = new SceneBumperBalls;
     currentSceneType = SCENE_CARNIVAL;
     activeScene->Init();
 }

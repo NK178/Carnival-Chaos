@@ -393,7 +393,6 @@ void SceneWhackAMole::Update(double dt)
 		camera.pos = player[0].pos;
 		camera.target = player[0].target;
 	}
-
 	player[0].accel = glm::vec3{ 0,-1,0 } *10.f;
 	
 	glm::vec3 viewDir = glm::normalize(camera.target - camera.pos);
