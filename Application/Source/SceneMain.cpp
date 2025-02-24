@@ -1201,6 +1201,18 @@ void SceneMain::UpdateDialogue(double dt) {
 	}
 
 	if (isSignDialogueActive) {
+		if (KeyboardController::GetInstance()->IsKeyPressed('E')) {
+			if (isTyping) {
+				// Skip rendering the current text
+				currentCharIndex = currentText.length();
+				isTyping = false;
+			}
+			else {
+				// Skip to the next line
+				dialogueTimer = TEXT_DISPLAY_TIME;
+			}
+		}
+
 		if (isTyping) {
 			typewriterTimer += dt;
 			if (typewriterTimer >= 0.05f) { // Adjust the typing speed here
@@ -1445,8 +1457,7 @@ void SceneMain::HandleKeyPress()
 	//	// Change to black background
 	//	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	//}
-	if (KeyboardController::GetInstance()->IsKeyPressed('Q') && !cutsceneSkipped)
-	{
+	if (KeyboardController::GetInstance()->IsKeyPressed('Q') && !cutsceneSkipped) {
 		// Skip cutscene
 		cutsceneStage = 4;
 		camera.enableFNAF = false;
@@ -1461,12 +1472,16 @@ void SceneMain::HandleKeyPress()
 		isEnterMainSceneDialogueActive = false;
 		hasPlayedEnterMainSceneDialogue = true;
 
-		camera.pos = glm::vec3(-3,10,-70);
+		camera.pos = glm::vec3(-3, 10, -70);
 		camera.target = glm::vec3(0, 10, -70);
 
 		cutsceneSkipped = true; // Set the flag to indicate the cutscene has been skipped
 	}
-
+	if (KeyboardController::GetInstance()->IsKeyPressed('Q') && isSignDialogueActive) {
+		// Skip the entire sign dialogue
+		isSignDialogueActive = false;
+		readSign = false;
+	}
 	static bool isRightUp = false;
 	if (!isRightUp && MouseController::GetInstance()->IsButtonDown(GLFW_MOUSE_BUTTON_RIGHT))
 	{
