@@ -34,11 +34,12 @@ void SceneHole::Init()
 	camera.enableFNAF = false;
 	camera.allowMovement = true;
 	camera.allowJump = true;
-	camera.allowSprint = false;
+	camera.allowSprint = true;
 	camera.allowCrouch = true;
 	camera.allowProne = false;
 	camera.allowLocomotiveTilt = true;
 	camera.allowLocomotiveBop = false;
+
 
 	// Set background color to dark blue
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
