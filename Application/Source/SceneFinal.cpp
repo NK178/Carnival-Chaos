@@ -166,6 +166,10 @@ void SceneFinal::Init()
 	meshList[GEO_BUMPERCAR] = MeshBuilder::GenerateOBJ("Car", "Models//ATV.obj");
 	meshList[GEO_BUMPERCAR]->textureID = LoadTGA("Images//cart.tga");
 
+	meshList[GEO_PELLETGUN] = MeshBuilder::GenerateOBJ("PelletGun",
+		"Models//Ray_Gun.obj");
+	meshList[GEO_PELLETGUN]->textureID = LoadTGA("Images//Ray_Gun_Diffuse.tga");
+
 	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.4f, 1000.0f);
 	projectionStack.LoadMatrix(projection);
 
@@ -289,7 +293,7 @@ void SceneFinal::Update(double dt) {
 	float cross = (aiForward.x * aiToPlayer.z) - (aiForward.z * aiToPlayer.x);
 	float dot = glm::dot(aiForward, aiToPlayer);
 
-	std::cout << cross << std::endl;
+	//std::cout << cross << std::endl;
 
 	if (dot > 0)
 	{
@@ -552,6 +556,48 @@ void SceneFinal::Render()
 	meshList[GEO_BUMPERCAR]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
 	meshList[GEO_BUMPERCAR]->material.kShininess = 1.0f;
 	RenderMesh(meshList[GEO_BUMPERCAR], true);
+	modelStack.PopMatrix();
+	
+	modelStack.PushMatrix();
+	// Calculate position based on camera position and view direction
+	glm::vec3 viewDirection = glm::normalize(camera.target - camera.pos);
+
+
+	// Position gun slightly in front and to the right of the camera
+	float gunDistance = 0.75f; // How far in front of the camera
+	float gunRightOffset = 0.2f; // How far to the right
+	float gunDownOffset = 0.3f; // How far down from eye level
+
+	// Calculate right vector by cross product of view direction and up vector
+	glm::vec3 rightVector = glm::normalize(glm::cross(viewDirection, camera.up));
+	// Calculate gun position
+	glm::vec3 gunPosition = camera.pos +
+		(viewDirection * gunDistance) +
+		(rightVector * gunRightOffset) -
+		(camera.up * gunDownOffset);
+
+	modelStack.Translate(gunPosition.x, gunPosition.y, gunPosition.z);
+
+	// Orient the gun to face where the camera is looking
+	// Calculate rotation angles based on view direction
+	float yaw = atan2(viewDirection.x, viewDirection.z);
+	float pitch = -asin(viewDirection.y); // Negative because we want to invert the pitch
+
+	// Apply rotations
+	modelStack.Rotate(glm::degrees(yaw), 0, 1, 0); // Rotate around Y axis (yaw)
+	modelStack.Rotate(glm::degrees(pitch), 1, 0, 0); // Rotate around X axis (pitch)
+	// Additional rotation to orient the gun model correctly (adjust as needed based on your model)
+	modelStack.Rotate(180.0f, 0, 1, 0); // This may need to be adjusted depending on how the gun model is oriented
+
+	// Scale the gun to an appropriate size
+	modelStack.Scale(0.02f, 0.02f, 0.02f); // Adjust these values to make the gun the right size
+
+	// Set materials and render
+	meshList[GEO_PELLETGUN]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+	meshList[GEO_PELLETGUN]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_PELLETGUN]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_PELLETGUN]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_PELLETGUN], true);
 	modelStack.PopMatrix();
 
 

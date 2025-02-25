@@ -1024,7 +1024,7 @@ void SceneBalloonPop::Render()
 	modelStack.Rotate(glm::degrees(yaw), 0, 1, 0); // Rotate around Y axis (yaw)
 	modelStack.Rotate(glm::degrees(pitch), 1, 0, 0); // Rotate around X axis (pitch)
 	// Additional rotation to orient the gun model correctly (adjust as needed based on your model)
-	modelStack.Rotate(270.0f, 0, 0, 1); // This may need to be adjusted depending on how the gun model is oriented
+	modelStack.Rotate(180.0f, 0, 1, 0); // This may need to be adjusted depending on how the gun model is oriented
 
 	// Scale the gun to an appropriate size
 	modelStack.Scale(0.02f, 0.02f, 0.02f); // Adjust these values to make the gun the right size
