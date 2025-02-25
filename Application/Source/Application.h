@@ -43,6 +43,7 @@ public:
     static void setShowPointer(bool Show);
     static bool getEnablePointer();
     static bool getShowPointer();
+    static bool getBuffer();
 };
 
 #endif // APPLICATION_H

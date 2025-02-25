@@ -348,3 +348,8 @@ bool Application::getShowPointer()
 {
 	return showPointer;
 }
+
+bool Application::getBuffer()
+{
+    return glfwSwapBuffers;
+}
