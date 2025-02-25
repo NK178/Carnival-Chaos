@@ -245,8 +245,15 @@ void SceneSpinningRing::Init()
 
 	// Initialize Variables
 	enableLight = true;
+
+	rotationAngle = 0.0f;
+	rotationSpeed = 90.0f;
+	beamWarningTimer = 3.f;
+	isBeamSpawned = false;
+	isShowingBeamWarning = false;
+
 	isObjectiveRead = false; 
-	remainingTime = 999.0f;
+	remainingTime = 30.0f;
 	countdownTime = 4.0f;
 	playerWon = false;
 	playerLost = false;
@@ -310,6 +317,7 @@ void SceneSpinningRing::Update(double dt)
 			if (remainingTime < 0) {
 				remainingTime = 0; // ensure time does not go below 0
 				playerWon = true; // player wins
+				rotationSpeed = 0.0f;
 			}
 		}
 	}
@@ -319,6 +327,26 @@ void SceneSpinningRing::Update(double dt)
 		camera.Update(dt);
 		player[0].pos = camera.pos;
 		glm::vec3 viewDir = glm::normalize(camera.target - camera.pos);
+
+		// slowly increase rotation speed
+		rotationSpeed += 1.0f * dt;
+		rotationAngle += rotationSpeed * dt;
+
+		if (!isBeamSpawned) {
+			if (!isShowingBeamWarning && remainingTime <= 19.0f) {
+				isShowingBeamWarning = true;
+				beamWarningTimer = 3.0f;
+			}
+
+			if (isShowingBeamWarning) {
+				beamWarningTimer -= dt;
+				if (beamWarningTimer <= 0.0f) {
+					isShowingBeamWarning = false;
+					isBeamSpawned = true;
+					beamList.push_back(spinningBeam(beamList.size() + 1, GameObject::CUBE));
+				}
+			}
+		}
 
 		// Collision
 		CollisionData cd;
@@ -343,8 +371,8 @@ void SceneSpinningRing::Update(double dt)
 			wallTopList[i].UpdatePhysics(dt);
 		}
 
-		for (int n = 0; n < beamList.size(); n++) {
-			beamList[n].UpdatePhysics(dt);
+		for (int i = 0; i < beamList.size(); i++) {
+			beamList[i].UpdatePhysics(dt);
 		}
 
 		middleWall[0].UpdatePhysics(dt);
@@ -506,6 +534,7 @@ void SceneSpinningRing::Render()
 		modelStack.PushMatrix();
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		modelStack.Translate(0.f, 15.f, 0.f);
+		modelStack.Rotate(rotationAngle, 0.f, 1.f, 0.f);
 		modelStack.Scale(30.f, 30.f, 50.f);
 		meshList[GEO_SPINNER]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
 		meshList[GEO_SPINNER]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
@@ -518,6 +547,7 @@ void SceneSpinningRing::Render()
 		modelStack.PushMatrix();
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		modelStack.Translate(0.f, 5.f, 0.f);
+		modelStack.Rotate(rotationAngle, 0.f, 1.f, 0.f);
 		modelStack.Scale(50.f, 30.f, 50.f);
 		meshList[GEO_SPINNER2]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
 		meshList[GEO_SPINNER2]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
@@ -638,6 +668,15 @@ void SceneSpinningRing::Render()
 			std::string timeText = "Time Left: " + std::to_string(static_cast<int>(remainingTime));
 			RenderTextOnScreen(meshList[GEO_TEXT2], timeText, glm::vec3(1, 1, 1), 20, 10, 550);
 		}
+	}
+
+	if (isShowingBeamWarning) {
+		int countdown = static_cast<int>(glm::ceil(beamWarningTimer)); // countdown warning
+		RenderMeshOnScreen(meshList[GEO_UI], 100, 530, 100, 3);
+		RenderMeshOnScreen(meshList[GEO_WARNING], 20, 530, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2],
+			"Beam is spawning in " + std::to_string(countdown) + " seconds!",
+			glm::vec3(1, 0, 0), 18, 45, 520);
 	}
 
 	// Render FPS
