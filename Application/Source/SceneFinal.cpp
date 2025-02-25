@@ -170,6 +170,9 @@ void SceneFinal::Init()
 	meshList[GEO_PELLETGUN]->textureID = LoadTGA("Images//Ray_Gun_Diffuse.tga");
 	meshList[GEO_CROSSHAIR] = MeshBuilder::GenerateQuad("Crosshair", glm::vec3(1, 1, 1), 1.f);
 
+	meshList[GEO_CLOWN] = MeshBuilder::GenerateOBJ("Clown", "Models//bear.obj");
+	meshList[GEO_CLOWN]->textureID = LoadTGA("Images//texbear.tga");
+
 	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.4f, 1000.0f);
 	projectionStack.LoadMatrix(projection);
 
@@ -370,6 +373,9 @@ void SceneFinal::Update(double dt) {
 	carPhysics.UpdatePhysics(dt);
 	m_cpu.UpdatePhysics(dt);
 
+
+
+
 	// Check collisions with fences
 	PhysicsObject frontFence;
 	frontFence.pos = glm::vec3(0, 0, 100);
@@ -559,6 +565,7 @@ void SceneFinal::Render()
 	RenderMesh(meshList[GEO_BUMPERCAR], true);
 	modelStack.PopMatrix();
 
+	// AI car
 	modelStack.PushMatrix();
 	modelStack.Translate(m_cpu.pos.x, 7, m_cpu.pos.z);
 	modelStack.Rotate(m_cpu.angleDeg, 0, 1, 0);
@@ -613,7 +620,27 @@ void SceneFinal::Render()
 	modelStack.PopMatrix();
 
 
-	RenderTextOnScreen(meshList[GEO_TEXT], "Stamina", glm::vec3(0, 1, 0), 40, 0, 0);
+	// Render the AI driver's model (GEO_CLOWN) attached to the AI car (m_cpu)
+	modelStack.PushMatrix();
+	modelStack.Translate(m_cpu.pos.x, m_cpu.pos.y + 6.0f, m_cpu.pos.z - 2);
+
+	modelStack.Rotate(m_cpu.angleDeg + 180.0f, 0, 1, 0);
+
+	modelStack.Translate(0.5f, 0.0f, 0.0f);
+	modelStack.Scale(15.0f, 15.0f, 15.0f); // Adjust scale as needed
+
+	// Set materials for the driver (if needed)
+	meshList[GEO_CLOWN]->material.kAmbient = glm::vec3(0.7f, 0.7f, 0.7f);
+	meshList[GEO_CLOWN]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_CLOWN]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_CLOWN]->material.kShininess = 1.0f;
+
+	RenderMesh(meshList[GEO_CLOWN], true);
+	modelStack.PopMatrix();
+
+
+
+	/*RenderTextOnScreen(meshList[GEO_TEXT], "Stamina", glm::vec3(0, 1, 0), 40, 0, 0);*/
 
 	RenderSkyBox();
 
