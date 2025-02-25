@@ -1503,6 +1503,14 @@ void SceneMain::HandleKeyPress()
 		// Skip the entire sign dialogue
 		isSignDialogueActive = false;
 		readSign = false;
+		camera.enableFNAF = false;
+		camera.allowMovement = true;
+		camera.allowJump = true;
+		camera.allowSprint = false;
+		camera.allowCrouch = true;
+		camera.allowProne = false;
+		camera.allowLocomotiveTilt = true;
+		camera.allowLocomotiveBop = false;
 	}
 	static bool isRightUp = false;
 	if (!isRightUp && MouseController::GetInstance()->IsButtonDown(GLFW_MOUSE_BUTTON_RIGHT))

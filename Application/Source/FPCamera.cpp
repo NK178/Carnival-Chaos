@@ -385,7 +385,13 @@ void FPCamera::Update(double dt)
 
 	if (enableFNAF)
 	{
-		target = pos + forward;
+		glm::vec3 velocity = pos - prevPos;
+		if (glm::length(velocity) > 0.001f) //please don't divide by 0 
+		{
+			glm::vec3 newForward = glm::normalize(velocity);
+			forward = glm::mix(forward, newForward, 1.f); //smoothly adjust direction
+			target = pos + forward;
+		}
 	}
 
 	prevPos = pos;
