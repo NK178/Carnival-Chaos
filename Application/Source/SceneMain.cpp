@@ -31,6 +31,32 @@ SceneMain::~SceneMain()
 
 void SceneMain::Init()
 {
+	// Load things for the Loading Screen first
+	// Init VBO here
+	for (int i = 0; i < NUM_GEOMETRY; ++i)
+	{
+		meshList[i] = nullptr;
+	}
+
+	// Load the shader programs
+	m_programID = LoadShaders("Shader//Texture.vertexshader",
+		"Shader//Text.fragmentshader");
+	glUseProgram(m_programID);
+	m_parameters[U_TEXT_ENABLED] =
+		glGetUniformLocation(m_programID, "textEnabled");
+	m_parameters[U_TEXT_COLOR] = glGetUniformLocation(m_programID,
+		"textColor");
+
+	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
+	meshList[GEO_TEXT]->textureID = LoadTGA("Images//calibri.tga");
+	meshList[GEO_UI] = MeshBuilder::GenerateQuad("UIBox", glm::vec3(0.12f, 0.12f, 0.12f), 10.f);
+
+	//RenderLoadingScreen();
+	glfwSwapBuffers(m_window);
+	glfwPollEvents();
+
+	isLoading = true; 
+
 	tempCompensation = 0;
 	camera.enableFNAF = true;
 	camera.allowMovement = false;
@@ -56,11 +82,6 @@ void SceneMain::Init()
 	// Generate a default VAO for now
 	glGenVertexArrays(1, &m_vertexArrayID);
 	glBindVertexArray(m_vertexArrayID);
-
-	// Load the shader programs
-	m_programID = LoadShaders("Shader//Texture.vertexshader",
-		"Shader//Text.fragmentshader");
-	glUseProgram(m_programID);
 
 	// Get a handle for our "MVP" uniform
 	m_parameters[U_MVP] = glGetUniformLocation(m_programID, "MVP");
@@ -113,11 +134,6 @@ void SceneMain::Init()
 	m_parameters[U_COLOR_TEXTURE_ENABLED] = glGetUniformLocation(m_programID, "colorTextureEnabled");
 	m_parameters[U_COLOR_TEXTURE] = glGetUniformLocation(m_programID, "colorTexture");
 
-	m_parameters[U_TEXT_ENABLED] =
-		glGetUniformLocation(m_programID, "textEnabled");
-	m_parameters[U_TEXT_COLOR] = glGetUniformLocation(m_programID,
-		"textColor");
-
 	// Step 4 - Add the following code
 	Mesh::SetMaterialLoc(m_parameters[U_MATERIAL_AMBIENT], m_parameters[U_MATERIAL_DIFFUSE],
 		m_parameters[U_MATERIAL_SPECULAR],
@@ -125,12 +141,6 @@ void SceneMain::Init()
 
 	// Initialise camera properties
 	camera.Init(glm::vec3(-50, 10, -90), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
-
-	// Init VBO here
-	for (int i = 0; i < NUM_GEOMETRY; ++i)
-	{
-		meshList[i] = nullptr;
-	}
 
 	meshList[GEO_AXES] = MeshBuilder::GenerateAxes("Axes", 10000.f, 10000.f, 10000.f);
 	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Sun", glm::vec3(1.f, 1.f, 1.f), 1.f, 16, 16);
@@ -179,8 +189,6 @@ void SceneMain::Init()
 	meshList[GEO_BACK3]->textureID = LoadTGA("Images//midnight-silence_ft.tga");
 
 	// 16 x 16 is the number of columns and rows for the text
-	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
-	meshList[GEO_TEXT]->textureID = LoadTGA("Images//calibri.tga");
 	meshList[GEO_FPS] = MeshBuilder::GenerateText("fpstext", 16, 16);
 	meshList[GEO_FPS]->textureID = LoadTGA("Images//bizudgothic.tga");
 
@@ -190,7 +198,6 @@ void SceneMain::Init()
 	meshList[GEO_KEY_F]->textureID = LoadTGA("Images//keyboard_key_f.tga");
 	meshList[GEO_KEY_Q] = MeshBuilder::GenerateQuad("KeyQ", glm::vec3(1.f, 1.f, 1.f), 2.f);
 	meshList[GEO_KEY_Q]->textureID = LoadTGA("Images//keyboard_key_q.tga");
-	meshList[GEO_UI] = MeshBuilder::GenerateQuad("UIBox", glm::vec3(0.12f, 0.12f, 0.12f), 10.f);
 
 	meshList[GEO_TENT] = MeshBuilder::GenerateOBJ("Tent", "Models//circus_tent.obj");
 	meshList[GEO_TENT]->textureID = LoadTGA("Images//circus_tent.tga");
@@ -415,6 +422,8 @@ void SceneMain::Init()
 
 void SceneMain::Update(double dt)
 {
+	isLoading = false;
+
 	Application::SetPointerStatus(false);
 	HandleKeyPress();
 
@@ -682,6 +691,12 @@ void SceneMain::Render()
 
 	// Load identity matrix into the model stack
 	modelStack.LoadIdentity();
+
+	if (isLoading)
+	{
+		RenderLoadingScreen();
+		return;
+	}
 
 	//Light
 	for (int i = 0; i < NUM_LIGHTS; i++) {
@@ -1137,6 +1152,12 @@ void SceneMain::Render()
 	//RenderMesh(meshList[GEO_CUBE], true);
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	//modelStack.PopMatrix();
+}
+
+void SceneMain::RenderLoadingScreen()
+{
+	RenderMeshOnScreen(meshList[GEO_UI], 45, 560, 45, 3);
+	RenderTextOnScreen(meshList[GEO_TEXT], "Hello World!", glm::vec3(1, 0, 0), 20, 10, 550);
 }
 
 // boolean to check if player complete all 6 minigames

@@ -280,6 +280,7 @@ private:
 
 	bool isSceneLoaded; 
 	bool cutsceneSkipped;
+	bool isLoading;
 
 	void RenderUI();
 	void RenderObjectives();
@@ -292,6 +293,7 @@ private:
 	void RenderTextOnScreen(Mesh* mesh, std::string text, glm::vec3 color, float size, float x, float y);
 	void Material(GEOMETRY_TYPE obj, float AmR, float AmG, float AmB, float DifA, float DifG, float DifB, float SpA, float SpG, float SpB, float Shiny);
 	void RenderSkyBox();
+	void RenderLoadingScreen();
 };
 
 #endif
