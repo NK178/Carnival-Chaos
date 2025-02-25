@@ -1002,7 +1002,7 @@ void SceneBalloonPop::Render()
 		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 30);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "- BALLOON POP -", glm::vec3(1, 1, 0), 25, 220, 430);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "- Hit the balloons with", glm::vec3(1, 1, 1), 15, 230, 380);
-		RenderTextOnScreen(meshList[GEO_TEXT2], "your arrows!", glm::vec3(1, 1, 1), 15, 320, 350);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "your pellets!", glm::vec3(1, 1, 1), 15, 310, 350);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "- Get 10 points before", glm::vec3(1, 1, 1), 15, 230, 320);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "30 seconds is up!", glm::vec3(1, 1, 1), 15, 280, 290);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "- Press LMB to shoot!", glm::vec3(1, 1, 1), 15, 240, 260);
