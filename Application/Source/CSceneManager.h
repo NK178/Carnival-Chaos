@@ -1,11 +1,11 @@
-#ifndef CSCENEMANAGER_H
-#define CSCENEMANAGER_H
+#pragma once
 
-#include <stack>
-#include <vector>
 #include "Scene.h"
+#include "LoadingScreen.h"
+#include <chrono>   // For time duration (std::chrono::milliseconds)
+#include <thread>   // For std::this_thread functions
+#include <stack>
 
-// Scene type enum
 enum SCENE_TYPE {
     SCENE_MAINMENU,
     SCENE_CARNIVAL,
@@ -15,70 +15,53 @@ enum SCENE_TYPE {
     SCENE_HOLE,
     SCENE_WHACKAMOLE,
     SCENE_SPINNING_RING,
-    SCENE_FINAL,
-    SCENE_COUNT
+    SCENE_FINAL
+};
+
+enum TRANSITION_ACTION {
+    PUSH,
+    POP,
+    REPLACE
+};
+
+struct SceneTransition {
+    TRANSITION_ACTION action;
+    Scene* newScene;
+    SCENE_TYPE newSceneType;
 };
 
 class CSceneManager {
-private:
-    // Stack of raw scene pointers (we'll manage memory manually)
-    std::stack<Scene*> sceneStack;
-
-    // Stack to track scene types (parallel to sceneStack)
-    std::stack<SCENE_TYPE> typeStack;
-
-    // Current scene type
-    SCENE_TYPE currentSceneType;
-
-    // Flag for scene transitions
-    bool isTransitioning;
-
-    // Action to perform during transition
-    enum TransitionAction {
-        PUSH,
-        POP,
-        REPLACE
-    };
-
-    // Transition data
-    struct Transition {
-        TransitionAction action;
-        Scene* newScene;
-        SCENE_TYPE newSceneType;
-    };
-
-    Transition currentTransition;
-
-    // Private method to create scene instances
-    Scene* CreateScene(SCENE_TYPE sceneType);
-
 public:
     CSceneManager();
     ~CSceneManager();
 
-    // Initialize the scene manager with a starting scene
-    void Init(SCENE_TYPE startingScene = SCENE_MAINMENU);
-
-    // Main update loop
+    void Init(SCENE_TYPE startingScene);
     void Update(double dt);
-
-    // Render the current scene
     void Render();
-
-    // Clean up all scenes
     void Exit();
 
-    // Stack operations
-    void PushScene(SCENE_TYPE newScene);  // Add scene to top of stack
-    void PopScene();                      // Remove top scene and go back to previous
-    void ReplaceScene(SCENE_TYPE newScene); // Replace current scene
+    void PushScene(SCENE_TYPE newScene);
+    void PopScene();
+    void ReplaceScene(SCENE_TYPE newScene);
 
-    // Scene access
     Scene* GetCurrentScene();
     SCENE_TYPE GetCurrentSceneType() const;
-
-    // Returns true if transitioning between scenes
     bool IsTransitioning() const;
-};
 
-#endif // CSCENEMANAGER_H
+private:
+    Scene* CreateScene(SCENE_TYPE sceneType);
+    void StartLoadingScreen();
+    void PreloadScene();
+    void CompleteTransition();
+
+    std::stack<Scene*> sceneStack;
+    std::stack<SCENE_TYPE> typeStack;
+    SCENE_TYPE currentSceneType;
+    bool isTransitioning;
+
+    // Loading screen
+    LoadingScreen loadingScreen;
+    bool isLoadingActive;
+
+    SceneTransition currentTransition;
+};

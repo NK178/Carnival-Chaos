@@ -100,12 +100,12 @@ void Application::Init()
 		exit(EXIT_FAILURE);
 	}
 
-	//Set the GLFW window creation hints - these are optional
 	glfwWindowHint(GLFW_SAMPLES, 4); //Request 4x antialiasing
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); //Request a specific OpenGL version
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); //Request a specific OpenGL version
 	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); //We don't want the old OpenGL
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
+
 
 	//Create a window and create its OpenGL context
 	m_window = glfwCreateWindow(1920, 1080, "CARNIVAL CHAOS by x86 Assembly", NULL, NULL);
@@ -149,7 +149,7 @@ void Application::Init()
 		glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
 	// Initialize scene manager with main menu scene
-	sceneManager.Init(SCENE_FINAL);
+	sceneManager.Init(SCENE_CARNIVAL);
 }
 
 void Application::Run()
