@@ -115,11 +115,11 @@ public:
 
 private:
 
-	struct spinningWallSide : public GameObject {
+	struct playerBox : public GameObject {
 		std::vector<glm::vec3> normals;
 		std::vector<glm::vec3> vertices;
 
-		spinningWallSide(int id, int type) : GameObject(id, type) {
+		playerBox(int id, int type) : GameObject(id, type) {
 			normals.push_back(glm::vec3(0, 1, 0));
 			normals.push_back(glm::vec3(0, -1, 0));
 			normals.push_back(glm::vec3(1, 0, 0));
@@ -138,18 +138,33 @@ private:
 		}
 	};
 
-	std::vector<std::vector<glm::vec3>> worldnormals;
-	std::vector<std::vector<glm::vec3>> worldvertices;
+	struct spinningWallSide : public GameObject {
+		std::vector<glm::vec3> normals;
+		std::vector<glm::vec3> vertices;
 
-	struct playerBox : public GameObject {
-		glm::vec3 playerDimensions{ 1.5f,7.f,1.5f };
-		playerBox(int id, int type) : GameObject(id, type) {}
+		spinningWallSide(int id, int type) : GameObject(id, type) {
+			normals.push_back(glm::vec3(0, 1, 0));
+			normals.push_back(glm::vec3(0, -1, 0));
+			normals.push_back(glm::vec3(1, 0, 0));
+			normals.push_back(glm::vec3(-1, 0, 0));
+			normals.push_back(glm::vec3(0, 0, 1));
+			normals.push_back(glm::vec3(0, 0, -1));
+
+			vertices.push_back(glm::vec3(-3.f, 30.f, 3.5f));    // Vertex 0
+			vertices.push_back(glm::vec3(3.f, 30.f, 3.5f));    // Vertex 1
+			vertices.push_back(glm::vec3(-3.f, 1.5f, 3.5f));    // Vertex 2
+			vertices.push_back(glm::vec3(3.f, 1.5f, 3.5f));    // Vertex 3
+			vertices.push_back(glm::vec3(-3.f, 30.f, -3.5f));    // Vertex 4
+			vertices.push_back(glm::vec3(3.f, 30.f, -3.5f));    // Vertex 5
+			vertices.push_back(glm::vec3(-3.f, 1.5f, -3.5f));    // Vertex 6
+			vertices.push_back(glm::vec3(3.f, 1.5f, -3.5f));    // Vertex 7
+		}
 	};
 
-	//struct spinningWallSides : public GameObject {
-	//	glm::vec3 spinningWallSideDimensions{ 1.5f,7.f,1.5f };
-	//	spinningWallSides(int id, int type) : GameObject(id, type) {}
-	//};
+	std::vector<std::vector<glm::vec3>> playerNormals;
+	std::vector<std::vector<glm::vec3>> playerVertices;
+	std::vector<std::vector<glm::vec3>> spinningWallSideNormals;
+	std::vector<std::vector<glm::vec3>> spinningWallSideVertices;
 
 	struct spinningWallTop : public GameObject {
 		glm::vec3 spinningWallTopDimensions{ 1.5f,7.f,1.5f };

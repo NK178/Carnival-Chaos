@@ -244,90 +244,44 @@ void SceneSpinningRing::Init()
 	// Initialize Variables
 	enableLight = true;
 	isObjectiveRead = false; 
-	remainingTime = 30.0f;
+	remainingTime = 999.0f;
 	countdownTime = 4.0f;
 	playerWon = false;
 	playerLost = false;
 
 	// Collisions
 	player.push_back(playerBox(1, GameObject::CUBE));
-	wallSideList.push_back(spinningWallSide(1, GameObject::CUBE));
 	wallSideList.push_back(spinningWallSide(2, GameObject::CUBE));
 	wallSideList.push_back(spinningWallSide(3, GameObject::CUBE));
+	//wallSideList.push_back(spinningWallSide(4, GameObject::CUBE));
 
-	wallTopList.push_back(spinningWallTop(4, GameObject::CUBE));
-	wallTopList.push_back(spinningWallTop(5, GameObject::CUBE));
+	//wallTopList.push_back(spinningWallTop(5, GameObject::CUBE));
+	//wallTopList.push_back(spinningWallTop(6, GameObject::CUBE));
 
-	beamList.push_back(spinningBeam(9, GameObject::CUBE));
-	beamList.push_back(spinningBeam(10, GameObject::CUBE));
+	//beamList.push_back(spinningBeam(7, GameObject::CUBE));
+	//beamList.push_back(spinningBeam(8, GameObject::CUBE));
 
 	// Collision Boxes Position
 	player[0].pos = camera.pos;
-	//wallTopList[0].pos = glm::vec3{ 0,0,0 };
+	wallSideList[0].pos = glm::vec3{ 0,0,8 };
+	wallSideList[1].pos = glm::vec3{ 0,0,-30 };
 
 	for (int i = 0; i < wallSideList.size(); i++) {
 		wallSideList[i].mass = 0.f;
 	}
 
-	for (int j = 0; j < wallTopList.size(); j++) {
-		wallTopList[j].mass = 0.f;
-	}
+	//for (int j = 0; j < wallTopList.size(); j++) {
+	//	wallTopList[j].mass = 0.f;
+	//}
 
-	for (int n = 0; n < beamList.size(); n++) {
-		beamList[n].mass = 0.f;
-	}
+	//for (int n = 0; n < beamList.size(); n++) {
+	//	beamList[n].mass = 0.f;
+	//}
 }
 
 void SceneSpinningRing::Update(double dt)
 {
 	HandleKeyPress();
-
-	camera.Update(dt);
-	player[0].pos = camera.pos;
-	glm::vec3 viewDir = glm::normalize(camera.target - camera.pos);
-
-	// Collision
-	CollisionData cd;
-	worldnormals.clear();
-	worldvertices.clear();
-		
-	for (int i = 0; i < wallSideList.size(); i++) {
-		wallSideList[i].UpdatePhysics(dt);
-	}
-
-	for (int j = 0; j < wallTopList.size(); j++) {
-		wallTopList[j].UpdatePhysics(dt);
-	}
-
-	for (int n = 0; n < beamList.size(); n++) {
-		beamList[n].UpdatePhysics(dt);
-	};
-
-	player[0].UpdatePhysics(dt);
-	// spinning wall side normals
-	for (int o = 0; o < wallSideList.size(); o++) {
-		std::vector<glm::vec3> temp = wallSideList[o].normals;
-		Updatenormals(wallSideList[o], temp);
-		worldnormals.push_back(temp);
-	}
-	// spinning wall side vertices
-	for (int o = 0; o < wallSideList.size(); o++) {
-		std::vector<glm::vec3> temp = wallSideList[o].normals;
-		Updatevertices(wallSideList[o], temp);
-		worldvertices.push_back(temp);
-	}
-
-	//for (int i = 0; i < wallSideList.size(); i++) {
-	//	if (OverlapAABB2AABB(player[0], player[0].playerDimensions, wallSideList[i], wallSideList[i].wallDimensions, cd)) {
-	//		ResolveCollision(cd);
-	//		camera.pos = player[0].pos;
-	//		camera.target = camera.pos + viewDir * 1.2f;
-	//	}
-	//}
-
-	// FPS
-	float temp = 1.f / dt;
-	fps = glm::round(temp * 100.f) / 100.f;
 
 	// Countdown Timer
 	if (isObjectiveRead) {
@@ -345,6 +299,67 @@ void SceneSpinningRing::Update(double dt)
 			}
 		}
 	}
+
+	// only update player and camera if countdown has ended
+	if (countdownTime <= 0) {
+		camera.Update(dt);
+		player[0].pos = camera.pos;
+		glm::vec3 viewDir = glm::normalize(camera.target - camera.pos);
+
+		// Collision
+		CollisionData cd;
+		playerNormals.clear();
+		playerVertices.clear();
+		spinningWallSideNormals.clear();
+		spinningWallSideVertices.clear();
+
+		for (int i = 0; i < wallSideList.size(); i++) {
+			wallSideList[i].UpdatePhysics(dt);
+		}
+
+		//for (int j = 0; j < wallTopList.size(); j++) {
+		//	wallTopList[j].UpdatePhysics(dt);
+		//}
+
+		//for (int n = 0; n < beamList.size(); n++) {
+		//	beamList[n].UpdatePhysics(dt);
+		//}
+
+		player[0].UpdatePhysics(dt);
+
+		// spinning wall side normals and vertices
+		for (int o = 0; o < wallSideList.size(); o++) {
+			std::vector<glm::vec3> tempNormals = wallSideList[o].normals;
+			Updatenormals(wallSideList[o], tempNormals);
+			spinningWallSideNormals.push_back(tempNormals);
+
+			std::vector<glm::vec3> tempVertices = wallSideList[o].vertices;
+			Updatevertices(wallSideList[o], tempVertices);
+			spinningWallSideVertices.push_back(tempVertices);
+		}
+
+		for (int o = 0; o < player.size(); o++) {
+			std::vector<glm::vec3> tempNormals = player[o].normals;
+			Updatenormals(player[o], tempNormals);
+			playerNormals.push_back(tempNormals);
+
+			std::vector<glm::vec3> tempVertices = player[o].vertices;
+			Updatevertices(player[o], tempVertices);
+			playerVertices.push_back(tempVertices);
+		}
+
+		for (int i = 0; i < wallSideList.size(); i++) {
+			if (SAT(wallSideList[i], spinningWallSideNormals[i], spinningWallSideVertices[i], player[0], playerNormals[0], playerVertices[0], cd)) {
+				ResolveCollision(cd);
+				camera.pos = player[0].pos;
+				camera.target = camera.pos + viewDir * 1.2f;
+			}
+		}
+	}
+
+	// FPS
+	float temp = 1.f / dt;
+	fps = glm::round(temp * 100.f) / 100.f;
 }
 
 void SceneSpinningRing::Render()
@@ -408,6 +423,7 @@ void SceneSpinningRing::Render()
 	// Render Spinners
 	{
 		modelStack.PushMatrix();
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		modelStack.Translate(0.f, 15.f, 0.f);
 		modelStack.Scale(30.f, 30.f, 50.f);
 		meshList[GEO_SPINNER]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
@@ -415,9 +431,11 @@ void SceneSpinningRing::Render()
 		meshList[GEO_SPINNER]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
 		meshList[GEO_SPINNER]->material.kShininess = 1.0f;
 		RenderMesh(meshList[GEO_SPINNER], true);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		modelStack.PopMatrix();
 
 		modelStack.PushMatrix();
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		modelStack.Translate(0.f, 5.f, 0.f);
 		modelStack.Scale(50.f, 30.f, 50.f);
 		meshList[GEO_SPINNER2]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
@@ -425,6 +443,7 @@ void SceneSpinningRing::Render()
 		meshList[GEO_SPINNER2]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
 		meshList[GEO_SPINNER2]->material.kShininess = 1.0f;
 		RenderMesh(meshList[GEO_SPINNER2], true);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		modelStack.PopMatrix();
 	}
 
@@ -439,10 +458,13 @@ void SceneSpinningRing::Render()
 	RenderMesh(meshList[GEO_CYLINDER], true);
 	modelStack.PopMatrix();
 
-	for (int j = 0; j < worldvertices.size(); j++) {
+	for (int j = 0; j < spinningWallSideVertices.size(); j++) {
 		for (int i = 0; i < wallSideList[j].vertices.size(); i++) {
+			glm::vec3 vertex = spinningWallSideVertices[j][i];
+			std::cout << "Rendering vertex " << i << ": (" << vertex.x << ", " << vertex.y << ", " << vertex.z << ")" << std::endl;
+
 			modelStack.PushMatrix();
-			modelStack.Translate(worldvertices[j][i].x, worldvertices[j][i].y, worldvertices[j][i].z);
+			modelStack.Translate(spinningWallSideVertices[j][i].x, spinningWallSideVertices[j][i].y, spinningWallSideVertices[j][i].z);
 			modelStack.Scale(0.1, 0.1, 0.1);
 			meshList[GEO_SPHERE]->material.kAmbient;
 			meshList[GEO_SPHERE]->material.kDiffuse;
