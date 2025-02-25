@@ -221,14 +221,14 @@ private:
 			normals.push_back(glm::vec3(0, 0, 1));
 			normals.push_back(glm::vec3(0, 0, -1));
 
-			vertices.push_back(glm::vec3(-1.5f, 5.0f, 1.5f));    // Vertex 0 
-			vertices.push_back(glm::vec3(1.5f, 5.0f, 1.5f));     // Vertex 1 
-			vertices.push_back(glm::vec3(-1.5f, 0.f, 1.5f));   // Vertex 2 
-			vertices.push_back(glm::vec3(1.5f, 0.f, 1.5f));    // Vertex 3 
-			vertices.push_back(glm::vec3(-1.5f, 5.0f, -1.5f));   // Vertex 4 
-			vertices.push_back(glm::vec3(1.5f, 5.0f, -1.5f));    // Vertex 5 
-			vertices.push_back(glm::vec3(-1.5f, 0.f, -1.5f));  // Vertex 6 
-			vertices.push_back(glm::vec3(1.5f, 0.f, -1.5f));   // Vertex 7 
+			vertices.push_back(glm::vec3(-45.f, 6.0f, 1.5f));    // Vertex 0 
+			vertices.push_back(glm::vec3(0.f, 6.0f, 1.5f));     // Vertex 1 
+			vertices.push_back(glm::vec3(-45.f, 3.f, 1.5f));   // Vertex 2 
+			vertices.push_back(glm::vec3(0.f, 3.f, 1.5f));    // Vertex 3 
+			vertices.push_back(glm::vec3(-45.f, 6.0f, -1.5f));   // Vertex 4 
+			vertices.push_back(glm::vec3(0.f, 6.0f, -1.5f));    // Vertex 5 
+			vertices.push_back(glm::vec3(-45.f, 3.f, -1.5f));  // Vertex 6 
+			vertices.push_back(glm::vec3(0.f, 3.f, -1.5f));   // Vertex 7 
 		}
 	};
 

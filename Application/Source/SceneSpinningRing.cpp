@@ -273,7 +273,8 @@ void SceneSpinningRing::Init()
 	wallTopList[0].pos = glm::vec3{ 0,0,0 };
 	wallTopList[1].pos = glm::vec3{ 0,20,0 };
 	middleWall[0].pos = glm::vec3{ 0,0,0 };
-	beamList[0].pos = glm::vec3{ 0,0,0 };
+	beamList[0].pos = glm::vec3{ 50,0,0 };
+	beamList[1].pos = glm::vec3{ -5,0,0 };
 
 	for (int i = 0; i < wallSideList.size(); i++) {
 		wallSideList[i].mass = 0.f;
