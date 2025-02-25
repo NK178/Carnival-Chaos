@@ -11,7 +11,7 @@
 #include <iostream>
 
 CSceneManager::CSceneManager()
-    : currentSceneType(SCENE_MAINMENU)
+    : currentSceneType(SCENE_MAINMENU), isTransitioning(false)
 {
 }
 
