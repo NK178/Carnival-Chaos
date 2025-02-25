@@ -166,9 +166,9 @@ void SceneFinal::Init()
 	meshList[GEO_BUMPERCAR] = MeshBuilder::GenerateOBJ("Car", "Models//ATV.obj");
 	meshList[GEO_BUMPERCAR]->textureID = LoadTGA("Images//cart.tga");
 
-	meshList[GEO_PELLETGUN] = MeshBuilder::GenerateOBJ("PelletGun",
-		"Models//Ray_Gun.obj");
+	meshList[GEO_PELLETGUN] = MeshBuilder::GenerateOBJ("PelletGun", "Models//Ray_Gun.obj");
 	meshList[GEO_PELLETGUN]->textureID = LoadTGA("Images//Ray_Gun_Diffuse.tga");
+	meshList[GEO_CROSSHAIR] = MeshBuilder::GenerateQuad("Crosshair", glm::vec3(1, 1, 1), 1.f);
 
 	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.4f, 1000.0f);
 	projectionStack.LoadMatrix(projection);
@@ -295,7 +295,7 @@ void SceneFinal::Update(double dt) {
 
 	//std::cout << cross << std::endl;
 
-	if (dot > 0)
+	if (dot > 20)
 	{
 		AImove = 'F';
 	}
@@ -311,7 +311,7 @@ void SceneFinal::Update(double dt) {
 		{
 			AIsteer = 'R';
 		}
-		else if (cross < 2)
+		else if (cross < -2)
 		{
 			AIsteer = 'L';
 		}
@@ -348,6 +348,18 @@ void SceneFinal::Update(double dt) {
 	else
 	{
 		m_cpu.angularVel = 0;
+	}
+
+	float overallDist = sqrt(((carPhysics.pos.x - m_cpu.pos.x) * (carPhysics.pos.x - m_cpu.pos.x)) + ((carPhysics.pos.z - m_cpu.pos.z) * (carPhysics.pos.z - m_cpu.pos.z)));
+
+	std::cout << overallDist << std::endl;
+
+	if (overallDist <= 20)
+	{
+		glm::vec3 displacementVect = carPhysics.pos - m_cpu.pos;
+		displacementVect.y = 0;
+		carPhysics.AddForce(displacementVect * 100.f);
+		m_cpu.AddForce(-displacementVect * 100.f);
 	}
 
 	// Apply drag force
@@ -604,6 +616,11 @@ void SceneFinal::Render()
 	RenderTextOnScreen(meshList[GEO_TEXT], "Stamina", glm::vec3(0, 1, 0), 40, 0, 0);
 
 	RenderSkyBox();
+
+	// Render vertical line of crosshair
+	RenderMeshOnScreen(meshList[GEO_CROSSHAIR], 400, 300, 2, 20);  // Thin vertical line
+	// Render horizontal line of crosshair
+	RenderMeshOnScreen(meshList[GEO_CROSSHAIR], 400, 300, 20, 2);  // Thin horizontal line
 }
 
 void SceneFinal::RenderMesh(Mesh* mesh, bool enableLight)

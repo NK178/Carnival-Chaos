@@ -32,6 +32,7 @@ public:
 		GEO_TEXT2,
 		GEO_FPS,
 		GEO_KEY_E,
+		GEO_WARNING,
 		GEO_UI,
 
 		//SKybox
@@ -262,6 +263,14 @@ private:
 	FPCamera camera;
 	int projType = 1; // fix to 0 for orthographic, 1 for projection
 
+	// spinning wall and beam rotation
+	float rotationAngle;
+	float rotationSpeed;
+	float beamWarningTimer;
+	bool isBeamSpawned;
+	bool isShowingBeamWarning;
+
+	// ui and player conditions
 	bool isObjectiveRead;
 	float remainingTime;
 	float countdownTime;

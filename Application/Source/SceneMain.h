@@ -199,7 +199,7 @@ private:
 	};
 
 	// dialogue displays
-	int currentLineIndex = 0;
+	int currentLineIndex = -1;
 	float dialogueTimer = 0;
 	const float TEXT_DISPLAY_TIME = 4.0f;
 	bool isTyping;
