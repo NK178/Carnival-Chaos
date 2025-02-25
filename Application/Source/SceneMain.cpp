@@ -626,6 +626,45 @@ void SceneMain::Update(double dt)
 	fps = glm::round(temp * 100.f) / 100.f;
 
 	UpdateDialogue(dt);
+
+	// Add this inside HandleKeyPress() method
+if (KeyboardController::GetInstance()->IsKeyPressed('1')) {
+	// Force enter Archery scene
+	shouldEnterArchery = true;
+}
+
+if (KeyboardController::GetInstance()->IsKeyPressed('2')) {
+	// Force enter BalloonPop scene
+	shouldEnterBalloonPop = true;
+}
+
+if (KeyboardController::GetInstance()->IsKeyPressed('3')) {
+	// Force enter Hole scene
+	shouldEnterHole = true;
+}
+
+if (KeyboardController::GetInstance()->IsKeyPressed('4')) {
+	// Force enter WhackAMole scene
+	shouldEnterWhackAMole = true;
+}
+
+if (KeyboardController::GetInstance()->IsKeyPressed('5')) {
+	// Force enter Spinning Ring scene
+	shouldEnterSpinningRing = true;
+}
+
+if (KeyboardController::GetInstance()->IsKeyPressed('6')) {
+	// Force enter WIU Test scene
+	shouldEnterWIUTest = true;
+}
+
+if (KeyboardController::GetInstance()->IsKeyPressed('7')) {
+	// Force enter Final scene (after completing all games)
+	for (int i = 0; i < 6; i++) {
+		tentCompleted[i] = true;
+	}
+	shouldEnterFinal = true;
+}
 }
 
 void SceneMain::Render()
