@@ -43,6 +43,7 @@ public:
 
 		//Entities
 		GEO_CAR,
+		GEO_PELLETGUN,
 
 
 		NUM_GEOMETRY,
