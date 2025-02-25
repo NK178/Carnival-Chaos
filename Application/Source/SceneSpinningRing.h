@@ -198,14 +198,37 @@ private:
 			normals.push_back(glm::vec3(0, 0, 1));
 			normals.push_back(glm::vec3(0, 0, -1));
 
-			vertices.push_back(glm::vec3(5.f, 30.0f, 5.f));    // Vertex 0 
-			vertices.push_back(glm::vec3(5.f, 30.0f, 5.f));     // Vertex 1 
-			vertices.push_back(glm::vec3(-5.f, 0.f, 5.f));   // Vertex 2 
-			vertices.push_back(glm::vec3(5.f, 0.f, 5.f));    // Vertex 3 
-			vertices.push_back(glm::vec3(-5.f, 30.0f, -5.f));   // Vertex 4 
-			vertices.push_back(glm::vec3(5.f, 30.0f, -5.f));    // Vertex 5 
-			vertices.push_back(glm::vec3(-5.f, 0.f, -5.f));  // Vertex 6 
-			vertices.push_back(glm::vec3(5.f, 0.f, -5.f));   // Vertex 7 
+			vertices.push_back(glm::vec3(-3.f, 30.0f, 5.f));    // Vertex 0 
+			vertices.push_back(glm::vec3(3.f, 30.0f, 5.f));     // Vertex 1 
+			vertices.push_back(glm::vec3(-3.f, 0.f, 5.f));   // Vertex 2 
+			vertices.push_back(glm::vec3(3.f, 0.f, 5.f));    // Vertex 3 
+			vertices.push_back(glm::vec3(-3.f, 30.0f, -5.f));   // Vertex 4 
+			vertices.push_back(glm::vec3(3.f, 30.0f, -5.f));    // Vertex 5 
+			vertices.push_back(glm::vec3(-3.f, 0.f, -5.f));  // Vertex 6 
+			vertices.push_back(glm::vec3(3.f, 0.f, -5.f));   // Vertex 7 
+		}
+	};
+
+	struct spinningBeam : public GameObject {
+		std::vector<glm::vec3> normals;
+		std::vector<glm::vec3> vertices;
+
+		spinningBeam(int id, int type) : GameObject(id, type) {
+			normals.push_back(glm::vec3(0, 1, 0));
+			normals.push_back(glm::vec3(0, -1, 0));
+			normals.push_back(glm::vec3(1, 0, 0));
+			normals.push_back(glm::vec3(-1, 0, 0));
+			normals.push_back(glm::vec3(0, 0, 1));
+			normals.push_back(glm::vec3(0, 0, -1));
+
+			vertices.push_back(glm::vec3(-45.f, 6.0f, 1.5f));    // Vertex 0 
+			vertices.push_back(glm::vec3(0.f, 6.0f, 1.5f));     // Vertex 1 
+			vertices.push_back(glm::vec3(-45.f, 3.f, 1.5f));   // Vertex 2 
+			vertices.push_back(glm::vec3(0.f, 3.f, 1.5f));    // Vertex 3 
+			vertices.push_back(glm::vec3(-45.f, 6.0f, -1.5f));   // Vertex 4 
+			vertices.push_back(glm::vec3(0.f, 6.0f, -1.5f));    // Vertex 5 
+			vertices.push_back(glm::vec3(-45.f, 3.f, -1.5f));  // Vertex 6 
+			vertices.push_back(glm::vec3(0.f, 3.f, -1.5f));   // Vertex 7 
 		}
 	};
 
@@ -217,11 +240,8 @@ private:
 	std::vector<std::vector<glm::vec3>> spinningWallTopVertices;
 	std::vector<std::vector<glm::vec3>> middleWallNormals;
 	std::vector<std::vector<glm::vec3>> middleWallVertices;
-
-	struct spinningBeam: public GameObject {
-		glm::vec3 spinningBeamDimensions{ 1.5f,7.f,1.5f };
-		spinningBeam(int id, int type) : GameObject(id, type) {}
-	};
+	std::vector<std::vector<glm::vec3>> spinningBeamNormals;
+	std::vector<std::vector<glm::vec3>> spinningBeamVertices;
 
 	std::vector<playerBox> player;
 	std::vector<spinningWallSide> wallSideList;
