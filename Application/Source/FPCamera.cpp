@@ -341,20 +341,18 @@ void FPCamera::Update(double dt)
 	}
 
 	
+	//store the initial offset
+	static glm::vec3 targetOffset = glm::vec3(0, 0, 1000); //higher value = better fix
+
+	//mouse input handling...
 	double deltaX = MouseController::GetInstance()->GetMouseDeltaX();
 	float angleX = -deltaX * ROTATE_SPEED * 0.05 * static_cast<float>(dt);
 
 	if (enableFNAF)
 	{
-		Application::SetPointerStatus(true);
-
 		angleX = 0;
 	}
-	glm::mat4 yaw = glm::rotate(
-		glm::mat4(1.f), // matrix to modify
-		glm::radians(angleX), // rotation angle in degree and
-		glm::vec3(up.x, up.y, up.z)// the axis to rotate along
-	);
+	glm::mat4 yaw = glm::rotate(glm::mat4(1.f), glm::radians(angleX), glm::vec3(up.x, up.y, up.z));
 	glm::vec3 yawView = yaw * glm::vec4(view, 0.f);
 
 	double deltaY = MouseController::GetInstance()->GetMouseDeltaY();
@@ -365,38 +363,40 @@ void FPCamera::Update(double dt)
 		angleY = 0;
 	}
 
-	glm::mat4 pitch = glm::rotate(
-		glm::mat4(1.f), // matrix to modify
-		glm::clamp(glm::radians(angleY), -1.5f, 1.5f), // rotation angle in degree and
-		glm::vec3(right.x, right.y, right.z)// the axis to rotate along
-	);
-	glm::vec3 pitchView = pitch * glm::vec4(view, 0.f);
-	target = pos + pitchView + yawView;
+	glm::mat4 pitch = glm::rotate(glm::mat4(1.f), glm::clamp(glm::radians(angleY), -1.5f, 1.5f), glm::vec3(right.x, right.y, right.z));
+	glm::vec3 pitchView = pitch * glm::vec4(yawView, 0.f);
+
+	view = glm::normalize(pitchView);
+
+	//update the target offset based on the new view
+	targetOffset = view * glm::length(targetOffset);
+
+	//update the target based on the new pos and offset.
+	target = pos + targetOffset;
+
+	//ensure direction doesn't get affected by movement
+	forward = glm::normalize(target - pos);
 
 	multDebugX = pitchView.z > 0 ? 1 : -1;
 	multDebugZ = pitchView.x > 0 ? -1 : 1;
-	
+
 	isDirty = true;
 	this->Refresh();
 
 	if (enableFNAF)
 	{
 		glm::vec3 velocity = pos - prevPos;
-		if (glm::length(velocity) > 0.001f) //please don't divide by 0 lol
+		if (glm::length(velocity) > 0.001f) //please don't divide by 0 
 		{
 			glm::vec3 newForward = glm::normalize(velocity);
 			forward = glm::mix(forward, newForward, 1.f); //smoothly adjust direction
 			target = pos + forward;
 		}
 	}
-	
+
 	prevPos = pos;
 
-
-
-
 	UpdatePhysics(dt);
-	
 }
 
 glm::vec3 FPCamera::GetView(void)

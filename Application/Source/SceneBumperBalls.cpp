@@ -247,6 +247,15 @@ void SceneBumperBalls::Init()
 	cylinderlist[0].bounciness = 0.f;
 
 	newcampos = glm::vec3{ player[0].pos.x,player[0].pos.y + 10.f,player[0].pos.z };
+
+	camera.enableFNAF = false;
+	camera.allowMovement = false; // 
+	camera.allowJump = false; // 
+	camera.allowSprint = false; // 
+	camera.allowCrouch = false; // 
+	camera.allowProne = false; // 
+	camera.allowLocomotiveTilt = false;
+	camera.allowLocomotiveBop = false;
 }
 
 void SceneBumperBalls::Update(double dt)
@@ -267,10 +276,14 @@ void SceneBumperBalls::Update(double dt)
 	if (KeyboardController::GetInstance()->IsKeyDown('P'))
 		spherelist[0].pos.y += static_cast<float>(dt) * SPEED;
 
-	CollisionData cd;
+	glm::vec3 viewDir = glm::normalize(camera.target - camera.pos);
+	UpdateMovement();
 
+	CollisionData cd;
 	newcampos = glm::vec3{ player[0].pos.x,player[0].pos.y + 10.f,player[0].pos.z };
 	camera.pos = newcampos;
+	camera.target = camera.pos + viewDir * 1.2f;
+
 	//Ball to ball
 	for (int i = 0; i < spherelist.size() - 1; ++i) {
 		for (int j = i + 1; j < spherelist.size(); ++j) {
@@ -303,12 +316,6 @@ void SceneBumperBalls::Update(double dt)
 	}
 
 
-	if (KeyboardController::GetInstance()->IsKeyPressed('H')) {
-		player[0].AddForce(100.f * glm::vec3{ 1,0,0 });
-
-	}
-
-
 	player[0].AddForce(100.f * glm::vec3{ 0,-1,0 });
 	player[0].UpdatePhysics(dt);
 	for (int i = 0; i < spherelist.size(); i++) {
@@ -320,6 +327,9 @@ void SceneBumperBalls::Update(double dt)
 		cylinderlist[i].UpdatePhysics(dt);
 	}
 	camera.Update(dt);
+
+
+
 
 }
 
@@ -660,24 +670,23 @@ void SceneBumperBalls::Material(GEOMETRY_TYPE obj, float AmR, float AmG, float A
 	meshList[obj]->material.kShininess = Shiny;
 }
 
-void SceneBumperBalls::UpdateMovement(float dt)
+void SceneBumperBalls::UpdateMovement()
 {
+	glm::vec3 view = glm::normalize(camera.target - camera.pos); 
+	glm::vec3 right = glm::normalize(glm::cross(view, glm::vec3{ 0,1,0 }));
 	//INVERSED CONTROLS
 	if (KeyboardController::GetInstance()->IsKeyDown('W')) {
-		player[0].AddForce(glm::vec3{ 0,0,-1 });
+		player[0].AddForce(-view *PLAYER_SPEED);
 	}
 	if (KeyboardController::GetInstance()->IsKeyDown('S')) {
-		player[0].AddForce(glm::vec3{ 0,0,1 });
+		player[0].AddForce(view * PLAYER_SPEED);
 	}
 	if (KeyboardController::GetInstance()->IsKeyDown('A')) {
-		player[0].AddForce(glm::vec3{ 1,0,0 });
+		player[0].AddForce(right *PLAYER_SPEED);
 	}
 	if (KeyboardController::GetInstance()->IsKeyDown('D')) {
-		player[0].AddForce(glm::vec3{ -1,0,0 });
+		player[0].AddForce(-right *PLAYER_SPEED);
 	}
-
-
-
 }
 
 void SceneBumperBalls::RenderSkyBox() {
