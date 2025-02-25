@@ -6,27 +6,43 @@
 
 class Application
 {
-public:
-	Application();
-	~Application();
-	void Init();
-	void Run();
-	void Exit();
-	static void SetPointerStatus(bool status);
-	static bool IsKeyPressed(unsigned short key);
-
-	//TEST
-	void setEnablePointer(bool Enable);
-	void setShowPointer(bool Show);
-	bool getEnablePointer();
-	bool getShowPointer();
-	static bool enablePointer;
-
 private:
+    // The scene manager instance
+    CSceneManager sceneManager;
 
-	//Declare a window object
-	StopWatch m_timer;
-	bool showPointer = true;
+    // Timer for the game loop
+    StopWatch m_timer;
+
+    // For cursor control
+    static bool enablePointer;
+    static bool showPointer;
+
+    // Process input for scene navigation and game control
+    void ProcessInput();
+
+public:
+    // Constructor and Destructor
+    Application();
+    ~Application();
+
+    // Initialize the application
+    void Init();
+
+    // Main game loop
+    void Run();
+
+    // Cleanup
+    void Exit();
+
+    // Input checking
+    static bool IsKeyPressed(unsigned short key);
+    static void SetPointerStatus(bool status);
+
+    // Pointer visibility controls
+    static void setEnablePointer(bool Enable);
+    static void setShowPointer(bool Show);
+    static bool getEnablePointer();
+    static bool getShowPointer();
 };
 
-#endif
+#endif // APPLICATION_H
