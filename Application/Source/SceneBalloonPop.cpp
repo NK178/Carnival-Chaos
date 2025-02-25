@@ -370,19 +370,22 @@ void SceneBalloonPop::FireDart() {
 				(rightVector * gunRightOffset) -
 				(camera.up * gunDownOffset);
 
-			// Calculate barrel end position (offset from gun position)
-			// The values below need to be adjusted based on your gun model
-			float barrelLength = 0.3f; // Adjust based on your gun model
-			glm::vec3 barrelEndPosition = gunPosition + (viewDirection * barrelLength);
+			// Calculate barrel end position with adjusted offsets
+			
+			float barrelLength = 0.6f;       
+			float barrelRightAdjust = 0.3f;  
+			float barrelUpAdjust = 0.02f;    
 
-			// Use barrel end as pellet spawn position
+			glm::vec3 barrelEndPosition = gunPosition +
+				(viewDirection * barrelLength) +
+				(rightVector * barrelRightAdjust) +
+				(camera.up * barrelUpAdjust);
+
+			// Use barrel end as pellet spawn position with adjusted position
 			const float DART_BASE_SPEED = 180.0f;
 			dart.Fire(barrelEndPosition, viewDirection, DART_BASE_SPEED);
 
-			// Remove upward force for pellets - they should go straight
-			// const float INITIAL_UP_FORCE = 10.0f;
-			// dart.physics.AddForce(glm::vec3(0, INITIAL_UP_FORCE, 0));
-
+			// No gravity/arc for pellets - they should travel in a straight line
 			break;
 		}
 	}
