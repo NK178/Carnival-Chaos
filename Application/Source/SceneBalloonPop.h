@@ -116,6 +116,8 @@ public:
 	virtual void Render();
 	virtual void Exit();
 
+       bool m_hasWon;
+
 private:
 	void HandleKeyPress();
 	void RenderMesh(Mesh* mesh, bool enableLight);
@@ -149,7 +151,7 @@ private:
 	float fps = 0;
 
 	bool m_isGameOver;
-	bool m_hasWon;
+	
 
 	bool m_isObjectiveRead;
 	float countdownTime;

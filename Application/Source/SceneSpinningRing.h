@@ -113,6 +113,8 @@ public:
 	virtual void Render();
 	virtual void Exit();
 
+	bool playerWon;
+
 private:
 
 	struct playerBox : public GameObject {
@@ -217,7 +219,6 @@ private:
 	bool isObjectiveRead;
 	float remainingTime;
 	float countdownTime;
-	bool playerWon;
 	bool playerLost;
 
 	MatrixStack modelStack, viewStack, projectionStack;	

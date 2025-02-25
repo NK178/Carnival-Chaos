@@ -31,13 +31,13 @@ void SceneHole::Init()
 	wallDisp = 100;
 	failedGrav = 0;
 
-	camera.enableFNAF = false;
-	camera.allowMovement = true;
-	camera.allowJump = true;
-	camera.allowSprint = true;
-	camera.allowCrouch = true;
+	camera.enableFNAF = true;
+	camera.allowMovement = false;
+	camera.allowJump = false;
+	camera.allowSprint = false;
+	camera.allowCrouch = false;
 	camera.allowProne = false;
-	camera.allowLocomotiveTilt = true;
+	camera.allowLocomotiveTilt = false;
 	camera.allowLocomotiveBop = false;
 
 
@@ -176,9 +176,18 @@ void SceneHole::Init()
 	// 16 x 16 is the number of columns and rows for the text
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Images//calibri.tga");
+	meshList[GEO_TEXT2] = MeshBuilder::GenerateText("text2", 16, 16);
+	meshList[GEO_TEXT2]->textureID = LoadTGA("Images//yugothicuisemibold.tga");
 
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("result", 16, 16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Images//calibri.tga");
+
+	meshList[GEO_KEY_E] = MeshBuilder::GenerateQuad("KeyE", glm::vec3(1.f, 1.f, 1.f), 2.f);
+	meshList[GEO_KEY_E]->textureID = LoadTGA("Images//keyboard_key_e.tga");
+	meshList[GEO_KEY_R] = MeshBuilder::GenerateQuad("KeyR", glm::vec3(1.f, 1.f, 1.f), 2.f);
+	meshList[GEO_KEY_R]->textureID = LoadTGA("Images//keyboard_key_r.tga");
+
+	meshList[GEO_UI] = MeshBuilder::GenerateQuad("UIBox", glm::vec3(0.12f, 0.12f, 0.12f), 10.f);
 
 	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 1000.0f);
 	projectionStack.LoadMatrix(projection);
@@ -262,7 +271,10 @@ void SceneHole::Update(double dt)
 	{
 		HandleKeyPress();
 
-		wallDisp -= dt * 60;
+		if (m_hasReadObjective)
+		{
+			wallDisp -= dt * 60;
+		}
 		//std::cout << camera.pos.z << "\n\n\n";
 		if (!((camera.pos.x > -170 && camera.pos.x < -130) && (camera.pos.z < 20 && camera.pos.z > -20)))
 		{
@@ -450,11 +462,11 @@ void SceneHole::Render()
 	RenderMesh(meshList[GEO_AXES], false);
 	modelStack.PopMatrix();
 
-	modelStack.PushMatrix();
+	/*modelStack.PushMatrix();
 	modelStack.Translate(light[0].position.x, light[0].position.y, light[0].position.z);
 	modelStack.Scale(0.1f, 0.1f, 0.1f);
 	RenderMesh(meshList[GEO_SPHERE], false);
-	modelStack.PopMatrix();
+	modelStack.PopMatrix();*/
 
 	//wall platform
 	modelStack.PushMatrix();
@@ -530,21 +542,95 @@ void SceneHole::Render()
 
 	//RenderTextOnScreen(meshList[GEO_TEXT], "Stamina", glm::vec3(0, 1, 0), 40, 0, 0);
 
+	if (!m_hasReadObjective) {
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 40);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- HOLE IN THE WALL -", glm::vec3(1, 1, 0), 20, 200, 480);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Navigate around the", glm::vec3(1, 1, 1), 15, 240, 450);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "approaching walls!", glm::vec3(1, 1, 1), 15, 265, 420);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Five walls will", glm::vec3(1, 1, 1), 15, 240, 390);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "steadily approach!", glm::vec3(1, 1, 1), 15, 265, 360);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- WASD to move", glm::vec3(1, 1, 0), 15, 250, 330);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Space to jump", glm::vec3(1, 1, 0), 15, 250, 300);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- C to crouch", glm::vec3(1, 1, 0), 15, 250, 270);
+
+		RenderMeshOnScreen(meshList[GEO_KEY_E], 310, 150, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Begin", glm::vec3(1, 1, 1), 20, 340, 140);
+
+		if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E))
+		{
+			m_hasReadObjective = true;
+			camera.enableFNAF = false;
+			camera.allowMovement = true;
+			camera.allowJump = true;
+			camera.allowSprint = false;
+			camera.allowCrouch = true;
+			camera.allowProne = false;
+			camera.allowLocomotiveTilt = true;
+			camera.allowLocomotiveBop = false;
+		}
+	}
+
 	if (gameResult == -1)
 	{
-		RenderTextOnScreen(meshList[GEO_TEXT], "DIED", glm::vec3(1, 0, 0), 40, 325, 400);
-		RenderTextOnScreen(meshList[GEO_TEXT], "[SPACE] to retry", glm::vec3(1, 0, 0), 40, 100, 300);
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "GAME OVER!", glm::vec3(1, 0, 0), 40, 210, 370);
 
-		if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_SPACE))
+		RenderTextOnScreen(meshList[GEO_TEXT2], "You fell!", glm::vec3(1, 1, 1), 20, 250, 320);
+
+		RenderMeshOnScreen(meshList[GEO_KEY_R], 350, 270, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Retry", glm::vec3(1, 1, 1), 20, 390, 260);
+		RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
+
+		if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_R))
 		{
-
+			gameResult = 0;
+			Init();
+			m_hasReadObjective = true;
+			camera.enableFNAF = false;
+			camera.allowMovement = true;
+			camera.allowJump = true;
+			camera.allowSprint = false;
+			camera.allowCrouch = true;
+			camera.allowProne = false;
+			camera.allowLocomotiveTilt = true;
+			camera.allowLocomotiveBop = false;
+		}
+		if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E))
+		{
+			//ADD CODE TO HANDLE LOADING CARNIVAL SCENE
 		}
 	}
 	else if (gameResult == 1)
 	{
-		RenderTextOnScreen(meshList[GEO_TEXT], "You Beat", glm::vec3(0, 1, 0), 40, 300, 400);
-		RenderTextOnScreen(meshList[GEO_TEXT], "Hole in the Wall!", glm::vec3(0, 1, 0), 40, 100, 300);
-		RenderTextOnScreen(meshList[GEO_TEXT], "[SPACE] to retry", glm::vec3(0, 1, 0), 40, 100, 200);
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "SUCCESS!", glm::vec3(0, 1, 0), 40, 210, 370);
+
+		RenderTextOnScreen(meshList[GEO_TEXT2], "You beat HITW!", glm::vec3(1, 1, 1), 20, 250, 320);
+
+		RenderMeshOnScreen(meshList[GEO_KEY_R], 350, 270, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Retry", glm::vec3(1, 1, 1), 20, 390, 260);
+		RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
+
+		if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_R))
+		{
+			gameResult = 0;
+			Init();
+			m_hasReadObjective = true;
+			camera.enableFNAF = false;
+			camera.allowMovement = true;
+			camera.allowJump = true;
+			camera.allowSprint = false;
+			camera.allowCrouch = true;
+			camera.allowProne = false;
+			camera.allowLocomotiveTilt = true;
+			camera.allowLocomotiveBop = false;
+		}
+		if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E))
+		{
+			//ADD CODE TO HANDLE LOADING CARNIVAL SCENE
+		}
 	}
 }
 

@@ -1,5 +1,5 @@
-#ifndef SCENE_HOLE
-#define SCENE_HOLE
+#ifndef SCENE_HOLE_H
+#define SCENE_HOLE_H
 
 #include "Scene.h"
 #include "Mesh.h"
@@ -27,8 +27,16 @@ public:
 
 		//Text
 		GEO_TEXT,
+		GEO_TEXT2,
 
-		//SKybox
+		//keys
+		GEO_KEY_E,
+		GEO_KEY_R,
+
+		//ui
+		GEO_UI,
+
+		//Skybox
 		GEO_LEFT,
 		GEO_RIGHT,
 		GEO_TOP,
@@ -107,6 +115,8 @@ public:
 	virtual void Render();
 	virtual void Exit();
 
+        signed short int gameResult = 0;
+
 private:
 	void HandleKeyPress();
 	void RenderMesh(Mesh* mesh, bool enableLight);
@@ -132,7 +142,8 @@ private:
 	float wallDisp;
 	float failedGrav;
 
-	signed short int gameResult = 0;
+
+	bool m_hasReadObjective = false; 
 
 	bool OverlapAABB2AABB(glm::vec3 Obj1, const int Width1, const int Height1, glm::vec3 Obj2, const int Width2, const int Height2);
 

@@ -20,6 +20,7 @@
 
 MainMenu::MainMenu()
 {
+	shouldStartGame = false;
 }
 
 MainMenu::~MainMenu()
@@ -535,7 +536,7 @@ void MainMenu::HandleMouseClick()
 		{
 			if (selectedOption == 0) // PLAY
 			{
-				CSceneManager::GetInstance().ChangeScene(CSceneManager::SCENE_CARNIVAL);
+				shouldStartGame = true;
 			}
 			else if (selectedOption == 1) // CREDITS
 			{

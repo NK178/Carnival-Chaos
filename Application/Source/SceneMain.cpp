@@ -626,6 +626,45 @@ void SceneMain::Update(double dt)
 	fps = glm::round(temp * 100.f) / 100.f;
 
 	UpdateDialogue(dt);
+
+	// Add this inside HandleKeyPress() method
+if (KeyboardController::GetInstance()->IsKeyPressed('1')) {
+	// Force enter Archery scene
+	shouldEnterArchery = true;
+}
+
+if (KeyboardController::GetInstance()->IsKeyPressed('2')) {
+	// Force enter BalloonPop scene
+	shouldEnterBalloonPop = true;
+}
+
+if (KeyboardController::GetInstance()->IsKeyPressed('3')) {
+	// Force enter Hole scene
+	shouldEnterHole = true;
+}
+
+if (KeyboardController::GetInstance()->IsKeyPressed('4')) {
+	// Force enter WhackAMole scene
+	shouldEnterWhackAMole = true;
+}
+
+if (KeyboardController::GetInstance()->IsKeyPressed('5')) {
+	// Force enter Spinning Ring scene
+	shouldEnterSpinningRing = true;
+}
+
+if (KeyboardController::GetInstance()->IsKeyPressed('6')) {
+	// Force enter WIU Test scene
+	shouldEnterWIUTest = true;
+}
+
+if (KeyboardController::GetInstance()->IsKeyPressed('7')) {
+	// Force enter Final scene (after completing all games)
+	for (int i = 0; i < 6; i++) {
+		tentCompleted[i] = true;
+	}
+	shouldEnterFinal = true;
+}
 }
 
 void SceneMain::Render()
@@ -1503,6 +1542,14 @@ void SceneMain::HandleKeyPress()
 		// Skip the entire sign dialogue
 		isSignDialogueActive = false;
 		readSign = false;
+		camera.enableFNAF = false;
+		camera.allowMovement = true;
+		camera.allowJump = true;
+		camera.allowSprint = false;
+		camera.allowCrouch = true;
+		camera.allowProne = false;
+		camera.allowLocomotiveTilt = true;
+		camera.allowLocomotiveBop = false;
 	}
 	static bool isRightUp = false;
 	if (!isRightUp && MouseController::GetInstance()->IsButtonDown(GLFW_MOUSE_BUTTON_RIGHT))

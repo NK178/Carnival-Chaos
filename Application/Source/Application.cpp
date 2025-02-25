@@ -1,4 +1,3 @@
-
 #include "Application.h"
 
 //Include GLEW
@@ -14,13 +13,21 @@
 #include "MainMenu.h"
 #include "KeyboardController.h"
 #include "MouseController.h"
-
+#include "CSceneManager.h"
+#include "SceneArchery.h"
+#include "SceneBalloonPop.h"
+#include "SceneFinal.h"
 #include "SceneHole.h"
+#include "SceneMain.h"
+#include "SceneSpinningRing.h"
+#include "SceneWhackAMole.h"
+#include "SceneWIUtest.h"
 
 GLFWwindow* m_window;
 const unsigned char FPS = 60; // FPS of this game
-const unsigned int frameTime = 1000 / FPS; // time for each 
+const unsigned int frameTime = 1000 / FPS; // time for each frame
 bool Application::enablePointer = false;
+bool Application::showPointer = false;
 
 //Define an error callback
 static void error_callback(int error, const char* description)
@@ -71,10 +78,10 @@ void resize_callback(GLFWwindow* window, int w, int h)
 
 bool Application::IsKeyPressed(unsigned short key)
 {
-    return ((GetAsyncKeyState(key) & 0x8001) != 0);
+	return ((GetAsyncKeyState(key) & 0x8001) != 0);
 }
 
-Application::Application()
+Application::Application() : sceneManager()
 {
 }
 
@@ -106,7 +113,7 @@ void Application::Init()
 	//If the window couldn't be created
 	if (!m_window)
 	{
-		fprintf( stderr, "Failed to open GLFW window.\n" );
+		fprintf(stderr, "Failed to open GLFW window.\n");
 		glfwTerminate();
 		exit(EXIT_FAILURE);
 	}
@@ -130,7 +137,7 @@ void Application::Init()
 	GLenum err = glewInit();
 
 	//If GLEW hasn't initialized
-	if (err != GLEW_OK) 
+	if (err != GLEW_OK)
 	{
 		fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
 		//return -1;
@@ -141,18 +148,23 @@ void Application::Init()
 	else if (showPointer == false)
 		glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
+	// Initialize scene manager with main menu scene
+	sceneManager.Init(SCENE_MAINMENU);
 }
 
 void Application::Run()
 {
 	//Main Loop
-	CSceneManager& sceneManager = CSceneManager::GetInstance();
-	sceneManager.Init();
-
 	m_timer.startTimer();    // Start timer to calculate how long it takes to render this frame
 	while (!glfwWindowShouldClose(m_window) && !IsKeyPressed(VK_ESCAPE))
 	{
+		// Process application input
+		ProcessInput();
+
+		// Update the scene manager
 		sceneManager.Update(m_timer.getElapsedTime());
+
+		// Render the current scene
 		sceneManager.Render();
 
 		//Swap buffers
@@ -169,15 +181,149 @@ void Application::Run()
 		glfwPollEvents();
 		m_timer.waitUntil(frameTime);       // Frame rate limiter
 	}
+}
 
-	sceneManager.Exit();
+void Application::ProcessInput()
+{
+    // Global go back to carnival
+    if (KeyboardController::GetInstance()->IsKeyPressed('Q')) {
+        // If not in main menu or carnival scene, pop back to carnival
+        if (sceneManager.GetCurrentSceneType() != SCENE_MAINMENU &&
+            sceneManager.GetCurrentSceneType() != SCENE_CARNIVAL) {
+            sceneManager.PopScene();
+        }
+    }
+
+
+    // Example: Handle special game transitions based on current scene
+    Scene* currentScene = sceneManager.GetCurrentScene();
+    if (currentScene) {
+        // Check for specific scene transitions based on current minigame
+        switch (sceneManager.GetCurrentSceneType()) {
+        case SCENE_MAINMENU:
+        {
+            MainMenu* menuScene = static_cast<MainMenu*>(currentScene);
+            if (menuScene && menuScene->shouldStartGame) {
+                // Push SceneMain first
+                sceneManager.PushScene(SCENE_MAINMENU);
+                // Then push Carnival scene
+                sceneManager.PushScene(SCENE_CARNIVAL);
+                menuScene->shouldStartGame = false;
+            }
+            break;
+        }
+        case SCENE_CARNIVAL:
+        {
+            SceneMain* carnivalScene = static_cast<SceneMain*>(currentScene);
+            if (carnivalScene) {
+                // Process any minigame entrance requests
+                if (carnivalScene->shouldEnterArchery) {
+                    sceneManager.PushScene(SCENE_ARCHERY);
+                    carnivalScene->shouldEnterArchery = false;
+                }
+                else if (carnivalScene->shouldEnterBalloonPop) {
+                    sceneManager.PushScene(SCENE_BALLOONPOP);
+                    carnivalScene->shouldEnterBalloonPop = false;
+                }
+                else if (carnivalScene->shouldEnterHole) {
+                    sceneManager.PushScene(SCENE_HOLE);
+                    carnivalScene->shouldEnterHole = false;
+                }
+                else if (carnivalScene->shouldEnterWhackAMole) {
+                    sceneManager.PushScene(SCENE_WHACKAMOLE);
+                    carnivalScene->shouldEnterWhackAMole = false;
+                }
+                else if (carnivalScene->shouldEnterSpinningRing) {
+                    sceneManager.PushScene(SCENE_SPINNING_RING);
+                    carnivalScene->shouldEnterSpinningRing = false;
+                }
+                else if (carnivalScene->shouldEnterWIUTest) {
+                    sceneManager.PushScene(SCENE_WIUTEST);
+                    carnivalScene->shouldEnterWIUTest = false;
+                }
+                // Check if player completed all required minigames to access final scene
+                else if (carnivalScene->shouldEnterFinal) {
+                    sceneManager.PushScene(SCENE_FINAL);
+                    carnivalScene->shouldEnterFinal = false;
+                }
+            }
+            break;
+        }
+        case SCENE_ARCHERY:
+        {
+            SceneArchery* archeryScene = static_cast<SceneArchery*>(currentScene);
+            // Return to carnival scene only when player wins and presses E
+            if (archeryScene->m_hasWon && KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E)) {
+                sceneManager.PopScene();
+            }
+            break;
+        }
+        case SCENE_BALLOONPOP:
+        {
+            SceneBalloonPop* balloonScene = static_cast<SceneBalloonPop*>(currentScene);
+            if (balloonScene->m_hasWon && KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E)) {
+                sceneManager.PopScene();
+            }
+            break;
+        }
+        case SCENE_HOLE:
+        {
+            SceneHole* holeScene = static_cast<SceneHole*>(currentScene);
+            // For SceneHole, check if gameResult > 0 (indicating a win)
+            if (holeScene->gameResult > 0 && KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E)) {
+                sceneManager.PopScene();
+            }
+            break;
+        }
+        case SCENE_WHACKAMOLE:
+        {
+            SceneWhackAMole* whackAMoleScene = static_cast<SceneWhackAMole*>(currentScene);
+            // For WhackAMole, you need to add a win condition flag in the scene
+            // if (whackAMoleScene->hasWon && KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E)) {
+            //     sceneManager.PopScene();
+            // }
+            break;
+        }
+        case SCENE_SPINNING_RING:
+        {
+            SceneSpinningRing* spinningRingScene = static_cast<SceneSpinningRing*>(currentScene);
+            if (spinningRingScene->playerWon && KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E)) {
+                sceneManager.PopScene();
+            }
+            break;
+        }
+        case SCENE_WIUTEST:
+        {
+            SceneWIUtest* wiuTestScene = static_cast<SceneWIUtest*>(currentScene);
+
+            // if (wiuTestScene->hasWon && KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E)) {
+            //     sceneManager.PopScene();
+            // }
+            break;
+        }
+        case SCENE_FINAL:
+        {
+            SceneFinal* finalScene = static_cast<SceneFinal*>(currentScene);
+
+            /*if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_R)) {
+                sceneManager.ReplaceScene(SCENE_MAINMENU);
+            }
+            break;*/
+        }
+        default:
+            break;
+        }
+    }
 }
 
 void Application::Exit()
 {
+	// Clean up scene manager
+	sceneManager.Exit();
+
 	KeyboardController::GetInstance()->DestroyInstance();
 	MouseController::GetInstance()->DestroyInstance();
-	
+
 	//Close OpenGL window and terminate GLFW
 	glfwDestroyWindow(m_window);
 	//Finalize and clean up GLFW
