@@ -232,13 +232,15 @@ void SceneBumperBalls::Init()
 	spherelist.push_back(Sphere(4,1.f,GameObject::SPHERE));
 	spherelist.push_back(Sphere(5,1.f,GameObject::SPHERE));
 	spherelist.push_back(Sphere(6,1.f,GameObject::SPHERE));
-	player[0].pos = glm::vec3{ 0,3,0 };
+	player[0].pos = glm::vec3{ -10,3,0 };
 	spherelist[0].pos = glm::vec3{ -15,-2,10 };
 	spherelist[1].pos = glm::vec3{ -15,-2,-10 };
 	spherelist[2].pos = glm::vec3{ 15,-2,10 };
 	spherelist[3].pos = glm::vec3{ 15,-2,-10 };
 
-	cylinderlist.push_back(Cylinder(101, GameObject::CYLINDER,3.f,1.f));
+	cylinderlist.push_back(Cylinder(101, GameObject::CYLINDER,70.f,28.f));
+	cylinderlist[0].pos = glm::vec3{0,-36,0};
+	cylinderlist[0].mass = 0.f;
 
 }
 
@@ -259,17 +261,33 @@ void SceneBumperBalls::Update(double dt)
 		spherelist[0].pos.y -= static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('P'))
 		spherelist[0].pos.y += static_cast<float>(dt) * SPEED;
-	
-
 
 
 
 	CollisionData cd;
-	if (OverlapSphere2Sphere(spherelist[1], spherelist[1].radius, spherelist[0], spherelist[0].radius, cd)) 
-		ResolveCollision(cd);
-	
-	//Cylinder 2 sphere overlap
-	if (OverlapSphere2Cylinder(spherelist[0], spherelist[0].radius, cylinderlist[0], cylinderlist[0].radius, cylinderlist[0].height, cd))
+
+	//Ball to ball
+	for (int i = 0; i < spherelist.size() - 1; ++i) {
+		for (int j = i + 1; j < spherelist.size(); ++j) {
+			if (OverlapSphere2Sphere(spherelist[i], spherelist[i].radius, spherelist[j], spherelist[j].radius, cd))
+				ResolveCollision(cd);
+		}
+	}
+
+	//Playerball to ball //do the player thingy 
+	for (int i = 0; i < spherelist.size(); i++) {
+		if (OverlapSphere2Sphere(player[0], player[0].radius, spherelist[i], spherelist[i].radius, cd))
+			ResolveCollision(cd);
+	}
+
+	//Cylinder to ball 
+	for (int i = 0; i < spherelist.size(); ++i) {
+		if (OverlapSphere2Cylinder(spherelist[i], spherelist[i].radius, cylinderlist[0], cylinderlist[0].radius, cylinderlist[0].height, cd))
+			ResolveCollision(cd);
+	}
+
+	//Cylinder to playerBall
+	if (OverlapSphere2Cylinder(player[0], player[0].radius, cylinderlist[0], cylinderlist[0].radius, cylinderlist[0].height, cd))
 		ResolveCollision(cd);
 
 	if (KeyboardController::GetInstance()->IsKeyPressed('G')) {
@@ -280,7 +298,19 @@ void SceneBumperBalls::Update(double dt)
 	}
 
 
+	if (KeyboardController::GetInstance()->IsKeyPressed('H')) {
+		player[0].AddForce(100.f * glm::vec3{ 1,0,0 });
+
+
+	}
+
+
+
+	player[0].AddForce(100.f * glm::vec3{ 0,-1,0 });
+	player[0].UpdatePhysics(dt);
 	for (int i = 0; i < spherelist.size(); i++) {
+		//gravity 
+		spherelist[i].AddForce(100.f * glm::vec3{ 0,-1,0 });
 		spherelist[i].UpdatePhysics(dt);
 	}
 	for (int i = 0; i < cylinderlist.size(); i++) {
@@ -369,22 +399,23 @@ void SceneBumperBalls::Render()
 		modelStack.PopMatrix();
 	}
 
-
 	modelStack.PushMatrix();
-	modelStack.Translate(0,-80,0);
-	modelStack.Scale(1.2,0.8,1.2);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	modelStack.Translate(0,-100,0);
+	modelStack.Scale(0.8, 1.f, 0.8f);
 	meshList[GEO_BARREL]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
 	meshList[GEO_BARREL]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
 	meshList[GEO_BARREL]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
 	meshList[GEO_BARREL]->material.kShininess = 1.0f;
 	RenderMesh(meshList[GEO_BARREL], true);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	modelStack.PopMatrix();
 
 	//Cylidner 
 	modelStack.PushMatrix();
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	modelStack.Translate(cylinderlist[0].pos.x, cylinderlist[0].pos.y, cylinderlist[0].pos.z);
-	modelStack.Scale(2*cylinderlist[0].radius, cylinderlist[0].height, 2*cylinderlist[0].radius);
+	modelStack.Scale(cylinderlist[0].radius, cylinderlist[0].height, cylinderlist[0].radius);
 	meshList[GEO_CYLINDER]->material.kAmbient = glm::vec3(0.5f, 0.1f, 0.1f);
 	meshList[GEO_CYLINDER]->material.kDiffuse = glm::vec3(0.7f, 0.5f, 0.5f);
 	meshList[GEO_CYLINDER]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);

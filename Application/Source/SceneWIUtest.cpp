@@ -235,7 +235,7 @@ void SceneWIUtest::Init()
 
 	spherelist.push_back(Sphere(3, 1.f,GameObject::SPHERE));
 	spherelist.push_back(Sphere(4,1.f,GameObject::SPHERE));
-	spherelist[0].pos = glm::vec3{ 0,5,0 };
+	spherelist[0].pos = glm::vec3{ 0,10,0 };
 	spherelist[1].pos = glm::vec3{ -15,3,0 };
 	spherelist[1].mass = 0.f;
 
@@ -337,7 +337,7 @@ void SceneWIUtest::Update(double dt)
 
 	if (KeyboardController::GetInstance()->IsKeyPressed('R')) {
 		obblist[0].angularVel += 50.f;
-		obblistV2[0].angleDeg = 30.f;
+		obblistV2[0].angularVel += 30.f;
 		//obblistV2[0].angularVel += 50.f;
 	}
 	
@@ -495,7 +495,7 @@ void SceneWIUtest::Render()
 	modelStack.PushMatrix();
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	modelStack.Translate(cylinderlist[0].pos.x, cylinderlist[0].pos.y, cylinderlist[0].pos.z);
-	modelStack.Scale(2*cylinderlist[0].radius, cylinderlist[0].height, 2*cylinderlist[0].radius);
+	modelStack.Scale(cylinderlist[0].radius, cylinderlist[0].height, cylinderlist[0].radius);
 	meshList[GEO_CYLINDER]->material.kAmbient = glm::vec3(0.5f, 0.1f, 0.1f);
 	meshList[GEO_CYLINDER]->material.kDiffuse = glm::vec3(0.7f, 0.5f, 0.5f);
 	meshList[GEO_CYLINDER]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);

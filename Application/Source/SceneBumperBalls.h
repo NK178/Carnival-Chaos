@@ -150,7 +150,7 @@ private:
 	struct Cylinder : public GameObject {
 		float height;
 		float radius;
-		Cylinder(int id, int type, int h, int r) : radius(r), height(h), GameObject(id, type) {}
+		Cylinder(int id, int type, float h, float r) : radius(r), height(h), GameObject(id, type) {}
 	};
 
 	std::vector<Sphere> spherelist;

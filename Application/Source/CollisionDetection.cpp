@@ -161,12 +161,12 @@ bool OverlapAABB2Sphere(PhysicsObject& circle, float radius, PhysicsObject& box,
 		return false;
 }
 
-/////// TO FIX 
 ///////////////////////////////// CYLINDER TO SPHERE  ///////////////////////////////////////
 bool OverlapSphere2Cylinder(PhysicsObject& sphere, float sphradius, PhysicsObject& cylinder, float cyradius, float height, CollisionData& cd)
 {
 	glm::vec3 dispvec = sphere.pos - cylinder.pos;
 	glm::vec3 normal = { 0,0,0 };
+	float pen = 0.f;
 	float halfheight = height * 0.5f;
 	float spmaxheight = sphere.pos.y + sphradius;
 	float spminheight = sphere.pos.y - sphradius;
@@ -176,15 +176,20 @@ bool OverlapSphere2Cylinder(PhysicsObject& sphere, float sphradius, PhysicsObjec
 		if (spmaxheight >= cylinder.pos.y - halfheight && spminheight <= cylinder.pos.y + halfheight) {
 			cd.pObj1 = &sphere;
 			cd.pObj2 = &cylinder;
-			if (length > 0.0f) 
+			if (sphere.pos.y < cylinder.pos.y - halfheight) {
+				normal = glm::vec3(0.0f, -1.0f, 0.0f);
+				pen = (sphere.pos.y + sphradius) - (cylinder.pos.y - halfheight);
+			}
+			else if (sphere.pos.y > cylinder.pos.y + halfheight) {
+				normal = glm::vec3(0.0f, 1.0f, 0.0f);
+				pen = (cylinder.pos.y + halfheight) - (sphere.pos.y - sphradius);
+			}
+			else {
 				normal = glm::normalize(dispvec);
-			else 
-				if (cylinder.pos.y > sphere.pos.y)
-					normal = glm::vec3(0.0f, -1.0f, 0.0f);
-				else 
-					normal = glm::vec3(0.0f, 1.0f, 0.0f);
+				pen = (sphradius + cyradius) - length;
+			}
 			cd.normal = normal;
-			cd.pd = (sphradius + cyradius) - length;
+			cd.pd = pen;
 			return true;
 		}
 	}
