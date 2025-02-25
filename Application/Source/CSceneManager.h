@@ -1,48 +1,84 @@
-#pragma once
+#ifndef CSCENEMANAGER_H
+#define CSCENEMANAGER_H
+
+#include <stack>
 #include <vector>
 #include "Scene.h"
-#include "LoadingScreen.h"
-#include "MatrixStack.h" 
+
+// Scene type enum
+enum SCENE_TYPE {
+    SCENE_MAINMENU,
+    SCENE_CARNIVAL,
+    SCENE_WIUTEST,
+    SCENE_BALLOONPOP,
+    SCENE_ARCHERY,
+    SCENE_HOLE,
+    SCENE_WHACKAMOLE,
+    SCENE_SPINNING_RING,
+    SCENE_FINAL,
+    SCENE_COUNT
+};
 
 class CSceneManager {
-public:
-    enum SCENE_TYPE {
-        SCENE_WIUTEST,
-        SCENE_BALLOONPOP,
-        SCENE_ARCHERY,
-        SCENE_MAIN_MENU,
-        SCENE_CARNIVAL,
-        SCENE_SPINNING_RING,
-        SCENE_TOTAL
+private:
+    // Stack of raw scene pointers (we'll manage memory manually)
+    std::stack<Scene*> sceneStack;
+
+    // Stack to track scene types (parallel to sceneStack)
+    std::stack<SCENE_TYPE> typeStack;
+
+    // Current scene type
+    SCENE_TYPE currentSceneType;
+
+    // Flag for scene transitions
+    bool isTransitioning;
+
+    // Action to perform during transition
+    enum TransitionAction {
+        PUSH,
+        POP,
+        REPLACE
     };
 
-    static CSceneManager& GetInstance() {
-        static CSceneManager instance;
-        return instance;
-    }
+    // Transition data
+    struct Transition {
+        TransitionAction action;
+        Scene* newScene;
+        SCENE_TYPE newSceneType;
+    };
 
-    void Init();
+    Transition currentTransition;
+
+    // Private method to create scene instances
+    Scene* CreateScene(SCENE_TYPE sceneType);
+
+public:
+    CSceneManager();
+    ~CSceneManager();
+
+    // Initialize the scene manager with a starting scene
+    void Init(SCENE_TYPE startingScene = SCENE_MAINMENU);
+
+    // Main update loop
     void Update(double dt);
+
+    // Render the current scene
     void Render();
+
+    // Clean up all scenes
     void Exit();
 
-    // Scene management
-    void ChangeScene(SCENE_TYPE newScene);
-    Scene* GetCurrentScene() { return activeScene; }
+    // Stack operations
+    void PushScene(SCENE_TYPE newScene);  // Add scene to top of stack
+    void PopScene();                      // Remove top scene and go back to previous
+    void ReplaceScene(SCENE_TYPE newScene); // Replace current scene
 
-private:
-    CSceneManager() : activeScene(nullptr), nextScene(nullptr),
-        loadingScreen(nullptr), isLoading(false) {
-    }
-    ~CSceneManager() { Exit(); }
+    // Scene access
+    Scene* GetCurrentScene();
+    SCENE_TYPE GetCurrentSceneType() const;
 
-    // Prevent copying
-    CSceneManager(const CSceneManager&) = delete;
-    CSceneManager& operator=(const CSceneManager&) = delete;
-
-    Scene* activeScene;
-    Scene* nextScene;
-    LoadingScreen* loadingScreen;
-    SCENE_TYPE currentSceneType;
-    bool isLoading;
+    // Returns true if transitioning between scenes
+    bool IsTransitioning() const;
 };
+
+#endif // CSCENEMANAGER_H
