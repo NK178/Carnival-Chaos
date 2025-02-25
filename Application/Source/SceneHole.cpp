@@ -345,7 +345,7 @@ void SceneHole::Update(double dt)
 		//wall3
 		if (abs(camera.pos.x - wallDisp - 400) < 3)
 		{
-			if (camera.pos.z > -9.5 && camera.pos.z < 17)
+			if (camera.pos.z > 9.5 && camera.pos.z < 17)
 			{
 				if (camera.pos.y > 2)
 				{
@@ -492,6 +492,52 @@ void SceneHole::Render()
 	RenderMesh(meshList[GEO_PLANE], true);
 	modelStack.PopMatrix();
 
+	//edging2
+	modelStack.PushMatrix();
+	modelStack.Translate(-130.f, -100.f, 0);
+	modelStack.Scale(1.f, 50.f, 10.f);
+	modelStack.Rotate(90.f, 0, 1, 0);
+	meshList[GEO_PLANE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+	meshList[GEO_PLANE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_PLANE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_PLANE]->material.kShininess = 0.5f;
+	RenderMesh(meshList[GEO_PLANE], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(-170.f, -100.f, 0);
+	modelStack.Scale(1.f, 50.f, 10.f);
+	modelStack.Rotate(90.f, 0, 1, 0);
+	meshList[GEO_PLANE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+	meshList[GEO_PLANE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_PLANE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_PLANE]->material.kShininess = 0.5f;
+	RenderMesh(meshList[GEO_PLANE], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(-150.f, -100.f, 20.f);
+	modelStack.Scale(10.f, 50.f, 10.f);
+	modelStack.Rotate(180.f, 1, 1, 0);
+	meshList[GEO_PLANE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+	meshList[GEO_PLANE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_PLANE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_PLANE]->material.kShininess = 0.5f;
+	RenderMesh(meshList[GEO_PLANE], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(-150.f, -100.f, -20.f);
+	modelStack.Scale(10.f, 50.f, 10.f);
+	modelStack.Rotate(180.f, 1, 1, 0);
+	meshList[GEO_PLANE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+	meshList[GEO_PLANE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_PLANE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_PLANE]->material.kShininess = 0.5f;
+	RenderMesh(meshList[GEO_PLANE], true);
+	modelStack.PopMatrix();
+
+
 	modelStack.PushMatrix();
 	modelStack.Translate(-150, 0, 0);
 	modelStack.Scale(10.f, 1.f, 10.f);
@@ -511,7 +557,21 @@ void SceneHole::Render()
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
+	modelStack.Translate(wallDisp + 1, -3, 0);
+	modelStack.Scale(10.f, 2.f, 2.f);
+	modelStack.Rotate(90.f, 0, 1, 0);
+	RenderMesh(meshList[GEO_HWALL1], false);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
 	modelStack.Translate(wallDisp + 200, -3, 0);
+	modelStack.Scale(10.f, 2.f, 2.f);
+	modelStack.Rotate(90.f, 0, 1, 0);
+	RenderMesh(meshList[GEO_HWALL2], false);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(wallDisp + 201, -3, 0);
 	modelStack.Scale(10.f, 2.f, 2.f);
 	modelStack.Rotate(90.f, 0, 1, 0);
 	RenderMesh(meshList[GEO_HWALL2], false);
@@ -525,6 +585,13 @@ void SceneHole::Render()
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
+	modelStack.Translate(wallDisp + 401, -3, 0);
+	modelStack.Scale(10.f, 2.f, 2.f);
+	modelStack.Rotate(90.f, 0, 1, 0);
+	RenderMesh(meshList[GEO_HWALL3], false);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
 	modelStack.Translate(wallDisp + 600, -3, 0);
 	modelStack.Scale(10.f, 2.f, 2.f);
 	modelStack.Rotate(90.f, 0, 1, 0);
@@ -532,7 +599,21 @@ void SceneHole::Render()
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
+	modelStack.Translate(wallDisp + 601, -3, 0);
+	modelStack.Scale(10.f, 2.f, 2.f);
+	modelStack.Rotate(90.f, 0, 1, 0);
+	RenderMesh(meshList[GEO_HWALL4], false);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
 	modelStack.Translate(wallDisp + 800, -3, 0);
+	modelStack.Scale(10.f, 2.f, 2.f);
+	modelStack.Rotate(90.f, 0, 1, 0);
+	RenderMesh(meshList[GEO_HWALL5], false);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(wallDisp + 801, -3, 0);
 	modelStack.Scale(10.f, 2.f, 2.f);
 	modelStack.Rotate(90.f, 0, 1, 0);
 	RenderMesh(meshList[GEO_HWALL5], false);
@@ -588,6 +669,7 @@ void SceneHole::Render()
 		{
 			gameResult = 0;
 			Init();
+			camera.vel = glm::vec3(0, 0, 0);
 			m_hasReadObjective = true;
 			camera.enableFNAF = false;
 			camera.allowMovement = true;
@@ -619,6 +701,7 @@ void SceneHole::Render()
 		{
 			gameResult = 0;
 			Init();
+			camera.vel = glm::vec3(0, 0, 0);
 			m_hasReadObjective = true;
 			camera.enableFNAF = false;
 			camera.allowMovement = true;
