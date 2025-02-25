@@ -230,7 +230,7 @@ void SceneBalloonPop::Init()
 	meshList[GEO_BALLOON]->textureID = LoadTGA("Images//BalloonAlbedo.tga");
 
 	meshList[GEO_DART] = MeshBuilder::GenerateOBJ("Dart",
-		"Models//dart.obj");
+		"Models//TennisBall.obj");
 	meshList[GEO_DART]->textureID = LoadTGA("Images//arrow.tga");
 
 	meshList[GEO_GAMEOVER] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 2.f);
@@ -258,7 +258,7 @@ void SceneBalloonPop::Init()
 	light[1].position = glm::vec3(0, 60, 0);
 	light[1].color = glm::vec3(1, 1, 1);
 	light[1].type = Light::LIGHT_SPOT;
-	light[1].power = 16.0f;
+	light[1].power = 5.0f;
 	light[1].kC = 1.f;
 	light[1].kL = 0.01f;
 	light[1].kQ = 0.001f;
@@ -956,7 +956,7 @@ void SceneBalloonPop::Render()
 			float pitch = atan2(velocity.y, sqrt(velocity.x * velocity.x + velocity.z * velocity.z));
 			modelStack.Rotate(glm::degrees(pitch), 1, 0, 0);
 
-			modelStack.Scale(0.5f, 0.5f, 0.5f);
+			modelStack.Scale(0.02f, 0.02f, 0.02f);
 			meshList[GEO_DART]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
 			meshList[GEO_DART]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
 			meshList[GEO_DART]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
