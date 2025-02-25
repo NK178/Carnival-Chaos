@@ -112,7 +112,7 @@ void SceneBumperBalls::Init()
 		m_parameters[U_MATERIAL_SHININESS]);
 
 	// Initialise camera properties
-	camera.Init(glm::vec3(-10, 9, -10), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	camera.Init(glm::vec3(-10, 9, 10), glm::vec3(-10, 4, 0), glm::vec3(0, 1, 0));
 
 	// Init VBO here
 	for (int i = 0; i < NUM_GEOMETRY; ++i)
@@ -232,12 +232,13 @@ void SceneBumperBalls::Init()
 	spherelist.push_back(Sphere(4,6.f,GameObject::SPHERE));
 	spherelist.push_back(Sphere(5,6.f,GameObject::SPHERE));
 	spherelist.push_back(Sphere(6,6.f,GameObject::SPHERE));
-	player[0].pos = glm::vec3{ -10,3,0 };
+
+	player[0].pos = glm::vec3{ -16,3,-3 };
 	player[0].bounciness = 0.2f;
-	spherelist[0].pos = glm::vec3{ -15,3,10 };
-	spherelist[1].pos = glm::vec3{ -15,3,-10 };
-	spherelist[2].pos = glm::vec3{ 15,3,10 };
-	spherelist[3].pos = glm::vec3{ 15,3,-10 };
+	spherelist[0].pos = glm::vec3{ 10,3,10 };
+	spherelist[1].pos = glm::vec3{ -10,3,15 };
+	spherelist[2].pos = glm::vec3{ 10,0,-10};
+	spherelist[3].pos = glm::vec3{ 0,3,-15 };
 	for (int i = 0; i < spherelist.size(); i++) {
 		spherelist[0].bounciness = 0.2f;
 	}
@@ -277,7 +278,8 @@ void SceneBumperBalls::Update(double dt)
 		spherelist[0].pos.y += static_cast<float>(dt) * SPEED;
 
 	glm::vec3 viewDir = glm::normalize(camera.target - camera.pos);
-	UpdateMovement();
+	if (!gameover)
+		UpdateMovement();
 
 	CollisionData cd;
 	newcampos = glm::vec3{ player[0].pos.x,player[0].pos.y + 10.f,player[0].pos.z };
@@ -315,19 +317,26 @@ void SceneBumperBalls::Update(double dt)
 			activate = false;
 	}
 
-
-	player[0].AddForce(100.f * glm::vec3{ 0,-1,0 });
-	player[0].UpdatePhysics(dt);
-	for (int i = 0; i < spherelist.size(); i++) {
-		//gravity 
-		spherelist[i].AddForce(100.f * glm::vec3{ 0,-1,0 });
-		spherelist[i].UpdatePhysics(dt);
+	if (!gameover) {
+		player[0].AddForce(100.f * glm::vec3{ 0,-1,0 });
+		player[0].UpdatePhysics(dt);
+		for (int i = 0; i < spherelist.size(); i++) {
+			//gravity 
+			spherelist[i].AddForce(100.f * glm::vec3{ 0,-1,0 });
+			spherelist[i].UpdatePhysics(dt);
+		}
+		for (int i = 0; i < cylinderlist.size(); i++) {
+			cylinderlist[i].UpdatePhysics(dt);
+		}
+		camera.Update(dt);
 	}
-	for (int i = 0; i < cylinderlist.size(); i++) {
-		cylinderlist[i].UpdatePhysics(dt);
-	}
-	camera.Update(dt);
 
+	//Check if player lose 
+	if (player[0].pos.y < -50.f)
+		gameover = true;
+
+	if (KeyboardController::GetInstance()->IsKeyPressed('R') && gameover)
+		InitGame();
 
 
 
@@ -378,6 +387,7 @@ void SceneBumperBalls::Render()
 		}
 	}
 
+	RenderSkyBox();
 
 	modelStack.PushMatrix();
 	RenderMesh(meshList[GEO_AXES], false);
@@ -436,8 +446,46 @@ void SceneBumperBalls::Render()
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	//modelStack.PopMatrix();
 
+	if (gameover) {
+		RenderTextOnScreen(meshList[GEO_TEXT], "Game Over!", glm::vec3(1, 0, 0), 40, 200, 400);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Press R to restart", glm::vec3(1, 0, 0), 40, 80, 350);
+	}
 
-	RenderSkyBox();
+
+}
+
+void SceneBumperBalls::InitGame() {
+
+	player[0].pos = glm::vec3{ -16,3,-3 };
+	player[0].bounciness = 0.2f;
+	player[0].vel = glm::vec3{ 0,0,0 };
+
+	spherelist[0].pos = glm::vec3{ 10,3,10 };
+	spherelist[1].pos = glm::vec3{ -10,3,15 };
+	spherelist[2].pos = glm::vec3{ 10,0,-10 };
+	spherelist[3].pos = glm::vec3{ 0,3,-15 };
+
+	for (int i = 0; i < spherelist.size(); i++) {
+		spherelist[i].vel = glm::vec3{ 0,0,0 };
+		spherelist[0].bounciness = 0.2f;
+	}
+	cylinderlist.push_back(Cylinder(101, GameObject::CYLINDER, 70.f, 28.f));
+	cylinderlist[0].pos = glm::vec3{ 0,-36,0 };
+	cylinderlist[0].mass = 0.f;
+	cylinderlist[0].bounciness = 0.f;
+
+	newcampos = glm::vec3{ player[0].pos.x,player[0].pos.y + 10.f,player[0].pos.z };
+
+	camera.enableFNAF = false;
+	camera.allowMovement = false; // 
+	camera.allowJump = false; // 
+	camera.allowSprint = false; // 
+	camera.allowCrouch = false; // 
+	camera.allowProne = false; // 
+	camera.allowLocomotiveTilt = false;
+	camera.allowLocomotiveBop = false;
+	gameover = false;
+
 }
 
 void SceneBumperBalls::RenderMesh(Mesh* mesh, bool enableLight)

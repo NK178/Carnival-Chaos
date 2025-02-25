@@ -139,6 +139,7 @@ private:
 	void Material(GEOMETRY_TYPE obj, float AmR, float AmG, float AmB, float DifA, float DifG, float DifB, float SpA, float SpG, float SpB, float Shiny);
 	void UpdateMovement();
 	void RenderSkyBox();
+	void InitGame();
 
 	struct Sphere : public GameObject {
 		float radius;
@@ -159,6 +160,8 @@ private:
 	std::vector<Cylinder> cylinderlist;
 	glm::vec3 newcampos;
 	bool activate = false;
+	bool gameover = false;
+	bool gamestart = false;
 	const float PLAYER_SPEED = 50.f;
 };
 

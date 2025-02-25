@@ -415,7 +415,7 @@ void SceneWhackAMole::Update(double dt)
 		iscameramove = false;
 	}
 
-	if (KeyboardController::GetInstance()->IsKeyDown('R')) 
+	if (KeyboardController::GetInstance()->IsKeyDown('R') && !gamestart) 
 		InitGame();
 	for (int i = 0; i < walllist.size(); i++) {
 		walllist[i].UpdatePhysics(dt);
