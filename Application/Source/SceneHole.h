@@ -27,8 +27,16 @@ public:
 
 		//Text
 		GEO_TEXT,
+		GEO_TEXT2,
 
-		//SKybox
+		//keys
+		GEO_KEY_E,
+		GEO_KEY_R,
+
+		//ui
+		GEO_UI,
+
+		//Skybox
 		GEO_LEFT,
 		GEO_RIGHT,
 		GEO_TOP,
@@ -133,6 +141,7 @@ private:
 	float failedGrav;
 
 	signed short int gameResult = 0;
+	bool m_hasReadObjective = false; 
 
 	bool OverlapAABB2AABB(glm::vec3 Obj1, const int Width1, const int Height1, glm::vec3 Obj2, const int Width2, const int Height2);
 
