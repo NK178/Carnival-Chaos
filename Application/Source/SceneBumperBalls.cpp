@@ -227,21 +227,26 @@ void SceneBumperBalls::Init()
 
 	enableLight = true;
 
-	player.push_back(PlayerBall(100, 2.f, GameObject::SPHERE));
-	spherelist.push_back(Sphere(3,1.f,GameObject::SPHERE));
-	spherelist.push_back(Sphere(4,1.f,GameObject::SPHERE));
-	spherelist.push_back(Sphere(5,1.f,GameObject::SPHERE));
-	spherelist.push_back(Sphere(6,1.f,GameObject::SPHERE));
+	player.push_back(PlayerBall(100, 6.f, GameObject::SPHERE));
+	spherelist.push_back(Sphere(3,6.f,GameObject::SPHERE));
+	spherelist.push_back(Sphere(4,6.f,GameObject::SPHERE));
+	spherelist.push_back(Sphere(5,6.f,GameObject::SPHERE));
+	spherelist.push_back(Sphere(6,6.f,GameObject::SPHERE));
 	player[0].pos = glm::vec3{ -10,3,0 };
-	spherelist[0].pos = glm::vec3{ -15,-2,10 };
-	spherelist[1].pos = glm::vec3{ -15,-2,-10 };
-	spherelist[2].pos = glm::vec3{ 15,-2,10 };
-	spherelist[3].pos = glm::vec3{ 15,-2,-10 };
-
+	player[0].bounciness = 0.2f;
+	spherelist[0].pos = glm::vec3{ -15,3,10 };
+	spherelist[1].pos = glm::vec3{ -15,3,-10 };
+	spherelist[2].pos = glm::vec3{ 15,3,10 };
+	spherelist[3].pos = glm::vec3{ 15,3,-10 };
+	for (int i = 0; i < spherelist.size(); i++) {
+		spherelist[0].bounciness = 0.2f;
+	}
 	cylinderlist.push_back(Cylinder(101, GameObject::CYLINDER,70.f,28.f));
 	cylinderlist[0].pos = glm::vec3{0,-36,0};
 	cylinderlist[0].mass = 0.f;
+	cylinderlist[0].bounciness = 0.f;
 
+	newcampos = glm::vec3{ player[0].pos.x,player[0].pos.y + 10.f,player[0].pos.z };
 }
 
 void SceneBumperBalls::Update(double dt)
@@ -262,10 +267,10 @@ void SceneBumperBalls::Update(double dt)
 	if (KeyboardController::GetInstance()->IsKeyDown('P'))
 		spherelist[0].pos.y += static_cast<float>(dt) * SPEED;
 
-
-
 	CollisionData cd;
 
+	newcampos = glm::vec3{ player[0].pos.x,player[0].pos.y + 10.f,player[0].pos.z };
+	camera.pos = newcampos;
 	//Ball to ball
 	for (int i = 0; i < spherelist.size() - 1; ++i) {
 		for (int j = i + 1; j < spherelist.size(); ++j) {
@@ -301,9 +306,7 @@ void SceneBumperBalls::Update(double dt)
 	if (KeyboardController::GetInstance()->IsKeyPressed('H')) {
 		player[0].AddForce(100.f * glm::vec3{ 1,0,0 });
 
-
 	}
-
 
 
 	player[0].AddForce(100.f * glm::vec3{ 0,-1,0 });
@@ -376,11 +379,12 @@ void SceneBumperBalls::Render()
 	RenderMesh(meshList[GEO_SPHERE], false);
 	modelStack.PopMatrix();
 
+
 	modelStack.PushMatrix();
 	modelStack.Translate(player[0].pos.x, player[0].pos.y, player[0].pos.z);
-	modelStack.Scale(0.3f, 0.3f, 0.3f);
-	meshList[GEO_BEACHBALL]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);	
-	meshList[GEO_BEACHBALL]->material.kDiffuse = glm::vec3(0.5f,0.5f, 0.5f);
+	modelStack.Scale(0.05*player[0].radius, 0.05* player[0].radius, 0.05*player[0].radius);
+	meshList[GEO_BEACHBALL]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+	meshList[GEO_BEACHBALL]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
 	meshList[GEO_BEACHBALL]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
 	meshList[GEO_BEACHBALL]->material.kShininess = 1.0f;
 	RenderMesh(meshList[GEO_BEACHBALL], true);
@@ -390,17 +394,16 @@ void SceneBumperBalls::Render()
 	for (int i = 0; i < spherelist.size(); i++) {
 		modelStack.PushMatrix();
 		modelStack.Translate(spherelist[i].pos.x, spherelist[i].pos.y, spherelist[i].pos.z);
-		modelStack.Scale(0.5f, 0.5f, 0.5f);
-		meshList[GEO_BASKETBALL]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-		meshList[GEO_BASKETBALL]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-		meshList[GEO_BASKETBALL]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-		meshList[GEO_BASKETBALL]->material.kShininess = 1.0f;
-		RenderMesh(meshList[GEO_BASKETBALL], true);
+		modelStack.Scale(0.05*spherelist[i].radius, 0.05*spherelist[i].radius, 0.05*spherelist[i].radius);
+		meshList[GEO_BEACHBALL]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+		meshList[GEO_BEACHBALL]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+		meshList[GEO_BEACHBALL]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+		meshList[GEO_BEACHBALL]->material.kShininess = 1.0f;
+		RenderMesh(meshList[GEO_BEACHBALL], true);
 		modelStack.PopMatrix();
 	}
 
 	modelStack.PushMatrix();
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	modelStack.Translate(0,-100,0);
 	modelStack.Scale(0.8, 1.f, 0.8f);
 	meshList[GEO_BARREL]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
@@ -408,21 +411,20 @@ void SceneBumperBalls::Render()
 	meshList[GEO_BARREL]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
 	meshList[GEO_BARREL]->material.kShininess = 1.0f;
 	RenderMesh(meshList[GEO_BARREL], true);
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	modelStack.PopMatrix();
 
-	//Cylidner 
-	modelStack.PushMatrix();
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	modelStack.Translate(cylinderlist[0].pos.x, cylinderlist[0].pos.y, cylinderlist[0].pos.z);
-	modelStack.Scale(cylinderlist[0].radius, cylinderlist[0].height, cylinderlist[0].radius);
-	meshList[GEO_CYLINDER]->material.kAmbient = glm::vec3(0.5f, 0.1f, 0.1f);
-	meshList[GEO_CYLINDER]->material.kDiffuse = glm::vec3(0.7f, 0.5f, 0.5f);
-	meshList[GEO_CYLINDER]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	meshList[GEO_CYLINDER]->material.kShininess = 1.0f;
-	RenderMesh(meshList[GEO_CYLINDER], true);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	modelStack.PopMatrix();
+	////Cylidner 
+	//modelStack.PushMatrix();
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//modelStack.Translate(cylinderlist[0].pos.x, cylinderlist[0].pos.y, cylinderlist[0].pos.z);
+	//modelStack.Scale(cylinderlist[0].radius, cylinderlist[0].height, cylinderlist[0].radius);
+	//meshList[GEO_CYLINDER]->material.kAmbient = glm::vec3(0.5f, 0.1f, 0.1f);
+	//meshList[GEO_CYLINDER]->material.kDiffuse = glm::vec3(0.7f, 0.5f, 0.5f);
+	//meshList[GEO_CYLINDER]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	//meshList[GEO_CYLINDER]->material.kShininess = 1.0f;
+	//RenderMesh(meshList[GEO_CYLINDER], true);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	//modelStack.PopMatrix();
 
 
 	RenderSkyBox();
@@ -656,6 +658,26 @@ void SceneBumperBalls::Material(GEOMETRY_TYPE obj, float AmR, float AmG, float A
 	meshList[obj]->material.kDiffuse = glm::vec3(DifA, DifG, DifB);
 	meshList[obj]->material.kSpecular = glm::vec3(SpA, SpG, SpB);
 	meshList[obj]->material.kShininess = Shiny;
+}
+
+void SceneBumperBalls::UpdateMovement(float dt)
+{
+	//INVERSED CONTROLS
+	if (KeyboardController::GetInstance()->IsKeyDown('W')) {
+		player[0].AddForce(glm::vec3{ 0,0,-1 });
+	}
+	if (KeyboardController::GetInstance()->IsKeyDown('S')) {
+		player[0].AddForce(glm::vec3{ 0,0,1 });
+	}
+	if (KeyboardController::GetInstance()->IsKeyDown('A')) {
+		player[0].AddForce(glm::vec3{ 1,0,0 });
+	}
+	if (KeyboardController::GetInstance()->IsKeyDown('D')) {
+		player[0].AddForce(glm::vec3{ -1,0,0 });
+	}
+
+
+
 }
 
 void SceneBumperBalls::RenderSkyBox() {
