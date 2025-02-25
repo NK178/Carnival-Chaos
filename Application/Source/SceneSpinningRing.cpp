@@ -246,13 +246,15 @@ void SceneSpinningRing::Init()
 	// Initialize Variables
 	enableLight = true;
 
-	rotationAngle = 0.0f;
-	rotationSpeed = 90.0f;
+	wallRotation = 0.0f;
+	wallSpeed = 50.0f;
+	beamRotation = 0.0f;
+	beamSpeed = 0.0f;
 	beamWarningTimer = 3.f;
 	isBeamSpawned = false;
 	isShowingBeamWarning = false;
 
-	isObjectiveRead = false; 
+	isObjectiveRead = false;
 	remainingTime = 30.0f;
 	countdownTime = 4.0f;
 	playerWon = false;
@@ -317,7 +319,8 @@ void SceneSpinningRing::Update(double dt)
 			if (remainingTime < 0) {
 				remainingTime = 0; // ensure time does not go below 0
 				playerWon = true; // player wins
-				rotationSpeed = 0.0f;
+				wallSpeed = 0.0f;
+				beamSpeed = 0.0f;
 			}
 		}
 	}
@@ -329,8 +332,11 @@ void SceneSpinningRing::Update(double dt)
 		glm::vec3 viewDir = glm::normalize(camera.target - camera.pos);
 
 		// slowly increase rotation speed
-		rotationSpeed += 1.0f * dt;
-		rotationAngle += rotationSpeed * dt;
+		wallSpeed += 1.0f * dt;
+		wallRotation += wallSpeed * dt;
+		if (wallSpeed >= 120.f) {
+			wallSpeed = 120.f;
+		}
 
 		if (!isBeamSpawned) {
 			if (!isShowingBeamWarning && remainingTime <= 19.0f) {
@@ -343,8 +349,20 @@ void SceneSpinningRing::Update(double dt)
 				if (beamWarningTimer <= 0.0f) {
 					isShowingBeamWarning = false;
 					isBeamSpawned = true;
-					beamList.push_back(spinningBeam(beamList.size() + 1, GameObject::CUBE));
+
+					if (beamList.empty()) { // Ensure only one beam is added
+						beamSpeed = 50.f;
+						beamList.push_back(spinningBeam(beamList.size() + 1, GameObject::CUBE));
+					}
 				}
+			}
+		}
+
+		if (isBeamSpawned) {
+			beamSpeed += 3.0f * dt;
+			beamRotation += beamSpeed * dt;
+			if (beamSpeed >= 90.f) {
+				beamSpeed = 90.f;
 			}
 		}
 
@@ -534,7 +552,7 @@ void SceneSpinningRing::Render()
 		modelStack.PushMatrix();
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		modelStack.Translate(0.f, 15.f, 0.f);
-		modelStack.Rotate(rotationAngle, 0.f, 1.f, 0.f);
+		modelStack.Rotate(wallRotation, 0.f, 1.f, 0.f);
 		modelStack.Scale(30.f, 30.f, 50.f);
 		meshList[GEO_SPINNER]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
 		meshList[GEO_SPINNER]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
@@ -547,7 +565,7 @@ void SceneSpinningRing::Render()
 		modelStack.PushMatrix();
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		modelStack.Translate(0.f, 5.f, 0.f);
-		modelStack.Rotate(rotationAngle, 0.f, 1.f, 0.f);
+		modelStack.Rotate(beamRotation, 0.f, 1.f, 0.f);
 		modelStack.Scale(50.f, 30.f, 50.f);
 		meshList[GEO_SPINNER2]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
 		meshList[GEO_SPINNER2]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);

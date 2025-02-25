@@ -549,12 +549,14 @@ void SceneHole::Render()
 		RenderTextOnScreen(meshList[GEO_TEXT2], "approaching walls!", glm::vec3(1, 1, 1), 15, 265, 420);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "- Five walls will", glm::vec3(1, 1, 1), 15, 240, 390);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "steadily approach!", glm::vec3(1, 1, 1), 15, 265, 360);
-		RenderTextOnScreen(meshList[GEO_TEXT2], "- WASD to move", glm::vec3(1, 1, 0), 15, 250, 330);
-		RenderTextOnScreen(meshList[GEO_TEXT2], "- Space to jump", glm::vec3(1, 1, 0), 15, 250, 300);
-		RenderTextOnScreen(meshList[GEO_TEXT2], "- C to crouch", glm::vec3(1, 1, 0), 15, 250, 270);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Don't fall off the", glm::vec3(1, 1, 1), 15, 240, 330);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "platform!", glm::vec3(1, 1, 1), 15, 330, 300);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- WASD to move", glm::vec3(1, 1, 0), 15, 290, 250);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Space to jump", glm::vec3(1, 1, 0), 15, 285, 220);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- C to crouch", glm::vec3(1, 1, 0), 15, 295, 190);
 
 		RenderMeshOnScreen(meshList[GEO_KEY_E], 310, 150, 15, 15);
-		RenderTextOnScreen(meshList[GEO_TEXT2], "Begin", glm::vec3(1, 1, 1), 20, 340, 140);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Continue", glm::vec3(1, 1, 1), 20, 340, 140);
 
 		if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E))
 		{
@@ -575,7 +577,7 @@ void SceneHole::Render()
 		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "GAME OVER!", glm::vec3(1, 0, 0), 40, 210, 370);
 
-		RenderTextOnScreen(meshList[GEO_TEXT2], "You fell!", glm::vec3(1, 1, 1), 20, 250, 320);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "You fell!", glm::vec3(1, 1, 1), 20, 320, 320);
 
 		RenderMeshOnScreen(meshList[GEO_KEY_R], 350, 270, 15, 15);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "Retry", glm::vec3(1, 1, 1), 20, 390, 260);
@@ -604,9 +606,9 @@ void SceneHole::Render()
 	else if (gameResult == 1)
 	{
 		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
-		RenderTextOnScreen(meshList[GEO_TEXT2], "SUCCESS!", glm::vec3(0, 1, 0), 40, 210, 370);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "YOU WIN!", glm::vec3(0, 1, 0), 40, 270, 370);
 
-		RenderTextOnScreen(meshList[GEO_TEXT2], "You beat HITW!", glm::vec3(1, 1, 1), 20, 250, 320);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "You beat HITW!", glm::vec3(1, 1, 1), 20, 280, 320);
 
 		RenderMeshOnScreen(meshList[GEO_KEY_R], 350, 270, 15, 15);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "Retry", glm::vec3(1, 1, 1), 20, 390, 260);
