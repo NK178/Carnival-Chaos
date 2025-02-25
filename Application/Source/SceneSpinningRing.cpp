@@ -317,7 +317,8 @@ void SceneSpinningRing::Update(double dt)
 			if (remainingTime < 0) {
 				remainingTime = 0; // ensure time does not go below 0
 				playerWon = true; // player wins
-				rotationSpeed = 0.0f;
+				wallSpeed = 0.0f;
+				beamSpeed = 0.0f;
 			}
 		}
 	}
@@ -329,8 +330,11 @@ void SceneSpinningRing::Update(double dt)
 		glm::vec3 viewDir = glm::normalize(camera.target - camera.pos);
 
 		// slowly increase rotation speed
-		rotationSpeed += 1.0f * dt;
-		rotationAngle += rotationSpeed * dt;
+		wallSpeed += 1.0f * dt;
+		wallRotation += wallSpeed * dt;
+		if (wallSpeed >= 120.f) {
+			wallSpeed = 120.f;
+		}
 
 		if (!isBeamSpawned) {
 			if (!isShowingBeamWarning && remainingTime <= 19.0f) {
@@ -343,8 +347,20 @@ void SceneSpinningRing::Update(double dt)
 				if (beamWarningTimer <= 0.0f) {
 					isShowingBeamWarning = false;
 					isBeamSpawned = true;
-					beamList.push_back(spinningBeam(beamList.size() + 1, GameObject::CUBE));
+
+					if (beamList.empty()) { // Ensure only one beam is added
+						beamSpeed = 50.f;
+						beamList.push_back(spinningBeam(beamList.size() + 1, GameObject::CUBE));
+					}
 				}
+			}
+		}
+
+		if (isBeamSpawned) {
+			beamSpeed += 3.0f * dt;
+			beamRotation += beamSpeed * dt;
+			if (beamSpeed >= 90.f) {
+				beamSpeed = 90.f;
 			}
 		}
 

@@ -264,8 +264,10 @@ private:
 	int projType = 1; // fix to 0 for orthographic, 1 for projection
 
 	// spinning wall and beam rotation
-	float rotationAngle;
-	float rotationSpeed;
+	float wallSpeed;
+	float wallRotation;
+	float beamSpeed;
+	float beamRotation;
 	float beamWarningTimer;
 	bool isBeamSpawned;
 	bool isShowingBeamWarning;
