@@ -278,46 +278,46 @@ void SceneBumperBalls::Update(double dt)
 		spherelist[0].pos.y += static_cast<float>(dt) * SPEED;
 
 	glm::vec3 viewDir = glm::normalize(camera.target - camera.pos);
-	if (!gameover)
+
+	if (gamestart) {
+
 		UpdateMovement();
 
-	CollisionData cd;
-	newcampos = glm::vec3{ player[0].pos.x,player[0].pos.y + 10.f,player[0].pos.z };
-	camera.pos = newcampos;
-	camera.target = camera.pos + viewDir * 1.2f;
+		CollisionData cd;
+		newcampos = glm::vec3{ player[0].pos.x,player[0].pos.y + 10.f,player[0].pos.z };
+		camera.pos = newcampos;
+		camera.target = camera.pos + viewDir * 1.2f;
 
-	//Ball to ball
-	for (int i = 0; i < spherelist.size() - 1; ++i) {
-		for (int j = i + 1; j < spherelist.size(); ++j) {
-			if (OverlapSphere2Sphere(spherelist[i], spherelist[i].radius, spherelist[j], spherelist[j].radius, cd))
+		//Ball to ball
+		for (int i = 0; i < spherelist.size() - 1; ++i) {
+			for (int j = i + 1; j < spherelist.size(); ++j) {
+				if (OverlapSphere2Sphere(spherelist[i], spherelist[i].radius, spherelist[j], spherelist[j].radius, cd))
+					ResolveCollision(cd);
+			}
+		}
+
+		//Playerball to ball //do the player thingy 
+		for (int i = 0; i < spherelist.size(); i++) {
+			if (OverlapSphere2Sphere(player[0], player[0].radius, spherelist[i], spherelist[i].radius, cd))
 				ResolveCollision(cd);
 		}
-	}
 
-	//Playerball to ball //do the player thingy 
-	for (int i = 0; i < spherelist.size(); i++) {
-		if (OverlapSphere2Sphere(player[0], player[0].radius, spherelist[i], spherelist[i].radius, cd))
+		//Cylinder to ball 
+		for (int i = 0; i < spherelist.size(); ++i) {
+			if (OverlapSphere2Cylinder(spherelist[i], spherelist[i].radius, cylinderlist[0], cylinderlist[0].radius, cylinderlist[0].height, cd))
+				ResolveCollision(cd);
+		}
+
+		//Cylinder to playerBall
+		if (OverlapSphere2Cylinder(player[0], player[0].radius, cylinderlist[0], cylinderlist[0].radius, cylinderlist[0].height, cd))
 			ResolveCollision(cd);
-	}
 
-	//Cylinder to ball 
-	for (int i = 0; i < spherelist.size(); ++i) {
-		if (OverlapSphere2Cylinder(spherelist[i], spherelist[i].radius, cylinderlist[0], cylinderlist[0].radius, cylinderlist[0].height, cd))
-			ResolveCollision(cd);
-	}
+		//Check if ball still in game 
+		for (int i = 0; i < spherelist.size(); i++) {
+			if (spherelist[i].pos.y < -50.f)
+				spherelist.erase(spherelist.begin() + i);
+		}
 
-	//Cylinder to playerBall
-	if (OverlapSphere2Cylinder(player[0], player[0].radius, cylinderlist[0], cylinderlist[0].radius, cylinderlist[0].height, cd))
-		ResolveCollision(cd);
-
-	if (KeyboardController::GetInstance()->IsKeyPressed('G')) {
-		if (!activate)
-			activate = true;
-		else
-			activate = false;
-	}
-
-	if (!gameover) {
 		player[0].AddForce(100.f * glm::vec3{ 0,-1,0 });
 		player[0].UpdatePhysics(dt);
 		for (int i = 0; i < spherelist.size(); i++) {
@@ -333,9 +333,18 @@ void SceneBumperBalls::Update(double dt)
 
 	//Check if player lose 
 	if (player[0].pos.y < -50.f)
-		gameover = true;
+		gamelose = true;
 
-	if (KeyboardController::GetInstance()->IsKeyPressed('R') && gameover)
+	//check if player win 
+	if (spherelist.size() == 0)
+		gamewin = true;
+
+	if (gamelose || gamewin)
+		gamestart = false;
+
+	
+
+	if (KeyboardController::GetInstance()->IsKeyPressed('R') && !gamestart)
 		InitGame();
 
 
@@ -446,9 +455,13 @@ void SceneBumperBalls::Render()
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	//modelStack.PopMatrix();
 
-	if (gameover) {
+	if (gamelose) {
 		RenderTextOnScreen(meshList[GEO_TEXT], "Game Over!", glm::vec3(1, 0, 0), 40, 200, 400);
 		RenderTextOnScreen(meshList[GEO_TEXT], "Press R to restart", glm::vec3(1, 0, 0), 40, 80, 350);
+	}
+	if (gamewin) {
+		RenderTextOnScreen(meshList[GEO_TEXT], "Game Win!", glm::vec3(1, 0, 0), 40, 200, 400);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Changing Scene......", glm::vec3(1, 0, 0), 40, 80, 350);
 	}
 
 
@@ -483,8 +496,11 @@ void SceneBumperBalls::InitGame() {
 	camera.allowCrouch = false; // 
 	camera.allowProne = false; // 
 	camera.allowLocomotiveTilt = false;
-	camera.allowLocomotiveBop = false;
-	gameover = false;
+	camera.allowLocomotiveBop = false;	
+	gamewin = false;
+	gamestart = true; 
+	gamelose = false;
+
 
 }
 

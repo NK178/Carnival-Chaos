@@ -159,9 +159,9 @@ private:
 	std::vector<PlayerBall> player;
 	std::vector<Cylinder> cylinderlist;
 	glm::vec3 newcampos;
-	bool activate = false;
-	bool gameover = false;
-	bool gamestart = false;
+	bool gamewin = false;
+	bool gamestart = true; //TO CHANGE
+	bool gamelose = false;
 	const float PLAYER_SPEED = 50.f;
 };
 
