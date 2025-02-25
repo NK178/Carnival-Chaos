@@ -394,23 +394,14 @@ void SceneFinal::Update(double dt) {
 		ResolveCollision(cd);
 	}
 
-	// Update camera to match driver's perspective
+	/// Update camera to match driver's perspective
 	float driverHeight = 7.0f; // Height of driver's head above car base
 	float driverOffset = 0.0f; // Forward/back adjustment from car center
 
 	// Position camera at driver's head position
 	camera.pos = carPhysics.pos + glm::vec3(0, driverHeight, 0);
 
-	glm::vec3 viewDir = camera.target - camera.pos;
-
-	// Calculate look target point (looking forward along car's direction)
-	glm::vec3 lookDirection = forward;
-	float lookAheadDistance = 10.0f; // How far ahead to look
-	//glm::vec3 fixedLookDirection = glm::vec3(0, 0, 1);
-	//float lookAheadDistance = 10.0f;
-	//camera.target = camera.pos + (lookDirection * lookAheadDistance);
-	camera.target = camera.pos + viewDir * 1.4f;
-
+	//DO NOT CHANGE THE TARGET HERE. Let camera.cpp handle it.
 
 	camera.Update(dt);
 }
