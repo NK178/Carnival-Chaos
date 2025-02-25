@@ -1072,7 +1072,7 @@ void SceneMain::Render()
 	//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	//	modelStack.Translate(tentList[n].pos.x, tentList[n].pos.y, tentList[n].pos.z);
 	//	modelStack.Rotate(tentList[n].angleDeg, 0, 1, 0);
- //       modelStack.Scale(2 * tentList[n].tentDimensions.x, 2 * tentList[n].tentDimensions.y, 2 * tentList[n].tentDimensions.z);
+	//  modelStack.Scale(2 * tentList[n].tentDimensions.x, 2 * tentList[n].tentDimensions.y, 2 * tentList[n].tentDimensions.z);
 	//	meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
 	//	meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
 	//	meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
@@ -1139,6 +1139,7 @@ void SceneMain::Render()
 	//modelStack.PopMatrix();
 }
 
+// boolean to check if player complete all 6 minigames
 bool SceneMain::CheckAllTentsCompleted()
 {
 	for (int i = 0; i < 6; i++) {
@@ -1194,6 +1195,7 @@ void SceneMain::RenderDialogue() {
 		return; // exit function early if no dialogue is active
 	}
 
+	// rendering of dialogue when player read the sign
 	RenderMeshOnScreen(meshList[GEO_UI], 150, 550, 150, 6);
 	if (isSignDialogueActive && currentLineIndex < signDialogueLines.size()) {
 		const DialogueLine& currentDialogue = signDialogueLines[currentLineIndex];
@@ -1217,6 +1219,7 @@ void SceneMain::RenderDialogue() {
 		}
 	}
 
+	// rendering of dialogue when player first enter the game
 	if (isEnterMainSceneDialogueActive && currentLineIndex < enterMainSceneLines.size()) {
 		const DialogueLine& currentDialogue = enterMainSceneLines[currentLineIndex];
 
@@ -1240,6 +1243,7 @@ void SceneMain::RenderDialogue() {
 	}
 }
 
+// typing speed for the dialogues
 void SceneMain::UpdateDialogue(double dt) {
 	if (readSign && !isSignDialogueActive) {
 		isSignDialogueActive = true;
@@ -1347,6 +1351,7 @@ void SceneMain::UpdateDialogue(double dt) {
 	}
 }
 
+// render objectives
 void SceneMain::RenderObjectives() {
 	modelStack.PushMatrix();
 	modelStack.Translate(30.f, 8.f, -75.f);
