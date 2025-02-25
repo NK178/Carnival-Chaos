@@ -1114,7 +1114,7 @@ void SceneBalloonPop::Render()
 	}
 
 	std::string temp("FPS:" + std::to_string(fps));
-	RenderTextOnScreen(meshList[GEO_FPS], temp.substr(0, 9), glm::vec3(0, 1, 0), 20, 620, 50);
+	RenderTextOnScreen(meshList[GEO_FPS], temp.substr(0, 9), glm::vec3(0, 1, 0), 20, 620, 20);
 
 }
 
