@@ -1,5 +1,5 @@
-#ifndef SCENE_HOLE
-#define SCENE_HOLE
+#ifndef SCENE_HOLE_H
+#define SCENE_HOLE_H
 
 #include "Scene.h"
 #include "Mesh.h"

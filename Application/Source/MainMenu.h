@@ -108,6 +108,8 @@ public:
 	virtual void Render();
 	virtual void Exit();
 
+	bool shouldStartGame;
+
 private:
 	void HandleKeyPress();
 	void HandleMouseClick();
