@@ -294,6 +294,7 @@ private:
 	void Material(GEOMETRY_TYPE obj, float AmR, float AmG, float AmB, float DifA, float DifG, float DifB, float SpA, float SpG, float SpB, float Shiny);
 	void RenderSkyBox();
 	void RenderLoadingScreen();
+	void UpdateLoadingScreen();
 };
 
 #endif

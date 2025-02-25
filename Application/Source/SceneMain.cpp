@@ -18,8 +18,7 @@
 #include "LoadTGA.h"
 #include <iostream>
 
-SceneMain::SceneMain()
-{
+SceneMain::SceneMain() : isLoading(true) {
 	for (int i = 0; i < 6; i++) {
 		tentCompleted[i] = false;
 	}
@@ -32,6 +31,7 @@ SceneMain::~SceneMain()
 void SceneMain::Init()
 {
 	isLoading = true;
+	std::cout << "Init: isLoading is true" << std::endl;
 
 	// Load things for the Loading Screen first
 	// Init VBO here
@@ -53,9 +53,10 @@ void SceneMain::Init()
 	meshList[GEO_TEXT]->textureID = LoadTGA("Images//calibri.tga");
 	meshList[GEO_UI] = MeshBuilder::GenerateQuad("UIBox", glm::vec3(0.12f, 0.12f, 0.12f), 10.f);
 
-	//RenderLoadingScreen();
-    app.getBuffer();
-	//glfwPollEvents();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	RenderLoadingScreen();
+	glfwSwapBuffers(glfwGetCurrentContext());
+	glfwPollEvents();
 
 	tempCompensation = 0;
 	camera.enableFNAF = true;
@@ -695,7 +696,10 @@ void SceneMain::Render()
 
 	if (isLoading)
 	{
+		std::cout << "Rendering loading screen..." << std::endl;
 		RenderLoadingScreen();
+		glfwSwapBuffers(glfwGetCurrentContext());
+		glfwPollEvents();
 		return;
 	}
 
@@ -1157,8 +1161,13 @@ void SceneMain::Render()
 
 void SceneMain::RenderLoadingScreen()
 {
-	RenderMeshOnScreen(meshList[GEO_UI], 45, 560, 45, 3);
+	//RenderMeshOnScreen(meshList[GEO_UI], 45, 560, 45, 3);
 	RenderTextOnScreen(meshList[GEO_TEXT], "Hello World!", glm::vec3(1, 0, 0), 20, 10, 550);
+}
+
+void SceneMain::UpdateLoadingScreen() 
+{
+	// call buffer
 }
 
 // boolean to check if player complete all 6 minigames
