@@ -22,7 +22,12 @@ public:
 		GEO_SPHERE,
 		GEO_PLANE,
 		GEO_CYLINDER,
+
+		//Obj
 		GEO_BEACHBALL,
+		GEO_BASKETBALL,
+		GEO_BARREL,
+
 
 		//Text
 		GEO_TEXT,
@@ -138,6 +143,10 @@ private:
 		float radius;
 		Sphere(int id, float r, int type) : radius(r), GameObject(id, type) {}
 	};
+	struct PlayerBall : public GameObject {
+		float radius;
+		PlayerBall(int id, float r, int type) : radius(r), GameObject(id, type) {}
+	};
 	struct Cylinder : public GameObject {
 		float height;
 		float radius;
@@ -145,6 +154,7 @@ private:
 	};
 
 	std::vector<Sphere> spherelist;
+	std::vector<PlayerBall> player;
 	std::vector<Cylinder> cylinderlist;
 	bool activate = false;
 };
