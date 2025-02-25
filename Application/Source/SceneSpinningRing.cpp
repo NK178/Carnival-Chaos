@@ -253,10 +253,11 @@ void SceneSpinningRing::Init()
 	player.push_back(playerBox(1, GameObject::CUBE));
 	wallSideList.push_back(spinningWallSide(2, GameObject::CUBE));
 	wallSideList.push_back(spinningWallSide(3, GameObject::CUBE));
-	//wallSideList.push_back(spinningWallSide(4, GameObject::CUBE));
+	wallSideList.push_back(spinningWallSide(4, GameObject::CUBE));
+	wallSideList.push_back(spinningWallSide(5, GameObject::CUBE));
 
-	//wallTopList.push_back(spinningWallTop(5, GameObject::CUBE));
-	//wallTopList.push_back(spinningWallTop(6, GameObject::CUBE));
+	wallTopList.push_back(spinningWallTop(6, GameObject::CUBE));
+	wallTopList.push_back(spinningWallTop(7, GameObject::CUBE));
 
 	//beamList.push_back(spinningBeam(7, GameObject::CUBE));
 	//beamList.push_back(spinningBeam(8, GameObject::CUBE));
@@ -264,15 +265,19 @@ void SceneSpinningRing::Init()
 	// Collision Boxes Position
 	player[0].pos = camera.pos;
 	wallSideList[0].pos = glm::vec3{ 0,0,8 };
-	wallSideList[1].pos = glm::vec3{ 0,0,-8 };
+	wallSideList[1].pos = glm::vec3{ 0,0,45 };
+	wallSideList[2].pos = glm::vec3{ 0,0,-8 };
+	wallSideList[3].pos = glm::vec3{ 0,0,-45 };
+	wallTopList[0].pos = glm::vec3{ 0,0,0 };
+	wallTopList[1].pos = glm::vec3{ 0,20,0 };
 
 	for (int i = 0; i < wallSideList.size(); i++) {
 		wallSideList[i].mass = 0.f;
 	}
 
-	//for (int j = 0; j < wallTopList.size(); j++) {
-	//	wallTopList[j].mass = 0.f;
-	//}
+	for (int i = 0; i < wallTopList.size(); i++) {
+		wallTopList[i].mass = 0.f;
+	}
 
 	//for (int n = 0; n < beamList.size(); n++) {
 	//	beamList[n].mass = 0.f;
@@ -312,47 +317,72 @@ void SceneSpinningRing::Update(double dt)
 		playerVertices.clear();
 		spinningWallSideNormals.clear();
 		spinningWallSideVertices.clear();
+		spinningWallTopNormals.clear();
+		spinningWallTopVertices.clear();
+
+		player[0].UpdatePhysics(dt);
 
 		for (int i = 0; i < wallSideList.size(); i++) {
 			wallSideList[i].UpdatePhysics(dt);
 		}
 
-		//for (int j = 0; j < wallTopList.size(); j++) {
-		//	wallTopList[j].UpdatePhysics(dt);
-		//}
+		for (int i = 0; i < wallTopList.size(); i++) {
+			wallTopList[i].UpdatePhysics(dt);
+		}
 
 		//for (int n = 0; n < beamList.size(); n++) {
 		//	beamList[n].UpdatePhysics(dt);
 		//}
 
-		player[0].UpdatePhysics(dt);
+		// collision normals and vertices
+		{
+			for (int o = 0; o < player.size(); o++) {
+				std::vector<glm::vec3> tempNormals = player[o].normals;
+				Updatenormals(player[o], tempNormals);
+				playerNormals.push_back(tempNormals);
 
-		// spinning wall side normals and vertices
-		for (int o = 0; o < wallSideList.size(); o++) {
-			std::vector<glm::vec3> tempNormals = wallSideList[o].normals;
-			Updatenormals(wallSideList[o], tempNormals);
-			spinningWallSideNormals.push_back(tempNormals);
+				std::vector<glm::vec3> tempVertices = player[o].vertices;
+				Updatevertices(player[o], tempVertices);
+				playerVertices.push_back(tempVertices);
+			}
 
-			std::vector<glm::vec3> tempVertices = wallSideList[o].vertices;
-			Updatevertices(wallSideList[o], tempVertices);
-			spinningWallSideVertices.push_back(tempVertices);
+			for (int o = 0; o < wallSideList.size(); o++) {
+				std::vector<glm::vec3> tempNormals = wallSideList[o].normals;
+				Updatenormals(wallSideList[o], tempNormals);
+				spinningWallSideNormals.push_back(tempNormals);
+
+				std::vector<glm::vec3> tempVertices = wallSideList[o].vertices;
+				Updatevertices(wallSideList[o], tempVertices);
+				spinningWallSideVertices.push_back(tempVertices);
+			}
+
+			for (int o = 0; o < wallTopList.size(); o++) {
+				std::vector<glm::vec3> tempNormals = wallTopList[o].normals;
+				Updatenormals(wallTopList[o], tempNormals);
+				spinningWallTopNormals.push_back(tempNormals);
+
+				std::vector<glm::vec3> tempVertices = wallTopList[o].vertices;
+				Updatevertices(wallTopList[o], tempVertices);
+				spinningWallTopVertices.push_back(tempVertices);
+			}
 		}
 
-		for (int o = 0; o < player.size(); o++) {
-			std::vector<glm::vec3> tempNormals = player[o].normals;
-			Updatenormals(player[o], tempNormals);
-			playerNormals.push_back(tempNormals);
+		// SAT collision
+		{
+			for (int i = 0; i < wallSideList.size(); i++) {
+				if (SAT(wallSideList[i], spinningWallSideNormals[i], spinningWallSideVertices[i], player[0], playerNormals[0], playerVertices[0], cd)) {
+					ResolveCollision(cd);
+					camera.pos = player[0].pos;
+					camera.target = camera.pos + viewDir * 1.2f;
+				}
+			}
 
-			std::vector<glm::vec3> tempVertices = player[o].vertices;
-			Updatevertices(player[o], tempVertices);
-			playerVertices.push_back(tempVertices);
-		}
-
-		for (int i = 0; i < wallSideList.size(); i++) {
-			if (SAT(wallSideList[i], spinningWallSideNormals[i], spinningWallSideVertices[i], player[0], playerNormals[0], playerVertices[0], cd)) {
-				ResolveCollision(cd);
-				camera.pos = player[0].pos;
-				camera.target = camera.pos + viewDir * 1.2f;
+			for (int i = 0; i < wallTopList.size(); i++) {
+				if (SAT(wallTopList[i], spinningWallTopNormals[i], spinningWallTopVertices[i], player[0], playerNormals[0], playerVertices[0], cd)) {
+					ResolveCollision(cd);
+					camera.pos = player[0].pos;
+					camera.target = camera.pos + viewDir * 1.2f;
+				}
 			}
 		}
 	}
@@ -460,11 +490,22 @@ void SceneSpinningRing::Render()
 
 	for (int j = 0; j < spinningWallSideVertices.size(); j++) {
 		for (int i = 0; i < wallSideList[j].vertices.size(); i++) {
-			glm::vec3 vertex = spinningWallSideVertices[j][i];
-			std::cout << "Rendering vertex " << i << ": (" << vertex.x << ", " << vertex.y << ", " << vertex.z << ")" << std::endl;
-
 			modelStack.PushMatrix();
 			modelStack.Translate(spinningWallSideVertices[j][i].x, spinningWallSideVertices[j][i].y, spinningWallSideVertices[j][i].z);
+			modelStack.Scale(0.1, 0.1, 0.1);
+			meshList[GEO_SPHERE]->material.kAmbient;
+			meshList[GEO_SPHERE]->material.kDiffuse;
+			meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+			meshList[GEO_SPHERE]->material.kShininess = 2.0f;
+			RenderMesh(meshList[GEO_SPHERE], true);
+			modelStack.PopMatrix();
+		}
+	}
+
+	for (int j = 0; j < spinningWallTopVertices.size(); j++) {
+		for (int i = 0; i < wallTopList[j].vertices.size(); i++) {
+			modelStack.PushMatrix();
+			modelStack.Translate(spinningWallTopVertices[j][i].x, spinningWallTopVertices[j][i].y, spinningWallTopVertices[j][i].z);
 			modelStack.Scale(0.1, 0.1, 0.1);
 			meshList[GEO_SPHERE]->material.kAmbient;
 			meshList[GEO_SPHERE]->material.kDiffuse;
