@@ -238,6 +238,10 @@ void SceneBalloonPop::Init()
 
 	meshList[GEO_CROSSHAIR] = MeshBuilder::GenerateQuad("Crosshair", glm::vec3(1, 1, 1), 1.f);
 
+	meshList[GEO_PELLETGUN] = MeshBuilder::GenerateOBJ("PelletGun",
+		"Models//Ray_Gun.obj");
+	meshList[GEO_PELLETGUN]->textureID = LoadTGA("Images//Ray_Gun_Diffuse.tga");
+
 	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 1000.0f);
 	projectionStack.LoadMatrix(projection);
 
@@ -313,6 +317,7 @@ void SceneBalloonPop::Init()
 }
 
 void SceneBalloonPop::HandleDartInput() {
+	// DISCLAIMER: THE "DARTS" WERE CHANGED TO PELLETS FROM A PELLET GUN!! DIDNT HAVE TIME TO CHANGE THE FUNCTION NAMES SO KEEP THIS IN MIND!! - Mathea
 	// Prevent shooting during countdown or if objectives haven't been read
 	if (!m_isObjectiveRead || countdownTime > 0 || m_isGameOver || m_hasWon) {
 		return;  // Don't process input
@@ -343,6 +348,7 @@ void SceneBalloonPop::HandleDartInput() {
 }
 
 void SceneBalloonPop::FireDart() {
+	// DISCLAIMER: THE "DARTS" WERE CHANGED TO PELLETS FROM A PELLET GUN!! DIDNT HAVE TIME TO CHANGE THE FUNCTION NAMES SO KEEP THIS IN MIND!! - Mathea
 	if (m_dartsLeft <= 0) return;
 
 	for (auto& dart : darts) {
@@ -350,16 +356,32 @@ void SceneBalloonPop::FireDart() {
 			m_dartsLeft--;
 
 			// Calculate fire direction from camera view direction
-			glm::vec3 forward = camera.target - camera.pos;
-			glm::vec3 fireDirection = glm::normalize(forward);
+			glm::vec3 viewDirection = glm::normalize(camera.target - camera.pos);
 
-			// Keep the existing Fire() implementation
+			// Calculate gun position parameters (same as in Render)
+			float gunDistance = 0.5f;
+			float gunRightOffset = 0.2f;
+			float gunDownOffset = 0.15f;
+			glm::vec3 rightVector = glm::normalize(glm::cross(viewDirection, camera.up));
+
+			// Calculate gun position (base)
+			glm::vec3 gunPosition = camera.pos +
+				(viewDirection * gunDistance) +
+				(rightVector * gunRightOffset) -
+				(camera.up * gunDownOffset);
+
+			// Calculate barrel end position (offset from gun position)
+			// The values below need to be adjusted based on your gun model
+			float barrelLength = 0.3f; // Adjust based on your gun model
+			glm::vec3 barrelEndPosition = gunPosition + (viewDirection * barrelLength);
+
+			// Use barrel end as pellet spawn position
 			const float DART_BASE_SPEED = 180.0f;
-			dart.Fire(camera.pos, fireDirection, DART_BASE_SPEED);
+			dart.Fire(barrelEndPosition, viewDirection, DART_BASE_SPEED);
 
-			// Keep the existing upward force for arc trajectory
-			const float INITIAL_UP_FORCE = 10.0f;
-			dart.physics.AddForce(glm::vec3(0, INITIAL_UP_FORCE, 0));
+			// Remove upward force for pellets - they should go straight
+			// const float INITIAL_UP_FORCE = 10.0f;
+			// dart.physics.AddForce(glm::vec3(0, INITIAL_UP_FORCE, 0));
 
 			break;
 		}
@@ -367,6 +389,7 @@ void SceneBalloonPop::FireDart() {
 }
 
 void SceneBalloonPop::CheckDartCollisions() {
+	// DISCLAIMER: THE "DARTS" WERE CHANGED TO PELLETS FROM A PELLET GUN!! DIDNT HAVE TIME TO CHANGE THE FUNCTION NAMES SO KEEP THIS IN MIND!! - Mathea
 	for (auto& dart : darts) {
 		if (dart.isActive) {
 			for (auto& balloon : balloons) {
@@ -420,25 +443,23 @@ void SceneBalloonPop::Update(double dt)
 
 				HandleDartInput();
 
-				// Update all active darts
 				for (auto& dart : darts) {
 					if (dart.isActive) {
-						// Apply gravity - reduced strength
-						dart.physics.AddForce(glm::vec3(0, -9.81f * 0.05f, 0));
+						// Remove gravity effects for pellets - they go straight
+						// dart.physics.AddForce(glm::vec3(0, -9.81f * 0.05f, 0));
 
-						// Apply minimal air resistance
+						// Minimal air resistance can remain if desired
 						glm::vec3 airResistance = -dart.physics.vel * 0.01f;
 						dart.physics.AddForce(airResistance);
 
 						// Update physics
 						dart.Update(static_cast<float>(dt));
 
-						// Floor collision now makes dart disappear
+						// Keep floor and wall collision checks
 						if (dart.physics.pos.y < 1.0f) {
 							dart.isActive = false;
 						}
 
-						// Wall collisions now make dart disappear
 						const float WALL_X = 120.0f;
 						const float WALL_Z = 120.0f;
 
@@ -944,18 +965,6 @@ void SceneBalloonPop::Render()
 				dart.physics.pos.z
 			);
 
-			// Get direction from player to dart
-			glm::vec3 directionFromPlayer = glm::normalize(dart.physics.pos - camera.pos);
-
-			// Calculate angle to face away from player
-			float angle = atan2(directionFromPlayer.x, directionFromPlayer.z);
-			modelStack.Rotate(glm::degrees(angle), 0, 1, 0);
-
-			// Add pitch based on velocity to show proper trajectory
-			glm::vec3 velocity = dart.physics.vel;
-			float pitch = atan2(velocity.y, sqrt(velocity.x * velocity.x + velocity.z * velocity.z));
-			modelStack.Rotate(glm::degrees(pitch), 1, 0, 0);
-
 			modelStack.Scale(0.02f, 0.02f, 0.02f);
 			meshList[GEO_DART]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
 			meshList[GEO_DART]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
@@ -984,6 +993,49 @@ void SceneBalloonPop::Render()
 			modelStack.PopMatrix();
 		}
 	}
+
+
+	modelStack.PushMatrix();
+	// Calculate position based on camera position and view direction
+	glm::vec3 viewDirection = glm::normalize(camera.target - camera.pos);
+
+
+	// Position gun slightly in front and to the right of the camera
+	float gunDistance = 0.5f; // How far in front of the camera
+	float gunRightOffset = 0.2f; // How far to the right
+	float gunDownOffset = 0.15f; // How far down from eye level
+
+	// Calculate right vector by cross product of view direction and up vector
+	glm::vec3 rightVector = glm::normalize(glm::cross(viewDirection, camera.up));
+	// Calculate gun position
+	glm::vec3 gunPosition = camera.pos +
+		(viewDirection * gunDistance) +
+		(rightVector * gunRightOffset) -
+		(camera.up * gunDownOffset);
+
+	modelStack.Translate(gunPosition.x, gunPosition.y, gunPosition.z);
+
+	// Orient the gun to face where the camera is looking
+	// Calculate rotation angles based on view direction
+	float yaw = atan2(viewDirection.x, viewDirection.z);
+	float pitch = -asin(viewDirection.y); // Negative because we want to invert the pitch
+
+	// Apply rotations
+	modelStack.Rotate(glm::degrees(yaw), 0, 1, 0); // Rotate around Y axis (yaw)
+	modelStack.Rotate(glm::degrees(pitch), 1, 0, 0); // Rotate around X axis (pitch)
+	// Additional rotation to orient the gun model correctly (adjust as needed based on your model)
+	modelStack.Rotate(270.0f, 0, 0, 1); // This may need to be adjusted depending on how the gun model is oriented
+
+	// Scale the gun to an appropriate size
+	modelStack.Scale(0.02f, 0.02f, 0.02f); // Adjust these values to make the gun the right size
+
+	// Set materials and render
+	meshList[GEO_PELLETGUN]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+	meshList[GEO_PELLETGUN]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_PELLETGUN]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_PELLETGUN]->material.kShininess = 1.0f;
+	RenderMesh(meshList[GEO_PELLETGUN], true);
+	modelStack.PopMatrix();
 
 	RenderSkyBox();
 

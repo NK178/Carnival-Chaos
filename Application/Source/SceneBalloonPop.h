@@ -27,6 +27,7 @@ public:
 		GEO_BALLOON,
 		GEO_CROSSHAIR,
 		GEO_DART,
+		GEO_PELLETGUN,
 		GEO_GAMEOVER,
 
 		//Text
@@ -118,6 +119,7 @@ public:
 
        bool m_hasWon;
 
+	   
 private:
 	void HandleKeyPress();
 	void RenderMesh(Mesh* mesh, bool enableLight);
@@ -202,6 +204,9 @@ private:
 		balloons.push_back(newBalloon);
 	}
 
+
+
+	// DISCLAIMER: THE "DARTS" WERE CHANGED TO PELLETS FROM A PELLET GUN!! DIDNT HAVE TIME TO CHANGE THE FUNCTION NAMES SO KEEP THIS IN MIND!! - Mathea
 	class Dart {
 	public:
 		bool isActive;
