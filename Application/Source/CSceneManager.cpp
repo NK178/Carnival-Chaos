@@ -8,10 +8,12 @@
 #include "SceneWhackAMole.h"
 #include "SceneSpinningRing.h"
 #include "SceneFinal.h"
+#include "LoadingScreen.h"
 #include <iostream>
 
 CSceneManager::CSceneManager()
-    : currentSceneType(SCENE_MAINMENU), isTransitioning(false)
+    : currentSceneType(SCENE_MAINMENU), isTransitioning(false),
+    isLoadingActive(false), loadingScreen()
 {
 }
 
@@ -22,6 +24,9 @@ CSceneManager::~CSceneManager()
 
 void CSceneManager::Init(SCENE_TYPE startingScene)
 {
+    // Initialize loading screen
+    loadingScreen.Init();
+
     // Clear any existing scenes
     Exit();
 
@@ -37,64 +42,25 @@ void CSceneManager::Init(SCENE_TYPE startingScene)
 
 void CSceneManager::Update(double dt)
 {
+    // If loading screen is active, update it
+    if (isLoadingActive) {
+        loadingScreen.Update(dt);
+
+        // Check if loading is complete - we'll manually set this flag
+        // when the loading is done in our loading thread
+        if (!loadingScreen.isLoading) {
+            isLoadingActive = false;
+            CompleteTransition();
+        }
+        return; // Skip regular update while loading
+    }
+
     // Handle scene transitions if needed
     if (isTransitioning) {
-        switch (currentTransition.action) {
-        case PUSH: {
-            // Initialize the new scene
-            currentTransition.newScene->Init();
-
-            // Push it onto the stacks
-            sceneStack.push(currentTransition.newScene);
-            typeStack.push(currentTransition.newSceneType);
-
-            // Update current scene type
-            currentSceneType = currentTransition.newSceneType;
-            break;
-        }
-        case POP: {
-            // Exit and remove the current scene
-            if (!sceneStack.empty()) {
-                Scene* currentScene = sceneStack.top();
-                currentScene->Exit();
-                delete currentScene;  // Manual memory management
-
-                sceneStack.pop();
-                typeStack.pop();
-
-                // If there's a scene left, note its type
-                if (!typeStack.empty()) {
-                    currentSceneType = typeStack.top();
-                }
-            }
-            break;
-        }
-        case REPLACE: {
-            // Exit and remove the current scene
-            if (!sceneStack.empty()) {
-                Scene* currentScene = sceneStack.top();
-                currentScene->Exit();
-                delete currentScene;  // Manual memory management
-
-                sceneStack.pop();
-                typeStack.pop();
-            }
-
-            // Initialize the new scene
-            currentTransition.newScene->Init();
-
-            // Push it onto the stacks
-            sceneStack.push(currentTransition.newScene);
-            typeStack.push(currentTransition.newSceneType);
-
-            // Update current scene type
-            currentSceneType = currentTransition.newSceneType;
-            break;
-        }
-        }
-
-        // Transition complete
-        isTransitioning = false;
+        // Start loading screen
+        StartLoadingScreen();
+        isTransitioning = false; // We're now in loading mode instead
+        return;
     }
 
     // Update the current scene
@@ -105,7 +71,13 @@ void CSceneManager::Update(double dt)
 
 void CSceneManager::Render()
 {
-    // Render the current scene
+    // Render the loading screen if active
+    if (isLoadingActive) {
+        loadingScreen.Render();
+        return;
+    }
+
+    // Otherwise render the current scene
     if (!sceneStack.empty()) {
         sceneStack.top()->Render();
     }
@@ -124,6 +96,43 @@ void CSceneManager::Exit()
         if (!typeStack.empty()) {
             typeStack.pop();
         }
+    }
+}
+
+void CSceneManager::StartLoadingScreen()
+{
+    // Reset and initialize loading screen
+    loadingScreen.Init();
+    isLoadingActive = true;
+
+    // Clear any previous loading messages
+    loadingScreen.loadingMessages.clear();
+
+    // Add loading messages
+    loadingScreen.AddLoadingMessage("Preparing scene...");
+    loadingScreen.AddLoadingMessage("Loading assets...");
+    loadingScreen.AddLoadingMessage("Setting up environment...");
+    loadingScreen.AddLoadingMessage("Almost ready...");
+
+    // Set up the loading function based on transition type
+    switch (currentTransition.action) {
+    case PUSH:
+        loadingScreen.SetSceneToLoad(currentTransition.newScene, [this]() {
+            // This will run in a separate thread
+            PreloadScene();
+            // When done, mark loading as complete
+            loadingScreen.isLoading = false;
+            });
+        break;
+    case POP:
+    case REPLACE:
+        loadingScreen.SetSceneToLoad(nullptr, [this]() {
+            // Simulate loading time
+            std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+            // When done, mark loading as complete
+            loadingScreen.isLoading = false;
+            });
+        break;
     }
 }
 
@@ -173,9 +182,7 @@ void CSceneManager::PopScene()
     isTransitioning = true;
 
     std::cout << "Popping scene, returning to Carnival scene" << std::endl;
-
 }
-
 
 void CSceneManager::ReplaceScene(SCENE_TYPE newScene)
 {
@@ -203,7 +210,7 @@ SCENE_TYPE CSceneManager::GetCurrentSceneType() const
 
 bool CSceneManager::IsTransitioning() const
 {
-    return isTransitioning;
+    return isTransitioning || isLoadingActive;
 }
 
 Scene* CSceneManager::CreateScene(SCENE_TYPE sceneType)
@@ -244,4 +251,89 @@ Scene* CSceneManager::CreateScene(SCENE_TYPE sceneType)
     }
 
     return scene;
+}
+
+void CSceneManager::PreloadScene()
+{
+    // This function is called in a separate thread
+    // Scene-specific preloading can go here
+
+    // Simulate loading time
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+
+    // You could add specific preloading based on scene type
+    // For example:
+    if (currentTransition.newSceneType == SCENE_BALLOONPOP) {
+        // Preload balloon pop assets
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    }
+    else if (currentTransition.newSceneType == SCENE_CARNIVAL) {
+        // Preload carnival assets
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    }
+}
+
+void CSceneManager::CompleteTransition()
+{
+    // Actually perform the scene transition
+    switch (currentTransition.action) {
+    case PUSH: {
+        // Initialize the new scene
+        if (currentTransition.newScene) {
+            currentTransition.newScene->Init();
+
+            // Push it onto the stacks
+            sceneStack.push(currentTransition.newScene);
+            typeStack.push(currentTransition.newSceneType);
+
+            // Update current scene type
+            currentSceneType = currentTransition.newSceneType;
+        }
+        break;
+    }
+    case POP: {
+        // Exit and remove the current scene
+        if (!sceneStack.empty()) {
+            Scene* currentScene = sceneStack.top();
+            currentScene->Exit();
+            delete currentScene;  // Manual memory management
+
+            sceneStack.pop();
+            typeStack.pop();
+
+            // If there's a scene left, note its type
+            if (!typeStack.empty()) {
+                currentSceneType = typeStack.top();
+            }
+        }
+        break;
+    }
+    case REPLACE: {
+        // Exit and remove the current scene
+        if (!sceneStack.empty()) {
+            Scene* currentScene = sceneStack.top();
+            currentScene->Exit();
+            delete currentScene;  // Manual memory management
+
+            sceneStack.pop();
+            typeStack.pop();
+        }
+
+        // Initialize the new scene
+        if (currentTransition.newScene) {
+            currentTransition.newScene->Init();
+
+            // Push it onto the stacks
+            sceneStack.push(currentTransition.newScene);
+            typeStack.push(currentTransition.newSceneType);
+
+            // Update current scene type
+            currentSceneType = currentTransition.newSceneType;
+        }
+        break;
+    }
+    }
+
+    // Reset transition data
+    currentTransition.newScene = nullptr;
 }
