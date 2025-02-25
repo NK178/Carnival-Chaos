@@ -406,7 +406,7 @@ void SceneMain::Init()
 	showSignText = false;
 	readSign = false;
 	isSignDialogueActive = false;
-	currentLineIndex = 0;
+	currentLineIndex = -1;
 	dialogueTimer = 0;
 
 	cutsceneStage = -1;
