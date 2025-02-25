@@ -264,7 +264,7 @@ void SceneSpinningRing::Init()
 	// Collision Boxes Position
 	player[0].pos = camera.pos;
 	wallSideList[0].pos = glm::vec3{ 0,0,8 };
-	wallSideList[1].pos = glm::vec3{ 0,0,-30 };
+	wallSideList[1].pos = glm::vec3{ 0,0,-8 };
 
 	for (int i = 0; i < wallSideList.size(); i++) {
 		wallSideList[i].mass = 0.f;
