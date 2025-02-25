@@ -15,7 +15,6 @@ void CSceneManager::Init() {
     // Initialize with first scene
     activeScene = new SceneBalloonPop;
     currentSceneType = SCENE_MAIN_MENU;
-    loadingScreen = new LoadingScreen;
     activeScene->Init();
 }
 
@@ -37,36 +36,6 @@ void CSceneManager::Update(double dt) {
     }
 }
 
-//void CSceneManager::Update(double dt) {
-//    if (isLoading) {
-//        loadingScreen->Update(dt);
-//        if (loadingScreen->IsLoadingComplete()) {
-//            // Transition from loading screen to next scene
-//            if (activeScene != loadingScreen) {
-//                delete activeScene;
-//            }
-//            activeScene = nextScene;
-//            nextScene = nullptr;
-//            isLoading = false;
-//        }
-//    }
-//    else if (nextScene != nullptr) {
-//        // Start loading sequence
-//        isLoading = true;
-//        loadingScreen->SetSceneToLoad(nextScene);
-//        loadingScreen->Init();
-//        if (activeScene != loadingScreen) {
-//            activeScene->Exit();
-//            Scene* oldScene = activeScene;
-//            activeScene = loadingScreen;
-//            delete oldScene;
-//        }
-//    }
-//    else if (activeScene != nullptr) {
-//        activeScene->Update(dt);
-//    }
-//}
-
 void CSceneManager::Render() {
     if (activeScene != nullptr) {
         activeScene->Render();
@@ -83,11 +52,6 @@ void CSceneManager::Exit() {
     if (nextScene != nullptr) {
         delete nextScene;
         nextScene = nullptr;
-    }
-
-    if (loadingScreen != nullptr) {
-        delete loadingScreen;
-        loadingScreen = nullptr;
     }
 }
 
@@ -125,4 +89,8 @@ void CSceneManager::ChangeScene(SCENE_TYPE newScene) {
         nextScene = scene;
         currentSceneType = newScene;
     }
+}
+
+void CSceneManager::RenderTransitionScreen()
+{
 }

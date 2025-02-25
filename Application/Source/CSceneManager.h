@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 #include "Scene.h"
-#include "LoadingScreen.h"
 #include "MatrixStack.h" 
 
 class CSceneManager {
@@ -31,8 +30,8 @@ public:
     Scene* GetCurrentScene() { return activeScene; }
 
 private:
-    CSceneManager() : activeScene(nullptr), nextScene(nullptr),
-        loadingScreen(nullptr), isLoading(false) {
+    CSceneManager() : activeScene(nullptr), nextScene(nullptr)
+    {
     }
     ~CSceneManager() { Exit(); }
 
@@ -42,7 +41,8 @@ private:
 
     Scene* activeScene;
     Scene* nextScene;
-    LoadingScreen* loadingScreen;
     SCENE_TYPE currentSceneType;
     bool isLoading;
+    bool isTransitioning;
+    void RenderTransitionScreen();
 };
