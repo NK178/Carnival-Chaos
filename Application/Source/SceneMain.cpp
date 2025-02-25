@@ -1065,7 +1065,7 @@ void SceneMain::Render()
 	RenderObjectives();
 
 	std::string temp("FPS:" + std::to_string(fps));
-	RenderTextOnScreen(meshList[GEO_FPS], temp.substr(0, 9), glm::vec3(0, 1, 0), 20, 620, 50);
+	RenderTextOnScreen(meshList[GEO_FPS], temp.substr(0, 9), glm::vec3(0, 1, 0), 20, 620, 20);
 
 	//for (int n = 0; n < tentList.size(); n++) {
 	//	modelStack.PushMatrix();
