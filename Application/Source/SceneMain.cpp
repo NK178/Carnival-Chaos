@@ -1525,6 +1525,13 @@ void SceneMain::HandleKeyPress()
 	//}
 	if (KeyboardController::GetInstance()->IsKeyPressed('Q') && !cutsceneSkipped) {
 		// Skip cutscene
+
+		if (cutsceneStage != 4)
+		{
+			camera.pos = glm::vec3(-3, 10, -70);
+			camera.target = glm::vec3(0, 10, -70);
+		}
+
 		cutsceneStage = 4;
 		camera.enableFNAF = false;
 		camera.allowMovement = true;
@@ -1537,9 +1544,6 @@ void SceneMain::HandleKeyPress()
 
 		isEnterMainSceneDialogueActive = false;
 		hasPlayedEnterMainSceneDialogue = true;
-
-		camera.pos = glm::vec3(-3, 10, -70);
-		camera.target = glm::vec3(0, 10, -70);
 
 		cutsceneSkipped = true; // Set the flag to indicate the cutscene has been skipped
 	}
