@@ -227,14 +227,16 @@ void SceneBumperBalls::Init()
 
 	enableLight = true;
 
-
+	player.push_back(PlayerBall(100, 2.f, GameObject::SPHERE));
 	spherelist.push_back(Sphere(3,1.f,GameObject::SPHERE));
 	spherelist.push_back(Sphere(4,1.f,GameObject::SPHERE));
 	spherelist.push_back(Sphere(5,1.f,GameObject::SPHERE));
 	spherelist.push_back(Sphere(6,1.f,GameObject::SPHERE));
-	spherelist[0].pos = glm::vec3{ -10,5,-10 };
-	spherelist[1].pos = glm::vec3{ -15,5,-10 };
-	spherelist[1].mass = 0.f;
+	player[0].pos = glm::vec3{ 0,3,0 };
+	spherelist[0].pos = glm::vec3{ -15,-2,10 };
+	spherelist[1].pos = glm::vec3{ -15,-2,-10 };
+	spherelist[2].pos = glm::vec3{ 15,-2,10 };
+	spherelist[3].pos = glm::vec3{ 15,-2,-10 };
 
 	cylinderlist.push_back(Cylinder(101, GameObject::CYLINDER,3.f,1.f));
 
@@ -345,7 +347,7 @@ void SceneBumperBalls::Render()
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Translate(0, 5, 0);
+	modelStack.Translate(player[0].pos.x, player[0].pos.y, player[0].pos.z);
 	modelStack.Scale(0.3f, 0.3f, 0.3f);
 	meshList[GEO_BEACHBALL]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);	
 	meshList[GEO_BEACHBALL]->material.kDiffuse = glm::vec3(0.5f,0.5f, 0.5f);
@@ -354,15 +356,18 @@ void SceneBumperBalls::Render()
 	RenderMesh(meshList[GEO_BEACHBALL], true);
 	modelStack.PopMatrix();
 
-	modelStack.PushMatrix();
-	modelStack.Translate(-10, 5, 0);
-	modelStack.Scale(0.3f, 0.3f, 0.3f);
-	meshList[GEO_BASKETBALL]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-	meshList[GEO_BASKETBALL]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-	meshList[GEO_BASKETBALL]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	meshList[GEO_BASKETBALL]->material.kShininess = 1.0f;
-	RenderMesh(meshList[GEO_BASKETBALL], true);
-	modelStack.PopMatrix();
+
+	for (int i = 0; i < spherelist.size(); i++) {
+		modelStack.PushMatrix();
+		modelStack.Translate(spherelist[i].pos.x, spherelist[i].pos.y, spherelist[i].pos.z);
+		modelStack.Scale(0.5f, 0.5f, 0.5f);
+		meshList[GEO_BASKETBALL]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+		meshList[GEO_BASKETBALL]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+		meshList[GEO_BASKETBALL]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+		meshList[GEO_BASKETBALL]->material.kShininess = 1.0f;
+		RenderMesh(meshList[GEO_BASKETBALL], true);
+		modelStack.PopMatrix();
+	}
 
 
 	modelStack.PushMatrix();
@@ -374,21 +379,6 @@ void SceneBumperBalls::Render()
 	meshList[GEO_BARREL]->material.kShininess = 1.0f;
 	RenderMesh(meshList[GEO_BARREL], true);
 	modelStack.PopMatrix();
-
-
-	for (int i = 0; i < spherelist.size(); i++) {
-		modelStack.PushMatrix();
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		modelStack.Translate(spherelist[i].pos.x, spherelist[i].pos.y, spherelist[i].pos.z);
-		modelStack.Scale(2 * spherelist[i].radius, 2* spherelist[i].radius, 2*spherelist[i].radius);
-		meshList[GEO_SPHERE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-		meshList[GEO_SPHERE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-		meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-		meshList[GEO_SPHERE]->material.kShininess = 1.0f;
-		RenderMesh(meshList[GEO_SPHERE], true);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		modelStack.PopMatrix();
-	}
 
 	//Cylidner 
 	modelStack.PushMatrix();
