@@ -23,6 +23,8 @@ public:
 		GEO_PLANE,
 		GEO_FENCE,
 		GEO_BUMPERCAR,
+		GEO_CLOWN,
+		GEO_BALLOON,
 	
 		//Text
 		GEO_TEXT,
