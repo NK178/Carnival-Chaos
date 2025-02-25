@@ -32,6 +32,7 @@ public:
 		GEO_TEXT2,
 		GEO_FPS,
 		GEO_KEY_E,
+		GEO_WARNING,
 		GEO_UI,
 
 		//SKybox

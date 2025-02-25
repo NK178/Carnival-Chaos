@@ -164,6 +164,8 @@ void SceneSpinningRing::Init()
 
 	meshList[GEO_KEY_E] = MeshBuilder::GenerateQuad("KeyE", glm::vec3(1.f, 1.f, 1.f), 2.f);
 	meshList[GEO_KEY_E]->textureID = LoadTGA("Images//keyboard_key_e.tga");
+	meshList[GEO_WARNING] = MeshBuilder::GenerateQuad("warning", glm::vec3(1.f, 1.f, 1.f), 2.f);
+	meshList[GEO_WARNING]->textureID = LoadTGA("Images//warning.tga");
 
 	meshList[GEO_SPINNER] = MeshBuilder::GenerateOBJ("Spinner", "Models//spinner.obj");
 	meshList[GEO_SPINNER]->textureID = LoadTGA("Images//spinner.tga");
@@ -640,7 +642,7 @@ void SceneSpinningRing::Render()
 
 	// Render FPS
 	std::string temp("FPS:" + std::to_string(fps)); 
-	RenderTextOnScreen(meshList[GEO_FPS], temp.substr(0, 9), glm::vec3(0, 1, 0), 20, 620, w0);
+	RenderTextOnScreen(meshList[GEO_FPS], temp.substr(0, 9), glm::vec3(0, 1, 0), 20, 620, 0);
 }
 
 void SceneSpinningRing::RenderMesh(Mesh* mesh, bool enableLight)
