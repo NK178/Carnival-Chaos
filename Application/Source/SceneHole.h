@@ -115,6 +115,8 @@ public:
 	virtual void Render();
 	virtual void Exit();
 
+        signed short int gameResult = 0;
+
 private:
 	void HandleKeyPress();
 	void RenderMesh(Mesh* mesh, bool enableLight);
@@ -140,7 +142,7 @@ private:
 	float wallDisp;
 	float failedGrav;
 
-	signed short int gameResult = 0;
+
 	bool m_hasReadObjective = false; 
 
 	bool OverlapAABB2AABB(glm::vec3 Obj1, const int Width1, const int Height1, glm::vec3 Obj2, const int Width2, const int Height2);
