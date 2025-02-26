@@ -21,6 +21,30 @@
 
 SceneFinal::SceneFinal()
 {
+	m_battleTimer = 80.0f;        // 80 seconds total
+	m_bossHealth = 100;           // 100 health
+	m_battleStarted = true; // DISCLAIMER : Set this to true for now, Yong Quan youre in charge of adding the UI before the battle starts!!
+	m_battleEnded = false;
+	m_playerWon = false;
+	
+	for (int i = 0; i < MAX_BALLOONS; ++i) {
+		m_balloons[i].active = true;  // Always active
+		m_balloons[i].size = 1.0f;
+
+		// Spread them out in a triangle formation
+		if (i == 0) {
+			m_balloons[i].offset = glm::vec3(-4.0f, 30.0f, -2.0f);  // Left
+		}
+		else if (i == 1) {
+			m_balloons[i].offset = glm::vec3(4.0f, 30.0f, -2.0f);   // Right
+		}
+		else {
+			m_balloons[i].offset = glm::vec3(0.0f, 40.0f, 0.0f);    // Top
+		}
+	}
+
+	m_balloonSpawnTimer = 0.0f;
+	m_balloonSpawnInterval = 15.0f; // Spawn a balloon every 15 seconds
 
 }
 
@@ -173,6 +197,12 @@ void SceneFinal::Init()
 	meshList[GEO_CLOWN] = MeshBuilder::GenerateOBJ("Clown", "Models//bear.obj");
 	meshList[GEO_CLOWN]->textureID = LoadTGA("Images//texbear.tga");
 
+	meshList[GEO_BALLOON] = MeshBuilder::GenerateOBJ("Balloon",
+		"Models//Balloon.obj");
+	meshList[GEO_BALLOON]->textureID = LoadTGA("Images//BalloonAlbedo.tga");
+	meshList[GEO_HEALTHBAR] = MeshBuilder::GenerateQuad("HealthBar", glm::vec3(1.0f, 1.0f, 1.0f), 1.0f);
+
+
 	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.4f, 1000.0f);
 	projectionStack.LoadMatrix(projection);
 
@@ -256,7 +286,69 @@ void SceneFinal::Init()
 
 }
 
+// Disclaimer = SORRY FOR THE MILLION DEBUG STATEMENTS IT TOOK AWHILE - Mathea
+bool SceneFinal::CheckRayBalloonCollision(glm::vec3 rayOrigin, glm::vec3 rayDirection)
+{
+	/*std::cout << "SHOOTING - Origin: " << rayOrigin.x << ", "
+		<< rayOrigin.y << ", " << rayOrigin.z << std::endl;
+	std::cout << "Direction: " << rayDirection.x << ", "
+		<< rayDirection.y << ", " << rayDirection.z << std::endl;*/
+
+	// Iterate through each balloon
+	for (int i = 0; i < MAX_BALLOONS; ++i)
+	{
+		if (m_balloons[i].active)
+		{
+
+			glm::vec3 balloonPos = m_cpu.pos + m_balloons[i].offset;
+			std::cout << "Balloon " << i << " position: " << balloonPos.x << ", "
+				<< balloonPos.y << ", " << balloonPos.z << std::endl;
+
+			// Compute vector from ray origin to balloon center
+			glm::vec3 toBalloon = balloonPos - rayOrigin;
+
+			// Project 'toBalloon' onto the ray direction
+			float projection = glm::dot(toBalloon, rayDirection);
+			if (projection < 0)
+				continue; // Balloon is behind the ray origin
+
+			// Find the closest point on the ray to the balloon's center
+			glm::vec3 closestPoint = rayOrigin + projection * rayDirection;
+
+			// Distance from the balloon's center to this closest point
+			float distance = glm::length(balloonPos - closestPoint);
+
+			float balloonRadius = 3.0f * m_balloons[i].size;
+
+			// If the distance is less than the radius, the ray hits the balloon
+			if (distance < balloonRadius)
+			{
+				std::cout << "HIT BALLOON " << i << "!" << std::endl;
+
+				// Balloon hit! Deactivate it and deal damage.
+				m_balloons[i].active = false;
+				m_bossHealth -= 10; // Each balloon hit deals 10 damage
+
+				if (m_bossHealth <= 0)
+				{
+					m_bossHealth = 0;
+					m_battleEnded = true;
+					m_playerWon = true;
+					std::cout << "BOSS DEFEATED!" << std::endl;
+				}
+
+				return true; // Collision detected.
+			}
+		}
+	}
+
+	std::cout << "No balloon hit" << std::endl;
+	return false;
+}
+
 void SceneFinal::Update(double dt) {
+
+	HandleKeyPress();
 	// Store old position for collision
 	glm::vec3 oldPos = carPhysics.pos;
 
@@ -429,6 +521,43 @@ void SceneFinal::Update(double dt) {
 	if (m_cpu.pos.x < -ARENA_LIMIT) m_cpu.pos.x = -ARENA_LIMIT;
 	if (m_cpu.pos.z > ARENA_LIMIT) m_cpu.pos.z = ARENA_LIMIT;
 	if (m_cpu.pos.z < -ARENA_LIMIT) m_cpu.pos.z = -ARENA_LIMIT;
+
+
+
+	// --- Battle Logic ---
+   // If the battle has started and not yet ended, update the timer
+	if (m_battleStarted && !m_battleEnded) {
+		m_battleTimer -= dt;
+		if (m_battleTimer <= 0.0f) {
+			// Time's up; if the boss still has health, the player loses.
+			m_battleTimer = 0.0f;
+			m_battleEnded = true;
+			m_playerWon = (m_bossHealth <= 0);
+			// Optionally trigger a "loss" event here if m_bossHealth > 0.
+		}
+	}
+
+
+	if (m_battleStarted && !m_battleEnded) {
+		m_balloonSpawnTimer += dt;
+		if (m_balloonSpawnTimer >= m_balloonSpawnInterval) {
+			m_balloonSpawnTimer = 0.0f;
+
+			// Activate all three balloons at once after each interval
+			for (int i = 0; i < MAX_BALLOONS; ++i) {
+				m_balloons[i].active = true;
+
+				// Update positions based on current boss location
+				m_balloons[i].pos = m_cpu.pos + m_balloons[i].offset;
+			}
+
+			std::cout << "All balloons respawned!" << std::endl;
+		}
+	}
+
+	//if (KeyboardController::GetInstance()->IsKeyPressed('H')) {
+	//	m_bossHealth--;
+	//}
 
 	// Update camera to match driver's perspective
 	float driverHeight = 7.0f;
@@ -648,14 +777,51 @@ void SceneFinal::Render()
 
 
 
-	/*RenderTextOnScreen(meshList[GEO_TEXT], "Stamina", glm::vec3(0, 1, 0), 40, 0, 0);*/
+
+	// Render boss balloons
+	for (int i = 0; i < MAX_BALLOONS; ++i) {
+		if (m_balloons[i].active) {
+			modelStack.PushMatrix();
+			// Position the balloon relative to the boss car
+			// m_cpu.pos is assumed to be the boss car's position
+			modelStack.Translate(m_cpu.pos.x + m_balloons[i].offset.x,
+				m_cpu.pos.y + m_balloons[i].offset.y,
+				m_cpu.pos.z + m_balloons[i].offset.z);
+			// Scale the balloon according to its size
+			modelStack.Scale(m_balloons[i].size, m_balloons[i].size, m_balloons[i].size);
+			meshList[GEO_BALLOON]->material.kAmbient = glm::vec3(0.7f, 0.7f, 0.7f);
+			meshList[GEO_BALLOON]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+			meshList[GEO_BALLOON]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+			meshList[GEO_BALLOON]->material.kShininess = 1.0f;
+			// Render the balloon mesh (make sure GEO_BALLOON is defined and loaded)
+			RenderMesh(meshList[GEO_BALLOON], true);
+			modelStack.PopMatrix();
+		}
+	}
+
+
+
 
 	RenderSkyBox();
+
+
+	if (m_battleStarted) {
+		// Render health label and boss health bar next to each other
+		RenderTextOnScreen(meshList[GEO_TEXT], "Health:", glm::vec3(1, 1, 1), 20, 20, 550);
+		float healthPercent = (float)m_bossHealth / 100.0f;
+		
+		RenderMeshOnScreen(meshList[GEO_HEALTHBAR], 260, 560, 200 * healthPercent, 20);
+
+		RenderTextOnScreen(meshList[GEO_TEXT], "Time: " + std::to_string((int)m_battleTimer), glm::vec3(1, 1, 1), 20, 20, 520);
+	}
 
 	// Render vertical line of crosshair
 	RenderMeshOnScreen(meshList[GEO_CROSSHAIR], 400, 300, 2, 20);  // Thin vertical line
 	// Render horizontal line of crosshair
 	RenderMeshOnScreen(meshList[GEO_CROSSHAIR], 400, 300, 20, 2);  // Thin horizontal line
+
+
+
 }
 
 void SceneFinal::RenderMesh(Mesh* mesh, bool enableLight)
@@ -757,7 +923,7 @@ void SceneFinal::HandleKeyPress()
 		isRightUp = false;
 	}
 
-	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_TAB))
+	/*if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_TAB))
 	{
 		if (light[0].type == Light::LIGHT_POINT) {
 			light[0].type = Light::LIGHT_DIRECTIONAL;
@@ -773,6 +939,18 @@ void SceneFinal::HandleKeyPress()
 		}
 
 		glUniform1i(m_parameters[U_LIGHT0_TYPE], light[0].type);
+	}*/
+
+
+	if (MouseController::GetInstance()->IsButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
+		std::cout << "LEFT MOUSE BUTTON PRESSED" << std::endl;
+
+		// Create a ray from the camera's position in the direction the camera is facing
+		glm::vec3 rayOrigin = camera.pos;
+		glm::vec3 rayDirection = glm::normalize(camera.target - camera.pos);
+
+		// Check for collision with balloons
+		bool hitBalloon = CheckRayBalloonCollision(rayOrigin, rayDirection);
 	}
 
 }
@@ -933,3 +1111,4 @@ void SceneFinal::RenderSkyBox() {
 	RenderMesh(meshList[GEO_BOTTOM], false);
 	modelStack.PopMatrix();
 }
+// ababababa

@@ -377,8 +377,8 @@ void SceneMain::Init()
 	typewriterTimer = 0.0f; 
 	currentText = "";
 	currentCharIndex = 0;
-	isEnterMainSceneDialogueActive = true; 
-	hasPlayedEnterMainSceneDialogue = false;
+	isCutsceneDialogueActive = true;
+	hasPlayedCutsceneDialogue = false;
 
 	// Tent Position (for interaction use)
 	tentPositions[0] = glm::vec3(30.f, 0.f, -40.f); 
@@ -613,7 +613,7 @@ void SceneMain::Update(double dt)
 		if (showReadSignText)
 		{
 			readSignTextTimer += dt;
-			if (readSignTextTimer >= READ_SIGN_TEXT_DISPLAY_TIME)
+			if (readSignTextTimer >= 3.0f)
 			{
 				showReadSignText = false;
 				readSignTextTimer = 0.0f;
@@ -802,52 +802,6 @@ void SceneMain::Render()
 				//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 				//modelStack.PopMatrix();
 			}
-		}
-	}
-
-	// Render Trees
-	{
-	//	meshList[GEO_TREE]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
-	//	meshList[GEO_TREE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-	//	meshList[GEO_TREE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	//	meshList[GEO_TREE]->material.kShininess = 1.0f;
-
-		{
-	//		modelStack.PushMatrix();
-	//		modelStack.Translate(40.f, 0.f, 20.f);
-	//		modelStack.Scale(0.02f, 0.02f, 0.02f);
-	//		RenderMesh(meshList[GEO_TREE], true);
-	//		modelStack.PopMatrix();
-
-	//		modelStack.PushMatrix();
-	//		modelStack.Translate(40.f, 0.f, -20.f);
-	//		modelStack.Scale(0.02f, 0.02f, 0.02f);
-	//		RenderMesh(meshList[GEO_TREE], true);
-	//		modelStack.PopMatrix();
-
-	//		modelStack.PushMatrix();
-	//		modelStack.Translate(40.f, 0.f, -60.f);
-	//		modelStack.Scale(0.02f, 0.02f, 0.02f);
-	//		RenderMesh(meshList[GEO_TREE], true);
-	//		modelStack.PopMatrix();
-
-	//		modelStack.PushMatrix();
-	//		modelStack.Translate(-40.f, 0.f, -40.f);
-	//		modelStack.Scale(0.02f, 0.02f, 0.02f);
-	//		RenderMesh(meshList[GEO_TREE], true);
-	//		modelStack.PopMatrix();
-
-	//		modelStack.PushMatrix();
-	//		modelStack.Translate(-40.f, 0.f, 0.f);
-	//		modelStack.Scale(0.02f, 0.02f, 0.02f);
-	//		RenderMesh(meshList[GEO_TREE], true);
-	//		modelStack.PopMatrix();
-
-	//		modelStack.PushMatrix();
-	//		modelStack.Translate(-40.f, 0.f, 40.f);
-	//		modelStack.Scale(0.02f, 0.02f, 0.02f);
-	//		RenderMesh(meshList[GEO_TREE], true);
-	//		modelStack.PopMatrix();
 		}
 	}
 
@@ -1060,9 +1014,22 @@ void SceneMain::Render()
 		modelStack.PopMatrix();
 	}
 
+	// Render Money Bag (if player completes final challenge)
+	if (isFinalChallengeCompleted) {
+		modelStack.PushMatrix();
+		modelStack.Translate(0.f, 0.f, -60.f);
+		modelStack.Scale(30.f, 50.f, 30.f);
+		meshList[GEO_MONEYBAG]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+		meshList[GEO_MONEYBAG]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+		meshList[GEO_MONEYBAG]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+		meshList[GEO_MONEYBAG]->material.kShininess = 1.0f;
+		RenderMesh(meshList[GEO_MONEYBAG], true);
+		modelStack.PopMatrix();
+	}
+
 	RenderUI();
-	RenderDialogue();
 	RenderObjectives();
+	RenderDialogue();
 
 	std::string temp("FPS:" + std::to_string(fps));
 	RenderTextOnScreen(meshList[GEO_FPS], temp.substr(0, 9), glm::vec3(0, 1, 0), 20, 620, 20);
@@ -1179,7 +1146,7 @@ void SceneMain::RenderUI()
 }
 
 void SceneMain::RenderDialogue() {
-	if (isEnterMainSceneDialogueActive) {
+	if (isCutsceneDialogueActive) {
 		RenderMeshOnScreen(meshList[GEO_UI], 150, 535, 150, 9);
 		RenderMeshOnScreen(meshList[GEO_KEY_Q], 20, 510, 10, 10);
 		RenderTextOnScreen(meshList[GEO_TEXT], "[ SKIP CUTSCENE ]", glm::vec3(1, 1, 1), 15, 40, 505);
@@ -1189,7 +1156,7 @@ void SceneMain::RenderDialogue() {
 		RenderMeshOnScreen(meshList[GEO_KEY_Q], 20, 510, 10, 10);
 		RenderTextOnScreen(meshList[GEO_TEXT], "[ SKIP ]", glm::vec3(1, 1, 1), 15, 40, 505);
 		RenderMeshOnScreen(meshList[GEO_KEY_E], 170, 510, 10, 10);
-		RenderTextOnScreen(meshList[GEO_TEXT], "[ NEXT TEXT ]", glm::vec3(1, 1, 1), 15, 200, 505);
+		RenderTextOnScreen(meshList[GEO_TEXT], "[ NEXT DIALOGUE ]", glm::vec3(1, 1, 1), 15, 200, 505);
 	}
 	else {
 		return; // exit function early if no dialogue is active
@@ -1220,8 +1187,8 @@ void SceneMain::RenderDialogue() {
 	}
 
 	// rendering of dialogue when player first enter the game
-	if (isEnterMainSceneDialogueActive && currentLineIndex < enterMainSceneLines.size()) {
-		const DialogueLine& currentDialogue = enterMainSceneLines[currentLineIndex];
+	if (isCutsceneDialogueActive && currentLineIndex < sceneMainCutsceneLines.size()) {
+		const DialogueLine& currentDialogue = sceneMainCutsceneLines[currentLineIndex];
 
 		if (currentDialogue.isMultiLine) {
 			std::string textToRender = currentText.substr(0, currentCharIndex);
@@ -1246,6 +1213,8 @@ void SceneMain::RenderDialogue() {
 // typing speed for the dialogues
 void SceneMain::UpdateDialogue(double dt) {
 	if (readSign && !isSignDialogueActive) {
+		UpdateSignText();
+
 		isSignDialogueActive = true;
 		currentLineIndex = 0;
 		dialogueTimer = 0;
@@ -1271,7 +1240,7 @@ void SceneMain::UpdateDialogue(double dt) {
 			}
 			else {
 				// Skip to the next line
-				dialogueTimer = TEXT_DISPLAY_TIME;
+				dialogueTimer = 4.0f;
 			}
 		}
 
@@ -1287,7 +1256,7 @@ void SceneMain::UpdateDialogue(double dt) {
 		}
 		else {
 			dialogueTimer += dt;
-			if (dialogueTimer >= TEXT_DISPLAY_TIME) {
+			if (dialogueTimer >= 4.0f) {
 				dialogueTimer = 0;
 				currentLineIndex++;
 				if (currentLineIndex >= signDialogueLines.size()) {
@@ -1314,7 +1283,7 @@ void SceneMain::UpdateDialogue(double dt) {
 		}
 	}
 
-	if (isEnterMainSceneDialogueActive && !hasPlayedEnterMainSceneDialogue) {
+	if (isCutsceneDialogueActive && !hasPlayedCutsceneDialogue) {
 		if (isTyping) {
 			typewriterTimer += dt;
 			if (typewriterTimer >= 0.05f) { // Adjust the typing speed here
@@ -1327,17 +1296,17 @@ void SceneMain::UpdateDialogue(double dt) {
 		}
 		else {
 			dialogueTimer += dt;
-			if (dialogueTimer >= TEXT_DISPLAY_TIME) {
+			if (dialogueTimer >= 4.0f) {
 				dialogueTimer = 0;
 				currentLineIndex++;
-				if (currentLineIndex >= enterMainSceneLines.size()) {
-					isEnterMainSceneDialogueActive = false;
-					hasPlayedEnterMainSceneDialogue = true;
+				if (currentLineIndex >= sceneMainCutsceneLines.size()) {
+					isCutsceneDialogueActive = false;
+					hasPlayedCutsceneDialogue = true;
 				}
 				else {
 					isTyping = true;
 					typewriterTimer = 0.0f;
-					const DialogueLine& currentDialogue = enterMainSceneLines[currentLineIndex];
+					const DialogueLine& currentDialogue = sceneMainCutsceneLines[currentLineIndex];
 					if (currentDialogue.isMultiLine) {
 						currentText = currentDialogue.textLines[0] + "\n" + currentDialogue.textLines[1];
 					}
@@ -1348,6 +1317,57 @@ void SceneMain::UpdateDialogue(double dt) {
 				}
 			}
 		}
+	}
+}
+
+void SceneMain::UpdateSignText() {
+	// clear previous dialogue
+	signDialogueLines.clear();
+
+	int completedTents = 0;
+	for (int i = 0; i < 6; ++i) {
+		if (tentCompleted[i]) {
+			completedTents++;
+		}
+	}
+
+	if (completedTents == 0) {
+		// if no minigames are completed
+		signDialogueLines = {
+			{{"Let me see..."}, false},
+			{{"If you complete all six games..."}, false},
+			{{"And the final challenge..."}, false},
+			{{"You get to bring home", "a grand prize of..."}, true},
+			{{"A million dollars?!"}, false},
+			{{"Sounds too good to be true..."}, false},
+			{{"Whatever, since I'm already here,", "why not do it anyway?"}, true},
+			{{"Looks like I have to complete all six", "games in their respective tents first."}, true}
+		};
+	}
+	else if (completedTents < 6) {
+		// dialogue changes based on how many minigames player completed
+		signDialogueLines = {
+			{{"I've completed " + std::to_string(completedTents) + " out of 6 games."}, false},
+			{{"Still a long way to go."}, false},
+			{{"Better keep going."}, false}
+		};
+	}
+	else if (completedTents == 6 && !isFinalChallengeCompleted) {
+		// all minigames complete and final challenge not completed
+		signDialogueLines = {
+			{{"Alright! I finished all six games!"}, false},
+			{{"Now it's time for the final challenge..."}, false},
+			{{"I wonder what kind of challenge awaits."}, false}
+		};
+	}
+	else if (completedTents == 6 && isFinalChallengeCompleted) {
+		// player finished all the game
+		signDialogueLines = {
+			{{"I can't believe it..."}, false},
+			{{"I've actually done it."}, false},
+			{{"All six games, and the final challenge."}, false},
+			{{"What a journey!"}, false}
+		};
 	}
 }
 
@@ -1542,8 +1562,8 @@ void SceneMain::HandleKeyPress()
 		camera.allowLocomotiveTilt = true;
 		camera.allowLocomotiveBop = false;
 
-		isEnterMainSceneDialogueActive = false;
-		hasPlayedEnterMainSceneDialogue = true;
+		isCutsceneDialogueActive = false;
+		hasPlayedCutsceneDialogue = true;
 
 		cutsceneSkipped = true; // Set the flag to indicate the cutscene has been skipped
 	}

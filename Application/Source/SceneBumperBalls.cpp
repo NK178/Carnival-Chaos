@@ -245,8 +245,8 @@ void SceneBumperBalls::Init()
 	spherelist[1].pos = glm::vec3{ -10,3,15 };
 	spherelist[2].pos = glm::vec3{ 10,0,-10};
 	spherelist[3].pos = glm::vec3{ 0,3,-15 };
-	for (int i = 0; i < spherelist.size(); i++) {
-		spherelist[0].bounciness = 0.2f;
+	for (int i = 0; i < spherelist.size(); ++i) {
+		spherelist[i].bounciness = 0.2f;
 	}
 	cylinderlist.push_back(Cylinder(101, GameObject::CYLINDER,70.f,28.f));
 	cylinderlist[0].pos = glm::vec3{0,-36,0};
@@ -303,10 +303,105 @@ void SceneBumperBalls::Update(double dt)
 		player[0].xrot += player[0].xrotvel * dt;
 		player[0].zrot += player[0].zrotvel * dt;
 
+		for (int i = 0; i < spherelist.size(); ++i)
+		{
+			spherelist[0].xrot += spherelist[0].xrotvel * dt;
+			spherelist[0].zrot += spherelist[0].zrotvel * dt;
+		}
+
 		CollisionData cd;
 		newcampos = glm::vec3{ player[0].pos.x,player[0].pos.y + 10.f,player[0].pos.z };
 		camera.pos = newcampos;
 		camera.target = camera.pos + viewDir * 1.2f;
+
+		//my friend here justin he's already taken and he's cracked at bumper balls my guy
+
+		//spherelist[0].target = glm::vec3(player[0].pos.x, 0, player[0].pos.z);
+		//spherelist[1].target = spherelist[0].pos + ((player[0].pos - spherelist[0].pos) / 2.f);
+
+		float dispDist = (((player[0].pos.x - spherelist[0].pos.x) * (player[0].pos.x - spherelist[0].pos.x)) + ((player[0].pos.z - spherelist[0].pos.z) * (player[0].pos.z - spherelist[0].pos.z)));
+
+		//spherelist[0].target = (player[0].pos * 0.5f) + ((player[0].vel * 0.1f) * (abs(dispDist * 0.3f) / (50.f - spherelist[0].vel)));
+		spherelist[0].target = (player[0].pos * 0.5f) + ((player[0].vel * 0.25f) * (abs(dispDist * 0.1f) / (60.f - spherelist[0].vel)));
+
+		
+		if (abs(spherelist[0].target.x) > 25)
+		{
+			spherelist[0].target.x *= 0.5f;
+			if (abs(spherelist[0].target.x) > 25)
+			{
+				spherelist[0].target.x = 0.f;
+			}
+		}
+		if (abs(spherelist[0].target.z) > 25)
+		{
+			spherelist[0].target.z *= 0.5f;
+			if (abs(spherelist[0].target.z) > 25)
+			{
+				spherelist[0].target.z = 0.f;
+			}
+		}
+
+		spherelist[1].target = spherelist[1].pos * 10.f;
+		spherelist[2].target = spherelist[2].pos * 10.f;
+		spherelist[3].target = spherelist[3].pos * 10.f;
+
+		float enemyNerf = 1.f;
+		const float BALL_ROT = 150.f;
+
+		//all AI enemy movement systems
+		for (int i = 0; i < spherelist.size(); ++i)
+		{
+			spherelist[i].lat  = spherelist[i].pos.x < spherelist[i].target.x ? 'R' : 'L';
+			spherelist[i].vert = spherelist[i].pos.z < spherelist[i].target.z ? 'U' : 'D';
+			
+			if (spherelist[i].lat == 'R')
+			{
+				spherelist[i].AddForce(glm::vec3(PLAYER_SPEED / enemyNerf, 0, 0));
+				spherelist[i].zrotvel += BALL_ROT * dt;
+
+				/*if (spherelist[i].vel.x < 0)
+				{
+					spherelist[i].AddForce(glm::vec3(PLAYER_SPEED / enemyNerf, 0, 0));
+					spherelist[i].zrotvel += BALL_ROT * dt;
+				}*/
+			}
+			else
+			{
+				spherelist[i].AddForce(glm::vec3(-PLAYER_SPEED / enemyNerf, 0, 0));
+				spherelist[i].zrotvel -= BALL_ROT * dt;
+
+				/*if (spherelist[i].vel.x > 0)
+				{
+					spherelist[i].AddForce(glm::vec3(-PLAYER_SPEED / enemyNerf, 0, 0));
+					spherelist[i].zrotvel -= BALL_ROT * dt;
+				}*/
+			}
+			if (spherelist[i].vert == 'U')
+			{
+				spherelist[i].AddForce(glm::vec3(0, 0, PLAYER_SPEED / enemyNerf));
+				spherelist[i].xrotvel += BALL_ROT * dt;
+
+				/*if (spherelist[i].vel.z < 0)
+				{
+					spherelist[i].AddForce(glm::vec3(0, 0, PLAYER_SPEED / enemyNerf));
+					spherelist[i].xrotvel += BALL_ROT * dt;
+				}*/
+			}
+			else
+			{
+				spherelist[i].AddForce(glm::vec3(0, 0, -PLAYER_SPEED / enemyNerf));
+				spherelist[i].xrotvel -= BALL_ROT * dt;
+
+				if (spherelist[i].vel.z > 0)
+				{
+					spherelist[i].AddForce(glm::vec3(0, 0, -PLAYER_SPEED / enemyNerf));
+					spherelist[i].xrotvel -= BALL_ROT * dt;
+				}
+			}
+			//spherelist[i].lat  == 'R' ? spherelist[i].AddForce(glm::vec3(PLAYER_SPEED, 0, 0)) : spherelist[i].AddForce(glm::vec3(-PLAYER_SPEED, 0, 0));
+			//spherelist[i].vert == 'U' ? spherelist[i].AddForce(glm::vec3(0, 0, PLAYER_SPEED)) : spherelist[i].AddForce(glm::vec3(0, 0, -PLAYER_SPEED));
+		}
 
 		//Ball to ball
 		for (int i = 0; i < spherelist.size() - 1; ++i) {
@@ -335,7 +430,9 @@ void SceneBumperBalls::Update(double dt)
 		//Check if ball still in game 
 		for (int i = 0; i < spherelist.size(); i++) {
 			if (spherelist[i].pos.y < -50.f)
-				spherelist.erase(spherelist.begin() + i);
+				isballactive[i] = false;
+				//ballcount--;
+				//spherelist.erase(spherelist.begin() + i);
 		}
 
 		player[0].AddForce(100.f * glm::vec3{ 0,-1,0 });
@@ -356,7 +453,7 @@ void SceneBumperBalls::Update(double dt)
 		gamelose = true;
 
 	//check if player win 
-	if (spherelist.size() == 0)
+	if (!isballactive[0]&& !isballactive[1] && !isballactive[2] && !isballactive[3])
 		gamewin = true;
 
 	if (gamelose || gamewin) {
@@ -443,6 +540,8 @@ void SceneBumperBalls::Render()
 	for (int i = 0; i < spherelist.size(); i++) {
 		modelStack.PushMatrix();
 		modelStack.Translate(spherelist[i].pos.x, spherelist[i].pos.y, spherelist[i].pos.z);
+		modelStack.Rotate(spherelist[i].xrot, 1, 0, 0);
+		modelStack.Rotate(spherelist[i].zrot, 0, 0, 1);
 		modelStack.Scale(0.05*spherelist[i].radius, 0.05*spherelist[i].radius, 0.05*spherelist[i].radius);
 		meshList[GEO_BEACHBALL]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
 		meshList[GEO_BEACHBALL]->material.kDiffuse = glm::vec3(0.6f, 0.6f, 0.6f);
@@ -494,17 +593,19 @@ void SceneBumperBalls::Render()
 		RenderTextOnScreen(meshList[GEO_TEXT], "Returning ", glm::vec3(0, 1, 0), 25, 210, 300);
 		RenderTextOnScreen(meshList[GEO_TEXT], "to carnival...", glm::vec3(0, 1, 0), 25, 210, 270);
 	}
-
-
 }
 
 void SceneBumperBalls::InitGame() {
-	spherelist.clear(); //remove all the stuff
-	spherelist.push_back(Sphere(3, 6.f, GameObject::SPHERE));
-	spherelist.push_back(Sphere(4, 6.f, GameObject::SPHERE));
-	spherelist.push_back(Sphere(5, 6.f, GameObject::SPHERE));
-	spherelist.push_back(Sphere(6, 6.f, GameObject::SPHERE));
+	//spherelist.clear(); //remove all the stuff
+	//spherelist.push_back(Sphere(3, 6.f, GameObject::SPHERE));
+	//spherelist.push_back(Sphere(4, 6.f, GameObject::SPHERE));
+	//spherelist.push_back(Sphere(5, 6.f, GameObject::SPHERE));
+	//spherelist.push_back(Sphere(6, 6.f, GameObject::SPHERE));
+	//ballcount = 4;
 
+	for (int i = 0; i < 4; i++) {
+		isballactive[i] = true;
+	}
 	player[0].pos = glm::vec3{ -16,3,-3 };
 	player[0].bounciness = 0.2f;
 	player[0].vel = glm::vec3{ 0,0,0 };
@@ -512,6 +613,14 @@ void SceneBumperBalls::InitGame() {
 	player[0].zrot = 0;
 	player[0].xrotvel = 0;
 	player[0].zrotvel = 0;
+
+	for (int i = 0; i < spherelist.size(); ++i)
+	{
+		spherelist[i].xrot = 0;
+		spherelist[i].zrot = 0;
+		spherelist[i].xrotvel = 0;
+		spherelist[i].zrotvel = 0;
+	}
 
 	newcampos = glm::vec3{ player[0].pos.x,player[0].pos.y + 10.f,player[0].pos.z };
 	camera.pos = newcampos;
@@ -524,7 +633,7 @@ void SceneBumperBalls::InitGame() {
 
 	for (int i = 0; i < spherelist.size(); i++) {
 		spherelist[i].vel = glm::vec3{ 0,0,0 };
-		spherelist[0].bounciness = 0.2f;
+		spherelist[i].bounciness = 0.2f;
 	}
 	cylinderlist.push_back(Cylinder(101, GameObject::CYLINDER, 70.f, 28.f));
 	cylinderlist[0].pos = glm::vec3{ 0,-36,0 };

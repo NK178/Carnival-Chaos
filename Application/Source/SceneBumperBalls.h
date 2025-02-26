@@ -145,6 +145,13 @@ private:
 
 	struct Sphere : public GameObject {
 		float radius;
+		glm::vec3 target;
+		char lat;
+		char vert;
+		float xrot;
+		float zrot;
+		float xrotvel;
+		float zrotvel;
 		Sphere(int id, float r, int type) : radius(r), GameObject(id, type) {}
 	};
 	struct PlayerBall : public GameObject {
@@ -169,7 +176,8 @@ private:
 	bool gamestart = false; 
 	bool gamelose = false;
 	const float PLAYER_SPEED = 50.f;
-
+	int ballcount = 4;
+	bool isballactive[4] = { true,true,true,true };
 	bool isObjectiveRead = false;
 	float countdown = 4.f;
 };

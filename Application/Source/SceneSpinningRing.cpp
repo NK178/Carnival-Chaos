@@ -550,7 +550,7 @@ void SceneSpinningRing::Render()
 	// Render Spinners
 	{
 		modelStack.PushMatrix();
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		modelStack.Translate(0.f, 15.f, 0.f);
 		modelStack.Rotate(wallRotation, 0.f, 1.f, 0.f);
 		modelStack.Scale(30.f, 30.f, 50.f);
@@ -559,11 +559,11 @@ void SceneSpinningRing::Render()
 		meshList[GEO_SPINNER]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
 		meshList[GEO_SPINNER]->material.kShininess = 1.0f;
 		RenderMesh(meshList[GEO_SPINNER], true);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		modelStack.PopMatrix();
 
 		modelStack.PushMatrix();
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		modelStack.Translate(0.f, 5.f, 0.f);
 		modelStack.Rotate(beamRotation, 0.f, 1.f, 0.f);
 		modelStack.Scale(50.f, 30.f, 50.f);
@@ -572,7 +572,7 @@ void SceneSpinningRing::Render()
 		meshList[GEO_SPINNER2]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
 		meshList[GEO_SPINNER2]->material.kShininess = 1.0f;
 		RenderMesh(meshList[GEO_SPINNER2], true);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		modelStack.PopMatrix();
 	}
 
@@ -587,61 +587,61 @@ void SceneSpinningRing::Render()
 	RenderMesh(meshList[GEO_CYLINDER], true);
 	modelStack.PopMatrix();
 
-	for (int j = 0; j < spinningWallSideVertices.size(); j++) {
-		for (int i = 0; i < wallSideList[j].vertices.size(); i++) {
-			modelStack.PushMatrix();
-			modelStack.Translate(spinningWallSideVertices[j][i].x, spinningWallSideVertices[j][i].y, spinningWallSideVertices[j][i].z);
-			modelStack.Scale(0.1, 0.1, 0.1);
-			meshList[GEO_SPHERE]->material.kAmbient;
-			meshList[GEO_SPHERE]->material.kDiffuse;
-			meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-			meshList[GEO_SPHERE]->material.kShininess = 2.0f;
-			RenderMesh(meshList[GEO_SPHERE], true);
-			modelStack.PopMatrix();
-		}
-	}
+	//for (int j = 0; j < spinningWallSideVertices.size(); j++) {
+	//	for (int i = 0; i < wallSideList[j].vertices.size(); i++) {
+	//		modelStack.PushMatrix();
+	//		modelStack.Translate(spinningWallSideVertices[j][i].x, spinningWallSideVertices[j][i].y, spinningWallSideVertices[j][i].z);
+	//		modelStack.Scale(0.1, 0.1, 0.1);
+	//		meshList[GEO_SPHERE]->material.kAmbient;
+	//		meshList[GEO_SPHERE]->material.kDiffuse;
+	//		meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	//		meshList[GEO_SPHERE]->material.kShininess = 2.0f;
+	//		RenderMesh(meshList[GEO_SPHERE], true);
+	//		modelStack.PopMatrix();
+	//	}
+	//}
 
-	for (int j = 0; j < spinningWallTopVertices.size(); j++) {
-		for (int i = 0; i < wallTopList[j].vertices.size(); i++) {
-			modelStack.PushMatrix();
-			modelStack.Translate(spinningWallTopVertices[j][i].x, spinningWallTopVertices[j][i].y, spinningWallTopVertices[j][i].z);
-			modelStack.Scale(0.1, 0.1, 0.1);
-			meshList[GEO_SPHERE]->material.kAmbient;
-			meshList[GEO_SPHERE]->material.kDiffuse;
-			meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-			meshList[GEO_SPHERE]->material.kShininess = 2.0f;
-			RenderMesh(meshList[GEO_SPHERE], true);
-			modelStack.PopMatrix();
-		}
-	}
+	//for (int j = 0; j < spinningWallTopVertices.size(); j++) {
+	//	for (int i = 0; i < wallTopList[j].vertices.size(); i++) {
+	//		modelStack.PushMatrix();
+	//		modelStack.Translate(spinningWallTopVertices[j][i].x, spinningWallTopVertices[j][i].y, spinningWallTopVertices[j][i].z);
+	//		modelStack.Scale(0.1, 0.1, 0.1);
+	//		meshList[GEO_SPHERE]->material.kAmbient;
+	//		meshList[GEO_SPHERE]->material.kDiffuse;
+	//		meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	//		meshList[GEO_SPHERE]->material.kShininess = 2.0f;
+	//		RenderMesh(meshList[GEO_SPHERE], true);
+	//		modelStack.PopMatrix();
+	//	}
+	//}
 
-	for (int j = 0; j < middleWallVertices.size(); j++) {
-		for (int i = 0; i < middleWall[j].vertices.size(); i++) {
-			modelStack.PushMatrix();
-			modelStack.Translate(middleWallVertices[j][i].x, middleWallVertices[j][i].y, middleWallVertices[j][i].z);
-			modelStack.Scale(0.1, 0.1, 0.1);
-			meshList[GEO_SPHERE]->material.kAmbient;
-			meshList[GEO_SPHERE]->material.kDiffuse;
-			meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-			meshList[GEO_SPHERE]->material.kShininess = 2.0f;
-			RenderMesh(meshList[GEO_SPHERE], true);
-			modelStack.PopMatrix();
-		}
-	}
+	//for (int j = 0; j < middleWallVertices.size(); j++) {
+	//	for (int i = 0; i < middleWall[j].vertices.size(); i++) {
+	//		modelStack.PushMatrix();
+	//		modelStack.Translate(middleWallVertices[j][i].x, middleWallVertices[j][i].y, middleWallVertices[j][i].z);
+	//		modelStack.Scale(0.1, 0.1, 0.1);
+	//		meshList[GEO_SPHERE]->material.kAmbient;
+	//		meshList[GEO_SPHERE]->material.kDiffuse;
+	//		meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	//		meshList[GEO_SPHERE]->material.kShininess = 2.0f;
+	//		RenderMesh(meshList[GEO_SPHERE], true);
+	//		modelStack.PopMatrix();
+	//	}
+	//}
 
-	for (int j = 0; j < spinningBeamVertices.size(); j++) {
-		for (int i = 0; i < beamList[j].vertices.size(); i++) {
-			modelStack.PushMatrix();
-			modelStack.Translate(spinningBeamVertices[j][i].x, spinningBeamVertices[j][i].y, spinningBeamVertices[j][i].z);
-			modelStack.Scale(0.1, 0.1, 0.1);
-			meshList[GEO_SPHERE]->material.kAmbient;
-			meshList[GEO_SPHERE]->material.kDiffuse;
-			meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-			meshList[GEO_SPHERE]->material.kShininess = 2.0f;
-			RenderMesh(meshList[GEO_SPHERE], true);
-			modelStack.PopMatrix();
-		}
-	}
+	//for (int j = 0; j < spinningBeamVertices.size(); j++) {
+	//	for (int i = 0; i < beamList[j].vertices.size(); i++) {
+	//		modelStack.PushMatrix();
+	//		modelStack.Translate(spinningBeamVertices[j][i].x, spinningBeamVertices[j][i].y, spinningBeamVertices[j][i].z);
+	//		modelStack.Scale(0.1, 0.1, 0.1);
+	//		meshList[GEO_SPHERE]->material.kAmbient;
+	//		meshList[GEO_SPHERE]->material.kDiffuse;
+	//		meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	//		meshList[GEO_SPHERE]->material.kShininess = 2.0f;
+	//		RenderMesh(meshList[GEO_SPHERE], true);
+	//		modelStack.PopMatrix();
+	//	}
+	//}
 
 	if (!isObjectiveRead) { // Render Objective
 		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 30);
@@ -760,6 +760,39 @@ void SceneSpinningRing::Exit()
 	}
 	glDeleteVertexArrays(1, &m_vertexArrayID);
 	glDeleteProgram(m_programID);
+
+	//// delete collision boxes
+	//{
+	//	for (auto& box : player)
+	//	{
+	//		delete& box;
+	//	}
+	//	player.clear();
+
+	//	for (auto& box : wallSideList)
+	//	{
+	//		delete& box;
+	//	}
+	//	wallSideList.clear();
+
+	//	for (auto& box : wallTopList)
+	//	{
+	//		delete& box;
+	//	}
+	//	wallTopList.clear();
+
+	//	for (auto& box : middleWall)
+	//	{
+	//		delete& box;
+	//	}
+	//	middleWall.clear();
+
+	//	for (auto& box : beamList)
+	//	{
+	//		delete& box;
+	//	}
+	//	beamList.clear();
+	//}
 }
 
 void SceneSpinningRing::HandleKeyPress()

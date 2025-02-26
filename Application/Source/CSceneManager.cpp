@@ -176,7 +176,7 @@ Scene* CSceneManager::CreateScene(SCENE_TYPE sceneType)
     case SCENE_BUMPERBALLS:
         scene = new SceneBumperBalls();
         break;
-    case SCENE_SPINNING_RING:
+    case SCENE_SPINNINGRING:
         scene = new SceneSpinningRing();
         break;
     case SCENE_FINAL:
