@@ -117,6 +117,7 @@ public:
 	~SceneFinal();
 
 	virtual void Init();
+	bool CheckRayBalloonCollision(glm::vec3 rayOrigin, glm::vec3 rayDirection);
 	virtual void Update(double dt);
 	virtual void Render();
 	virtual void Exit();
