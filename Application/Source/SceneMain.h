@@ -254,6 +254,11 @@ private:
 		sideBoundaryBox(int id, int type) : GameObject(id, type) {}
 	};
 
+	struct moneyBagBox : public GameObject {
+		glm::vec3 boundaryDimensions{ 2.f,20.f,10.f };
+		moneyBagBox(int id, int type) : GameObject(id, type) {}
+	};
+
 	std::vector<playerBox> player;
 	std::vector<tentBoxes> tentList;
 	std::vector<finalTentBox> finalTent;
@@ -261,6 +266,7 @@ private:
 	std::vector<frontFenceBox> frontFenceList;
 	std::vector<frontBoundaryBox> frontBoundary;
 	std::vector<sideBoundaryBox> sideBoundary;
+	std::vector<moneyBagBox> moneyBag;
 
 	Application app;
 

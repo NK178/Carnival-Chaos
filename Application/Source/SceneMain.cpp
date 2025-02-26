@@ -788,19 +788,6 @@ void SceneMain::Render()
 				modelStack.Scale(0.05f, 0.05f, 0.05f);
 				RenderMesh(meshList[GEO_TENT], true);
 				modelStack.PopMatrix();
-
-				//modelStack.PushMatrix();
-				//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-				//modelStack.Translate(finalTent[0].pos.x, finalTent[0].pos.y, finalTent[0].pos.z);
-				//modelStack.Rotate(finalTent[0].angleDeg, 0, 1, 0);
-				//modelStack.Scale(2 * finalTent[0].tentDimensions.x, 2 * finalTent[0].tentDimensions.y, 2 * finalTent[0].tentDimensions.z);
-				//meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-				//meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-				//meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-				//meshList[GEO_CUBE]->material.kShininess = 1.0f;
-				//RenderMesh(meshList[GEO_CUBE], true);
-				//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-				//modelStack.PopMatrix();
 			}
 		}
 	}
@@ -1048,62 +1035,6 @@ void SceneMain::Render()
 	//	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	//	modelStack.PopMatrix();
 	//}
-
-	//for (int n = 0; n < sideFenceList.size(); n++) {
-	//	modelStack.PushMatrix();
-	//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	//	modelStack.Translate(sideFenceList[n].pos.x, sideFenceList[n].pos.y, sideFenceList[n].pos.z);
-	//	modelStack.Rotate(sideFenceList[n].angleDeg, 0, 1, 0);
-	//	modelStack.Scale(2 * sideFenceList[n].fenceDimensions.x, 2 * sideFenceList[n].fenceDimensions.y, 2 * sideFenceList[n].fenceDimensions.z);
-	//	meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-	//	meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-	//	meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	//	meshList[GEO_CUBE]->material.kShininess = 1.0f;
-	//	RenderMesh(meshList[GEO_CUBE], true);
-	//	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	//	modelStack.PopMatrix();
-	//}
-	//for (int n = 0; n < frontFenceList.size(); n++) {
-	//	modelStack.PushMatrix();
-	//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	//	modelStack.Translate(frontFenceList[n].pos.x, frontFenceList[n].pos.y, frontFenceList[n].pos.z);
-	//	modelStack.Rotate(frontFenceList[n].angleDeg, 0, 1, 0);
-	//	modelStack.Scale(2 * frontFenceList[n].fenceDimensions.x, 2 * frontFenceList[n].fenceDimensions.y, 2 * frontFenceList[n].fenceDimensions.z);
-	//	meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-	//	meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-	//	meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	//	meshList[GEO_CUBE]->material.kShininess = 1.0f;
-	//	RenderMesh(meshList[GEO_CUBE], true);
-	//	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	//	modelStack.PopMatrix();
-	//}
-	//for (int n = 0; n < sideBoundary.size(); n++) {
-	//	modelStack.PushMatrix();
-	//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	//	modelStack.Translate(sideBoundary[n].pos.x, sideBoundary[n].pos.y, sideBoundary[n].pos.z);
-	//	modelStack.Rotate(sideBoundary[n].angleDeg, 0, 1, 0);
-	//	modelStack.Scale(2 * sideBoundary[n].boundaryDimensions.x, 2 * sideBoundary[n].boundaryDimensions.y, 2 * sideBoundary[n].boundaryDimensions.z);
-	//	meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-	//	meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-	//	meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	//	meshList[GEO_CUBE]->material.kShininess = 1.0f;
-	//	RenderMesh(meshList[GEO_CUBE], true);
-	//	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	//	modelStack.PopMatrix();
-	//}
-
-	//modelStack.PushMatrix();
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	//modelStack.Translate(frontBoundary[0].pos.x, frontBoundary[0].pos.y, frontBoundary[0].pos.z);
-	//modelStack.Rotate(frontBoundary[0].angleDeg, 0, 1, 0);
-	//modelStack.Scale(2 * frontBoundary[0].boundaryDimensions.x, 2 * frontBoundary[0].boundaryDimensions.y, 2 * frontBoundary[0].boundaryDimensions.z);
-	//meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-	//meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-	//meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	//meshList[GEO_CUBE]->material.kShininess = 1.0f;
-	//RenderMesh(meshList[GEO_CUBE], true);
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	//modelStack.PopMatrix();
 }
 
 // boolean to check if player complete all 6 minigames
