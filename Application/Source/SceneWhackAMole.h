@@ -32,6 +32,8 @@ public:
 
 		//Text
 		GEO_TEXT,
+		GEO_UI,
+		GEO_KEY_E,
 
 		//SKybox
 		GEO_LEFT,
@@ -303,10 +305,12 @@ private:
 	bool isattack = true;
 	bool gamestart = false; 
 	bool isplayerhit = false;
-	bool iscameramove = true;
+	bool iscameramove = false;
+	bool gamewin = false;
 
 	//Testing 
 	bool shockwave = false;
+	bool isObjectiveRead = false;
 
 
 
