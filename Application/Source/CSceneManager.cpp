@@ -82,8 +82,68 @@ void CSceneManager::PushScene(SCENE_TYPE newScene)
     }
 }
 
+//void CSceneManager::PopScene()
+//{
+//    // Pop scenes until we reach the Carnival scene
+//    while (sceneStack.size() > 1 && currentSceneType != SCENE_CARNIVAL)
+//    {
+//        Scene* currentScene = sceneStack.top();
+//        currentScene->Exit();  // Properly exit the scene to clean up resources
+//        delete currentScene;
+//        sceneStack.pop();
+//        typeStack.pop();
+//
+//        if (!typeStack.empty())
+//        {
+//            currentSceneType = typeStack.top();
+//        }
+//    }
+//
+//    // If we're already at Carnival, reinitialize it to reset its state
+//    if (currentSceneType == SCENE_CARNIVAL)
+//    {
+//        std::cout << "Already at Carnival scene. Reinitializing the carnival scene." << std::endl;
+//        Scene* carnivalScene = sceneStack.top();
+//
+//        // First properly exit to clean up all resources
+//        carnivalScene->Exit();
+//
+//        // Then reinitialize completely (this should recreate all objects from scratch)
+//        carnivalScene->Init();
+//
+//        return;
+//    }
+//}
+
 void CSceneManager::PopScene()
 {
+    // Check if we're returning to the Carnival scene
+    bool returningToCarnival = false;
+    if (sceneStack.size() > 1) {
+        // Check the second scene from the top (the one we'll return to)
+        Scene* temp = nullptr;
+        Scene* topScene = sceneStack.top();
+        sceneStack.pop();
+        if (!sceneStack.empty()) {
+            temp = sceneStack.top();
+            if (typeStack.size() > 1) {
+                std::stack<SCENE_TYPE> tempStack = typeStack;
+                tempStack.pop();
+                SCENE_TYPE nextType = tempStack.top();
+                if (nextType == SCENE_CARNIVAL) {
+                    returningToCarnival = true;
+                    // Save state before we exit SceneMain
+                    SceneMain* mainScene = dynamic_cast<SceneMain*>(temp);
+                    if (mainScene) {
+                        mainScene->SaveState();
+                    }
+                }
+            }
+        }
+        // Put top scene back
+        sceneStack.push(topScene);
+    }
+
     // Pop scenes until we reach the Carnival scene
     while (sceneStack.size() > 1 && currentSceneType != SCENE_CARNIVAL)
     {
@@ -99,18 +159,25 @@ void CSceneManager::PopScene()
         }
     }
 
-    // If we're already at Carnival, reinitialize it to reset its state
-    if (currentSceneType == SCENE_CARNIVAL)
+    // If we're already at Carnival, reinitialize it but restore the state
+    if (currentSceneType == SCENE_CARNIVAL && returningToCarnival)
+    {
+        std::cout << "Returning to Carnival scene with preserved state." << std::endl;
+        Scene* carnivalScene = sceneStack.top();
+
+        // Exit and reinitialize scene (RestoreState will be called in Init)
+        carnivalScene->Exit();
+        carnivalScene->Init();
+
+        return;
+    }
+    // If we're at Carnival but not returning from a game, just reinitialize normally
+    else if (currentSceneType == SCENE_CARNIVAL)
     {
         std::cout << "Already at Carnival scene. Reinitializing the carnival scene." << std::endl;
         Scene* carnivalScene = sceneStack.top();
-
-        // First properly exit to clean up all resources
         carnivalScene->Exit();
-
-        // Then reinitialize completely (this should recreate all objects from scratch)
         carnivalScene->Init();
-
         return;
     }
 }

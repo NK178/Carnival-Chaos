@@ -18,6 +18,9 @@
 #include "LoadTGA.h"
 #include <iostream>
 
+bool SceneMain::hasStateToRestore = false;
+SceneMain::SavedState SceneMain::savedState = { {false}, false, false, false, false };
+
 SceneMain::SceneMain()
 {
 	for (int i = 0; i < 6; i++) {
@@ -426,6 +429,27 @@ void SceneMain::Init()
 	cutsceneSkipped = false;
 
 	UpdateSignText();
+
+	if (hasStateToRestore) {
+		RestoreState();
+	}
+}
+
+void SceneMain::RestoreState() {
+	if (hasStateToRestore && savedState.isInitialized) {
+		// Restore the saved state
+		for (int i = 0; i < 6; i++) {
+			tentCompleted[i] = savedState.tentCompleted[i];
+		}
+		hasReadSign = savedState.hasReadSign;
+		hasPlayedCutsceneDialogue = savedState.hasPlayedCutsceneDialogue;
+		isFinalChallengeCompleted = savedState.isFinalChallengeCompleted;
+
+		// Make sure dialogue flags are properly reset
+		isSignDialogueActive = false;
+		isCutsceneDialogueActive = false;
+		readSign = false;
+	}
 }
 
 void SceneMain::Update(double dt)
@@ -1118,6 +1142,21 @@ void SceneMain::Render()
 	//RenderMesh(meshList[GEO_CUBE], true);
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	//modelStack.PopMatrix();
+}
+
+// Implement the state methods
+void SceneMain::SaveState() {
+	// Save all important state variables
+	for (int i = 0; i < 6; i++) {
+		savedState.tentCompleted[i] = tentCompleted[i];
+	}
+	savedState.hasReadSign = hasReadSign;
+	savedState.hasPlayedCutsceneDialogue = true; // Force to true to prevent cutscene replay
+	savedState.isFinalChallengeCompleted = isFinalChallengeCompleted;
+	savedState.isInitialized = true;
+
+	// Set flag to indicate we have state to restore
+	hasStateToRestore = true;
 }
 
 // boolean to check if player complete all 6 minigames

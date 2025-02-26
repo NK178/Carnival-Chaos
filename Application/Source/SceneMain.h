@@ -133,8 +133,10 @@ public:
 	~SceneMain();
 
 	virtual void Init();
+	void RestoreState();
 	virtual void Update(double dt);
 	virtual void Render();
+	void SaveState();
 	virtual void Exit();
 
      bool shouldEnterArchery = false;      // Flag to enter the archery minigame
@@ -145,7 +147,16 @@ public:
      bool shouldEnterSpinningRing = false; // Flag to enter the spinning ring minigame
      bool shouldEnterFinal = false;        // Flag to enter the final scene
 
+	 static bool hasStateToRestore;
 private:
+	static struct SavedState {
+		bool tentCompleted[6];
+		bool hasReadSign;
+		bool hasPlayedCutsceneDialogue;
+		bool isFinalChallengeCompleted;
+		bool isInitialized;
+	} savedState;
+
 	void HandleKeyPress();
 	void RenderMesh(Mesh* mesh, bool enableLight);
 
