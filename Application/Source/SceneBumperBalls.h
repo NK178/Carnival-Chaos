@@ -137,7 +137,7 @@ private:
 	void RenderText(Mesh* mesh, std::string text, glm::vec3 color);
 	void RenderTextOnScreen(Mesh* mesh, std::string text, glm::vec3 color, float size, float x, float y);
 	void Material(GEOMETRY_TYPE obj, float AmR, float AmG, float AmB, float DifA, float DifG, float DifB, float SpA, float SpG, float SpB, float Shiny);
-	void UpdateMovement();
+	void UpdateMovement(float dt);
 	void RenderSkyBox();
 	void InitGame();
 
@@ -147,7 +147,11 @@ private:
 	};
 	struct PlayerBall : public GameObject {
 		float radius;
-		PlayerBall(int id, float r, int type) : radius(r), GameObject(id, type) {}
+		float xrot; 
+		float zrot;
+		float xrotvel;
+		float zrotvel;
+		PlayerBall(int id, float r, int type) : radius(r), xrot(0), zrot(0), xrotvel(0), zrotvel(0),GameObject(id, type) {}
 	};
 	struct Cylinder : public GameObject {
 		float height;

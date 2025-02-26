@@ -138,17 +138,17 @@ void SceneBumperBalls::Init()
 	//GEO_BASKETBALL
 	//skybox
 	meshList[GEO_LEFT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_LEFT]->textureID = LoadTGA("Images//day-at-the-beach_rt.tga");
+	meshList[GEO_LEFT]->textureID = LoadTGA("Images//circus_skybox.tga");
 	meshList[GEO_RIGHT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_RIGHT]->textureID = LoadTGA("Images//day-at-the-beach_lf.tga");
+	meshList[GEO_RIGHT]->textureID = LoadTGA("Images//circus_skybox.tga");
 	meshList[GEO_TOP] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_TOP]->textureID = LoadTGA("Images//day-at-the-beach_up.tga");
+	meshList[GEO_TOP]->textureID = LoadTGA("Images//tenttop.tga");
 	meshList[GEO_BOTTOM] = MeshBuilder::GenerateQuad("Plane",glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_BOTTOM]->textureID = LoadTGA("Images//day-at-the-beach_dn.tga");
+	meshList[GEO_BOTTOM]->textureID = LoadTGA("Images//floorcircus.tga");
 	meshList[GEO_FRONT] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_FRONT]->textureID = LoadTGA("Images//day-at-the-beach_ft.tga");
+	meshList[GEO_FRONT]->textureID = LoadTGA("Images//circus_skybox.tga");
 	meshList[GEO_BACK] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
-	meshList[GEO_BACK]->textureID = LoadTGA("Images//day-at-the-beach_bk.tga");
+	meshList[GEO_BACK]->textureID = LoadTGA("Images//circus_skybox.tga");
 
 	// 16 x 16 is the number of columns and rows for the text
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16,16);
@@ -159,7 +159,7 @@ void SceneBumperBalls::Init()
 
 	glUniform1i(m_parameters[U_NUMLIGHTS], NUM_LIGHTS);
 
-	light[0].position = glm::vec3(30, 30, 0);
+	light[0].position = glm::vec3(83, 129, 5.6);
 	light[0].color = glm::vec3(1, 1, 1);
 	light[0].type = Light::LIGHT_DIRECTIONAL;
 	light[0].power = 1.f;
@@ -171,15 +171,15 @@ void SceneBumperBalls::Init()
 	light[0].exponent = 3.f;
 	light[0].spotDirection = glm::vec3(0.f, 1.f, 0.f);
 
-	light[1].position = glm::vec3(0, 3, 0);
-	light[1].color = glm::vec3(1, 1, 1);
+	light[1].position = glm::vec3(83, 129, 5.6);
+	light[1].color = glm::vec3(0.8, 0.8, 1);
 	light[1].type = Light::LIGHT_SPOT;
 	light[1].power = 0.4f;
 	light[1].kC = 1.f;
 	light[1].kL = 0.01f;
 	light[1].kQ = 0.001f;
-	light[1].cosCutoff = 45.f;
-	light[1].cosInner = 30.f;
+	light[1].cosCutoff = 70.f;
+	light[1].cosInner = 50.f;
 	light[1].exponent = 3.f;
 	light[1].spotDirection = glm::vec3(0.f, 1.f, 0.f);
 
@@ -263,25 +263,31 @@ void SceneBumperBalls::Update(double dt)
 {
 
 	HandleKeyPress();
-	const float SPEED = 15.f;
+	const float SPEED = 30.f;
 	if (KeyboardController::GetInstance()->IsKeyDown('I'))
-		spherelist[0].pos.x -= static_cast<float>(dt) * SPEED;
+		light[1].position.z -= static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('K'))
-		spherelist[0].pos.x += static_cast<float>(dt) * SPEED;
+		light[1].position.z += static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('J'))
-		spherelist[0].pos.z -= static_cast<float>(dt) * SPEED;
+		light[1].position.x -= static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('L'))
-		spherelist[0].pos.z += static_cast<float>(dt) * SPEED;
+		light[1].position.x += static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('O'))
-		spherelist[0].pos.y -= static_cast<float>(dt) * SPEED;
+		light[1].position.y -= static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('P'))
-		spherelist[0].pos.y += static_cast<float>(dt) * SPEED;
+		light[1].position.y += static_cast<float>(dt) * SPEED;
+
+	std::cout << light[0].position.x << " " << light[0].position.y << " " << light[0].position.z << std::endl;
 
 	glm::vec3 viewDir = glm::normalize(camera.target - camera.pos);
 
 	if (gamestart) {
 
-		UpdateMovement();
+		UpdateMovement(dt);
+
+		//ball rotation
+		player[0].xrot += player[0].xrotvel * dt;
+		player[0].zrot += player[0].zrotvel * dt;
 
 		CollisionData cd;
 		newcampos = glm::vec3{ player[0].pos.x,player[0].pos.y + 10.f,player[0].pos.z };
@@ -348,7 +354,6 @@ void SceneBumperBalls::Update(double dt)
 		InitGame();
 
 
-
 }
 
 void SceneBumperBalls::Render()
@@ -403,18 +408,20 @@ void SceneBumperBalls::Render()
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Translate(light[0].position.x, light[0].position.y, light[0].position.z);
-	modelStack.Scale(0.1f, 0.1f, 0.1f);
+	modelStack.Translate(light[1].position.x, light[1].position.y, light[1].position.z);
+	modelStack.Scale(1.f, 1.f,1.f);
 	RenderMesh(meshList[GEO_SPHERE], false);
 	modelStack.PopMatrix();
 
-
+	//Player 
 	modelStack.PushMatrix();
 	modelStack.Translate(player[0].pos.x, player[0].pos.y, player[0].pos.z);
+	modelStack.Rotate(player[0].xrot, 1, 0, 0);
+	modelStack.Rotate(player[0].zrot,0,0,1);
 	modelStack.Scale(0.05*player[0].radius, 0.05* player[0].radius, 0.05*player[0].radius);
-	meshList[GEO_BEACHBALL]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-	meshList[GEO_BEACHBALL]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-	meshList[GEO_BEACHBALL]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	meshList[GEO_BEACHBALL]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+	meshList[GEO_BEACHBALL]->material.kDiffuse = glm::vec3(0.6f, 0.6f, 0.6f);
+	meshList[GEO_BEACHBALL]->material.kSpecular = glm::vec3(0.3f, 0.3f, 0.3f);
 	meshList[GEO_BEACHBALL]->material.kShininess = 1.0f;
 	RenderMesh(meshList[GEO_BEACHBALL], true);
 	modelStack.PopMatrix();
@@ -424,9 +431,9 @@ void SceneBumperBalls::Render()
 		modelStack.PushMatrix();
 		modelStack.Translate(spherelist[i].pos.x, spherelist[i].pos.y, spherelist[i].pos.z);
 		modelStack.Scale(0.05*spherelist[i].radius, 0.05*spherelist[i].radius, 0.05*spherelist[i].radius);
-		meshList[GEO_BEACHBALL]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-		meshList[GEO_BEACHBALL]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-		meshList[GEO_BEACHBALL]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+		meshList[GEO_BEACHBALL]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+		meshList[GEO_BEACHBALL]->material.kDiffuse = glm::vec3(0.6f, 0.6f, 0.6f);
+		meshList[GEO_BEACHBALL]->material.kSpecular = glm::vec3(0.3f, 0.3f, 0.3f);
 		meshList[GEO_BEACHBALL]->material.kShininess = 1.0f;
 		RenderMesh(meshList[GEO_BEACHBALL], true);
 		modelStack.PopMatrix();
@@ -435,25 +442,12 @@ void SceneBumperBalls::Render()
 	modelStack.PushMatrix();
 	modelStack.Translate(0,-100,0);
 	modelStack.Scale(0.8, 1.f, 0.8f);
-	meshList[GEO_BARREL]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-	meshList[GEO_BARREL]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_BARREL]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+	meshList[GEO_BARREL]->material.kDiffuse = glm::vec3(0.7f, 0.7f, 0.7f);
 	meshList[GEO_BARREL]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
 	meshList[GEO_BARREL]->material.kShininess = 1.0f;
 	RenderMesh(meshList[GEO_BARREL], true);
 	modelStack.PopMatrix();
-
-	////Cylidner 
-	//modelStack.PushMatrix();
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	//modelStack.Translate(cylinderlist[0].pos.x, cylinderlist[0].pos.y, cylinderlist[0].pos.z);
-	//modelStack.Scale(cylinderlist[0].radius, cylinderlist[0].height, cylinderlist[0].radius);
-	//meshList[GEO_CYLINDER]->material.kAmbient = glm::vec3(0.5f, 0.1f, 0.1f);
-	//meshList[GEO_CYLINDER]->material.kDiffuse = glm::vec3(0.7f, 0.5f, 0.5f);
-	//meshList[GEO_CYLINDER]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	//meshList[GEO_CYLINDER]->material.kShininess = 1.0f;
-	//RenderMesh(meshList[GEO_CYLINDER], true);
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	//modelStack.PopMatrix();
 
 	if (gamelose) {
 		RenderTextOnScreen(meshList[GEO_TEXT], "Game Over!", glm::vec3(1, 0, 0), 40, 200, 400);
@@ -472,6 +466,10 @@ void SceneBumperBalls::InitGame() {
 	player[0].pos = glm::vec3{ -16,3,-3 };
 	player[0].bounciness = 0.2f;
 	player[0].vel = glm::vec3{ 0,0,0 };
+	player[0].xrot = 0;
+	player[0].zrot = 0;
+	player[0].xrotvel = 0;
+	player[0].zrotvel = 0;
 
 	spherelist[0].pos = glm::vec3{ 10,3,10 };
 	spherelist[1].pos = glm::vec3{ -10,3,15 };
@@ -734,22 +732,27 @@ void SceneBumperBalls::Material(GEOMETRY_TYPE obj, float AmR, float AmG, float A
 	meshList[obj]->material.kShininess = Shiny;
 }
 
-void SceneBumperBalls::UpdateMovement()
+void SceneBumperBalls::UpdateMovement(float dt)
 {
+	const float BALL_ROT = 150.f;
 	glm::vec3 view = glm::normalize(camera.target - camera.pos); 
 	glm::vec3 right = glm::normalize(glm::cross(view, glm::vec3{ 0,1,0 }));
 	//INVERSED CONTROLS
 	if (KeyboardController::GetInstance()->IsKeyDown('W')) {
 		player[0].AddForce(-view *PLAYER_SPEED);
+		player[0].zrotvel += BALL_ROT* dt;
 	}
 	if (KeyboardController::GetInstance()->IsKeyDown('S')) {
 		player[0].AddForce(view * PLAYER_SPEED);
+		player[0].zrotvel -= BALL_ROT * dt;
 	}
 	if (KeyboardController::GetInstance()->IsKeyDown('A')) {
 		player[0].AddForce(right *PLAYER_SPEED);
+		player[0].xrotvel += BALL_ROT * dt;
 	}
 	if (KeyboardController::GetInstance()->IsKeyDown('D')) {
 		player[0].AddForce(-right *PLAYER_SPEED);
+		player[0].xrotvel -= BALL_ROT * dt;
 	}
 }
 
