@@ -44,7 +44,7 @@ SceneFinal::SceneFinal()
 	}
 
 	m_balloonSpawnTimer = 0.0f;
-	m_balloonSpawnInterval = 10.0f; // Spawn a balloon every 3 seconds
+	m_balloonSpawnInterval = 15.0f; // Spawn a balloon every 15 seconds
 
 }
 
@@ -542,25 +542,16 @@ void SceneFinal::Update(double dt) {
 		m_balloonSpawnTimer += dt;
 		if (m_balloonSpawnTimer >= m_balloonSpawnInterval) {
 			m_balloonSpawnTimer = 0.0f;
-			// Count how many balloons are active
-			int activeCount = 0;
+
+			// Activate all three balloons at once after each interval
 			for (int i = 0; i < MAX_BALLOONS; ++i) {
-				if (m_balloons[i].active)
-					activeCount++;
-			}
-			// If fewer than 3 balloons are active, spawn one
-			if (activeCount < 3) {
-				for (int i = 0; i < MAX_BALLOONS; ++i) {
-					if (!m_balloons[i].active) {
-						m_balloons[i].active = true;
+				m_balloons[i].active = true;
 
-						// Position is based on the offset
-						m_balloons[i].pos = m_cpu.pos + m_balloons[i].offset;
-
-						break; // spawn only one per interval
-					}
-				}
+				// Update positions based on current boss location
+				m_balloons[i].pos = m_cpu.pos + m_balloons[i].offset;
 			}
+
+			std::cout << "All balloons respawned!" << std::endl;
 		}
 	}
 
