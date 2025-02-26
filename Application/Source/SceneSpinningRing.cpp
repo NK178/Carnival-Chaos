@@ -760,6 +760,39 @@ void SceneSpinningRing::Exit()
 	}
 	glDeleteVertexArrays(1, &m_vertexArrayID);
 	glDeleteProgram(m_programID);
+
+	// delete collision boxes
+	{
+		for (auto& box : player)
+		{
+			delete& box;
+		}
+		player.clear();
+
+		for (auto& box : wallSideList)
+		{
+			delete& box;
+		}
+		wallSideList.clear();
+
+		for (auto& box : wallTopList)
+		{
+			delete& box;
+		}
+		wallTopList.clear();
+
+		for (auto& box : middleWall)
+		{
+			delete& box;
+		}
+		middleWall.clear();
+
+		for (auto& box : beamList)
+		{
+			delete& box;
+		}
+		beamList.clear();
+	}
 }
 
 void SceneSpinningRing::HandleKeyPress()
