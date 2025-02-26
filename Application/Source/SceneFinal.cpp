@@ -550,7 +550,6 @@ void SceneFinal::Update(double dt) {
 		}
 	}
 
-
 	if (m_battleStarted && !m_battleEnded) {
 		m_balloonSpawnTimer += dt;
 		if (m_balloonSpawnTimer >= m_balloonSpawnInterval) {
@@ -565,6 +564,16 @@ void SceneFinal::Update(double dt) {
 			}
 
 			std::cout << "All balloons respawned!" << std::endl;
+		}
+	}
+
+	if (isObjectiveRead) {
+		if (countdownTime > 0) {
+			countdownTime -= dt; // decrease countdown time
+			if (countdownTime < 0) {
+				countdownTime = 0; // ensure countdown does not go below 0
+				m_battleStarted = true;
+			}
 		}
 	}
 
@@ -814,32 +823,37 @@ void SceneFinal::Render()
 	RenderSkyBox();
 	RenderDialogue();
 
-	if (!isEnterSceneDialogueActive) {
-		isObjectiveRead = false;
-	}
-	if (!isObjectiveRead) {
-		// render objective
+	if (hasESDialogueCompleted && !isObjectiveRead) {
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 30);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- FINAL CHALLENGE -", glm::vec3(1, 1, 0), 20, 220, 430);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Shoot the Balloons above the", glm::vec3(1, 1, 1), 13, 195, 380);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "boss to decrease its HP!", glm::vec3(1, 1, 1), 14, 225, 350);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Get its HP to 0", glm::vec3(1, 1, 1), 14, 260, 310);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "before timer ends!", glm::vec3(1, 1, 1), 14, 270, 280);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- WASD to move your bumper car", glm::vec3(1, 1, 0), 14, 190, 240);
+
+		RenderMeshOnScreen(meshList[GEO_KEY_E], 310, 200, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Continue", glm::vec3(1, 1, 1), 20, 340, 190);
 	}
 
-	//if (isObjectiveRead) {
-	//	if (countdownTime > 0) {
-	//		std::string countdownText;
-	//		if (countdownTime > 3.0f) {
-	//			countdownText = "3..";
-	//		}
-	//		else if (countdownTime > 2.0f) {
-	//			countdownText = "2..";
-	//		}
-	//		else if (countdownTime > 1.0f) {
-	//			countdownText = "1..";
-	//		}
-	//		else {
-	//			countdownText = "GO!";
-	//			m_battleStarted = true;
-	//		}
-	//		RenderTextOnScreen(meshList[GEO_TEXT2], countdownText, glm::vec3(1, 1, 1), 50, 350, 300);
-	//	}
-	//}
+	if (isObjectiveRead) {
+		if (countdownTime > 0) {
+			std::string countdownText;
+			if (countdownTime > 3.0f) {
+				countdownText = "3..";
+			}
+			else if (countdownTime > 2.0f) {
+				countdownText = "2..";
+			}
+			else if (countdownTime > 1.0f) {
+				countdownText = "1..";
+			}
+			else {
+				countdownText = "GO!";
+			}
+			RenderTextOnScreen(meshList[GEO_TEXT2], countdownText, glm::vec3(1, 1, 1), 50, 350, 300);
+		}
+	}
 
 	if (m_battleStarted) {
 		// Render health label and boss health bar next to each other
@@ -1114,6 +1128,18 @@ void SceneFinal::HandleKeyPress()
 		camera.allowProne = false;
 		camera.allowLocomotiveTilt = true;
 		camera.allowLocomotiveBop = false;
+	}
+
+	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E)) {
+		if (m_playerWon)
+		{
+			// go back to scene main
+		}
+		else if (!isObjectiveRead && hasESDialogueCompleted)
+		{
+			isObjectiveRead = true; // set to true when the objective is read
+			countdownTime = 4.0f;
+		}
 	}
 }
 
