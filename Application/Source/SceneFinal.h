@@ -193,15 +193,26 @@ private:
 
 	std::vector<DialogueLine> enterSceneDialogueLines = {
 		{{"What is this place?"}, false},
-		{{"Hello player."}, false},
+		{{"Hello, player."}, false},
 		{{"A bear?! Who are you?"}, false},
-		{{"I am the ringmaster who", 
-			"oversees the carnival."}, true},
-		{{"I've been watching your movements", 
-			"from afar when you played the games."}, true},
-		{{"You sure want the million dollar",
-			"reward, don't you?"}, true},
+		{{"I am the Ringmaster,",
+		  "the overseer of this carnival."}, true},
+		{{"I've been watching you closely",
+		  "as you played the carnival games."}, true},
+		{{"You truly desire the million-dollar",
+		  "reward, don't you?"}, true},
 		{{"I won't go easy on you!"}, false},
+	};
+
+	bool isBossDefeatedDialogueActive;
+	bool isWinScreenActive;
+
+	std::vector<DialogueLine> bossDefeatDialogueLines = {
+		{{"AHHH!!!"}, false},
+		{{"Whoa! That bear just got blasted",
+		  "into the sky like a rocket..."}, true},
+		{{"I guess I’ve completed the",
+		  "final challenge."}, true},
 	};
 
 	struct Balloon {

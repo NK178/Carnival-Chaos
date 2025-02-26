@@ -32,6 +32,8 @@ SceneFinal::SceneFinal()
 
 	isEnterSceneDialogueActive = true;
 	hasESDialogueCompleted = false;
+	isBossDefeatedDialogueActive = false;
+	isWinScreenActive = false;
 	
 	for (int i = 0; i < MAX_BALLOONS; ++i) {
 		m_balloons[i].active = true;  // Always active
@@ -857,12 +859,35 @@ void SceneFinal::Render()
 
 	if (m_battleStarted) {
 		// Render health label and boss health bar next to each other
+		RenderMeshOnScreen(meshList[GEO_UI], 65, 545, 65, 7);
 		RenderTextOnScreen(meshList[GEO_TEXT], "Health:", glm::vec3(1, 1, 1), 20, 20, 550);
 		float healthPercent = (float)m_bossHealth / 100.0f;
 		
 		RenderMeshOnScreen(meshList[GEO_HEALTHBAR], 260, 560, 200 * healthPercent, 20);
 
-		RenderTextOnScreen(meshList[GEO_TEXT], "Time: " + std::to_string((int)m_battleTimer), glm::vec3(1, 1, 1), 20, 20, 520);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Time Left: " + std::to_string((int)m_battleTimer), glm::vec3(1, 1, 1), 20, 20, 520);
+	}
+
+	if (isWinScreenActive) {
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "YOU WON!", glm::vec3(0, 1, 0), 50, 220, 350);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "You've completed the", glm::vec3(1, 1, 1), 20, 240, 300);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Final Challenge!", glm::vec3(1, 1, 1), 20, 210, 270);
+
+		RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
+	}
+
+	if (m_playerLost) {
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "GAME OVER!", glm::vec3(1, 0, 0), 40, 210, 370);
+
+		RenderTextOnScreen(meshList[GEO_TEXT2], "You ran out of time!", glm::vec3(1, 1, 1), 20, 190, 320);
+
+		RenderMeshOnScreen(meshList[GEO_KEY_R], 350, 270, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Retry", glm::vec3(1, 1, 1), 20, 390, 260);
+		RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
 	}
 
 	// Render vertical line of crosshair
@@ -876,7 +901,7 @@ void SceneFinal::Render()
 }
 
 void SceneFinal::RenderDialogue() {
-	if (isEnterSceneDialogueActive) {
+	if (isEnterSceneDialogueActive || isBossDefeatedDialogueActive) {
 		RenderMeshOnScreen(meshList[GEO_UI], 150, 535, 150, 9);
 		RenderMeshOnScreen(meshList[GEO_KEY_Q], 20, 510, 10, 10);
 		RenderTextOnScreen(meshList[GEO_TEXT], "[ SKIP ]", glm::vec3(1, 1, 1), 15, 40, 505);
@@ -887,10 +912,30 @@ void SceneFinal::RenderDialogue() {
 		return; // exit function early if no dialogue is active
 	}
 
-	// Rendering dialogue for when the player reads the sign
-	RenderMeshOnScreen(meshList[GEO_UI], 150, 550, 150, 6);
 	if (isEnterSceneDialogueActive && currentLineIndex < enterSceneDialogueLines.size()) {
 		const DialogueLine& currentDialogue = enterSceneDialogueLines[currentLineIndex];
+
+		if (currentDialogue.isMultiLine) {
+			std::string textToRender = currentText.substr(0, currentCharIndex);
+			size_t newlinePos = textToRender.find('\n');
+			if (newlinePos != std::string::npos) {
+				std::string firstLine = textToRender.substr(0, newlinePos);
+				std::string secondLine = textToRender.substr(newlinePos + 1);
+				RenderTextOnScreen(meshList[GEO_TEXT], firstLine, glm::vec3(1, 1, 1), 20, 10, 550);
+				RenderTextOnScreen(meshList[GEO_TEXT], secondLine, glm::vec3(1, 1, 1), 20, 10, 530);
+			}
+			else {
+				RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 550);
+			}
+		}
+		else {
+			std::string textToRender = currentText.substr(0, currentCharIndex);
+			RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 550);
+		}
+	}
+
+	if (isBossDefeatedDialogueActive && currentLineIndex < bossDefeatDialogueLines.size()) {
+		const DialogueLine& currentDialogue = bossDefeatDialogueLines[currentLineIndex];
 
 		if (currentDialogue.isMultiLine) {
 			std::string textToRender = currentText.substr(0, currentCharIndex);
@@ -974,6 +1019,72 @@ void SceneFinal::UpdateDialogue(double dt) {
 					isTyping = true;
 					typewriterTimer = 0.0f;
 					const DialogueLine& currentDialogue = enterSceneDialogueLines[currentLineIndex];
+					if (currentDialogue.isMultiLine) {
+						currentText = currentDialogue.textLines[0] + "\n" + currentDialogue.textLines[1];
+					}
+					else {
+						currentText = currentDialogue.textLines[0];
+					}
+					currentCharIndex = 0;
+				}
+			}
+		}
+	}
+
+	if (m_playerWon && !isBossDefeatedDialogueActive && !isWinScreenActive) {
+		isBossDefeatedDialogueActive = true;
+		currentLineIndex = 0;
+		dialogueTimer = 0;
+		isTyping = true;
+		typewriterTimer = 0.0f;
+
+		const DialogueLine& currentDialogue = bossDefeatDialogueLines[currentLineIndex];
+		if (currentDialogue.isMultiLine) {
+			currentText = currentDialogue.textLines[0] + "\n" + currentDialogue.textLines[1];
+		}
+		else {
+			currentText = currentDialogue.textLines[0];
+		}
+		currentCharIndex = 0;
+	}
+
+	// Handle boss defeat dialogue
+	if (isBossDefeatedDialogueActive) {
+		if (KeyboardController::GetInstance()->IsKeyPressed('E')) {
+			if (isTyping) {
+				currentCharIndex = currentText.length(); // Skip text animation
+				isTyping = false;
+			}
+			else {
+				dialogueTimer = 4.0f;
+			}
+		}
+
+		if (isTyping) {
+			typewriterTimer += dt;
+			if (typewriterTimer >= 0.05f) {
+				typewriterTimer = 0.0f;
+				currentCharIndex++;
+				if (currentCharIndex >= currentText.length()) {
+					isTyping = false;
+				}
+			}
+		}
+		else {
+			dialogueTimer += dt;
+			if (dialogueTimer >= 4.0f) {
+				dialogueTimer = 0;
+				currentLineIndex++;
+				if (currentLineIndex >= bossDefeatDialogueLines.size()) {
+					// Boss defeat dialogue ends, show win screen
+					isBossDefeatedDialogueActive = false;
+					isWinScreenActive = true;
+				}
+				else {
+					// Continue to the next line
+					isTyping = true;
+					typewriterTimer = 0.0f;
+					const DialogueLine& currentDialogue = bossDefeatDialogueLines[currentLineIndex];
 					if (currentDialogue.isMultiLine) {
 						currentText = currentDialogue.textLines[0] + "\n" + currentDialogue.textLines[1];
 					}
@@ -1131,7 +1242,7 @@ void SceneFinal::HandleKeyPress()
 	}
 
 	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E)) {
-		if (m_playerWon)
+		if (isWinScreenActive)
 		{
 			// go back to scene main
 		}
