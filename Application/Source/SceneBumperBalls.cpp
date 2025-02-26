@@ -112,8 +112,8 @@ void SceneBumperBalls::Init()
 		m_parameters[U_MATERIAL_SHININESS]);
 
 	// Initialise camera properties
-	camera.Init(glm::vec3(-10, 9, 10), glm::vec3(-10, 4, 0), glm::vec3(0, 1, 0));
-
+	camera.Init(glm::vec3(-16, 13, -3), glm::vec3(-10, 4, 0), glm::vec3(0, 1, 0));
+	 
 	// Init VBO here
 	for (int i = 0; i < NUM_GEOMETRY; ++i)
 	{
@@ -150,9 +150,15 @@ void SceneBumperBalls::Init()
 	meshList[GEO_BACK] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
 	meshList[GEO_BACK]->textureID = LoadTGA("Images//circus_skybox.tga");
 
-	// 16 x 16 is the number of columns and rows for the text
+	//UI
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16,16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Images//calibri.tga");
+	meshList[GEO_KEY_E] = MeshBuilder::GenerateQuad("KeyE", glm::vec3(1.f, 1.f, 1.f), 2.f);
+	meshList[GEO_KEY_E]->textureID = LoadTGA("Images//keyboard_key_e.tga");
+	meshList[GEO_UI] = MeshBuilder::GenerateQuad("UIBox", glm::vec3(0.12f, 0.12f, 0.12f), 10.f);
+
+
+	//GEO_KEY_E
 
 	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 1000.0f);
 	projectionStack.LoadMatrix(projection);
@@ -171,7 +177,7 @@ void SceneBumperBalls::Init()
 	light[0].exponent = 3.f;
 	light[0].spotDirection = glm::vec3(0.f, 1.f, 0.f);
 
-	light[1].position = glm::vec3(83, 129, 5.6);
+	light[1].position = glm::vec3(0, 45, 0);
 	light[1].color = glm::vec3(0.8, 0.8, 1);
 	light[1].type = Light::LIGHT_SPOT;
 	light[1].power = 0.4f;
@@ -277,10 +283,18 @@ void SceneBumperBalls::Update(double dt)
 	if (KeyboardController::GetInstance()->IsKeyDown('P'))
 		light[1].position.y += static_cast<float>(dt) * SPEED;
 
-	std::cout << light[0].position.x << " " << light[0].position.y << " " << light[0].position.z << std::endl;
+	//Instructions 
+	if (KeyboardController::GetInstance()->IsKeyPressed('E') && !gamestart)
+		isObjectiveRead = true;
+
+	if (isObjectiveRead && !gamestart && !gamelose && !gamewin ) {
+		countdown -= dt;
+		if (countdown < 0.f)
+			gamestart = true;
+	}
 
 	glm::vec3 viewDir = glm::normalize(camera.target - camera.pos);
-
+	//Game 
 	if (gamestart) {
 
 		UpdateMovement(dt);
@@ -345,10 +359,9 @@ void SceneBumperBalls::Update(double dt)
 	if (spherelist.size() == 0)
 		gamewin = true;
 
-	if (gamelose || gamewin)
+	if (gamelose || gamewin) {
 		gamestart = false;
-
-	
+	}
 
 	if (KeyboardController::GetInstance()->IsKeyPressed('R') && !gamestart)
 		InitGame();
@@ -449,19 +462,48 @@ void SceneBumperBalls::Render()
 	RenderMesh(meshList[GEO_BARREL], true);
 	modelStack.PopMatrix();
 
+
+	if (!isObjectiveRead) { // Render Objective
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 30);
+		RenderTextOnScreen(meshList[GEO_TEXT], "- BUMPER BALLS -", glm::vec3(1, 1, 0), 25, 200, 430);
+		RenderTextOnScreen(meshList[GEO_TEXT], "- Use WASD to control the ball", glm::vec3(1, 1, 1), 13, 195, 380);
+		RenderTextOnScreen(meshList[GEO_TEXT], "- The controls are inversed!", glm::vec3(1, 1, 1), 14, 205, 350);
+		RenderTextOnScreen(meshList[GEO_TEXT], "- Pressing S moves you fowards", glm::vec3(1, 1, 1), 14, 205, 320);
+		RenderTextOnScreen(meshList[GEO_TEXT], "- Don't fall off the edge!", glm::vec3(1, 1, 1), 14, 210, 290);
+		RenderTextOnScreen(meshList[GEO_TEXT], "- Knock all your opponents off ", glm::vec3(1, 1, 1), 14, 190, 260);
+		RenderTextOnScreen(meshList[GEO_TEXT], "  to win!", glm::vec3(1, 1, 1), 14, 250, 240);
+
+		RenderMeshOnScreen(meshList[GEO_KEY_E], 310, 210, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Continue", glm::vec3(1, 1, 1), 20, 340, 200);
+	}
+	else if (countdown > 0.f && isObjectiveRead){
+		if (countdown < 1.f)
+			RenderTextOnScreen(meshList[GEO_TEXT], "Start!", glm::vec3(0, 1, 0), 40, 350, 400);
+		else
+			RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(static_cast<int>(countdown)), glm::vec3(0, 1, 0), 40, 400, 400);
+	}
+
 	if (gamelose) {
-		RenderTextOnScreen(meshList[GEO_TEXT], "Game Over!", glm::vec3(1, 0, 0), 40, 200, 400);
-		RenderTextOnScreen(meshList[GEO_TEXT], "Press R to restart", glm::vec3(1, 0, 0), 40, 80, 350);
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 30);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Game Over!", glm::vec3(1, 0, 0), 25, 220, 340);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Press R to restart", glm::vec3(1, 0, 0), 25, 190, 300);
 	}
 	if (gamewin) {
-		RenderTextOnScreen(meshList[GEO_TEXT], "Game Win!", glm::vec3(1, 0, 0), 40, 200, 400);
-		RenderTextOnScreen(meshList[GEO_TEXT], "Changing Scene......", glm::vec3(1, 0, 0), 40, 80, 350);
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 30);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Game Win!", glm::vec3(0, 1, 0), 25, 240, 340);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Returning ", glm::vec3(0, 1, 0), 25, 210, 300);
+		RenderTextOnScreen(meshList[GEO_TEXT], "to carnival...", glm::vec3(0, 1, 0), 25, 210, 270);
 	}
 
 
 }
 
 void SceneBumperBalls::InitGame() {
+	spherelist.clear(); //remove all the stuff
+	spherelist.push_back(Sphere(3, 6.f, GameObject::SPHERE));
+	spherelist.push_back(Sphere(4, 6.f, GameObject::SPHERE));
+	spherelist.push_back(Sphere(5, 6.f, GameObject::SPHERE));
+	spherelist.push_back(Sphere(6, 6.f, GameObject::SPHERE));
 
 	player[0].pos = glm::vec3{ -16,3,-3 };
 	player[0].bounciness = 0.2f;
@@ -470,6 +512,10 @@ void SceneBumperBalls::InitGame() {
 	player[0].zrot = 0;
 	player[0].xrotvel = 0;
 	player[0].zrotvel = 0;
+
+	newcampos = glm::vec3{ player[0].pos.x,player[0].pos.y + 10.f,player[0].pos.z };
+	camera.pos = newcampos;
+	camera.target = glm::vec3(-10, 4, 0);
 
 	spherelist[0].pos = glm::vec3{ 10,3,10 };
 	spherelist[1].pos = glm::vec3{ -10,3,15 };
@@ -496,9 +542,9 @@ void SceneBumperBalls::InitGame() {
 	camera.allowLocomotiveTilt = false;
 	camera.allowLocomotiveBop = false;	
 	gamewin = false;
-	gamestart = true; 
+	gamestart = false; 
 	gamelose = false;
-
+	countdown = 4.f;
 
 }
 

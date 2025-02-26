@@ -29,8 +29,10 @@ public:
 		GEO_BARREL,
 
 
-		//Text
+		//UI
 		GEO_TEXT,
+		GEO_UI,
+		GEO_KEY_E,
 
 		//SKybox
 		GEO_LEFT,
@@ -164,9 +166,12 @@ private:
 	std::vector<Cylinder> cylinderlist;
 	glm::vec3 newcampos;
 	bool gamewin = false;
-	bool gamestart = true; //TO CHANGE
+	bool gamestart = false; 
 	bool gamelose = false;
 	const float PLAYER_SPEED = 50.f;
+
+	bool isObjectiveRead = false;
+	float countdown = 4.f;
 };
 
 #endif
