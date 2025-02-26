@@ -211,7 +211,7 @@ private:
 		{{"AHHH!!!"}, false},
 		{{"Whoa! That bear just got blasted",
 		  "into the sky like a rocket..."}, true},
-		{{"I guess I’ve completed the",
+		{{"I guess I've completed the",
 		  "final challenge."}, true},
 	};
 

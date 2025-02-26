@@ -857,7 +857,7 @@ void SceneFinal::Render()
 		}
 	}
 
-	if (m_battleStarted) {
+	if (m_battleStarted && !m_battleEnded) {
 		// Render health label and boss health bar next to each other
 		RenderMeshOnScreen(meshList[GEO_UI], 65, 545, 65, 7);
 		RenderTextOnScreen(meshList[GEO_TEXT], "Health:", glm::vec3(1, 1, 1), 20, 20, 550);
@@ -871,8 +871,8 @@ void SceneFinal::Render()
 	if (isWinScreenActive) {
 		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "YOU WON!", glm::vec3(0, 1, 0), 50, 220, 350);
-		RenderTextOnScreen(meshList[GEO_TEXT2], "You've completed the", glm::vec3(1, 1, 1), 20, 240, 300);
-		RenderTextOnScreen(meshList[GEO_TEXT2], "Final Challenge!", glm::vec3(1, 1, 1), 20, 210, 270);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "You've completed the", glm::vec3(1, 1, 1), 20, 210, 300);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Final Challenge!", glm::vec3(1, 1, 1), 20, 245, 270);
 
 		RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
@@ -1227,18 +1227,24 @@ void SceneFinal::HandleKeyPress()
 		bool hitBalloon = CheckRayBalloonCollision(rayOrigin, rayDirection);
 	}
 
-	if (KeyboardController::GetInstance()->IsKeyPressed('Q') && isEnterSceneDialogueActive) {
-		// Skip the entire sign dialogue
-		isEnterSceneDialogueActive = false;
-		hasESDialogueCompleted = true;
-		camera.enableFNAF = false;
-		camera.allowMovement = true;
-		camera.allowJump = true;
-		camera.allowSprint = false;
-		camera.allowCrouch = true;
-		camera.allowProne = false;
-		camera.allowLocomotiveTilt = true;
-		camera.allowLocomotiveBop = false;
+	if (KeyboardController::GetInstance()->IsKeyPressed('Q')) {
+		if (isEnterSceneDialogueActive) {
+			// Skip the entire cutscene dialogue
+			isEnterSceneDialogueActive = false;
+			hasESDialogueCompleted = true;
+			camera.enableFNAF = false;
+			camera.allowMovement = true;
+			camera.allowJump = true;
+			camera.allowSprint = false;
+			camera.allowCrouch = true;
+			camera.allowProne = false;
+			camera.allowLocomotiveTilt = true;
+			camera.allowLocomotiveBop = false;
+		}
+		if (isBossDefeatedDialogueActive) {
+			isBossDefeatedDialogueActive = false;
+			isWinScreenActive = true;
+		}
 	}
 
 	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E)) {
