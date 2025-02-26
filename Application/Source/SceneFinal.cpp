@@ -428,13 +428,63 @@ void SceneFinal::Update(double dt) {
 
 	// Only process AI movement if the battle is active and not ended
 	if (m_battleStarted && !m_battleEnded && !isEnterSceneDialogueActive && !isBossDefeatedDialogueActive) {
+
+		//pseudo-random spot in the quadrant opposite to that of the player
+
+		srand((unsigned)time(NULL));
+		int consolidatedRand = rand() * 1.2;
+		if (rand() % 2 == 1)
+		{
+			if (consolidatedRand % 2 == 1)
+			{
+				cpuTarget.x = (rand() % 30) + 50;
+			}
+			else
+			{
+				cpuTarget.x = (rand() % 30) + 20;
+			}
+		}
+		else
+		{
+			if (consolidatedRand % 2 == 1)
+			{
+				cpuTarget.x = ((rand() % 30) + 50) * -1;
+			}
+			else
+			{
+				cpuTarget.x = ((rand() % 30) + 20) * -1;
+			}
+		}
+		if (consolidatedRand % 2 == 1)
+		{
+			if (rand() % 2 == 1)
+			{
+				cpuTarget.z = (rand() % 30) + 50;
+			}
+			else
+			{
+				cpuTarget.z = (rand() % 30) + 20;
+			}
+		}
+		else
+		{
+			if (rand() % 2 == 1)
+			{
+				cpuTarget.z = ((rand() % 30) + 50) * -1;
+			}
+			else
+			{
+				cpuTarget.z = ((rand() % 30) + 20) * -1;
+			}
+		}
+
 		float aiAngleRad = glm::radians(m_cpu.angleDeg);
 		glm::vec3 aiForward(-sin(aiAngleRad), 0, -cos(aiAngleRad));
 
-		glm::vec3 aiToPlayer = carPhysics.pos - m_cpu.pos;
+		glm::vec3 aiToTarget = cpuTarget - m_cpu.pos;
 
-		float cross = (aiForward.x * aiToPlayer.z) - (aiForward.z * aiToPlayer.x);
-		float dot = glm::dot(aiForward, aiToPlayer);
+		float cross = (aiForward.x * aiToTarget.z) - (aiForward.z * aiToTarget.x);
+		float dot = glm::dot(aiForward, aiToTarget);
 
 		if (dot > 20) {
 			AImove = 'F';
