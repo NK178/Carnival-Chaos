@@ -24,7 +24,6 @@ public:
 		GEO_FENCE,
 		GEO_BUMPERCAR,
 		GEO_CLOWN,
-		GEO_BALLOON,
 	
 		//Text
 		GEO_TEXT,
@@ -46,6 +45,8 @@ public:
 		//Entities
 		GEO_CAR,
 		GEO_PELLETGUN,
+		GEO_BALLOON,
+	   GEO_HEALTHBAR,
 
 
 		NUM_GEOMETRY,
@@ -159,6 +160,26 @@ private:
 	const float CAR_TURN_RATE = 180.0f; // Degrees per second
 	const float CAR_DRAG = 0.95f; // Air resistance factor
 
+	// Boss battle variables
+	float m_battleTimer;          // Timer for the 80-second battle
+	int m_bossHealth;             // Boss health (starts at 100)
+	bool m_battleStarted;         // Flag to track if the battle has started
+	bool m_battleEnded;           // Flag to track if the battle has ended
+	bool m_playerWon;             // Flag to track if player won
+
+	struct Balloon {
+		bool active;           // Is this balloon currently active?
+		glm::vec3 pos;         // Current world position of the balloon
+		glm::vec3 offset;      // Offset from the boss car's position (if needed)
+		float size;            // Scale factor for the balloon model
+		float spawnTimer;      // Timer for balloon-specific animations or lifetime control
+	};
+
+
+	static const int MAX_BALLOONS = 3;
+	Balloon m_balloons[MAX_BALLOONS];
+	float m_balloonSpawnTimer;    // Timer for balloon spawning
+	float m_balloonSpawnInterval; // Interval between balloon spawns
 
 
 };
