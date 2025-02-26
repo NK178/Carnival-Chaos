@@ -121,7 +121,7 @@ void SceneSpinningRing::Init()
 		m_parameters[U_MATERIAL_SHININESS]);
 
 	// Initialise camera properties
-	camera.Init(glm::vec3(-30,9,-20), glm::vec3(0,0,0), glm::vec3(0,1,0));
+	camera.Init(glm::vec3(-30,9,-20), glm::vec3(0,9,0), glm::vec3(0,1,0));
 
 	// Init VBO here
 	for (int i = 0; i < NUM_GEOMETRY; ++i)
@@ -275,6 +275,7 @@ void SceneSpinningRing::Init()
 	beamList.push_back(spinningBeam(8, GameObject::CUBE));
 	beamList.push_back(spinningBeam(9, GameObject::CUBE));
 
+	//DO NOT CHANGE Y < 10.f , BASE Y = 40.f;
 	// Collision Boxes Position
 	player[0].pos = camera.pos;
 	wallSideList[0].pos = glm::vec3{ 0,0,8 };
@@ -331,12 +332,12 @@ void SceneSpinningRing::Update(double dt)
 		player[0].pos = camera.pos;
 		glm::vec3 viewDir = glm::normalize(camera.target - camera.pos);
 
-		// slowly increase rotation speed
-		wallSpeed += 1.0f * dt;
-		wallRotation += wallSpeed * dt;
-		if (wallSpeed >= 120.f) {
-			wallSpeed = 120.f;
-		}
+		//// slowly increase rotation speed
+		//wallSpeed += 1.0f * dt;
+		//wallRotation += wallSpeed * dt;
+		//if (wallSpeed >= 120.f) {
+		//	wallSpeed = 120.f;
+		//}
 
 		if (!isBeamSpawned) {
 			if (!isShowingBeamWarning && remainingTime <= 19.0f) {
@@ -361,6 +362,7 @@ void SceneSpinningRing::Update(double dt)
 		if (isBeamSpawned) {
 			beamSpeed += 3.0f * dt;
 			beamRotation += beamSpeed * dt;
+			beamList[0].angularVel = beamSpeed;
 			if (beamSpeed >= 90.f) {
 				beamSpeed = 90.f;
 			}
@@ -447,7 +449,6 @@ void SceneSpinningRing::Update(double dt)
 				spinningBeamVertices.push_back(tempVertices);
 			}
 		}
-
 		// SAT collision
 		{
 			for (int i = 0; i < wallSideList.size(); i++) {
@@ -483,6 +484,12 @@ void SceneSpinningRing::Update(double dt)
 			}
 		}
 	}
+
+
+	if (KeyboardController::GetInstance()->IsKeyPressed('R'))
+		camera.pos.y += 7.f;
+	if (KeyboardController::GetInstance()->IsKeyPressed('T'))
+		camera.pos.y -= 7.f;
 
 	// FPS
 	float temp = 1.f / dt;
@@ -550,7 +557,7 @@ void SceneSpinningRing::Render()
 	// Render Spinners
 	{
 		modelStack.PushMatrix();
-		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		modelStack.Translate(0.f, 15.f, 0.f);
 		modelStack.Rotate(wallRotation, 0.f, 1.f, 0.f);
 		modelStack.Scale(30.f, 30.f, 50.f);
@@ -559,11 +566,11 @@ void SceneSpinningRing::Render()
 		meshList[GEO_SPINNER]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
 		meshList[GEO_SPINNER]->material.kShininess = 1.0f;
 		RenderMesh(meshList[GEO_SPINNER], true);
-		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		modelStack.PopMatrix();
 
 		modelStack.PushMatrix();
-		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		modelStack.Translate(0.f, 5.f, 0.f);
 		modelStack.Rotate(beamRotation, 0.f, 1.f, 0.f);
 		modelStack.Scale(50.f, 30.f, 50.f);
@@ -572,13 +579,13 @@ void SceneSpinningRing::Render()
 		meshList[GEO_SPINNER2]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
 		meshList[GEO_SPINNER2]->material.kShininess = 1.0f;
 		RenderMesh(meshList[GEO_SPINNER2], true);
-		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		modelStack.PopMatrix();
 	}
 
 	// Render Platform
 	modelStack.PushMatrix();
-	modelStack.Translate(0.f, -120.f, 0.f);
+	modelStack.Translate(0.f, -120, 0.f);
 	modelStack.Scale(50.f, 15.f, 50.f);
 	meshList[GEO_CYLINDER]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
 	meshList[GEO_CYLINDER]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
@@ -606,8 +613,8 @@ void SceneSpinningRing::Render()
 	//		modelStack.PushMatrix();
 	//		modelStack.Translate(spinningWallTopVertices[j][i].x, spinningWallTopVertices[j][i].y, spinningWallTopVertices[j][i].z);
 	//		modelStack.Scale(0.1, 0.1, 0.1);
-	//		meshList[GEO_SPHERE]->material.kAmbient;
-	//		meshList[GEO_SPHERE]->material.kDiffuse;
+	//		meshList[GEO_SPHERE]->material.kAmbient = glm::vec3(0.8, 0.8, 0.8);
+	//		meshList[GEO_SPHERE]->material.kDiffuse = glm::vec3(0.8, 0.8, 0.8);
 	//		meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
 	//		meshList[GEO_SPHERE]->material.kShininess = 2.0f;
 	//		RenderMesh(meshList[GEO_SPHERE], true);
@@ -629,19 +636,19 @@ void SceneSpinningRing::Render()
 	//	}
 	//}
 
-	//for (int j = 0; j < spinningBeamVertices.size(); j++) {
-	//	for (int i = 0; i < beamList[j].vertices.size(); i++) {
-	//		modelStack.PushMatrix();
-	//		modelStack.Translate(spinningBeamVertices[j][i].x, spinningBeamVertices[j][i].y, spinningBeamVertices[j][i].z);
-	//		modelStack.Scale(0.1, 0.1, 0.1);
-	//		meshList[GEO_SPHERE]->material.kAmbient;
-	//		meshList[GEO_SPHERE]->material.kDiffuse;
-	//		meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	//		meshList[GEO_SPHERE]->material.kShininess = 2.0f;
-	//		RenderMesh(meshList[GEO_SPHERE], true);
-	//		modelStack.PopMatrix();
-	//	}
-	//}
+	for (int j = 0; j < spinningBeamVertices.size(); j++) {
+		for (int i = 0; i < beamList[j].vertices.size(); i++) {
+			modelStack.PushMatrix();
+			modelStack.Translate(spinningBeamVertices[j][i].x, spinningBeamVertices[j][i].y, spinningBeamVertices[j][i].z);
+			modelStack.Scale(0.1, 0.1, 0.1);
+			meshList[GEO_SPHERE]->material.kAmbient = glm::vec3(0.8, 0.8, 0.8);
+			meshList[GEO_SPHERE]->material.kDiffuse = glm::vec3(0.8, 0.8, 0.8);
+			meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+			meshList[GEO_SPHERE]->material.kShininess = 2.0f;
+			RenderMesh(meshList[GEO_SPHERE], true);
+			modelStack.PopMatrix();
+		}
+	}
 
 	if (!isObjectiveRead) { // Render Objective
 		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 30);
