@@ -30,6 +30,7 @@ public:
 		GEO_TEXT2,
 		GEO_KEY_E,
 		GEO_KEY_R,
+		GEO_KEY_Q,
 		GEO_FPS,
 		GEO_UI,
 		GEO_CROSSHAIR,
@@ -46,7 +47,7 @@ public:
 		GEO_CAR,
 		GEO_PELLETGUN,
 		GEO_BALLOON,
-	   GEO_HEALTHBAR,
+		GEO_HEALTHBAR,
 
 
 		NUM_GEOMETRY,
@@ -144,7 +145,8 @@ private:
 
 	Application app;
 
-
+	void RenderDialogue();
+	void UpdateDialogue(double dt);
 	void RenderMeshOnScreen(Mesh* mesh, float x, float y, float sizex, float sizey);
 	void RenderText(Mesh* mesh, std::string text, glm::vec3 color);
 	void RenderTextOnScreen(Mesh* mesh, std::string text, glm::vec3 color, float size, float x, float y);
@@ -167,6 +169,40 @@ private:
 	bool m_battleStarted;         // Flag to track if the battle has started
 	bool m_battleEnded;           // Flag to track if the battle has ended
 	bool m_playerWon;             // Flag to track if player won
+	bool m_playerLost;
+
+	bool isObjectiveRead;
+	float countdownTime;
+
+	// structure for dialogue lines
+	struct DialogueLine {
+		std::vector<std::string> textLines;
+		bool isMultiLine;
+	};
+
+	// dialogue displays
+	int currentLineIndex = -1;
+	float dialogueTimer = 0;
+	bool isTyping;
+	float typewriterTimer;
+	std::string currentText;
+	int currentCharIndex;
+	
+	bool isEnterSceneDialogueActive;
+	bool hasESDialogueCompleted;
+
+	std::vector<DialogueLine> enterSceneDialogueLines = {
+		{{"What is this place?"}, false},
+		{{"Hello player."}, false},
+		{{"A bear?! Who are you?"}, false},
+		{{"I am the ringmaster who", 
+			"oversees the carnival."}, true},
+		{{"I've been watching your movements", 
+			"from afar when you played the games."}, true},
+		{{"You sure want the million dollar",
+			"reward, don't you?"}, true},
+		{{"I won't go easy on you!"}, false},
+	};
 
 	struct Balloon {
 		bool active;           // Is this balloon currently active?
