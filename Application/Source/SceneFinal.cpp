@@ -23,9 +23,17 @@ SceneFinal::SceneFinal()
 {
 	m_battleTimer = 80.0f;        // 80 seconds total
 	m_bossHealth = 100;           // 100 health
-	m_battleStarted = true; // DISCLAIMER : Set this to true for now, Yong Quan youre in charge of adding the UI before the battle starts!!
+	m_battleStarted = false; // DISCLAIMER : Set this to true for now, Yong Quan youre in charge of adding the UI before the battle starts!!
 	m_battleEnded = false;
 	m_playerWon = false;
+	m_playerLost = false;
+	isObjectiveRead = false;
+	countdownTime = 0.0f;
+
+	isEnterSceneDialogueActive = true;
+	hasESDialogueCompleted = false;
+	isBossDefeatedDialogueActive = false;
+	isWinScreenActive = false;
 	
 	for (int i = 0; i < MAX_BALLOONS; ++i) {
 		m_balloons[i].active = true;  // Always active
@@ -45,7 +53,6 @@ SceneFinal::SceneFinal()
 
 	m_balloonSpawnTimer = 0.0f;
 	m_balloonSpawnInterval = 15.0f; // Spawn a balloon every 15 seconds
-
 }
 
 SceneFinal::~SceneFinal()
@@ -183,6 +190,16 @@ void SceneFinal::Init()
 	// 16 x 16 is the number of columns and rows for the text
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Images//calibri.tga");
+	meshList[GEO_TEXT2] = MeshBuilder::GenerateText("text2", 16, 16);
+	meshList[GEO_TEXT2]->textureID = LoadTGA("Images//yugothicuisemibold.tga");
+	meshList[GEO_FPS] = MeshBuilder::GenerateText("fpstext", 16, 16);
+	meshList[GEO_FPS]->textureID = LoadTGA("Images//bizudgothic.tga");
+	meshList[GEO_UI] = MeshBuilder::GenerateQuad("UIBox", glm::vec3(0.12f, 0.12f, 0.12f), 10.f);
+
+	meshList[GEO_KEY_E] = MeshBuilder::GenerateQuad("KeyE", glm::vec3(1.f, 1.f, 1.f), 2.f);
+	meshList[GEO_KEY_E]->textureID = LoadTGA("Images//keyboard_key_e.tga");
+	meshList[GEO_KEY_Q] = MeshBuilder::GenerateQuad("KeyQ", glm::vec3(1.f, 1.f, 1.f), 2.f);
+	meshList[GEO_KEY_Q]->textureID = LoadTGA("Images//keyboard_key_q.tga");
 
 	meshList[GEO_FENCE] = MeshBuilder::GenerateOBJ("Fence", "Models//wall_OBJ.obj");
 	meshList[GEO_FENCE]->textureID = LoadTGA("Images//duvar.tga");
@@ -276,14 +293,17 @@ void SceneFinal::Init()
 
 	enableLight = true;
 
-
 	carPhysics.pos = glm::vec3(-10, 1, -10); // Starting position
 	carPhysics.mass = 1.0f;
 	carPhysics.bounciness = 0.3f;
 
 	// Initialize camera to follow car
 	//camera.Init(glm::vec3(-10, 9, -15), carPhysics.pos, glm::vec3(0, 1, 0));
-
+	// Typewriting Dialogue
+	isTyping = false;
+	typewriterTimer = 0.0f;
+	currentText = "";
+	currentCharIndex = 0;
 }
 
 // Disclaimer = SORRY FOR THE MILLION DEBUG STATEMENTS IT TOOK AWHILE - Mathea
@@ -465,9 +485,6 @@ void SceneFinal::Update(double dt) {
 	carPhysics.UpdatePhysics(dt);
 	m_cpu.UpdatePhysics(dt);
 
-
-
-
 	// Check collisions with fences
 	PhysicsObject frontFence;
 	frontFence.pos = glm::vec3(0, 0, 100);
@@ -522,8 +539,6 @@ void SceneFinal::Update(double dt) {
 	if (m_cpu.pos.z > ARENA_LIMIT) m_cpu.pos.z = ARENA_LIMIT;
 	if (m_cpu.pos.z < -ARENA_LIMIT) m_cpu.pos.z = -ARENA_LIMIT;
 
-
-
 	// --- Battle Logic ---
    // If the battle has started and not yet ended, update the timer
 	if (m_battleStarted && !m_battleEnded) {
@@ -536,7 +551,6 @@ void SceneFinal::Update(double dt) {
 			// Optionally trigger a "loss" event here if m_bossHealth > 0.
 		}
 	}
-
 
 	if (m_battleStarted && !m_battleEnded) {
 		m_balloonSpawnTimer += dt;
@@ -555,6 +569,16 @@ void SceneFinal::Update(double dt) {
 		}
 	}
 
+	if (isObjectiveRead) {
+		if (countdownTime > 0) {
+			countdownTime -= dt; // decrease countdown time
+			if (countdownTime < 0) {
+				countdownTime = 0; // ensure countdown does not go below 0
+				m_battleStarted = true;
+			}
+		}
+	}
+
 	//if (KeyboardController::GetInstance()->IsKeyPressed('H')) {
 	//	m_bossHealth--;
 	//}
@@ -563,6 +587,12 @@ void SceneFinal::Update(double dt) {
 	float driverHeight = 7.0f;
 	camera.pos = carPhysics.pos + glm::vec3(0, driverHeight, 0);
 	camera.Update(dt);
+
+	// FPS
+	float temp = 1.f / dt;
+	fps = glm::round(temp * 100.f) / 100.f;
+
+	UpdateDialogue(dt);
 }
 
 void SceneFinal::Render()
@@ -610,7 +640,6 @@ void SceneFinal::Render()
 		}
 	}
 
-
 	//modelStack.PushMatrix();
 	//RenderMesh(meshList[GEO_AXES], false);
 	//modelStack.PopMatrix();
@@ -641,7 +670,6 @@ void SceneFinal::Render()
 	meshList[GEO_CAR]->material.kShininess = 1.0f;
 	RenderMesh(meshList[GEO_CAR], false);
 	modelStack.PopMatrix();*/
-
 
 	// Front wall
 	modelStack.PushMatrix();
@@ -688,8 +716,6 @@ void SceneFinal::Render()
 	meshList[GEO_FENCE]->material.kShininess = 1.0f;
 	RenderMesh(meshList[GEO_FENCE], true);
 	modelStack.PopMatrix();
-
-
 
 	modelStack.PushMatrix();
 	modelStack.Translate(carPhysics.pos.x, carPhysics.pos.y, carPhysics.pos.z);
@@ -775,9 +801,6 @@ void SceneFinal::Render()
 	RenderMesh(meshList[GEO_CLOWN], true);
 	modelStack.PopMatrix();
 
-
-
-
 	// Render boss balloons
 	for (int i = 0; i < MAX_BALLOONS; ++i) {
 		if (m_balloons[i].active) {
@@ -799,20 +822,72 @@ void SceneFinal::Render()
 		}
 	}
 
-
-
-
 	RenderSkyBox();
+	RenderDialogue();
 
+	if (hasESDialogueCompleted && !isObjectiveRead) {
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 30);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- FINAL CHALLENGE -", glm::vec3(1, 1, 0), 20, 220, 430);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Shoot the Balloons above the", glm::vec3(1, 1, 1), 13, 195, 380);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "boss to decrease its HP!", glm::vec3(1, 1, 1), 14, 225, 350);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Get its HP to 0", glm::vec3(1, 1, 1), 14, 260, 310);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "before timer ends!", glm::vec3(1, 1, 1), 14, 270, 280);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- WASD to move your bumper car", glm::vec3(1, 1, 0), 14, 190, 240);
 
-	if (m_battleStarted) {
+		RenderMeshOnScreen(meshList[GEO_KEY_E], 310, 200, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Continue", glm::vec3(1, 1, 1), 20, 340, 190);
+	}
+
+	if (isObjectiveRead) {
+		if (countdownTime > 0) {
+			std::string countdownText;
+			if (countdownTime > 3.0f) {
+				countdownText = "3..";
+			}
+			else if (countdownTime > 2.0f) {
+				countdownText = "2..";
+			}
+			else if (countdownTime > 1.0f) {
+				countdownText = "1..";
+			}
+			else {
+				countdownText = "GO!";
+			}
+			RenderTextOnScreen(meshList[GEO_TEXT2], countdownText, glm::vec3(1, 1, 1), 50, 350, 300);
+		}
+	}
+
+	if (m_battleStarted && !m_battleEnded) {
 		// Render health label and boss health bar next to each other
+		RenderMeshOnScreen(meshList[GEO_UI], 65, 545, 65, 7);
 		RenderTextOnScreen(meshList[GEO_TEXT], "Health:", glm::vec3(1, 1, 1), 20, 20, 550);
 		float healthPercent = (float)m_bossHealth / 100.0f;
 		
 		RenderMeshOnScreen(meshList[GEO_HEALTHBAR], 260, 560, 200 * healthPercent, 20);
 
-		RenderTextOnScreen(meshList[GEO_TEXT], "Time: " + std::to_string((int)m_battleTimer), glm::vec3(1, 1, 1), 20, 20, 520);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Time Left: " + std::to_string((int)m_battleTimer), glm::vec3(1, 1, 1), 20, 20, 520);
+	}
+
+	if (isWinScreenActive) {
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "YOU WON!", glm::vec3(0, 1, 0), 50, 220, 350);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "You've completed the", glm::vec3(1, 1, 1), 20, 210, 300);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Final Challenge!", glm::vec3(1, 1, 1), 20, 245, 270);
+
+		RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
+	}
+
+	if (m_playerLost) {
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "GAME OVER!", glm::vec3(1, 0, 0), 40, 210, 370);
+
+		RenderTextOnScreen(meshList[GEO_TEXT2], "You ran out of time!", glm::vec3(1, 1, 1), 20, 190, 320);
+
+		RenderMeshOnScreen(meshList[GEO_KEY_R], 350, 270, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Retry", glm::vec3(1, 1, 1), 20, 390, 260);
+		RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
 	}
 
 	// Render vertical line of crosshair
@@ -820,8 +895,207 @@ void SceneFinal::Render()
 	// Render horizontal line of crosshair
 	RenderMeshOnScreen(meshList[GEO_CROSSHAIR], 400, 300, 20, 2);  // Thin horizontal line
 
+	// Render FPS
+	std::string temp("FPS:" + std::to_string(fps));
+	RenderTextOnScreen(meshList[GEO_FPS], temp.substr(0, 9), glm::vec3(0, 1, 0), 20, 620, 20);
+}
 
+void SceneFinal::RenderDialogue() {
+	if (isEnterSceneDialogueActive || isBossDefeatedDialogueActive) {
+		RenderMeshOnScreen(meshList[GEO_UI], 150, 535, 150, 9);
+		RenderMeshOnScreen(meshList[GEO_KEY_Q], 20, 510, 10, 10);
+		RenderTextOnScreen(meshList[GEO_TEXT], "[ SKIP ]", glm::vec3(1, 1, 1), 15, 40, 505);
+		RenderMeshOnScreen(meshList[GEO_KEY_E], 170, 510, 10, 10);
+		RenderTextOnScreen(meshList[GEO_TEXT], "[ NEXT DIALOGUE ]", glm::vec3(1, 1, 1), 15, 200, 505);
+	}
+	else {
+		return; // exit function early if no dialogue is active
+	}
 
+	if (isEnterSceneDialogueActive && currentLineIndex < enterSceneDialogueLines.size()) {
+		const DialogueLine& currentDialogue = enterSceneDialogueLines[currentLineIndex];
+
+		if (currentDialogue.isMultiLine) {
+			std::string textToRender = currentText.substr(0, currentCharIndex);
+			size_t newlinePos = textToRender.find('\n');
+			if (newlinePos != std::string::npos) {
+				std::string firstLine = textToRender.substr(0, newlinePos);
+				std::string secondLine = textToRender.substr(newlinePos + 1);
+				RenderTextOnScreen(meshList[GEO_TEXT], firstLine, glm::vec3(1, 1, 1), 20, 10, 550);
+				RenderTextOnScreen(meshList[GEO_TEXT], secondLine, glm::vec3(1, 1, 1), 20, 10, 530);
+			}
+			else {
+				RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 550);
+			}
+		}
+		else {
+			std::string textToRender = currentText.substr(0, currentCharIndex);
+			RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 550);
+		}
+	}
+
+	if (isBossDefeatedDialogueActive && currentLineIndex < bossDefeatDialogueLines.size()) {
+		const DialogueLine& currentDialogue = bossDefeatDialogueLines[currentLineIndex];
+
+		if (currentDialogue.isMultiLine) {
+			std::string textToRender = currentText.substr(0, currentCharIndex);
+			size_t newlinePos = textToRender.find('\n');
+			if (newlinePos != std::string::npos) {
+				std::string firstLine = textToRender.substr(0, newlinePos);
+				std::string secondLine = textToRender.substr(newlinePos + 1);
+				RenderTextOnScreen(meshList[GEO_TEXT], firstLine, glm::vec3(1, 1, 1), 20, 10, 550);
+				RenderTextOnScreen(meshList[GEO_TEXT], secondLine, glm::vec3(1, 1, 1), 20, 10, 530);
+			}
+			else {
+				RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 550);
+			}
+		}
+		else {
+			std::string textToRender = currentText.substr(0, currentCharIndex);
+			RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 550);
+		}
+	}
+}
+
+void SceneFinal::UpdateDialogue(double dt) {
+	// Start the dialogue when entering the scene
+	if (!isEnterSceneDialogueActive && !hasESDialogueCompleted) {
+		isEnterSceneDialogueActive = true;
+		currentLineIndex = 0;
+		dialogueTimer = 0;
+		isTyping = true; // Start typing the first line
+		typewriterTimer = 0.0f;
+
+		const DialogueLine& currentDialogue = enterSceneDialogueLines[currentLineIndex];
+		if (currentDialogue.isMultiLine) {
+			// Store both lines for multi-line dialogue
+			currentText = currentDialogue.textLines[0] + "\n" + currentDialogue.textLines[1];
+		}
+		else {
+			currentText = currentDialogue.textLines[0];
+		}
+		currentCharIndex = 0;
+	}
+
+	if (isEnterSceneDialogueActive) {
+		if (KeyboardController::GetInstance()->IsKeyPressed('E')) {
+			if (isTyping) {
+				// Skip rendering the current text if the player presses E
+				currentCharIndex = currentText.length();
+				isTyping = false;
+			}
+			else {
+				// Skip to the next line if the player presses E after finishing typing
+				dialogueTimer = 4.0f;
+			}
+		}
+
+		if (isTyping) {
+			typewriterTimer += dt;
+			if (typewriterTimer >= 0.05f) { // Adjust the typing speed here
+				typewriterTimer = 0.0f;
+				currentCharIndex++;
+				if (currentCharIndex >= currentText.length()) {
+					isTyping = false;
+				}
+			}
+		}
+		else {
+			dialogueTimer += dt;
+			if (dialogueTimer >= 4.0f) {
+				dialogueTimer = 0;
+				currentLineIndex++;
+				if (currentLineIndex >= enterSceneDialogueLines.size()) {
+					// Dialogue ends here
+					isEnterSceneDialogueActive = false;
+					hasESDialogueCompleted = true;
+					camera.enableFNAF = false;
+					camera.allowMovement = true;
+					camera.allowJump = true;
+					camera.allowLocomotiveTilt = true;
+				}
+				else {
+					// Continue to the next line
+					isTyping = true;
+					typewriterTimer = 0.0f;
+					const DialogueLine& currentDialogue = enterSceneDialogueLines[currentLineIndex];
+					if (currentDialogue.isMultiLine) {
+						currentText = currentDialogue.textLines[0] + "\n" + currentDialogue.textLines[1];
+					}
+					else {
+						currentText = currentDialogue.textLines[0];
+					}
+					currentCharIndex = 0;
+				}
+			}
+		}
+	}
+
+	if (m_playerWon && !isBossDefeatedDialogueActive && !isWinScreenActive) {
+		isBossDefeatedDialogueActive = true;
+		currentLineIndex = 0;
+		dialogueTimer = 0;
+		isTyping = true;
+		typewriterTimer = 0.0f;
+
+		const DialogueLine& currentDialogue = bossDefeatDialogueLines[currentLineIndex];
+		if (currentDialogue.isMultiLine) {
+			currentText = currentDialogue.textLines[0] + "\n" + currentDialogue.textLines[1];
+		}
+		else {
+			currentText = currentDialogue.textLines[0];
+		}
+		currentCharIndex = 0;
+	}
+
+	// Handle boss defeat dialogue
+	if (isBossDefeatedDialogueActive) {
+		if (KeyboardController::GetInstance()->IsKeyPressed('E')) {
+			if (isTyping) {
+				currentCharIndex = currentText.length(); // Skip text animation
+				isTyping = false;
+			}
+			else {
+				dialogueTimer = 4.0f;
+			}
+		}
+
+		if (isTyping) {
+			typewriterTimer += dt;
+			if (typewriterTimer >= 0.05f) {
+				typewriterTimer = 0.0f;
+				currentCharIndex++;
+				if (currentCharIndex >= currentText.length()) {
+					isTyping = false;
+				}
+			}
+		}
+		else {
+			dialogueTimer += dt;
+			if (dialogueTimer >= 4.0f) {
+				dialogueTimer = 0;
+				currentLineIndex++;
+				if (currentLineIndex >= bossDefeatDialogueLines.size()) {
+					// Boss defeat dialogue ends, show win screen
+					isBossDefeatedDialogueActive = false;
+					isWinScreenActive = true;
+				}
+				else {
+					// Continue to the next line
+					isTyping = true;
+					typewriterTimer = 0.0f;
+					const DialogueLine& currentDialogue = bossDefeatDialogueLines[currentLineIndex];
+					if (currentDialogue.isMultiLine) {
+						currentText = currentDialogue.textLines[0] + "\n" + currentDialogue.textLines[1];
+					}
+					else {
+						currentText = currentDialogue.textLines[0];
+					}
+					currentCharIndex = 0;
+				}
+			}
+		}
+	}
 }
 
 void SceneFinal::RenderMesh(Mesh* mesh, bool enableLight)
@@ -953,6 +1227,37 @@ void SceneFinal::HandleKeyPress()
 		bool hitBalloon = CheckRayBalloonCollision(rayOrigin, rayDirection);
 	}
 
+	if (KeyboardController::GetInstance()->IsKeyPressed('Q')) {
+		if (isEnterSceneDialogueActive) {
+			// Skip the entire cutscene dialogue
+			isEnterSceneDialogueActive = false;
+			hasESDialogueCompleted = true;
+			camera.enableFNAF = false;
+			camera.allowMovement = true;
+			camera.allowJump = true;
+			camera.allowSprint = false;
+			camera.allowCrouch = true;
+			camera.allowProne = false;
+			camera.allowLocomotiveTilt = true;
+			camera.allowLocomotiveBop = false;
+		}
+		if (isBossDefeatedDialogueActive) {
+			isBossDefeatedDialogueActive = false;
+			isWinScreenActive = true;
+		}
+	}
+
+	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E)) {
+		if (isWinScreenActive)
+		{
+			// go back to scene main
+		}
+		else if (!isObjectiveRead && hasESDialogueCompleted)
+		{
+			isObjectiveRead = true; // set to true when the objective is read
+			countdownTime = 4.0f;
+		}
+	}
 }
 
 void SceneFinal::RenderMeshOnScreen(Mesh* mesh, float x, float y, float sizex, float sizey)
@@ -1111,4 +1416,3 @@ void SceneFinal::RenderSkyBox() {
 	RenderMesh(meshList[GEO_BOTTOM], false);
 	modelStack.PopMatrix();
 }
-// ababababa
