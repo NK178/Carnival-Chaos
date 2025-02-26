@@ -234,6 +234,10 @@ void Application::ProcessInput()
                     sceneManager.PushScene(SCENE_WHACKAMOLE);
                     carnivalScene->shouldEnterWhackAMole = false;
                 }
+                else if (carnivalScene->shouldEnterBumperBalls) {
+                    sceneManager.PushScene(SCENE_BUMPERBALLS);
+                    carnivalScene->shouldEnterBumperBalls = false;
+                }
                 else if (carnivalScene->shouldEnterSpinningRing) {
                     sceneManager.PushScene(SCENE_SPINNING_RING);
                     carnivalScene->shouldEnterSpinningRing = false;
@@ -279,6 +283,15 @@ void Application::ProcessInput()
         case SCENE_WHACKAMOLE:
         {
             SceneWhackAMole* whackAMoleScene = static_cast<SceneWhackAMole*>(currentScene);
+            // For WhackAMole, you need to add a win condition flag in the scene
+            // if (whackAMoleScene->hasWon && KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E)) {
+            //     sceneManager.PopScene();
+            // }
+            break;
+        }
+        case SCENE_BUMPERBALLS:
+        {
+            SceneBumperBalls* bumperballsscene = static_cast<SceneBumperBalls*>(currentScene);
             // For WhackAMole, you need to add a win condition flag in the scene
             // if (whackAMoleScene->hasWon && KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E)) {
             //     sceneManager.PopScene();
