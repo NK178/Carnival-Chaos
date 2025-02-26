@@ -201,7 +201,6 @@ private:
 	// dialogue displays
 	int currentLineIndex = -1;
 	float dialogueTimer = 0;
-	const float TEXT_DISPLAY_TIME = 4.0f;
 	bool isTyping;
 	float typewriterTimer; 
 	std::string currentText; 
@@ -219,7 +218,6 @@ private:
 	bool hasReadSign;
 	bool showReadSignText;
 	float readSignTextTimer;
-	const float READ_SIGN_TEXT_DISPLAY_TIME = 3.0f;
 
 	// tent positions and tent interactions
 	glm::vec3 tentPositions[6];

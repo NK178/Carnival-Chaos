@@ -613,7 +613,7 @@ void SceneMain::Update(double dt)
 		if (showReadSignText)
 		{
 			readSignTextTimer += dt;
-			if (readSignTextTimer >= READ_SIGN_TEXT_DISPLAY_TIME)
+			if (readSignTextTimer >= 3.0f)
 			{
 				showReadSignText = false;
 				readSignTextTimer = 0.0f;
@@ -802,52 +802,6 @@ void SceneMain::Render()
 				//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 				//modelStack.PopMatrix();
 			}
-		}
-	}
-
-	// Render Trees
-	{
-	//	meshList[GEO_TREE]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
-	//	meshList[GEO_TREE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-	//	meshList[GEO_TREE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	//	meshList[GEO_TREE]->material.kShininess = 1.0f;
-
-		{
-	//		modelStack.PushMatrix();
-	//		modelStack.Translate(40.f, 0.f, 20.f);
-	//		modelStack.Scale(0.02f, 0.02f, 0.02f);
-	//		RenderMesh(meshList[GEO_TREE], true);
-	//		modelStack.PopMatrix();
-
-	//		modelStack.PushMatrix();
-	//		modelStack.Translate(40.f, 0.f, -20.f);
-	//		modelStack.Scale(0.02f, 0.02f, 0.02f);
-	//		RenderMesh(meshList[GEO_TREE], true);
-	//		modelStack.PopMatrix();
-
-	//		modelStack.PushMatrix();
-	//		modelStack.Translate(40.f, 0.f, -60.f);
-	//		modelStack.Scale(0.02f, 0.02f, 0.02f);
-	//		RenderMesh(meshList[GEO_TREE], true);
-	//		modelStack.PopMatrix();
-
-	//		modelStack.PushMatrix();
-	//		modelStack.Translate(-40.f, 0.f, -40.f);
-	//		modelStack.Scale(0.02f, 0.02f, 0.02f);
-	//		RenderMesh(meshList[GEO_TREE], true);
-	//		modelStack.PopMatrix();
-
-	//		modelStack.PushMatrix();
-	//		modelStack.Translate(-40.f, 0.f, 0.f);
-	//		modelStack.Scale(0.02f, 0.02f, 0.02f);
-	//		RenderMesh(meshList[GEO_TREE], true);
-	//		modelStack.PopMatrix();
-
-	//		modelStack.PushMatrix();
-	//		modelStack.Translate(-40.f, 0.f, 40.f);
-	//		modelStack.Scale(0.02f, 0.02f, 0.02f);
-	//		RenderMesh(meshList[GEO_TREE], true);
-	//		modelStack.PopMatrix();
 		}
 	}
 
@@ -1060,6 +1014,19 @@ void SceneMain::Render()
 		modelStack.PopMatrix();
 	}
 
+	// Render Money Bag (if player completes final challenge)
+	if (isFinalChallengeCompleted) {
+		modelStack.PushMatrix();
+		modelStack.Translate(0.f, 0.f, -60.f);
+		modelStack.Scale(30.f, 50.f, 30.f);
+		meshList[GEO_MONEYBAG]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
+		meshList[GEO_MONEYBAG]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+		meshList[GEO_MONEYBAG]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+		meshList[GEO_MONEYBAG]->material.kShininess = 1.0f;
+		RenderMesh(meshList[GEO_MONEYBAG], true);
+		modelStack.PopMatrix();
+	}
+
 	RenderUI();
 	RenderDialogue();
 	RenderObjectives();
@@ -1189,7 +1156,7 @@ void SceneMain::RenderDialogue() {
 		RenderMeshOnScreen(meshList[GEO_KEY_Q], 20, 510, 10, 10);
 		RenderTextOnScreen(meshList[GEO_TEXT], "[ SKIP ]", glm::vec3(1, 1, 1), 15, 40, 505);
 		RenderMeshOnScreen(meshList[GEO_KEY_E], 170, 510, 10, 10);
-		RenderTextOnScreen(meshList[GEO_TEXT], "[ NEXT TEXT ]", glm::vec3(1, 1, 1), 15, 200, 505);
+		RenderTextOnScreen(meshList[GEO_TEXT], "[ NEXT DIALOGUE ]", glm::vec3(1, 1, 1), 15, 200, 505);
 	}
 	else {
 		return; // exit function early if no dialogue is active
@@ -1271,7 +1238,7 @@ void SceneMain::UpdateDialogue(double dt) {
 			}
 			else {
 				// Skip to the next line
-				dialogueTimer = TEXT_DISPLAY_TIME;
+				dialogueTimer = 4.0f;
 			}
 		}
 
@@ -1287,7 +1254,7 @@ void SceneMain::UpdateDialogue(double dt) {
 		}
 		else {
 			dialogueTimer += dt;
-			if (dialogueTimer >= TEXT_DISPLAY_TIME) {
+			if (dialogueTimer >= 4.0f) {
 				dialogueTimer = 0;
 				currentLineIndex++;
 				if (currentLineIndex >= signDialogueLines.size()) {
@@ -1327,7 +1294,7 @@ void SceneMain::UpdateDialogue(double dt) {
 		}
 		else {
 			dialogueTimer += dt;
-			if (dialogueTimer >= TEXT_DISPLAY_TIME) {
+			if (dialogueTimer >= 4.0f) {
 				dialogueTimer = 0;
 				currentLineIndex++;
 				if (currentLineIndex >= enterMainSceneLines.size()) {
