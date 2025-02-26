@@ -387,8 +387,12 @@ void SceneMain::Init()
 	typewriterTimer = 0.0f;
 	currentText = "";
 	currentCharIndex = 0;
-	isCutsceneDialogueActive = true;
-	hasPlayedCutsceneDialogue = false;
+	if (!hasPlayedCutsceneDialogue) {
+		isCutsceneDialogueActive = true;
+	}
+
+	readSign = true;
+	UpdateSignText();
 
 	// Tent Position (for interaction use)
 	tentPositions[0] = glm::vec3(30.f, 0.f, -40.f);
@@ -414,13 +418,14 @@ void SceneMain::Init()
 
 	signPosition = glm::vec3(30.f, 3.f, -70.f);
 	showSignText = false;
-	readSign = false;
 	isSignDialogueActive = false;
 	currentLineIndex = -1;
 	dialogueTimer = 0;
 
 	cutsceneStage = -1;
 	cutsceneSkipped = false;
+
+	UpdateSignText();
 }
 
 void SceneMain::Update(double dt)
@@ -1657,6 +1662,7 @@ void SceneMain::HandleKeyPress()
 					tentCompleted[5] = true; // Mark bumper balls tent as completed
 					break;
 				}
+				hasPlayedCutsceneDialogue = true; // Ensure cutscene is not played again
 			}
 			else {
 				showReadSignText = true;
