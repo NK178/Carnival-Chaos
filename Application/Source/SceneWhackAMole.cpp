@@ -112,7 +112,7 @@ void SceneWhackAMole::Init()
 		m_parameters[U_MATERIAL_SHININESS]);
 
 	// Initialise camera properties
-	camera.Init(glm::vec3(0, 9, 0), glm::vec3(-1, 9, 0), glm::vec3(0, 1, 0));
+	camera.Init(glm::vec3(2, 9, 0), glm::vec3(-1, 9, 0), glm::vec3(0, 1, 0));
 
 	// Init VBO here
 	for (int i = 0; i < NUM_GEOMETRY; ++i)
@@ -155,9 +155,12 @@ void SceneWhackAMole::Init()
 	meshList[GEO_BACK] = MeshBuilder::GenerateQuad("Plane", glm::vec3(1.f, 1.f, 1.f), 100.f);
 	meshList[GEO_BACK]->textureID = LoadTGA("Images//whackamole_sides.tga");
 
-	// 16 x 16 is the number of columns and rows for the text
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16,16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Images//calibri.tga");
+	meshList[GEO_KEY_E] = MeshBuilder::GenerateQuad("KeyE", glm::vec3(1.f, 1.f, 1.f), 2.f);
+	meshList[GEO_KEY_E]->textureID = LoadTGA("Images//keyboard_key_e.tga");
+	meshList[GEO_UI] = MeshBuilder::GenerateQuad("UIBox", glm::vec3(0.12f, 0.12f, 0.12f), 10.f);
+
 
 	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 1000.0f);
 	projectionStack.LoadMatrix(projection);
@@ -260,12 +263,12 @@ void SceneWhackAMole::Init()
 	walllist.push_back(Walls(102, GameObject::CUBE, glm::vec3{ 100.f, 50.f, 1.f }));
 	walllist.push_back(Walls(103, GameObject::CUBE, glm::vec3{ 1.f, 50.f, 100.f }));
 	walllist.push_back(Walls(103, GameObject::CUBE, glm::vec3{ 1.f, 50.f, 100.f }));
-	walllist.push_back(Walls(104, GameObject::CUBE, glm::vec3{ 100.f, 1.f, 100.f }));
+	walllist.push_back(Walls(104, GameObject::CUBE, glm::vec3{ 100.f, 5.f, 100.f }));
 	walllist[0].pos = glm::vec3{ 0,0,-100};
 	walllist[1].pos = glm::vec3{ 0,0,100 };
 	walllist[2].pos = glm::vec3{ -100,0,0 };
 	walllist[3].pos = glm::vec3{ 100,0,0 };
-	walllist[4].pos = glm::vec3{ 0,0,0 };
+	walllist[4].pos = glm::vec3{ 0,-5,0 };
 
 	//Player 
 	player.push_back(Player(999, GameObject::CUBE));
@@ -278,9 +281,7 @@ void SceneWhackAMole::Init()
 	for (int i = 0; i < walllist.size(); i++) {
 		walllist[i].mass = 0.f;
 	}
-	////phase, position
-	// phase, position, hammer type
-	//hammer 3  (1,4,7)
+
 	attackorder.Push(NodeHammer(1, 5, GEO_HAMMER2));
 	attackorder.Push(NodeHammer(2, 4, GEO_HAMMER3));
 	attackorder.Push(NodeHammer(2, 6, GEO_HAMMER1));
@@ -334,6 +335,19 @@ void SceneWhackAMole::Update(double dt)
 	if (KeyboardController::GetInstance()->IsKeyDown('P'))
 		testobj.pos.y += static_cast<float>(dt) * SPEED;
 
+	if (KeyboardController::GetInstance()->IsKeyPressed('E') && !gamestart)
+		isObjectiveRead = true;
+
+	//Game start and game end logic
+	if (isObjectiveRead) {
+		iscameramove = true;
+		if (startcountdown > 0.f)
+			startcountdown -= dt;
+		else if (!isplayerhit)
+			gamestart = true;
+	}
+
+
 	CollisionData cd;
 	//Game logic 
 	if (gamestart) {
@@ -380,21 +394,7 @@ void SceneWhackAMole::Update(double dt)
 		}
 	}
 
-	////// TESTING FORCE UPWARDS
-	if (KeyboardController::GetInstance()->IsKeyPressed('T')) {
-		shockwave = true;
-		player[0].AddImpulse(glm::vec3(0, 1, 0) * 100.f);
-	}
-	if (!shockwave){
-		player[0].pos = camera.pos;
-		player[0].target = camera.target;
-	}
-	else {
-		camera.pos = player[0].pos;
-		camera.target = player[0].target;
-	}
-	player[0].accel = glm::vec3{ 0,-1,0 } *10.f;
-	
+	player[0].pos = camera.pos;
 	glm::vec3 viewDir = glm::normalize(camera.target - camera.pos);
 	for (int i = 0; i < walllist.size(); i++) {
 		if (OverlapAABB2AABB(player[0], player[0].boxextent, walllist[i], walllist[i].boxextent, cd)) {
@@ -403,17 +403,13 @@ void SceneWhackAMole::Update(double dt)
 			camera.target = camera.pos + viewDir * 1.2f;
 		}
 	}
-	
-	//Game start and game end logic
-	if (startcountdown > 0.f)
-		startcountdown -= dt;
-	else if (!isplayerhit)
-		gamestart = true;
-
-	if (isplayerhit) {
+	if (isplayerhit || gamewin) {
 		gamestart = false;
 		iscameramove = false;
 	}
+	if (attackorder.size == 0 && inactionorder.empty())
+		gamewin = true;
+	
 
 	if (KeyboardController::GetInstance()->IsKeyDown('R') && !gamestart) 
 		InitGame();
@@ -441,11 +437,6 @@ void SceneWhackAMole::Render()
 		camera.target.x, camera.target.y, camera.target.z,
 		camera.up.x, camera.up.y, camera.up.z
 	);
-	//viewStack.LookAt(
-	//	player[0].pos.x, player[0].pos.y, player[0].pos.z,
-	//	player[0].target.x, player[0].target.y, player[0].target.z,
-	//	camera.up.x, camera.up.y, camera.up.z
-	//);
 
 	// Load identity matrix into the model stack
 	modelStack.LoadIdentity();
@@ -596,9 +587,28 @@ void SceneWhackAMole::Render()
 		}
 	}
 
-	if (isplayerhit) {
-		RenderTextOnScreen(meshList[GEO_TEXT], "Game Over!", glm::vec3(1, 0, 0), 40, 200, 400);
-		RenderTextOnScreen(meshList[GEO_TEXT], "Press R to restart", glm::vec3(1, 0, 0), 40, 80, 350);
+	if (!isObjectiveRead) { // Render Objective
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 30);
+		RenderTextOnScreen(meshList[GEO_TEXT], "- WHACK A MOLE -", glm::vec3(1, 1, 0), 25, 200, 430);
+		RenderTextOnScreen(meshList[GEO_TEXT], "- You are the mole!", glm::vec3(1, 1, 1), 13, 180, 380);
+		RenderTextOnScreen(meshList[GEO_TEXT], "- Dodge the hammers to survive!", glm::vec3(1, 1, 1), 14, 180, 350);
+		RenderTextOnScreen(meshList[GEO_TEXT], "- Each phase gets progresively", glm::vec3(1, 1, 1), 14, 180, 300);
+		RenderTextOnScreen(meshList[GEO_TEXT], " harder", glm::vec3(1, 1, 1), 14, 190, 280);
+		RenderTextOnScreen(meshList[GEO_TEXT], "- Survive all the waves to win! ", glm::vec3(1, 1, 1), 14, 180, 250);
+
+		RenderMeshOnScreen(meshList[GEO_KEY_E], 310, 210, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Continue", glm::vec3(1, 1, 1), 20, 340, 200);
+	}
+	if (isplayerhit && !gamewin) {
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 30);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Game Over!", glm::vec3(1, 0, 0), 35, 220, 350);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Press R to restart", glm::vec3(1, 0, 0), 25, 180, 250);
+	}
+	if (!isplayerhit && gamewin) {
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 30);
+		RenderTextOnScreen(meshList[GEO_TEXT], "You win!", glm::vec3(0, 1, 0), 35, 220, 350);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Returning ", glm::vec3(0, 1, 0), 25, 210, 300);
+		RenderTextOnScreen(meshList[GEO_TEXT], "to carnival...", glm::vec3(0, 1, 0), 25, 210, 270);
 	}
 }
 
@@ -847,6 +857,8 @@ void SceneWhackAMole::InitGame()
 	gamestart = false;
 	isplayerhit = false;
 	iscameramove = true;
+	gamewin = false;
+
 
 	//refresh
 	attackorder.Clear(); 

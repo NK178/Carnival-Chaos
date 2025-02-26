@@ -32,7 +32,7 @@ void SceneHole::Init()
 	failedGrav = 0;
 
 	camera.enableFNAF = true;
-	camera.allowMovement = false;
+	camera.pos.x -= 2;
 	camera.allowJump = false;
 	camera.allowSprint = false;
 	camera.allowCrouch = false;
@@ -281,10 +281,12 @@ void SceneHole::Update(double dt)
 			if (camera.pos.y < 0)
 			{
 				failedGrav *= 1.01;
+				camera.allowJump = false;
+				camera.allowMovement = false;
 			}
 			else if (camera.pos.y < 3.5)
 			{
-				failedGrav += 0.05;
+				failedGrav += 0.2;
 			}
 		}
 		camera.pos.y -= failedGrav;
@@ -310,14 +312,14 @@ void SceneHole::Update(double dt)
 			{
 				if (camera.pos.z > -12 && camera.pos.y > 2)
 				{
-					camera.allowMovement = false;
-					camera.AddForce(glm::vec3(-200, -10, 0));
+					camera.pos.x -= 2;
+					
 				}
 			}
 			else
 			{
-				camera.allowMovement = false;
-				camera.AddForce(glm::vec3(-200, -10, 0));
+				camera.pos.x -= 2;
+				
 			}
 		}
 
@@ -328,15 +330,15 @@ void SceneHole::Update(double dt)
 			{
 				if (camera.pos.z > -3 && camera.pos.z < 3)
 				{
-					camera.allowMovement = false;
-					camera.AddForce(glm::vec3(-200, -10, 0));
+					camera.pos.x -= 2;
+					
 				}
 				else
 				{
 					if (camera.pos.y < 3.1)
 					{
-						camera.allowMovement = false;
-						camera.AddForce(glm::vec3(-200, -10, 0));
+						camera.pos.x -= 2;
+						
 					}
 				}
 			}
@@ -349,14 +351,14 @@ void SceneHole::Update(double dt)
 			{
 				if (camera.pos.y > 2)
 				{
-					camera.allowMovement = false;
-					camera.AddForce(glm::vec3(-200, -10, 0));
+					camera.pos.x -= 2;
+					
 				}
 			}
 			else
 			{
-				camera.allowMovement = false;
-				camera.AddForce(glm::vec3(-200, -10, 0));
+				camera.pos.x -= 2;
+				
 			}
 		}
 
@@ -365,23 +367,23 @@ void SceneHole::Update(double dt)
 		{
 			if (camera.pos.y == 3)
 			{
-				camera.allowMovement = false;
-				camera.AddForce(glm::vec3(-200, -10, 0));
+				camera.pos.x -= 2;
+				
 			}
 			else if (camera.pos.y > 3.1)
 			{
 				if (camera.pos.z > -8 && camera.pos.z < 8)
 				{
-					camera.allowMovement = false;
-					camera.AddForce(glm::vec3(-200, -10, 0));
+					camera.pos.x -= 2;
+					
 				}
 			}
 			else
 			{
 				if ((camera.pos.z < -8 || camera.pos.z > 8))
 				{
-					camera.allowMovement = false;
-					camera.AddForce(glm::vec3(-200, -10, 0));
+					camera.pos.x -= 2;
+					
 				}
 			}
 		}
@@ -391,15 +393,15 @@ void SceneHole::Update(double dt)
 		{
 			if (camera.pos.y < 3.1)
 			{
-				camera.allowMovement = false;
-				camera.AddForce(glm::vec3(-200, -10, 0));
+				camera.pos.x -= 2;
+				
 			}
 			else
 			{
 				if (camera.pos.z > -6 || camera.pos.z < -17)
 				{
-					camera.allowMovement = false;
-					camera.AddForce(glm::vec3(-200, -10, 0));
+					camera.pos.x -= 2;
+					
 				}
 			}
 		}
@@ -458,9 +460,9 @@ void SceneHole::Render()
 	}
 
 
-	modelStack.PushMatrix();
+	/*modelStack.PushMatrix();
 	RenderMesh(meshList[GEO_AXES], false);
-	modelStack.PopMatrix();
+	modelStack.PopMatrix();*/
 
 	/*modelStack.PushMatrix();
 	modelStack.Translate(light[0].position.x, light[0].position.y, light[0].position.z);
