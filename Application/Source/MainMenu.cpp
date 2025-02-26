@@ -390,7 +390,6 @@ void MainMenu::Render()
 		RenderTextOnScreen(meshList[GEO_TITLE], "R - Restart Minigame", glm::vec3(1, 1, 1), 15, 280, 260);
 		RenderTextOnScreen(meshList[GEO_TITLE], "C - Crouch", glm::vec3(1, 1, 1), 15, 280, 230); 
 		RenderTextOnScreen(meshList[GEO_TITLE], "[in Hole in Wall Minigame]", glm::vec3(1, 1, 0), 15, 300, 200);
-		//RenderTextOnScreen(meshList[GEO_TITLE], "other controls placeholder here", glm::vec3(1, 1, 1), 15, 280, 260);
 	}
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
