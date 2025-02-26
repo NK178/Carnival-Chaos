@@ -52,7 +52,11 @@ SceneFinal::SceneFinal()
 	}
 
 	m_balloonSpawnTimer = 0.0f;
-	m_balloonSpawnInterval = 15.0f; // Spawn a balloon every 15 seconds
+	m_balloonSpawnInterval = 10.0f; // Spawn a balloon every 10 seconds
+
+	m_bearFlying = false;
+	m_bearFlyTimer = 0.0f;
+	m_bearOriginalPos = glm::vec3(0, 0, 0);
 }
 
 SceneFinal::~SceneFinal()
@@ -198,6 +202,8 @@ void SceneFinal::Init()
 
 	meshList[GEO_KEY_E] = MeshBuilder::GenerateQuad("KeyE", glm::vec3(1.f, 1.f, 1.f), 2.f);
 	meshList[GEO_KEY_E]->textureID = LoadTGA("Images//keyboard_key_e.tga");
+	meshList[GEO_KEY_R] = MeshBuilder::GenerateQuad("KeyE", glm::vec3(1.f, 1.f, 1.f), 2.f);
+	meshList[GEO_KEY_R]->textureID = LoadTGA("Images//keyboard_key_r.tga");
 	meshList[GEO_KEY_Q] = MeshBuilder::GenerateQuad("KeyQ", glm::vec3(1.f, 1.f, 1.f), 2.f);
 	meshList[GEO_KEY_Q]->textureID = LoadTGA("Images//keyboard_key_q.tga");
 
@@ -309,20 +315,20 @@ void SceneFinal::Init()
 // Disclaimer = SORRY FOR THE MILLION DEBUG STATEMENTS IT TOOK AWHILE - Mathea
 bool SceneFinal::CheckRayBalloonCollision(glm::vec3 rayOrigin, glm::vec3 rayDirection)
 {
-	/*std::cout << "SHOOTING - Origin: " << rayOrigin.x << ", "
-		<< rayOrigin.y << ", " << rayOrigin.z << std::endl;
-	std::cout << "Direction: " << rayDirection.x << ", "
-		<< rayDirection.y << ", " << rayDirection.z << std::endl;*/
+	// Only process collisions if battle is active
+	if (!m_battleStarted || m_battleEnded || isEnterSceneDialogueActive || isBossDefeatedDialogueActive) {
+		return false;
+	}
+
+	// Ensure ray direction is normalized
+	rayDirection = glm::normalize(rayDirection);
 
 	// Iterate through each balloon
 	for (int i = 0; i < MAX_BALLOONS; ++i)
 	{
 		if (m_balloons[i].active)
 		{
-
 			glm::vec3 balloonPos = m_cpu.pos + m_balloons[i].offset;
-			std::cout << "Balloon " << i << " position: " << balloonPos.x << ", "
-				<< balloonPos.y << ", " << balloonPos.z << std::endl;
 
 			// Compute vector from ray origin to balloon center
 			glm::vec3 toBalloon = balloonPos - rayOrigin;
@@ -354,6 +360,28 @@ bool SceneFinal::CheckRayBalloonCollision(glm::vec3 rayOrigin, glm::vec3 rayDire
 					m_bossHealth = 0;
 					m_battleEnded = true;
 					m_playerWon = true;
+
+					// Start the bear flying animation
+					m_bearFlying = true;
+					m_bearFlyTimer = 0.0f;
+					m_bearOriginalPos = m_cpu.pos; // Store the original position
+
+					// Since player won, trigger boss defeated dialogue
+					isBossDefeatedDialogueActive = true;
+					currentLineIndex = 0;
+					dialogueTimer = 0;
+					isTyping = true;
+					typewriterTimer = 0.0f;
+
+					const DialogueLine& currentDialogue = bossDefeatDialogueLines[currentLineIndex];
+					if (currentDialogue.isMultiLine) {
+						currentText = currentDialogue.textLines[0] + "\n" + currentDialogue.textLines[1];
+					}
+					else {
+						currentText = currentDialogue.textLines[0];
+					}
+					currentCharIndex = 0;
+
 					std::cout << "BOSS DEFEATED!" << std::endl;
 				}
 
@@ -362,13 +390,13 @@ bool SceneFinal::CheckRayBalloonCollision(glm::vec3 rayOrigin, glm::vec3 rayDire
 		}
 	}
 
-	std::cout << "No balloon hit" << std::endl;
 	return false;
 }
 
 void SceneFinal::Update(double dt) {
 
 	HandleKeyPress();
+
 	// Store old position for collision
 	glm::vec3 oldPos = carPhysics.pos;
 
@@ -387,7 +415,6 @@ void SceneFinal::Update(double dt) {
 	float plrCarTotalVel = sqrt((carPhysics.vel.x * carPhysics.vel.x) + (carPhysics.vel.z * carPhysics.vel.z));
 	float cpuCarTotalVel = sqrt((m_cpu.vel.x * m_cpu.vel.x) + (m_cpu.vel.z * m_cpu.vel.z));
 
-
 	// Handle turning
 	if (KeyboardController::GetInstance()->IsKeyDown('A')) {
 		carPhysics.angularVel = KeyboardController::GetInstance()->IsKeyDown('S') ? CAR_TURN_RATE * -plrCarTotalVel / 100 : CAR_TURN_RATE * plrCarTotalVel / 100;
@@ -399,82 +426,72 @@ void SceneFinal::Update(double dt) {
 		carPhysics.angularVel = 0;
 	}
 
+	// Only process AI movement if the battle is active and not ended
+	if (m_battleStarted && !m_battleEnded && !isEnterSceneDialogueActive && !isBossDefeatedDialogueActive) {
+		float aiAngleRad = glm::radians(m_cpu.angleDeg);
+		glm::vec3 aiForward(-sin(aiAngleRad), 0, -cos(aiAngleRad));
 
-	float aiAngleRad = glm::radians(m_cpu.angleDeg);
-	glm::vec3 aiForward(-sin(aiAngleRad), 0, -cos(aiAngleRad));
+		glm::vec3 aiToPlayer = carPhysics.pos - m_cpu.pos;
 
-	glm::vec3 aiToPlayer = carPhysics.pos - m_cpu.pos;
+		float cross = (aiForward.x * aiToPlayer.z) - (aiForward.z * aiToPlayer.x);
+		float dot = glm::dot(aiForward, aiToPlayer);
 
-	float cross = (aiForward.x * aiToPlayer.z) - (aiForward.z * aiToPlayer.x);
-	float dot = glm::dot(aiForward, aiToPlayer);
+		if (dot > 20) {
+			AImove = 'F';
+		}
+		else {
+			AImove = 'B';
+		}
 
-	//std::cout << cross << std::endl;
+		if (AImove == 'F') {
+			m_cpu.AddForce(aiForward * CAR_FORCE);
 
-	if (dot > 20)
-	{
-		AImove = 'F';
+			if (cross > 2) {
+				AIsteer = 'R';
+			}
+			else if (cross < -2) {
+				AIsteer = 'L';
+			}
+			else {
+				AIsteer = 'N';
+			}
+		}
+		else if (AImove == 'B') {
+			m_cpu.AddForce(-aiForward * CAR_FORCE);
+
+			if (cross > 2) {
+				AIsteer = 'L';
+			}
+			else if (cross < 2) {
+				AIsteer = 'R';
+			}
+			else {
+				AIsteer = 'N';
+			}
+		}
+		if (AIsteer == 'L') {
+			m_cpu.angularVel = AImove == 'B' ? CAR_TURN_RATE * -cpuCarTotalVel / 100 : CAR_TURN_RATE * cpuCarTotalVel / 100;
+		}
+		else if (AIsteer == 'R') {
+			m_cpu.angularVel = AImove == 'B' ? -CAR_TURN_RATE * -cpuCarTotalVel / 100 : -CAR_TURN_RATE * cpuCarTotalVel / 100;
+		}
+		else {
+			m_cpu.angularVel = 0;
+		}
+
+		float overallDist = sqrt(((carPhysics.pos.x - m_cpu.pos.x) * (carPhysics.pos.x - m_cpu.pos.x)) + ((carPhysics.pos.z - m_cpu.pos.z) * (carPhysics.pos.z - m_cpu.pos.z)));
+
+		if (overallDist <= 20) {
+			glm::vec3 displacementVect = carPhysics.pos - m_cpu.pos;
+			displacementVect.y = 0;
+			carPhysics.AddForce(displacementVect * 100.f);
+			m_cpu.AddForce(-displacementVect * 100.f);
+		}
 	}
 	else {
-		AImove = 'B';
-	}
-
-	if (AImove == 'F')
-	{
-		m_cpu.AddForce(aiForward * CAR_FORCE);
-
-		if (cross > 2)
-		{
-			AIsteer = 'R';
-		}
-		else if (cross < -2)
-		{
-			AIsteer = 'L';
-		}
-		else
-		{
-			AIsteer = 'N';
-		}
-	}
-	else if (AImove == 'B')
-	{
-		m_cpu.AddForce(-aiForward * CAR_FORCE);
-
-		if (cross > 2)
-		{
-			AIsteer = 'L';
-		}
-		else if (cross < 2)
-		{
-			AIsteer = 'R';
-		}
-		else
-		{
-			AIsteer = 'N';
-		}
-	}
-	if (AIsteer == 'L')
-	{
-		m_cpu.angularVel = AImove == 'B' ? CAR_TURN_RATE * -cpuCarTotalVel / 100 : CAR_TURN_RATE * cpuCarTotalVel / 100;
-	}
-	else if (AIsteer == 'R')
-	{
-		m_cpu.angularVel = AImove == 'B' ? -CAR_TURN_RATE * -cpuCarTotalVel / 100 : -CAR_TURN_RATE * cpuCarTotalVel / 100;
-	}
-	else
-	{
+		// If battle not active or has ended, stop AI movement
 		m_cpu.angularVel = 0;
-	}
-
-	float overallDist = sqrt(((carPhysics.pos.x - m_cpu.pos.x) * (carPhysics.pos.x - m_cpu.pos.x)) + ((carPhysics.pos.z - m_cpu.pos.z) * (carPhysics.pos.z - m_cpu.pos.z)));
-
-	std::cout << overallDist << std::endl;
-
-	if (overallDist <= 20)
-	{
-		glm::vec3 displacementVect = carPhysics.pos - m_cpu.pos;
-		displacementVect.y = 0;
-		carPhysics.AddForce(displacementVect * 100.f);
-		m_cpu.AddForce(-displacementVect * 100.f);
+		m_cpu.vel *= 0.9f; // Apply stronger drag to gradually stop
 	}
 
 	// Apply drag force
@@ -484,6 +501,7 @@ void SceneFinal::Update(double dt) {
 	// Update physics
 	carPhysics.UpdatePhysics(dt);
 	m_cpu.UpdatePhysics(dt);
+
 
 	// Check collisions with fences
 	PhysicsObject frontFence;
@@ -540,19 +558,40 @@ void SceneFinal::Update(double dt) {
 	if (m_cpu.pos.z < -ARENA_LIMIT) m_cpu.pos.z = -ARENA_LIMIT;
 
 	// --- Battle Logic ---
-   // If the battle has started and not yet ended, update the timer
-	if (m_battleStarted && !m_battleEnded) {
+   // In the Update function, modify this section:
+	if (m_battleStarted && !m_battleEnded && !isEnterSceneDialogueActive && !isBossDefeatedDialogueActive) {
 		m_battleTimer -= dt;
 		if (m_battleTimer <= 0.0f) {
 			// Time's up; if the boss still has health, the player loses.
 			m_battleTimer = 0.0f;
 			m_battleEnded = true;
-			m_playerWon = (m_bossHealth <= 0);
-			// Optionally trigger a "loss" event here if m_bossHealth > 0.
+
+			if (m_bossHealth <= 0) {
+				m_playerWon = true;
+				// Trigger victory dialogue
+				isBossDefeatedDialogueActive = true;
+				currentLineIndex = 0;
+				dialogueTimer = 0;
+				isTyping = true;
+				typewriterTimer = 0.0f;
+
+				const DialogueLine& currentDialogue = bossDefeatDialogueLines[currentLineIndex];
+				if (currentDialogue.isMultiLine) {
+					currentText = currentDialogue.textLines[0] + "\n" + currentDialogue.textLines[1];
+				}
+				else {
+					currentText = currentDialogue.textLines[0];
+				}
+				currentCharIndex = 0;
+			}
+			else {
+				m_playerLost = true; // Make sure this is set to true when time runs out
+			}
 		}
 	}
 
-	if (m_battleStarted && !m_battleEnded) {
+	// Balloon spawn logic - only active during battle
+	if (m_battleStarted && !m_battleEnded && !isEnterSceneDialogueActive && !isBossDefeatedDialogueActive) {
 		m_balloonSpawnTimer += dt;
 		if (m_balloonSpawnTimer >= m_balloonSpawnInterval) {
 			m_balloonSpawnTimer = 0.0f;
@@ -583,6 +622,33 @@ void SceneFinal::Update(double dt) {
 	//	m_bossHealth--;
 	//}
 
+	// Timer logic - only runs during battle and not during dialogue
+	if (m_battleStarted && !m_battleEnded && !isEnterSceneDialogueActive && !isBossDefeatedDialogueActive) {
+		m_battleTimer -= dt;
+		if (m_battleTimer <= 0.0f) {
+			// Time's up; if the boss still has health, the player loses.
+			m_battleTimer = 0.0f;
+			m_battleEnded = true;
+			if (m_bossHealth <= 0) {
+				m_playerWon = true;
+			}
+			else {
+				m_playerLost = true;
+			}
+		}
+	}
+
+	// Countdown logic
+	if (isObjectiveRead) {
+		if (countdownTime > 0) {
+			countdownTime -= dt; // decrease countdown time
+			if (countdownTime < 0) {
+				countdownTime = 0; // ensure countdown does not go below 0
+				m_battleStarted = true;
+			}
+		}
+	}
+
 	// Update camera to match driver's perspective
 	float driverHeight = 7.0f;
 	camera.pos = carPhysics.pos + glm::vec3(0, driverHeight, 0);
@@ -591,6 +657,35 @@ void SceneFinal::Update(double dt) {
 	// FPS
 	float temp = 1.f / dt;
 	fps = glm::round(temp * 100.f) / 100.f;
+
+
+
+	// Add to Update function (inside the if (m_battleStarted && !m_battleEnded) section or near other animation code)
+	if (m_bearFlying) {
+		m_bearFlyTimer += dt;
+
+		// For 3 seconds, make the bear fly upward with sine wave motion
+		if (m_bearFlyTimer < 3.0f) {
+			// Calculate new height
+			float speed = 50.0f; // Adjust for faster/slower upward movement
+			float height = m_bearOriginalPos.y + speed * m_bearFlyTimer;
+
+			// Calculate horizontal sine wave motion
+			float amplitude = 10.0f * m_bearFlyTimer; // Increasing amplitude as it flies
+			float frequency = 5.0f; // Oscillations per second
+			float xOffset = amplitude * sin(frequency * m_bearFlyTimer * 2 * 3.14159f);
+			float zOffset = amplitude * cos(frequency * m_bearFlyTimer * 2 * 3.14159f);
+
+			// Update CPU position (for the bear)
+			m_cpu.pos.y = height;
+			m_cpu.pos.x = m_bearOriginalPos.x + xOffset;
+			m_cpu.pos.z = m_bearOriginalPos.z + zOffset;
+
+			// Spin the bear
+			m_cpu.angleDeg += 720.0f * dt; // Rotate 720 degrees per second
+		}
+	}
+
 
 	UpdateDialogue(dt);
 }
@@ -783,16 +878,24 @@ void SceneFinal::Render()
 	modelStack.PopMatrix();
 
 
-	// Render the AI driver's model (GEO_CLOWN) attached to the AI car (m_cpu)
+// Render the AI driver's model (GEO_CLOWN) attached to the AI car (m_cpu)
 	modelStack.PushMatrix();
-	modelStack.Translate(m_cpu.pos.x, m_cpu.pos.y + 6.0f, m_cpu.pos.z - 2);
 
-	modelStack.Rotate(m_cpu.angleDeg + 180.0f, 0, 1, 0);
-
-	modelStack.Translate(0.5f, 0.0f, 0.0f);
-	modelStack.Scale(15.0f, 15.0f, 15.0f); // Adjust scale as needed
-
-	// Set materials for the driver (if needed)
+	// If the bear is flying, use the updated position
+	if (m_bearFlying) {
+		modelStack.Translate(m_cpu.pos.x, m_cpu.pos.y, m_cpu.pos.z);
+		modelStack.Rotate(m_cpu.angleDeg + 180.0f, 0, 1, 0);
+		// Add some extra rotation for drama
+		modelStack.Rotate(m_bearFlyTimer * 360.0f, 0, 0, 1);
+		modelStack.Scale(15.0f, 15.0f, 15.0f);
+	}
+	else {
+		// Original bear rendering position code
+		modelStack.Translate(m_cpu.pos.x, m_cpu.pos.y + 6.0f, m_cpu.pos.z - 2);
+		modelStack.Rotate(m_cpu.angleDeg + 180.0f, 0, 1, 0);
+		modelStack.Translate(0.5f, 0.0f, 0.0f);
+		modelStack.Scale(15.0f, 15.0f, 15.0f);
+	}
 	meshList[GEO_CLOWN]->material.kAmbient = glm::vec3(0.7f, 0.7f, 0.7f);
 	meshList[GEO_CLOWN]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
 	meshList[GEO_CLOWN]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
@@ -882,7 +985,7 @@ void SceneFinal::Render()
 		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "GAME OVER!", glm::vec3(1, 0, 0), 40, 210, 370);
 
-		RenderTextOnScreen(meshList[GEO_TEXT2], "You ran out of time!", glm::vec3(1, 1, 1), 20, 190, 320);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "You ran out of time!", glm::vec3(1, 1, 1), 20, 200, 320);
 
 		RenderMeshOnScreen(meshList[GEO_KEY_R], 350, 270, 15, 15);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "Retry", glm::vec3(1, 1, 1), 20, 390, 260);
@@ -1256,6 +1359,37 @@ void SceneFinal::HandleKeyPress()
 		{
 			isObjectiveRead = true; // set to true when the objective is read
 			countdownTime = 4.0f;
+		}
+	}
+
+	if (KeyboardController::GetInstance()->IsKeyPressed('R')) {
+		if (m_playerLost) {
+			// Reset the game
+			m_battleTimer = 80.0f;
+			m_bossHealth = 100;
+			m_battleStarted = false;
+			m_battleEnded = false;
+			m_playerWon = false;
+			m_playerLost = false;
+			isObjectiveRead = false;
+			countdownTime = 0.0f;
+
+			// Reset balloon states
+			for (int i = 0; i < MAX_BALLOONS; ++i) {
+				m_balloons[i].active = true;
+			}
+
+			m_balloonSpawnTimer = 0.0f;
+
+			// Reset positions if needed
+			carPhysics.pos = glm::vec3(-10, 1, -10);
+			m_cpu.pos = glm::vec3(0, 0, 0); // Set to appropriate starting position
+
+			// Reset velocities
+			carPhysics.vel = glm::vec3(0, 0, 0);
+			m_cpu.vel = glm::vec3(0, 0, 0);
+			carPhysics.angularVel = 0;
+			m_cpu.angularVel = 0;
 		}
 	}
 }

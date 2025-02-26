@@ -229,6 +229,10 @@ private:
 	float m_balloonSpawnTimer;    // Timer for balloon spawning
 	float m_balloonSpawnInterval; // Interval between balloon spawns
 
+	bool m_bearFlying;
+	float m_bearFlyTimer;
+	glm::vec3 m_bearOriginalPos;
+
 
 };
 
