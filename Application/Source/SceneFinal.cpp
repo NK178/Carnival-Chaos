@@ -27,8 +27,6 @@ SceneFinal::SceneFinal()
 	m_battleEnded = false;
 	m_playerWon = false;
 	
-
-	// In SceneFinal constructor:
 	for (int i = 0; i < MAX_BALLOONS; ++i) {
 		m_balloons[i].active = true;  // Always active
 		m_balloons[i].size = 1.0f;
@@ -46,7 +44,7 @@ SceneFinal::SceneFinal()
 	}
 
 	m_balloonSpawnTimer = 0.0f;
-	m_balloonSpawnInterval = 3.0f; // Spawn a balloon every 3 seconds
+	m_balloonSpawnInterval = 10.0f; // Spawn a balloon every 3 seconds
 
 }
 
@@ -288,7 +286,69 @@ void SceneFinal::Init()
 
 }
 
+// Disclaimer = SORRY FOR THE MILLION DEBUG STATEMENTS IT TOOK AWHILE - Mathea
+bool SceneFinal::CheckRayBalloonCollision(glm::vec3 rayOrigin, glm::vec3 rayDirection)
+{
+	/*std::cout << "SHOOTING - Origin: " << rayOrigin.x << ", "
+		<< rayOrigin.y << ", " << rayOrigin.z << std::endl;
+	std::cout << "Direction: " << rayDirection.x << ", "
+		<< rayDirection.y << ", " << rayDirection.z << std::endl;*/
+
+	// Iterate through each balloon
+	for (int i = 0; i < MAX_BALLOONS; ++i)
+	{
+		if (m_balloons[i].active)
+		{
+
+			glm::vec3 balloonPos = m_cpu.pos + m_balloons[i].offset;
+			std::cout << "Balloon " << i << " position: " << balloonPos.x << ", "
+				<< balloonPos.y << ", " << balloonPos.z << std::endl;
+
+			// Compute vector from ray origin to balloon center
+			glm::vec3 toBalloon = balloonPos - rayOrigin;
+
+			// Project 'toBalloon' onto the ray direction
+			float projection = glm::dot(toBalloon, rayDirection);
+			if (projection < 0)
+				continue; // Balloon is behind the ray origin
+
+			// Find the closest point on the ray to the balloon's center
+			glm::vec3 closestPoint = rayOrigin + projection * rayDirection;
+
+			// Distance from the balloon's center to this closest point
+			float distance = glm::length(balloonPos - closestPoint);
+
+			float balloonRadius = 3.0f * m_balloons[i].size;
+
+			// If the distance is less than the radius, the ray hits the balloon
+			if (distance < balloonRadius)
+			{
+				std::cout << "HIT BALLOON " << i << "!" << std::endl;
+
+				// Balloon hit! Deactivate it and deal damage.
+				m_balloons[i].active = false;
+				m_bossHealth -= 10; // Each balloon hit deals 10 damage
+
+				if (m_bossHealth <= 0)
+				{
+					m_bossHealth = 0;
+					m_battleEnded = true;
+					m_playerWon = true;
+					std::cout << "BOSS DEFEATED!" << std::endl;
+				}
+
+				return true; // Collision detected.
+			}
+		}
+	}
+
+	std::cout << "No balloon hit" << std::endl;
+	return false;
+}
+
 void SceneFinal::Update(double dt) {
+
+	HandleKeyPress();
 	// Store old position for collision
 	glm::vec3 oldPos = carPhysics.pos;
 
@@ -477,8 +537,7 @@ void SceneFinal::Update(double dt) {
 		}
 	}
 
-	// Balloon spawning: every m_balloonSpawnInterval seconds, spawn a balloon on the boss car,
-// but only if there are fewer than 3 active.
+
 	if (m_battleStarted && !m_battleEnded) {
 		m_balloonSpawnTimer += dt;
 		if (m_balloonSpawnTimer >= m_balloonSpawnInterval) {
@@ -495,7 +554,7 @@ void SceneFinal::Update(double dt) {
 					if (!m_balloons[i].active) {
 						m_balloons[i].active = true;
 
-						// Position is now based on the offset
+						// Position is based on the offset
 						m_balloons[i].pos = m_cpu.pos + m_balloons[i].offset;
 
 						break; // spawn only one per interval
@@ -504,6 +563,10 @@ void SceneFinal::Update(double dt) {
 			}
 		}
 	}
+
+	//if (KeyboardController::GetInstance()->IsKeyPressed('H')) {
+	//	m_bossHealth--;
+	//}
 
 	// Update camera to match driver's perspective
 	float driverHeight = 7.0f;
@@ -869,7 +932,7 @@ void SceneFinal::HandleKeyPress()
 		isRightUp = false;
 	}
 
-	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_TAB))
+	/*if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_TAB))
 	{
 		if (light[0].type == Light::LIGHT_POINT) {
 			light[0].type = Light::LIGHT_DIRECTIONAL;
@@ -885,6 +948,18 @@ void SceneFinal::HandleKeyPress()
 		}
 
 		glUniform1i(m_parameters[U_LIGHT0_TYPE], light[0].type);
+	}*/
+
+
+	if (MouseController::GetInstance()->IsButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
+		std::cout << "LEFT MOUSE BUTTON PRESSED" << std::endl;
+
+		// Create a ray from the camera's position in the direction the camera is facing
+		glm::vec3 rayOrigin = camera.pos;
+		glm::vec3 rayDirection = glm::normalize(camera.target - camera.pos);
+
+		// Check for collision with balloons
+		bool hitBalloon = CheckRayBalloonCollision(rayOrigin, rayDirection);
 	}
 
 }
