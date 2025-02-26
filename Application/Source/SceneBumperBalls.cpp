@@ -305,8 +305,8 @@ void SceneBumperBalls::Update(double dt)
 
 		for (int i = 0; i < spherelist.size(); ++i)
 		{
-			spherelist[0].xrot += spherelist[0].xrotvel * dt;
-			spherelist[0].zrot += spherelist[0].zrotvel * dt;
+			spherelist[i].xrot += spherelist[i].xrotvel * dt;
+			spherelist[i].zrot += spherelist[i].zrotvel * dt;
 		}
 
 		CollisionData cd;
@@ -324,13 +324,17 @@ void SceneBumperBalls::Update(double dt)
 		//spherelist[0].target = (player[0].pos * 0.5f) + ((player[0].vel * 0.1f) * (abs(dispDist * 0.3f) / (50.f - spherelist[0].vel)));
 		spherelist[0].target = (player[0].pos * 0.5f) + ((player[0].vel * 0.25f) * (abs(dispDist * 0.1f) / (60.f - spherelist[0].vel)));
 
+		if (isballactive[1] || isballactive[3])
+		{
+			spherelist[0].target = -spherelist[0].vel * 5.f;
+		}
 		
 		if (abs(spherelist[0].target.x) > 25)
 		{
 			spherelist[0].target.x *= 0.5f;
 			if (abs(spherelist[0].target.x) > 25)
 			{
-				spherelist[0].target.x = 0.f;
+				spherelist[0].target = glm::normalize(spherelist[0].target) * 10.f;
 			}
 		}
 		if (abs(spherelist[0].target.z) > 25)
@@ -338,15 +342,21 @@ void SceneBumperBalls::Update(double dt)
 			spherelist[0].target.z *= 0.5f;
 			if (abs(spherelist[0].target.z) > 25)
 			{
-				spherelist[0].target.z = 0.f;
+				spherelist[0].target = glm::normalize(spherelist[0].target) * 10.f;
 			}
 		}
 
-		spherelist[1].target = spherelist[1].pos * 10.f;
-		spherelist[2].target = spherelist[2].pos * 10.f;
-		spherelist[3].target = spherelist[3].pos * 10.f;
+		spherelist[1].target = -player[0].pos * 0.5f;
 
-		float enemyNerf = 1.f;
+		if (isballactive[0] || isballactive[3])
+		{
+			spherelist[1].target = (player[0].pos * 0.5f) + ((player[0].vel * 0.1f) * (abs(dispDist * 0.3f) / (50.f - spherelist[1].vel)));
+		}
+
+		spherelist[2].target = spherelist[0].pos * 0.9f;
+		spherelist[3].target = spherelist[2].pos * 1.f;
+
+		float enemyNerf = 1.5f;
 		const float BALL_ROT = 150.f;
 
 		//all AI enemy movement systems
@@ -545,8 +555,8 @@ void SceneBumperBalls::Render()
 		modelStack.Scale(0.05*spherelist[i].radius, 0.05*spherelist[i].radius, 0.05*spherelist[i].radius);
 		meshList[GEO_BEACHBALL]->material.kAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
 		meshList[GEO_BEACHBALL]->material.kDiffuse = glm::vec3(0.6f, 0.6f, 0.6f);
-		meshList[GEO_BEACHBALL]->material.kSpecular = glm::vec3(0.3f, 0.3f, 0.3f);
-		meshList[GEO_BEACHBALL]->material.kShininess = 1.0f;
+		meshList[GEO_BEACHBALL]->material.kSpecular = glm::vec3(i, 0.3f, 0.3f);
+		meshList[GEO_BEACHBALL]->material.kShininess = 1.f;
 		RenderMesh(meshList[GEO_BEACHBALL], true);
 		modelStack.PopMatrix();
 	}

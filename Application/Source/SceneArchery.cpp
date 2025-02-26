@@ -926,7 +926,6 @@ void SceneArchery::Render()
 	}
 
 	if (m_isGameOver) {
-		//RenderMeshOnScreen(meshList[GEO_GAMEOVER], 400, 300, 400, 300);
 		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "GAME OVER!", glm::vec3(1, 0, 0), 40, 210, 370);
 
