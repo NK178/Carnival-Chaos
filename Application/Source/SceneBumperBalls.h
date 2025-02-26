@@ -148,6 +148,10 @@ private:
 		glm::vec3 target;
 		char lat;
 		char vert;
+		float xrot;
+		float zrot;
+		float xrotvel;
+		float zrotvel;
 		Sphere(int id, float r, int type) : radius(r), GameObject(id, type) {}
 	};
 	struct PlayerBall : public GameObject {
