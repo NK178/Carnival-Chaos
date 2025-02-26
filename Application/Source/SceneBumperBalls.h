@@ -113,6 +113,8 @@ public:
 	virtual void Render();
 	virtual void Exit();
 
+	bool gamewin = false;
+
 private:
 	void HandleKeyPress();
 	void RenderMesh(Mesh* mesh, bool enableLight);
@@ -172,7 +174,6 @@ private:
 	std::vector<PlayerBall> player;
 	std::vector<Cylinder> cylinderlist;
 	glm::vec3 newcampos;
-	bool gamewin = false;
 	bool gamestart = false; 
 	bool gamelose = false;
 	const float PLAYER_SPEED = 50.f;

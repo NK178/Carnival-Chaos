@@ -123,6 +123,9 @@ public:
 	virtual void Render();
 	virtual void Exit();
 
+	bool m_playerWon;             // Flag to track if player won
+	bool isWinScreenActive;
+
 private:
 	void HandleKeyPress();
 	void RenderMesh(Mesh* mesh, bool enableLight);
@@ -169,7 +172,6 @@ private:
 	int m_bossHealth;             // Boss health (starts at 100)
 	bool m_battleStarted;         // Flag to track if the battle has started
 	bool m_battleEnded;           // Flag to track if the battle has ended
-	bool m_playerWon;             // Flag to track if player won
 	bool m_playerLost;
 
 	bool isObjectiveRead;
@@ -206,7 +208,6 @@ private:
 	};
 
 	bool isBossDefeatedDialogueActive;
-	bool isWinScreenActive;
 
 	std::vector<DialogueLine> bossDefeatDialogueLines = {
 		{{"AHHH!!!"}, false},

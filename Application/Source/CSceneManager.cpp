@@ -88,7 +88,7 @@ void CSceneManager::PopScene()
     while (sceneStack.size() > 1 && currentSceneType != SCENE_CARNIVAL)
     {
         Scene* currentScene = sceneStack.top();
-        currentScene->Exit();
+        currentScene->Exit();  // Properly exit the scene to clean up resources
         delete currentScene;
         sceneStack.pop();
         typeStack.pop();
@@ -104,8 +104,13 @@ void CSceneManager::PopScene()
     {
         std::cout << "Already at Carnival scene. Reinitializing the carnival scene." << std::endl;
         Scene* carnivalScene = sceneStack.top();
-        carnivalScene->Exit();  // Optionally clean up the current state
-        carnivalScene->Init();  // Reinitialize to reset camera, cutsceneStage, etc.
+
+        // First properly exit to clean up all resources
+        carnivalScene->Exit();
+
+        // Then reinitialize completely (this should recreate all objects from scratch)
+        carnivalScene->Init();
+
         return;
     }
 }

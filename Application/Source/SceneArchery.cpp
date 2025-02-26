@@ -69,7 +69,7 @@ void SceneArchery::Init()
 	camera.allowLocomotiveTilt = false;
 	camera.allowLocomotiveBop = false;
 
-	
+
 
 	// Set background color to dark blue
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
