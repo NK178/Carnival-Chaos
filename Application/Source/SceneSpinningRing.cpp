@@ -492,7 +492,7 @@ void SceneSpinningRing::Update(double dt)
 					ResolveCollision(cd);
 					camera.pos = player[0].pos;
 					camera.target = camera.pos + viewDir * 1.2f;
-\				}
+				}
 			}
 		}
 	}
