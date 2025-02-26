@@ -352,19 +352,20 @@ void MainMenu::Render()
 		if (isScrollDown) {
 			// Yong Quan (cont.)
 			RenderTextOnScreen(meshList[GEO_TITLE], "Yong Quan (cont.) ", glm::vec3(1, 0, 0), 15, 280, 530);
-			RenderTextOnScreen(meshList[GEO_TITLE], "- Main Menu & Loading Screen", glm::vec3(1, 1, 1), 15, 280, 500);
-			RenderTextOnScreen(meshList[GEO_TITLE], "- Spinning Ring Minigame ", glm::vec3(1, 1, 1), 15, 280, 470);
-			RenderTextOnScreen(meshList[GEO_TITLE], "- Linking Scenes Together ", glm::vec3(1, 1, 1), 15, 280, 440);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Main Menu", glm::vec3(1, 1, 1), 15, 280, 500);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Game UI", glm::vec3(1, 1, 1), 15, 280, 470);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Spinning Ring Minigame ", glm::vec3(1, 1, 1), 15, 280, 440);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Linking Scenes Together ", glm::vec3(1, 1, 1), 15, 280, 410);
 
 			// Wilson
-			RenderTextOnScreen(meshList[GEO_TITLE], "Wilson ", glm::vec3(1, 0, 0), 15, 280, 390);
-			RenderTextOnScreen(meshList[GEO_TITLE], "- Camera ", glm::vec3(1, 1, 1), 15, 280, 360);
-			RenderTextOnScreen(meshList[GEO_TITLE], "- Hole in the Wall Minigame ", glm::vec3(1, 1, 1), 15, 280, 330);
-			RenderTextOnScreen(meshList[GEO_TITLE], "- Scene Bumper Balls (Boss AI) ", glm::vec3(1, 1, 1), 15, 280, 300);
-			RenderTextOnScreen(meshList[GEO_TITLE], "- Scene Final", glm::vec3(1, 1, 1), 15, 280, 270);
-			RenderTextOnScreen(meshList[GEO_TITLE], "  (Player Controls and Boss AI) ", glm::vec3(1, 1, 1), 15, 280, 240);
+			RenderTextOnScreen(meshList[GEO_TITLE], "Wilson ", glm::vec3(1, 0, 0), 15, 280, 360);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Camera ", glm::vec3(1, 1, 1), 15, 280, 330);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Hole in the Wall Minigame ", glm::vec3(1, 1, 1), 15, 280, 300);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Scene Bumper Balls (Boss AI) ", glm::vec3(1, 1, 1), 15, 280, 270);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Scene Final", glm::vec3(1, 1, 1), 15, 280, 240);
+			RenderTextOnScreen(meshList[GEO_TITLE], "  (Player Controls and Boss AI) ", glm::vec3(1, 1, 1), 15, 280, 210);
 
-			RenderTextOnScreen(meshList[GEO_TITLE], "And You!", glm::vec3(1, 1, 0), 20, 450, 140);
+			RenderTextOnScreen(meshList[GEO_TITLE], "And You!", glm::vec3(1, 1, 0), 20, 450, 110);
 
 			RenderTextOnScreen(meshList[GEO_TITLE], "Press 'W' to scroll up", glm::vec3(1, 1, 0), 15, 430, 70);
 		}
