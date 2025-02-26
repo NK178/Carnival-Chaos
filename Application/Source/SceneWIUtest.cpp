@@ -229,13 +229,13 @@ void SceneWIUtest::Init()
 
 	cubelist.push_back(Cube(1,GameObject::CUBE));
 	cubelist.push_back(Cube(2,GameObject::CUBE));
-	cubelist[0].pos = glm::vec3{ 3,3,4 };
-	cubelist[1].pos = glm::vec3{ 15,3,4 };
+	cubelist[0].pos = glm::vec3{ 10,0,4 };
+	cubelist[1].pos = glm::vec3{10,5,0 };
 	cubelist[0].mass = 0.f;
 
-	spherelist.push_back(Sphere(3,1.f,GameObject::SPHERE));
+	spherelist.push_back(Sphere(3, 1.f,GameObject::SPHERE));
 	spherelist.push_back(Sphere(4,1.f,GameObject::SPHERE));
-	spherelist[0].pos = glm::vec3{ -10,5,0 };
+	spherelist[0].pos = glm::vec3{ 0,10,0 };
 	spherelist[1].pos = glm::vec3{ -15,3,0 };
 	spherelist[1].mass = 0.f;
 
@@ -264,17 +264,17 @@ void SceneWIUtest::Update(double dt)
 	HandleKeyPress();
 	const float SPEED = 15.f;
 	if (KeyboardController::GetInstance()->IsKeyDown('I'))
-		obblistV2[0].pos.x -= static_cast<float>(dt) * SPEED;
+		spherelist[0].pos.x -= static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('K'))
-		obblistV2[0].pos.x += static_cast<float>(dt) * SPEED;
+		spherelist[0].pos.x += static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('J'))
-		obblistV2[0].pos.z -= static_cast<float>(dt) * SPEED;
+		spherelist[0].pos.z -= static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('L'))
-		obblistV2[0].pos.z += static_cast<float>(dt) * SPEED;
+		spherelist[0].pos.z += static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('O'))
-		obblistV2[0].pos.y -= static_cast<float>(dt) * SPEED;
+		spherelist[0].pos.y -= static_cast<float>(dt) * SPEED;
 	if (KeyboardController::GetInstance()->IsKeyDown('P'))
-		obblistV2[0].pos.y += static_cast<float>(dt) * SPEED;
+		spherelist[0].pos.y += static_cast<float>(dt) * SPEED;
 	
 	//Update my stuff 
 	worldnormals.clear();
@@ -337,7 +337,7 @@ void SceneWIUtest::Update(double dt)
 
 	if (KeyboardController::GetInstance()->IsKeyPressed('R')) {
 		obblist[0].angularVel += 50.f;
-		obblistV2[0].angleDeg = 30.f;
+		obblistV2[0].angularVel += 30.f;
 		//obblistV2[0].angularVel += 50.f;
 	}
 	
@@ -349,7 +349,7 @@ void SceneWIUtest::Update(double dt)
 	if (OverlapSphere2Sphere(spherelist[1], spherelist[1].radius, spherelist[0], spherelist[0].radius, cd)) 
 		ResolveCollision(cd);
 	
-	if (OverlapAABB2Sphere(spherelist[1], spherelist[1].radius, cubelist[1], cubelist[1].pos - cubelist[1].boxextent, cubelist[1].pos + cubelist[1].boxextent, cd))
+	if (OverlapAABB2Sphere(spherelist[0], spherelist[0].radius, cubelist[1], cubelist[1].pos - cubelist[1].boxextent, cubelist[1].pos + cubelist[1].boxextent, cd))
 		ResolveCollision(cd);
 
 	//Cylinder 2 sphere overlap
@@ -368,7 +368,6 @@ void SceneWIUtest::Update(double dt)
 
 	//std::cout << obblistV2[0].pos.x << " " << obblistV2[0].pos.y << " " << obblistV2[0].pos.z << std::endl;
 
-	cubelist[1].angularVel = 20.f;
 	if (KeyboardController::GetInstance()->IsKeyPressed('G')) {
 		if (!activate)
 			activate = true;
@@ -463,40 +462,40 @@ void SceneWIUtest::Render()
 	//RenderMesh(meshList[GEO_PLANE], true);
 	//modelStack.PopMatrix();
 
-	//for (int i = 0; i < cubelist.size(); i++) {
-	//	modelStack.PushMatrix();
-	//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	//	modelStack.Translate(cubelist[i].pos.x, cubelist[i].pos.y, cubelist[i].pos.z);
-	//	modelStack.Rotate(cubelist[i].angleDeg, 0, 1, 0);
-	//	modelStack.Scale(2*cubelist[i].boxextent.x, 2*cubelist[i].boxextent.y, 2*cubelist[i].boxextent.z);
-	//	meshList[GEO_CUBE]->material.kAmbient = glm::vec3(1.f, 0.1f, 0.1f);
-	//	meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(1.f, 0.1f, 0.1f);
-	//	meshList[GEO_CUBE]->material.kSpecular = glm::vec3(1.f, 0.2f, 0.2f);
-	//	meshList[GEO_CUBE]->material.kShininess = 2.0f;
-	//	RenderMesh(meshList[GEO_CUBE], true);
-	//	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	//	modelStack.PopMatrix();
-	//}
+	for (int i = 0; i < cubelist.size(); i++) {
+		modelStack.PushMatrix();
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		modelStack.Translate(cubelist[i].pos.x, cubelist[i].pos.y, cubelist[i].pos.z);
+		modelStack.Rotate(cubelist[i].angleDeg, 0, 1, 0);
+		modelStack.Scale(2*cubelist[i].boxextent.x, 2*cubelist[i].boxextent.y, 2*cubelist[i].boxextent.z);
+		meshList[GEO_CUBE]->material.kAmbient = glm::vec3(1.f, 0.1f, 0.1f);
+		meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(1.f, 0.1f, 0.1f);
+		meshList[GEO_CUBE]->material.kSpecular = glm::vec3(1.f, 0.2f, 0.2f);
+		meshList[GEO_CUBE]->material.kShininess = 2.0f;
+		RenderMesh(meshList[GEO_CUBE], true);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		modelStack.PopMatrix();
+	}
 
-	//for (int i = 0; i < spherelist.size(); i++) {
-	//	modelStack.PushMatrix();
-	//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	//	modelStack.Translate(spherelist[i].pos.x, spherelist[i].pos.y, spherelist[i].pos.z);
-	//	modelStack.Scale(2 * spherelist[i].radius, 2* spherelist[i].radius, 2*spherelist[i].radius);
-	//	meshList[GEO_SPHERE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-	//	meshList[GEO_SPHERE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-	//	meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	//	meshList[GEO_SPHERE]->material.kShininess = 1.0f;
-	//	RenderMesh(meshList[GEO_SPHERE], true);
-	//	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	//	modelStack.PopMatrix();
-	//}
+	for (int i = 0; i < spherelist.size(); i++) {
+		modelStack.PushMatrix();
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		modelStack.Translate(spherelist[i].pos.x, spherelist[i].pos.y, spherelist[i].pos.z);
+		modelStack.Scale(spherelist[i].radius, spherelist[i].radius, spherelist[i].radius);
+		meshList[GEO_SPHERE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+		meshList[GEO_SPHERE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+		meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+		meshList[GEO_SPHERE]->material.kShininess = 1.0f;
+		RenderMesh(meshList[GEO_SPHERE], true);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		modelStack.PopMatrix();
+	}
 
 	//Cylidner 
 	modelStack.PushMatrix();
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	modelStack.Translate(cylinderlist[0].pos.x, cylinderlist[0].pos.y, cylinderlist[0].pos.z);
-	modelStack.Scale(2*cylinderlist[0].radius, cylinderlist[0].height, 2*cylinderlist[0].radius);
+	modelStack.Scale(cylinderlist[0].radius, cylinderlist[0].height, cylinderlist[0].radius);
 	meshList[GEO_CYLINDER]->material.kAmbient = glm::vec3(0.5f, 0.1f, 0.1f);
 	meshList[GEO_CYLINDER]->material.kDiffuse = glm::vec3(0.7f, 0.5f, 0.5f);
 	meshList[GEO_CYLINDER]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);

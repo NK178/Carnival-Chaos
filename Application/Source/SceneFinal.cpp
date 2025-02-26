@@ -21,6 +21,32 @@
 
 SceneFinal::SceneFinal()
 {
+	m_battleTimer = 80.0f;        // 80 seconds total
+	m_bossHealth = 100;           // 100 health
+	m_battleStarted = true; // DISCLAIMER : Set this to true for now, Yong Quan youre in charge of adding the UI before the battle starts!!
+	m_battleEnded = false;
+	m_playerWon = false;
+	
+
+	// In SceneFinal constructor:
+	for (int i = 0; i < MAX_BALLOONS; ++i) {
+		m_balloons[i].active = true;  // Always active
+		m_balloons[i].size = 1.0f;
+
+		// Spread them out in a triangle formation
+		if (i == 0) {
+			m_balloons[i].offset = glm::vec3(-4.0f, 30.0f, -2.0f);  // Left
+		}
+		else if (i == 1) {
+			m_balloons[i].offset = glm::vec3(4.0f, 30.0f, -2.0f);   // Right
+		}
+		else {
+			m_balloons[i].offset = glm::vec3(0.0f, 40.0f, 0.0f);    // Top
+		}
+	}
+
+	m_balloonSpawnTimer = 0.0f;
+	m_balloonSpawnInterval = 3.0f; // Spawn a balloon every 3 seconds
 
 }
 
@@ -172,6 +198,12 @@ void SceneFinal::Init()
 
 	meshList[GEO_CLOWN] = MeshBuilder::GenerateOBJ("Clown", "Models//bear.obj");
 	meshList[GEO_CLOWN]->textureID = LoadTGA("Images//texbear.tga");
+
+	meshList[GEO_BALLOON] = MeshBuilder::GenerateOBJ("Balloon",
+		"Models//Balloon.obj");
+	meshList[GEO_BALLOON]->textureID = LoadTGA("Images//BalloonAlbedo.tga");
+	meshList[GEO_HEALTHBAR] = MeshBuilder::GenerateQuad("HealthBar", glm::vec3(1.0f, 1.0f, 1.0f), 1.0f);
+
 
 	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.4f, 1000.0f);
 	projectionStack.LoadMatrix(projection);
@@ -416,15 +448,66 @@ void SceneFinal::Update(double dt) {
 		ResolveCollision(cd);
 	}
 
-	/// Update camera to match driver's perspective
-	float driverHeight = 7.0f; // Height of driver's head above car base
-	float driverOffset = 0.0f; // Forward/back adjustment from car center
+	const float ARENA_LIMIT = 95.0f; // Just inside the arena walls
 
-	// Position camera at driver's head position
+	// Player car boundary check
+	if (carPhysics.pos.x > ARENA_LIMIT) carPhysics.pos.x = ARENA_LIMIT;
+	if (carPhysics.pos.x < -ARENA_LIMIT) carPhysics.pos.x = -ARENA_LIMIT;
+	if (carPhysics.pos.z > ARENA_LIMIT) carPhysics.pos.z = ARENA_LIMIT;
+	if (carPhysics.pos.z < -ARENA_LIMIT) carPhysics.pos.z = -ARENA_LIMIT;
+
+	// AI car boundary check
+	if (m_cpu.pos.x > ARENA_LIMIT) m_cpu.pos.x = ARENA_LIMIT;
+	if (m_cpu.pos.x < -ARENA_LIMIT) m_cpu.pos.x = -ARENA_LIMIT;
+	if (m_cpu.pos.z > ARENA_LIMIT) m_cpu.pos.z = ARENA_LIMIT;
+	if (m_cpu.pos.z < -ARENA_LIMIT) m_cpu.pos.z = -ARENA_LIMIT;
+
+
+
+	// --- Battle Logic ---
+   // If the battle has started and not yet ended, update the timer
+	if (m_battleStarted && !m_battleEnded) {
+		m_battleTimer -= dt;
+		if (m_battleTimer <= 0.0f) {
+			// Time's up; if the boss still has health, the player loses.
+			m_battleTimer = 0.0f;
+			m_battleEnded = true;
+			m_playerWon = (m_bossHealth <= 0);
+			// Optionally trigger a "loss" event here if m_bossHealth > 0.
+		}
+	}
+
+	// Balloon spawning: every m_balloonSpawnInterval seconds, spawn a balloon on the boss car,
+// but only if there are fewer than 3 active.
+	if (m_battleStarted && !m_battleEnded) {
+		m_balloonSpawnTimer += dt;
+		if (m_balloonSpawnTimer >= m_balloonSpawnInterval) {
+			m_balloonSpawnTimer = 0.0f;
+			// Count how many balloons are active
+			int activeCount = 0;
+			for (int i = 0; i < MAX_BALLOONS; ++i) {
+				if (m_balloons[i].active)
+					activeCount++;
+			}
+			// If fewer than 3 balloons are active, spawn one
+			if (activeCount < 3) {
+				for (int i = 0; i < MAX_BALLOONS; ++i) {
+					if (!m_balloons[i].active) {
+						m_balloons[i].active = true;
+
+						// Position is now based on the offset
+						m_balloons[i].pos = m_cpu.pos + m_balloons[i].offset;
+
+						break; // spawn only one per interval
+					}
+				}
+			}
+		}
+	}
+
+	// Update camera to match driver's perspective
+	float driverHeight = 7.0f;
 	camera.pos = carPhysics.pos + glm::vec3(0, driverHeight, 0);
-
-	//DO NOT CHANGE THE TARGET HERE. Let camera.cpp handle it.
-
 	camera.Update(dt);
 }
 
@@ -640,14 +723,51 @@ void SceneFinal::Render()
 
 
 
-	/*RenderTextOnScreen(meshList[GEO_TEXT], "Stamina", glm::vec3(0, 1, 0), 40, 0, 0);*/
+
+	// Render boss balloons
+	for (int i = 0; i < MAX_BALLOONS; ++i) {
+		if (m_balloons[i].active) {
+			modelStack.PushMatrix();
+			// Position the balloon relative to the boss car
+			// m_cpu.pos is assumed to be the boss car's position
+			modelStack.Translate(m_cpu.pos.x + m_balloons[i].offset.x,
+				m_cpu.pos.y + m_balloons[i].offset.y,
+				m_cpu.pos.z + m_balloons[i].offset.z);
+			// Scale the balloon according to its size
+			modelStack.Scale(m_balloons[i].size, m_balloons[i].size, m_balloons[i].size);
+			meshList[GEO_BALLOON]->material.kAmbient = glm::vec3(0.7f, 0.7f, 0.7f);
+			meshList[GEO_BALLOON]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+			meshList[GEO_BALLOON]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+			meshList[GEO_BALLOON]->material.kShininess = 1.0f;
+			// Render the balloon mesh (make sure GEO_BALLOON is defined and loaded)
+			RenderMesh(meshList[GEO_BALLOON], true);
+			modelStack.PopMatrix();
+		}
+	}
+
+
+
 
 	RenderSkyBox();
+
+
+	if (m_battleStarted) {
+		// Render health label and boss health bar next to each other
+		RenderTextOnScreen(meshList[GEO_TEXT], "Health:", glm::vec3(1, 1, 1), 20, 20, 550);
+		float healthPercent = (float)m_bossHealth / 100.0f;
+		
+		RenderMeshOnScreen(meshList[GEO_HEALTHBAR], 260, 560, 200 * healthPercent, 20);
+
+		RenderTextOnScreen(meshList[GEO_TEXT], "Time: " + std::to_string((int)m_battleTimer), glm::vec3(1, 1, 1), 20, 20, 520);
+	}
 
 	// Render vertical line of crosshair
 	RenderMeshOnScreen(meshList[GEO_CROSSHAIR], 400, 300, 2, 20);  // Thin vertical line
 	// Render horizontal line of crosshair
 	RenderMeshOnScreen(meshList[GEO_CROSSHAIR], 400, 300, 20, 2);  // Thin horizontal line
+
+
+
 }
 
 void SceneFinal::RenderMesh(Mesh* mesh, bool enableLight)
@@ -925,3 +1045,4 @@ void SceneFinal::RenderSkyBox() {
 	RenderMesh(meshList[GEO_BOTTOM], false);
 	modelStack.PopMatrix();
 }
+// ababababa
