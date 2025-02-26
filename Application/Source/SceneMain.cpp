@@ -1028,8 +1028,8 @@ void SceneMain::Render()
 	}
 
 	RenderUI();
-	RenderDialogue();
 	RenderObjectives();
+	RenderDialogue();
 
 	std::string temp("FPS:" + std::to_string(fps));
 	RenderTextOnScreen(meshList[GEO_FPS], temp.substr(0, 9), glm::vec3(0, 1, 0), 20, 620, 20);
@@ -1213,6 +1213,8 @@ void SceneMain::RenderDialogue() {
 // typing speed for the dialogues
 void SceneMain::UpdateDialogue(double dt) {
 	if (readSign && !isSignDialogueActive) {
+		UpdateSignText();
+
 		isSignDialogueActive = true;
 		currentLineIndex = 0;
 		dialogueTimer = 0;
@@ -1315,6 +1317,57 @@ void SceneMain::UpdateDialogue(double dt) {
 				}
 			}
 		}
+	}
+}
+
+void SceneMain::UpdateSignText() {
+	// clear previous dialogue
+	signDialogueLines.clear();
+
+	int completedTents = 0;
+	for (int i = 0; i < 6; ++i) {
+		if (tentCompleted[i]) {
+			completedTents++;
+		}
+	}
+
+	if (completedTents == 0) {
+		// if no minigames are completed
+		signDialogueLines = {
+			{{"Let me see..."}, false},
+			{{"If you complete all six games..."}, false},
+			{{"And the final challenge..."}, false},
+			{{"You get to bring home", "a grand prize of..."}, true},
+			{{"A million dollars?!"}, false},
+			{{"Sounds too good to be true..."}, false},
+			{{"Whatever, since I'm already here,", "why not do it anyway?"}, true},
+			{{"Looks like I have to complete all six", "games in their respective tents first."}, true}
+		};
+	}
+	else if (completedTents < 6) {
+		// dialogue changes based on how many minigames player completed
+		signDialogueLines = {
+			{{"I've completed " + std::to_string(completedTents) + " out of 6 games."}, false},
+			{{"Still a long way to go."}, false},
+			{{"Better keep going."}, false}
+		};
+	}
+	else if (completedTents == 6 && !isFinalChallengeCompleted) {
+		// all minigames complete and final challenge not completed
+		signDialogueLines = {
+			{{"Alright! I finished all six games!"}, false},
+			{{"Now it's time for the final challenge..."}, false},
+			{{"I wonder what kind of challenge awaits."}, false}
+		};
+	}
+	else if (completedTents == 6 && isFinalChallengeCompleted) {
+		// player finished all the game
+		signDialogueLines = {
+			{{"I can't believe it..."}, false},
+			{{"I've actually done it."}, false},
+			{{"All six games, and the final challenge."}, false},
+			{{"What a journey!"}, false}
+		};
 	}
 }
 

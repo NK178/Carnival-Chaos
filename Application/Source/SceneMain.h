@@ -184,19 +184,7 @@ private:
 		  "to have a look..."}, true},
 	};
 
-	std::vector<DialogueLine> signDialogueLines = {
-		{{"Let me see..."}, false},
-		{{"If you complete all six games..."}, false},
-		{{"And the final challenge..."}, false},
-		{{"You get to bring home",
-		  "a grand prize of..."}, true},
-		{{"A million dollars?!"}, false},
-		{{"Sounds too good to be true..."}, false},
-		{{"Whatever, since I'm already here,",
-		  "why not do it anyway?"}, true},
-		{{"Looks like I have to complete all six",
-		  "games in their respective tents first."}, true},
-	};
+	std::vector<DialogueLine> signDialogueLines;
 
 	// dialogue displays
 	int currentLineIndex = -1;
@@ -281,9 +269,9 @@ private:
 
 	void RenderUI();
 	void RenderObjectives();
-	void UpdateDialogue(double dt);
 	void RenderDialogue();
-	//void StartScene(); 
+	void UpdateDialogue(double dt);
+	void UpdateSignText();
 
 	void RenderMeshOnScreen(Mesh* mesh, float x, float y, float sizex, float sizey);
 	void RenderText(Mesh* mesh, std::string text, glm::vec3 color);
