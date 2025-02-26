@@ -365,7 +365,7 @@ void MainMenu::Render()
 			RenderTextOnScreen(meshList[GEO_TITLE], "- Scene Final", glm::vec3(1, 1, 1), 15, 280, 240);
 			RenderTextOnScreen(meshList[GEO_TITLE], "  (Player Controls and Boss AI) ", glm::vec3(1, 1, 1), 15, 280, 210);
 
-			RenderTextOnScreen(meshList[GEO_TITLE], "And You!", glm::vec3(1, 1, 0), 20, 450, 110);
+			RenderTextOnScreen(meshList[GEO_TITLE], "And You!", glm::vec3(1, 1, 0), 20, 450, 140);
 
 			RenderTextOnScreen(meshList[GEO_TITLE], "Press 'W' to scroll up", glm::vec3(1, 1, 0), 15, 430, 70);
 		}
@@ -379,11 +379,18 @@ void MainMenu::Render()
 		RenderMeshOnScreen(meshList[GEO_UI], 520, 310, 50, 50);
 
 		RenderTextOnScreen(meshList[GEO_TITLE], "W,A,S,D - Walk", glm::vec3(1, 1, 1), 15, 280, 530);
-		RenderTextOnScreen(meshList[GEO_TITLE], "SPACE - Jump", glm::vec3(1, 1, 1), 15, 280, 500);
-		RenderTextOnScreen(meshList[GEO_TITLE], "SHIFT - Dash", glm::vec3(1, 1, 1), 15, 280, 470);
-		RenderTextOnScreen(meshList[GEO_TITLE], "E - Enter (Object)", glm::vec3(1, 1, 1), 15, 280, 440);
-		RenderTextOnScreen(meshList[GEO_TITLE], "F - Interact", glm::vec3(1, 1, 1), 15, 280, 410);
-		RenderTextOnScreen(meshList[GEO_TITLE], "other controls placeholder here", glm::vec3(1, 1, 1), 15, 280, 380);
+		RenderTextOnScreen(meshList[GEO_TITLE], "(A,D - Tilts Camera Left/Right)", glm::vec3(1, 0, 0), 15, 300, 500);
+		RenderTextOnScreen(meshList[GEO_TITLE], "(W,S - Backwards/Forward", glm::vec3(1, 0, 0), 15, 300, 470);
+		RenderTextOnScreen(meshList[GEO_TITLE], "([in Scene Bumper Balls])", glm::vec3(1, 1, 0), 15, 320, 440);
+		RenderTextOnScreen(meshList[GEO_TITLE], "SPACE - Jump", glm::vec3(1, 1, 1), 15, 280, 410);
+		RenderTextOnScreen(meshList[GEO_TITLE], "SHIFT - Dash", glm::vec3(1, 1, 1), 15, 280, 380);
+		RenderTextOnScreen(meshList[GEO_TITLE], "E - Enter Tent/Skip Dialogue", glm::vec3(1, 1, 1), 15, 280, 350);
+		RenderTextOnScreen(meshList[GEO_TITLE], "F - Interact", glm::vec3(1, 1, 1), 15, 280, 320);
+		RenderTextOnScreen(meshList[GEO_TITLE], "Q - Skip Cutscene/Exit Minigame", glm::vec3(1, 1, 1), 15, 280, 290);
+		RenderTextOnScreen(meshList[GEO_TITLE], "R - Restart Minigame", glm::vec3(1, 1, 1), 15, 280, 260);
+		RenderTextOnScreen(meshList[GEO_TITLE], "C - Crouch", glm::vec3(1, 1, 1), 15, 280, 230); 
+		RenderTextOnScreen(meshList[GEO_TITLE], "[in Hole in Wall Minigame]", glm::vec3(1, 1, 0), 15, 300, 200);
+		//RenderTextOnScreen(meshList[GEO_TITLE], "other controls placeholder here", glm::vec3(1, 1, 1), 15, 280, 260);
 	}
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
