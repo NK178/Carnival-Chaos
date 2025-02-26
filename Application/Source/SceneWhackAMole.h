@@ -281,8 +281,10 @@ private:
 	};
 	struct Player : public GameObject {
 		glm::vec3 boxextent{2.f,10.f,2.f};
+		glm::vec3 target;
 		Player(int id, int type) : GameObject(id,type) {}
 	};
+
 
 
 	bool activate = false;
@@ -302,6 +304,9 @@ private:
 	bool gamestart = false; 
 	bool isplayerhit = false;
 	bool iscameramove = true;
+
+	//Testing 
+	bool shockwave = false;
 
 
 
