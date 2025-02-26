@@ -150,7 +150,7 @@ void Application::Init()
 		glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
 	// Initialize scene manager with main menu scene
-	sceneManager.Init(SCENE_FINAL);
+	sceneManager.Init(SCENE_BUMPERBALLS);
 }
 
 void Application::Run()

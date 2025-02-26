@@ -356,7 +356,7 @@ void SceneBumperBalls::Update(double dt)
 		spherelist[2].target = spherelist[0].pos * 0.9f;
 		spherelist[3].target = spherelist[2].pos * 1.f;
 
-		float enemyNerf = 1.f;
+		float enemyNerf = 1.5f;
 		const float BALL_ROT = 150.f;
 
 		//all AI enemy movement systems
