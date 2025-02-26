@@ -495,17 +495,6 @@ void SceneFinal::Update(double dt) {
 					if (!m_balloons[i].active) {
 						m_balloons[i].active = true;
 
-						// Choose a position based on which balloon index this is
-						if (i == 0) {
-							m_balloons[i].offset = glm::vec3(-4.0f, 5.0f, -2.0f);  // Left side
-						}
-						else if (i == 1) {
-							m_balloons[i].offset = glm::vec3(4.0f, 5.0f, -2.0f);   // Right side
-						}
-						else {
-							m_balloons[i].offset = glm::vec3(0.0f, 8.0f, 0.0f);    // Top center
-						}
-
 						// Position is now based on the offset
 						m_balloons[i].pos = m_cpu.pos + m_balloons[i].offset;
 
