@@ -416,15 +416,23 @@ void SceneFinal::Update(double dt) {
 		ResolveCollision(cd);
 	}
 
-	/// Update camera to match driver's perspective
-	float driverHeight = 7.0f; // Height of driver's head above car base
-	float driverOffset = 0.0f; // Forward/back adjustment from car center
+	const float ARENA_LIMIT = 95.0f; // Just inside the arena walls
 
-	// Position camera at driver's head position
+	// Player car boundary check
+	if (carPhysics.pos.x > ARENA_LIMIT) carPhysics.pos.x = ARENA_LIMIT;
+	if (carPhysics.pos.x < -ARENA_LIMIT) carPhysics.pos.x = -ARENA_LIMIT;
+	if (carPhysics.pos.z > ARENA_LIMIT) carPhysics.pos.z = ARENA_LIMIT;
+	if (carPhysics.pos.z < -ARENA_LIMIT) carPhysics.pos.z = -ARENA_LIMIT;
+
+	// AI car boundary check
+	if (m_cpu.pos.x > ARENA_LIMIT) m_cpu.pos.x = ARENA_LIMIT;
+	if (m_cpu.pos.x < -ARENA_LIMIT) m_cpu.pos.x = -ARENA_LIMIT;
+	if (m_cpu.pos.z > ARENA_LIMIT) m_cpu.pos.z = ARENA_LIMIT;
+	if (m_cpu.pos.z < -ARENA_LIMIT) m_cpu.pos.z = -ARENA_LIMIT;
+
+	// Update camera to match driver's perspective
+	float driverHeight = 7.0f;
 	camera.pos = carPhysics.pos + glm::vec3(0, driverHeight, 0);
-
-	//DO NOT CHANGE THE TARGET HERE. Let camera.cpp handle it.
-
 	camera.Update(dt);
 }
 
