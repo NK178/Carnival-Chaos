@@ -281,10 +281,12 @@ void SceneHole::Update(double dt)
 			if (camera.pos.y < 0)
 			{
 				failedGrav *= 1.01;
+				camera.allowJump = false;
+				camera.allowMovement = false;
 			}
 			else if (camera.pos.y < 3.5)
 			{
-				failedGrav += 0.05;
+				failedGrav += 0.2;
 			}
 		}
 		camera.pos.y -= failedGrav;
@@ -458,9 +460,9 @@ void SceneHole::Render()
 	}
 
 
-	modelStack.PushMatrix();
+	/*modelStack.PushMatrix();
 	RenderMesh(meshList[GEO_AXES], false);
-	modelStack.PopMatrix();
+	modelStack.PopMatrix();*/
 
 	/*modelStack.PushMatrix();
 	modelStack.Translate(light[0].position.x, light[0].position.y, light[0].position.z);
