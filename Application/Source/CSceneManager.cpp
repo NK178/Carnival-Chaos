@@ -6,6 +6,7 @@
 #include "SceneArchery.h"
 #include "SceneHole.h"
 #include "SceneWhackAMole.h"
+#include "SceneBumperBalls.h"
 #include "SceneSpinningRing.h"
 #include "SceneFinal.h"
 #include <iostream>
@@ -171,6 +172,9 @@ Scene* CSceneManager::CreateScene(SCENE_TYPE sceneType)
         break;
     case SCENE_WHACKAMOLE:
         scene = new SceneWhackAMole();
+        break;
+    case SCENE_BUMPERBALLS:
+        scene = new SceneBumperBalls();
         break;
     case SCENE_SPINNING_RING:
         scene = new SceneSpinningRing();
