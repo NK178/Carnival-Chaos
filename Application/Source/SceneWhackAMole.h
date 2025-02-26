@@ -114,6 +114,8 @@ public:
 	virtual void Render();
 	virtual void Exit();
 
+	bool gamewin = false;
+
 private:
 	void HandleKeyPress();
 	void RenderMesh(Mesh* mesh, bool enableLight);
@@ -306,7 +308,7 @@ private:
 	bool gamestart = false; 
 	bool isplayerhit = false;
 	bool iscameramove = false;
-	bool gamewin = false;
+
 
 	//Testing 
 	bool shockwave = false;

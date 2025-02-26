@@ -23,6 +23,7 @@ SceneMain::SceneMain()
 	for (int i = 0; i < 6; i++) {
 		tentCompleted[i] = false;
 	}
+
 }
 
 SceneMain::~SceneMain()
@@ -31,6 +32,15 @@ SceneMain::~SceneMain()
 
 void SceneMain::Init()
 {
+	player.clear();
+	tentList.clear();
+	finalTent.clear();
+	sideFenceList.clear();
+	frontFenceList.clear();
+	sideBoundary.clear();
+	frontBoundary.clear();
+
+
 	tempCompensation = 0;
 	camera.enableFNAF = true;
 	camera.allowMovement = false;
@@ -361,7 +371,7 @@ void SceneMain::Init()
 			sideBoundary.push_back(sideBoundaryBox(24, GameObject::CUBE));
 
 			frontBoundary[0].pos = glm::vec3{ 0.f, 0.f, -100.f };
-			sideBoundary[0].pos = glm::vec3{ 62.f, 0.f, -90.f }; 
+			sideBoundary[0].pos = glm::vec3{ 62.f, 0.f, -90.f };
 			sideBoundary[1].pos = glm::vec3{ -62.f, 0.f, -90.f };
 
 			for (int i = 0; i < sideBoundary.size(); i++) {
@@ -373,15 +383,15 @@ void SceneMain::Init()
 	}
 
 	// Typewriting Dialogue
-	isTyping = false; 
-	typewriterTimer = 0.0f; 
+	isTyping = false;
+	typewriterTimer = 0.0f;
 	currentText = "";
 	currentCharIndex = 0;
 	isCutsceneDialogueActive = true;
 	hasPlayedCutsceneDialogue = false;
 
 	// Tent Position (for interaction use)
-	tentPositions[0] = glm::vec3(30.f, 0.f, -40.f); 
+	tentPositions[0] = glm::vec3(30.f, 0.f, -40.f);
 	tentPositions[1] = glm::vec3(30.f, 0.f, 0.f);
 	tentPositions[2] = glm::vec3(30.f, 0.f, 40.f);
 	tentPositions[3] = glm::vec3(-30.f, 0.f, -40.f);
@@ -394,7 +404,7 @@ void SceneMain::Init()
 		tentCompleted[i] = false;
 	}
 
-	finalTentPosition = glm::vec3(0.f, 0.f, 70.f); 
+	finalTentPosition = glm::vec3(0.f, 0.f, 70.f);
 	showEnterFinalTentText = false;
 	isFinalChallengeCompleted = false;
 
@@ -535,7 +545,7 @@ void SceneMain::Update(double dt)
 			}
 		}
 
-        if (OverlapAABB2AABB(player[0], player[0].playerDimensions, frontBoundary[0], frontBoundary[0].boundaryDimensions, cd)) {
+		if (OverlapAABB2AABB(player[0], player[0].playerDimensions, frontBoundary[0], frontBoundary[0].boundaryDimensions, cd)) {
 			ResolveCollision(cd);
 			camera.pos = player[0].pos;
 			camera.target = camera.pos + viewDir * 1.2f;
@@ -627,44 +637,43 @@ void SceneMain::Update(double dt)
 
 	UpdateDialogue(dt);
 
-	// Add this inside HandleKeyPress() method
-if (KeyboardController::GetInstance()->IsKeyPressed('1')) {
-	// Force enter Archery scene
-	shouldEnterArchery = true;
-}
-
-if (KeyboardController::GetInstance()->IsKeyPressed('2')) {
-	// Force enter BalloonPop scene
-	shouldEnterBalloonPop = true;
-}
-
-if (KeyboardController::GetInstance()->IsKeyPressed('3')) {
-	// Force enter Hole scene
-	shouldEnterHole = true;
-}
-
-if (KeyboardController::GetInstance()->IsKeyPressed('4')) {
-	// Force enter WhackAMole scene
-	shouldEnterWhackAMole = true;
-}
-
-if (KeyboardController::GetInstance()->IsKeyPressed('5')) {
-	// Force enter Spinning Ring scene
-	shouldEnterSpinningRing = true;
-}
-
-if (KeyboardController::GetInstance()->IsKeyPressed('6')) {
-	// Force enter WIU Test scene
-	shouldEnterWIUTest = true;
-}
-
-if (KeyboardController::GetInstance()->IsKeyPressed('7')) {
-	// Force enter Final scene (after completing all games)
-	for (int i = 0; i < 6; i++) {
-		tentCompleted[i] = true;
-	}
-	shouldEnterFinal = true;
-}
+	//if (KeyboardController::GetInstance()->IsKeyPressed('1')) {
+	//	// Force enter Archery scene
+	//	shouldEnterArchery = true;
+	//}
+	//
+	//if (KeyboardController::GetInstance()->IsKeyPressed('2')) {
+	//	// Force enter BalloonPop scene
+	//	shouldEnterBalloonPop = true;
+	//}
+	//
+	//if (KeyboardController::GetInstance()->IsKeyPressed('3')) {
+	//	// Force enter Hole scene
+	//	shouldEnterHole = true;
+	//}
+	//
+	//if (KeyboardController::GetInstance()->IsKeyPressed('4')) {
+	//	// Force enter WhackAMole scene
+	//	shouldEnterWhackAMole = true;
+	//}
+	//
+	//if (KeyboardController::GetInstance()->IsKeyPressed('5')) {
+	//	// Force enter Spinning Ring scene
+	//	shouldEnterSpinningRing = true;
+	//}
+	//
+	//if (KeyboardController::GetInstance()->IsKeyPressed('6')) {
+	//	// Force enter WIU Test scene
+	//	shouldEnterBumperBalls= true;
+	//}
+	//
+	//if (KeyboardController::GetInstance()->IsKeyPressed('7')) {
+	//	// Force enter Final scene (after completing all games)
+	//	for (int i = 0; i < 6; i++) {
+	//		tentCompleted[i] = true;
+	//	}
+	//	shouldEnterFinal = true;
+	//}
 }
 
 void SceneMain::Render()
@@ -718,7 +727,7 @@ void SceneMain::Render()
 	modelStack.Scale(150.f, 1.f, 200.f);
 	modelStack.Rotate(-90.f, 1, 0, 0);
 	meshList[GEO_PLANE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-	meshList[GEO_PLANE]->material.kDiffuse = glm::vec3(0.5f,0.5f, 0.5f);
+	meshList[GEO_PLANE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
 	meshList[GEO_PLANE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
 	meshList[GEO_PLANE]->material.kShininess = 1.0f;
 	RenderMesh(meshList[GEO_PLANE], true);
@@ -914,7 +923,7 @@ void SceneMain::Render()
 		modelStack.PushMatrix();
 		modelStack.Translate(-20.5f, 0.f, -80.f);
 		modelStack.Rotate(-101, 0, 1, 0);
-		modelStack.Scale(5.f, 5.f, 10.f);          
+		modelStack.Scale(5.f, 5.f, 10.f);
 		RenderMesh(meshList[GEO_FENCE], true);
 		modelStack.PopMatrix();
 
@@ -922,7 +931,7 @@ void SceneMain::Render()
 		modelStack.PushMatrix();
 		modelStack.Translate(60.5f, 0.f, -80.f);
 		modelStack.Rotate(-101, 0, 1, 0);
-		modelStack.Scale(5.f, 5.f, 10.f);          
+		modelStack.Scale(5.f, 5.f, 10.f);
 		RenderMesh(meshList[GEO_FENCE], true);
 		modelStack.PopMatrix();
 	}
@@ -1377,7 +1386,7 @@ void SceneMain::RenderObjectives() {
 	modelStack.Translate(30.f, 8.f, -75.f);
 	modelStack.Rotate(270.f, 0, 1, 0);
 	modelStack.Scale(0.5f, 0.5f, 0.5f);
-	
+
 	int completedGames = 0;
 	for (int i = 0; i < 6; i++) {
 		if (tentCompleted[i]) {
@@ -1385,7 +1394,7 @@ void SceneMain::RenderObjectives() {
 		}
 	}
 
-	int visibleObjectives = 1; 
+	int visibleObjectives = 1;
 	if (hasReadSign) {
 		visibleObjectives++;
 		if (completedGames == 6) {
@@ -1491,7 +1500,7 @@ void SceneMain::RenderMesh(Mesh* mesh, bool enableLight)
 	else
 	{
 		glUniform1i(m_parameters[U_COLOR_TEXTURE_ENABLED], 0);
-	}	
+	}
 	mesh->Render();
 
 	if (mesh->textureID > 0)
@@ -1617,27 +1626,43 @@ void SceneMain::HandleKeyPress()
 		readSign = true;
 		hasReadSign = true;
 	}
-
-	for (int i = 0; i < 6; i++)
-	{
-		if (KeyboardController::GetInstance()->IsKeyPressed('E') && showEnterTentText[i])
-		{
-			if (hasReadSign)
-			{
-				tentCompleted[i] = true; // placeholder
-				// enter tent scene here
+	// When a game is entered
+	for (int i = 0; i < 6; i++) {
+		if (KeyboardController::GetInstance()->IsKeyPressed('E') && showEnterTentText[i]) {
+			if (hasReadSign) {
+				// Based on which tent (i) is being entered, set the appropriate flag
+				switch (i) {
+				case 0:
+					shouldEnterArchery = true;
+					tentCompleted[0] = true; // Mark archery tent as completed
+					break;
+				case 1:
+					shouldEnterBalloonPop = true;
+					tentCompleted[1] = true; // Mark balloon pop tent as completed
+					break;
+				case 2:
+					shouldEnterHole = true;
+					tentCompleted[2] = true; // Mark hole tent as completed
+					break;
+				case 3:
+					shouldEnterWhackAMole = true;
+					tentCompleted[3] = true; // Mark whack-a-mole tent as completed
+					break;
+				case 4:
+					shouldEnterSpinningRing = true;
+					tentCompleted[4] = true; // Mark spinning ring tent as completed
+					break;
+				case 5:
+					shouldEnterBumperBalls = true;
+					tentCompleted[5] = true; // Mark bumper balls tent as completed
+					break;
+				}
 			}
-			else
-			{
+			else {
 				showReadSignText = true;
 				readSignTextTimer = 0.0f;
 			}
 		}
-	}
-	if (KeyboardController::GetInstance()->IsKeyPressed('E') && showEnterFinalTentText)
-	{
-		// logic to complete the final challenge
-		isFinalChallengeCompleted = true;
 	}
 }
 

@@ -143,7 +143,6 @@ public:
      bool shouldEnterWhackAMole = false;   // Flag to enter the whack-a-mole minigame
 	 bool shouldEnterBumperBalls = false;   // Flag to enter the Bumper balls minigame
      bool shouldEnterSpinningRing = false; // Flag to enter the spinning ring minigame
-     bool shouldEnterWIUTest = false;      // Flag to enter the WIU test minigame
      bool shouldEnterFinal = false;        // Flag to enter the final scene
 
 private:

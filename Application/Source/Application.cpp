@@ -22,7 +22,6 @@
 #include "SceneSpinningRing.h"
 #include "SceneWhackAMole.h"
 #include "SceneBumperBalls.h"
-#include "SceneWIUtest.h"
 
 GLFWwindow* m_window;
 const unsigned char FPS = 60; // FPS of this game
@@ -242,10 +241,6 @@ void Application::ProcessInput()
                     sceneManager.PushScene(SCENE_SPINNINGRING);
                     carnivalScene->shouldEnterSpinningRing = false;
                 }
-                else if (carnivalScene->shouldEnterWIUTest) {
-                    sceneManager.PushScene(SCENE_WIUTEST);
-                    carnivalScene->shouldEnterWIUTest = false;
-                }
                 // Check if player completed all required minigames to access final scene
                 else if (carnivalScene->shouldEnterFinal) {
                     sceneManager.PushScene(SCENE_FINAL);
@@ -283,19 +278,19 @@ void Application::ProcessInput()
         case SCENE_WHACKAMOLE:
         {
             SceneWhackAMole* whackAMoleScene = static_cast<SceneWhackAMole*>(currentScene);
-            // For WhackAMole, you need to add a win condition flag in the scene
-            // if (whackAMoleScene->hasWon && KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E)) {
-            //     sceneManager.PopScene();
-            // }
+          
+             if (whackAMoleScene->gamewin && KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E)) {
+                 sceneManager.PopScene();
+             }
             break;
         }
         case SCENE_BUMPERBALLS:
         {
             SceneBumperBalls* bumperballsscene = static_cast<SceneBumperBalls*>(currentScene);
-            // For WhackAMole, you need to add a win condition flag in the scene
-            // if (whackAMoleScene->hasWon && KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E)) {
-            //     sceneManager.PopScene();
-            // }
+            
+             if (bumperballsscene->gamewin && KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E)) {
+                 sceneManager.PopScene();
+             }
             break;
         }
         case SCENE_SPINNINGRING:
@@ -306,23 +301,14 @@ void Application::ProcessInput()
             }
             break;
         }
-        case SCENE_WIUTEST:
-        {
-            SceneWIUtest* wiuTestScene = static_cast<SceneWIUtest*>(currentScene);
-
-            // if (wiuTestScene->hasWon && KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E)) {
-            //     sceneManager.PopScene();
-            // }
-            break;
-        }
         case SCENE_FINAL:
         {
             SceneFinal* finalScene = static_cast<SceneFinal*>(currentScene);
 
-            /*if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_R)) {
-                sceneManager.ReplaceScene(SCENE_MAINMENU);
+            if (finalScene->isWinScreenActive && finalScene->m_playerWon && KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E)) {
+                sceneManager.PopScene();
             }
-            break;*/
+            break;
         }
         default:
             break;
