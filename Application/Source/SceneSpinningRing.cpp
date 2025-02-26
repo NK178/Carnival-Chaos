@@ -273,7 +273,6 @@ void SceneSpinningRing::Init()
 	middleWall.push_back(middleWallBox(8, GameObject::CUBE));
 
 	beamList.push_back(spinningBeam(8, GameObject::CUBE));
-	//beamList.push_back(spinningBeam(9, GameObject::CUBE));
 
 	//DO NOT CHANGE Y < 10.f , BASE Y = 40.f;
 	// Collision Boxes Position
@@ -286,7 +285,6 @@ void SceneSpinningRing::Init()
 	wallTopList[1].pos = glm::vec3{ 0,20,0 };
 	middleWall[0].pos = glm::vec3{ 0,0,0 };
 	beamList[0].pos = glm::vec3{ 0,0,0 };
-	//beamList[1].pos = glm::vec3{ -5,0,0 };
 
 	for (int i = 0; i < wallSideList.size(); i++) {
 		wallSideList[i].mass = 0.f;
@@ -332,12 +330,14 @@ void SceneSpinningRing::Update(double dt)
 		player[0].pos = camera.pos;
 		glm::vec3 viewDir = glm::normalize(camera.target - camera.pos);
 
-		//// slowly increase rotation speed
-		//wallSpeed += 1.0f * dt;
-		//wallRotation += wallSpeed * dt;
-		//if (wallSpeed >= 120.f) {
-		//	wallSpeed = 120.f;
-		//}
+		// slowly increase rotation speed
+		wallSpeed += 1.0f * dt;
+		wallRotation += wallSpeed * dt;
+		wallTopList[0].angularVel = wallTopList[1].angularVel = wallSpeed;
+		if (wallSpeed >= 120.f) {
+			wallSpeed = 120.f;
+			wallTopList[0].angularVel = wallTopList[1].angularVel = wallSpeed;
+		}
 
 		if (!isBeamSpawned) {
 			if (!isShowingBeamWarning && remainingTime <= 19.0f) {
@@ -608,19 +608,19 @@ void SceneSpinningRing::Render()
 	//	}
 	//}
 
-	//for (int j = 0; j < spinningWallTopVertices.size(); j++) {
-	//	for (int i = 0; i < wallTopList[j].vertices.size(); i++) {
-	//		modelStack.PushMatrix();
-	//		modelStack.Translate(spinningWallTopVertices[j][i].x, spinningWallTopVertices[j][i].y, spinningWallTopVertices[j][i].z);
-	//		modelStack.Scale(0.1, 0.1, 0.1);
-	//		meshList[GEO_SPHERE]->material.kAmbient = glm::vec3(0.8, 0.8, 0.8);
-	//		meshList[GEO_SPHERE]->material.kDiffuse = glm::vec3(0.8, 0.8, 0.8);
-	//		meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	//		meshList[GEO_SPHERE]->material.kShininess = 2.0f;
-	//		RenderMesh(meshList[GEO_SPHERE], true);
-	//		modelStack.PopMatrix();
-	//	}
-	//}
+	for (int j = 0; j < spinningWallTopVertices.size(); j++) {
+		for (int i = 0; i < wallTopList[j].vertices.size(); i++) {
+			modelStack.PushMatrix();
+			modelStack.Translate(spinningWallTopVertices[j][i].x, spinningWallTopVertices[j][i].y, spinningWallTopVertices[j][i].z);
+			modelStack.Scale(0.1, 0.1, 0.1);
+			meshList[GEO_SPHERE]->material.kAmbient = glm::vec3(0.8, 0.8, 0.8);
+			meshList[GEO_SPHERE]->material.kDiffuse = glm::vec3(0.8, 0.8, 0.8);
+			meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+			meshList[GEO_SPHERE]->material.kShininess = 2.0f;
+			RenderMesh(meshList[GEO_SPHERE], true);
+			modelStack.PopMatrix();
+		}
+	}
 
 	//for (int j = 0; j < middleWallVertices.size(); j++) {
 	//	for (int i = 0; i < middleWall[j].vertices.size(); i++) {
@@ -636,19 +636,19 @@ void SceneSpinningRing::Render()
 	//	}
 	//}
 
-	for (int j = 0; j < spinningBeamVertices.size(); j++) {
-		for (int i = 0; i < beamList[j].vertices.size(); i++) {
-			modelStack.PushMatrix();
-			modelStack.Translate(spinningBeamVertices[j][i].x, spinningBeamVertices[j][i].y, spinningBeamVertices[j][i].z);
-			modelStack.Scale(0.1, 0.1, 0.1);
-			meshList[GEO_SPHERE]->material.kAmbient = glm::vec3(0.8, 0.8, 0.8);
-			meshList[GEO_SPHERE]->material.kDiffuse = glm::vec3(0.8, 0.8, 0.8);
-			meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-			meshList[GEO_SPHERE]->material.kShininess = 2.0f;
-			RenderMesh(meshList[GEO_SPHERE], true);
-			modelStack.PopMatrix();
-		}
-	}
+	//for (int j = 0; j < spinningBeamVertices.size(); j++) {
+	//	for (int i = 0; i < beamList[j].vertices.size(); i++) {
+	//		modelStack.PushMatrix();
+	//		modelStack.Translate(spinningBeamVertices[j][i].x, spinningBeamVertices[j][i].y, spinningBeamVertices[j][i].z);
+	//		modelStack.Scale(0.1, 0.1, 0.1);
+	//		meshList[GEO_SPHERE]->material.kAmbient = glm::vec3(0.8, 0.8, 0.8);
+	//		meshList[GEO_SPHERE]->material.kDiffuse = glm::vec3(0.8, 0.8, 0.8);
+	//		meshList[GEO_SPHERE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	//		meshList[GEO_SPHERE]->material.kShininess = 2.0f;
+	//		RenderMesh(meshList[GEO_SPHERE], true);
+	//		modelStack.PopMatrix();
+	//	}
+	//}
 
 	if (!isObjectiveRead) { // Render Objective
 		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 30);
