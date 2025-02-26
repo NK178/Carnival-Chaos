@@ -149,7 +149,7 @@ void Application::Init()
 		glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
 	// Initialize scene manager with main menu scene
-	sceneManager.Init(SCENE_MAINMENU);
+	sceneManager.Init(SCENE_SPINNINGRING);
 }
 
 void Application::Run()
@@ -234,7 +234,7 @@ void Application::ProcessInput()
                     carnivalScene->shouldEnterWhackAMole = false;
                 }
                 else if (carnivalScene->shouldEnterSpinningRing) {
-                    sceneManager.PushScene(SCENE_SPINNING_RING);
+                    sceneManager.PushScene(SCENE_SPINNINGRING);
                     carnivalScene->shouldEnterSpinningRing = false;
                 }
                 else if (carnivalScene->shouldEnterWIUTest) {
@@ -284,7 +284,7 @@ void Application::ProcessInput()
             // }
             break;
         }
-        case SCENE_SPINNING_RING:
+        case SCENE_SPINNINGRING:
         {
             SceneSpinningRing* spinningRingScene = static_cast<SceneSpinningRing*>(currentScene);
             if (spinningRingScene->playerWon && KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E)) {

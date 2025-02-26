@@ -174,7 +174,7 @@ private:
 	int cutsceneStage = -1;
 	float tempCompensation;
 
-	std::vector<DialogueLine> enterMainSceneLines = {
+	std::vector<DialogueLine> sceneMainCutsceneLines = {
 		{{"Hmm... What's this?"}, false},
 		{{"A carnival? In the middle of town?!"}, false},
 		{{"It wasn't here before",
@@ -184,31 +184,18 @@ private:
 		  "to have a look..."}, true},
 	};
 
-	std::vector<DialogueLine> signDialogueLines = {
-		{{"Let me see..."}, false},
-		{{"If you complete all six games..."}, false},
-		{{"And the final challenge..."}, false},
-		{{"You get to bring home",
-		  "a grand prize of..."}, true},
-		{{"A million dollars?!"}, false},
-		{{"Sounds too good to be true..."}, false},
-		{{"Whatever, since I'm already here,",
-		  "why not do it anyway?"}, true},
-		{{"Looks like I have to complete all six",
-		  "games in their respective tents first."}, true},
-	};
+	std::vector<DialogueLine> signDialogueLines;
 
 	// dialogue displays
 	int currentLineIndex = -1;
 	float dialogueTimer = 0;
-	const float TEXT_DISPLAY_TIME = 4.0f;
 	bool isTyping;
 	float typewriterTimer; 
 	std::string currentText; 
 	int currentCharIndex;
 
-	bool isEnterMainSceneDialogueActive;
-	bool hasPlayedEnterMainSceneDialogue;
+	bool isCutsceneDialogueActive;
+	bool hasPlayedCutsceneDialogue;
 
 	// sign interaction
 	glm::vec3 signPosition;
@@ -219,14 +206,14 @@ private:
 	bool hasReadSign;
 	bool showReadSignText;
 	float readSignTextTimer;
-	const float READ_SIGN_TEXT_DISPLAY_TIME = 3.0f;
 
 	// tent positions and tent interactions
 	glm::vec3 tentPositions[6];
 	bool showEnterTentText[6];
 	bool tentCompleted[6];
-	glm::vec3 finalTentPosition;
 	bool CheckAllTentsCompleted();
+
+	glm::vec3 finalTentPosition;
 	bool showEnterFinalTentText;
 	bool isFinalChallengeCompleted;
 
@@ -283,9 +270,9 @@ private:
 
 	void RenderUI();
 	void RenderObjectives();
-	void UpdateDialogue(double dt);
 	void RenderDialogue();
-	//void StartScene(); 
+	void UpdateDialogue(double dt);
+	void UpdateSignText();
 
 	void RenderMeshOnScreen(Mesh* mesh, float x, float y, float sizex, float sizey);
 	void RenderText(Mesh* mesh, std::string text, glm::vec3 color);
