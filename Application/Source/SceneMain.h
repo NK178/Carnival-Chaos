@@ -174,7 +174,7 @@ private:
 	int cutsceneStage = -1;
 	float tempCompensation;
 
-	std::vector<DialogueLine> enterMainSceneLines = {
+	std::vector<DialogueLine> sceneMainCutsceneLines = {
 		{{"Hmm... What's this?"}, false},
 		{{"A carnival? In the middle of town?!"}, false},
 		{{"It wasn't here before",
@@ -194,8 +194,8 @@ private:
 	std::string currentText; 
 	int currentCharIndex;
 
-	bool isEnterMainSceneDialogueActive;
-	bool hasPlayedEnterMainSceneDialogue;
+	bool isCutsceneDialogueActive;
+	bool hasPlayedCutsceneDialogue;
 
 	// sign interaction
 	glm::vec3 signPosition;
@@ -211,8 +211,9 @@ private:
 	glm::vec3 tentPositions[6];
 	bool showEnterTentText[6];
 	bool tentCompleted[6];
-	glm::vec3 finalTentPosition;
 	bool CheckAllTentsCompleted();
+
+	glm::vec3 finalTentPosition;
 	bool showEnterFinalTentText;
 	bool isFinalChallengeCompleted;
 

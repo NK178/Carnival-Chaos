@@ -377,8 +377,8 @@ void SceneMain::Init()
 	typewriterTimer = 0.0f; 
 	currentText = "";
 	currentCharIndex = 0;
-	isEnterMainSceneDialogueActive = true; 
-	hasPlayedEnterMainSceneDialogue = false;
+	isCutsceneDialogueActive = true;
+	hasPlayedCutsceneDialogue = false;
 
 	// Tent Position (for interaction use)
 	tentPositions[0] = glm::vec3(30.f, 0.f, -40.f); 
@@ -1146,7 +1146,7 @@ void SceneMain::RenderUI()
 }
 
 void SceneMain::RenderDialogue() {
-	if (isEnterMainSceneDialogueActive) {
+	if (isCutsceneDialogueActive) {
 		RenderMeshOnScreen(meshList[GEO_UI], 150, 535, 150, 9);
 		RenderMeshOnScreen(meshList[GEO_KEY_Q], 20, 510, 10, 10);
 		RenderTextOnScreen(meshList[GEO_TEXT], "[ SKIP CUTSCENE ]", glm::vec3(1, 1, 1), 15, 40, 505);
@@ -1187,8 +1187,8 @@ void SceneMain::RenderDialogue() {
 	}
 
 	// rendering of dialogue when player first enter the game
-	if (isEnterMainSceneDialogueActive && currentLineIndex < enterMainSceneLines.size()) {
-		const DialogueLine& currentDialogue = enterMainSceneLines[currentLineIndex];
+	if (isCutsceneDialogueActive && currentLineIndex < sceneMainCutsceneLines.size()) {
+		const DialogueLine& currentDialogue = sceneMainCutsceneLines[currentLineIndex];
 
 		if (currentDialogue.isMultiLine) {
 			std::string textToRender = currentText.substr(0, currentCharIndex);
@@ -1283,7 +1283,7 @@ void SceneMain::UpdateDialogue(double dt) {
 		}
 	}
 
-	if (isEnterMainSceneDialogueActive && !hasPlayedEnterMainSceneDialogue) {
+	if (isCutsceneDialogueActive && !hasPlayedCutsceneDialogue) {
 		if (isTyping) {
 			typewriterTimer += dt;
 			if (typewriterTimer >= 0.05f) { // Adjust the typing speed here
@@ -1299,14 +1299,14 @@ void SceneMain::UpdateDialogue(double dt) {
 			if (dialogueTimer >= 4.0f) {
 				dialogueTimer = 0;
 				currentLineIndex++;
-				if (currentLineIndex >= enterMainSceneLines.size()) {
-					isEnterMainSceneDialogueActive = false;
-					hasPlayedEnterMainSceneDialogue = true;
+				if (currentLineIndex >= sceneMainCutsceneLines.size()) {
+					isCutsceneDialogueActive = false;
+					hasPlayedCutsceneDialogue = true;
 				}
 				else {
 					isTyping = true;
 					typewriterTimer = 0.0f;
-					const DialogueLine& currentDialogue = enterMainSceneLines[currentLineIndex];
+					const DialogueLine& currentDialogue = sceneMainCutsceneLines[currentLineIndex];
 					if (currentDialogue.isMultiLine) {
 						currentText = currentDialogue.textLines[0] + "\n" + currentDialogue.textLines[1];
 					}
@@ -1562,8 +1562,8 @@ void SceneMain::HandleKeyPress()
 		camera.allowLocomotiveTilt = true;
 		camera.allowLocomotiveBop = false;
 
-		isEnterMainSceneDialogueActive = false;
-		hasPlayedEnterMainSceneDialogue = true;
+		isCutsceneDialogueActive = false;
+		hasPlayedCutsceneDialogue = true;
 
 		cutsceneSkipped = true; // Set the flag to indicate the cutscene has been skipped
 	}
