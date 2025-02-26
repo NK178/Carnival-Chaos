@@ -310,6 +310,7 @@ private:
 
 	//Testing 
 	bool shockwave = false;
+	bool gravity = false;
 	bool isObjectiveRead = false;
 
 

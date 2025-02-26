@@ -394,22 +394,6 @@ void SceneWhackAMole::Update(double dt)
 		}
 	}
 
-	////// TESTING FORCE UPWARDS
-	if (KeyboardController::GetInstance()->IsKeyPressed('T')) {
-		shockwave = true;
-		camera.AddImpulse(glm::vec3(0, 1, 0) * 100.f);
-	}
-
-	//camera.AddForce(glm::vec3(0, -1, 0) * 120.f);
-	//if (!shockwave){
-	//	player[0].pos = camera.pos;
-	//	player[0].target = camera.target;
-	//}
-	//else {
-	//	camera.pos = player[0].pos;
-	//	camera.target = player[0].target;
-	//}
-	/*player[0].accel = glm::vec3{ 0,-1,0 } *10.f;*/
 	player[0].pos = camera.pos;
 	glm::vec3 viewDir = glm::normalize(camera.target - camera.pos);
 	for (int i = 0; i < walllist.size(); i++) {
