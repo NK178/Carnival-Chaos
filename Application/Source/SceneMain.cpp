@@ -1746,6 +1746,7 @@ void SceneMain::HandleKeyPress()
 	if (KeyboardController::GetInstance()->IsKeyPressed('E') && showInteractMBText) {
 		StartDialogue(endingDialogueLines, &isEndingDialogueActive);
 		tookMoneyBag = true;
+		showInteractMBText = false;
 	}
 }
 
