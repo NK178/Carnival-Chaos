@@ -534,12 +534,15 @@ void SceneMain::Update(double dt)
 		// Ensure camera controls are enabled
 		if (!camera.allowMovement) {
 			camera.enableFNAF = false;
-			camera.allowMovement = true;
+			if (!isFinalChallengeCompleted)
+			{
+				camera.allowMovement = true;
+				camera.allowLocomotiveTilt = true;
+			}
 			camera.allowJump = false;
 			camera.allowSprint = false;
 			camera.allowCrouch = true;
 			camera.allowProne = false;
-			camera.allowLocomotiveTilt = true;
 			camera.allowLocomotiveBop = false;
 		}
 	}
@@ -1249,6 +1252,7 @@ void SceneMain::UpdateDialogue(double dt) {
 	if (isFinalChallengeCompleted && !hasPlayedFCCDialogue && !anyOtherDialogueActive()) {
 		StartDialogue(isFCCDialogueLines, &isFCCDialogueActive);
 		hasPlayedFCCDialogue = true;
+		camera.allowMovement = false;
 	}
 
 	// update active dialogue
