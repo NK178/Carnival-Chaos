@@ -474,6 +474,10 @@ void SceneMain::Init()
 	finalTentPosition = glm::vec3(0.f, 0.f, 70.f);
 	showEnterFinalTentText = false;
 	isFinalChallengeCompleted = false;
+
+	moneybagPosition = glm::vec3{0.f, 0.f, -60.f};
+	tookMoneyBag = false;
+	showInteractMBText = false;
 	
 	showReadSignText = false;
 	readSignTextTimer = 0.0f;
@@ -642,7 +646,7 @@ void SceneMain::Update(double dt)
 		frontBoundary[0].UpdatePhysics(dt);
 	}
 
-	// Interaction between Sign and Tents
+	// Interaction between sign, tents and objects
 	{
 		float distance = glm::distance(camera.pos, signPosition);
 		if (distance < 12.0f)
@@ -697,6 +701,18 @@ void SceneMain::Update(double dt)
 			{
 				showReadSignText = false;
 				readSignTextTimer = 0.0f;
+			}
+		}
+
+		if (isFinalChallengeCompleted) {
+			float distanceToMoneyBag = glm::distance(camera.pos, moneybagPosition);
+			if (distanceToMoneyBag < 12.0f)
+			{
+				showInteractMBText = true;
+			}
+			else
+			{
+				showInteractMBText = false;
 			}
 		}
 	}
@@ -1043,7 +1059,7 @@ void SceneMain::Render()
 	}
 
 	// Render Money Bag (if player completes final challenge)
-	if (isFinalChallengeCompleted) {
+	if (isFinalChallengeCompleted && !tookMoneyBag) {
 		modelStack.PushMatrix();
 		modelStack.Translate(0.f, 0.f, -60.f);
 		modelStack.Scale(30.f, 50.f, 30.f);
@@ -1099,6 +1115,12 @@ void SceneMain::RenderUI()
 	{
 		RenderMeshOnScreen(meshList[GEO_UI], 150, 550, 150, 6);
 		RenderTextOnScreen(meshList[GEO_TEXT], "How about we read the sign first?", glm::vec3(1, 1, 1), 20, 10, 550);
+	}
+
+	if (showInteractMBText)
+	{
+		RenderMeshOnScreen(meshList[GEO_KEY_E], 40, 120, 20, 20);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Take Money Bag", glm::vec3(1, 1, 1), 30, 80, 105);
 	}
 }
 
@@ -1705,6 +1727,11 @@ void SceneMain::HandleKeyPress()
 
 			isFinalChallengeCompleted = true;
 		}
+	}
+	if (KeyboardController::GetInstance()->IsKeyPressed('E') && showInteractMBText) {
+		StartDialogue(endingDialogueLines, &isEndingDialogueActive);
+		tookMoneyBag = true;
+		hasPlayedEndingDialogue = true;
 	}
 }
 

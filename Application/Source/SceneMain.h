@@ -233,7 +233,8 @@ private:
 		{{"A... money bag?"}, false},
 		{{"Oh! I remember now!", "The million-dollar reward!"}, true},
 		{{"...It's fake money?"}, false},
-		{{"...That bear wasted my time", "with his games!!"}, true}
+		{{"...That bear wasted my time", "with his stupid games!!"}, true},
+		{{"I swear I'll find you again on day!"}, false}
 	};
 
 	// Dialogue system flags
@@ -278,6 +279,9 @@ private:
 	bool isFinalChallengeCompleted;
 
 	bool interactWithSpinningRing;
+	glm::vec3 moneybagPosition;
+	bool tookMoneyBag;
+	bool showInteractMBText = false; // MB = moneybag
 
 	// Collisions
 	struct playerBox : public GameObject {
