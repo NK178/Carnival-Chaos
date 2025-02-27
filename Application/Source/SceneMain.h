@@ -210,6 +210,11 @@ private:
 
 	std::vector<DialogueLine> signDialogueLines;
 
+	std::vector<DialogueLine> completedTentDialogueLines = {
+		{{"I have already played ths game!"}, false},
+		{{"I should try another one."}, false}
+	};
+
 	std::vector<DialogueLine> spinningRingTentDialogueLines = {
 		{{"Huh..?"}, false},
 		{{"This game is...", "out of order?"}, true},
@@ -244,16 +249,17 @@ private:
 	// Dialogue system flags
 	bool isCutsceneDialogueActive;
 	bool isSignDialogueActive;
+	bool isCompletedTentDialogueActive;
 	bool isSpinningRingDialogueActive;
 	bool isAllTentsCompletedDialogueActive;
-	bool isFCCDialogueActive;
+	bool isFCCDialogueActive; // FCC = FInal Challenge Completed
 	bool isEndingDialogueActive;
 
 	// Flags to track if dialogues have been played
 	bool hasPlayedCutsceneDialogue;
 	bool hasReadSign;
 	bool hasPlayedAllTentsCompletedDialogue;
-	bool hasPlayedFCCDialogue;
+	bool hasPlayedFCCDialogue; // FCC = FInal Challenge Completed
 	bool hasPlayedEndingDialogue;
 
 	// dialogue displays
@@ -286,6 +292,8 @@ private:
 	glm::vec3 moneybagPosition;
 	bool tookMoneyBag;
 	bool showInteractMBText = false; // MB = moneybag
+
+	bool showEndScreen;
 
 	//Camera store positions
 	glm::vec3 storedsignpos{ 20,10,-70 };

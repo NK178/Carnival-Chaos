@@ -469,6 +469,7 @@ void SceneMain::Init()
 
 	// Initialize dialogue flags
 	isSignDialogueActive = false;
+	isCompletedTentDialogueActive = false;
 	isSpinningRingDialogueActive = false;
 	isAllTentsCompletedDialogueActive = false;
 	isFCCDialogueActive = false;
@@ -499,6 +500,8 @@ void SceneMain::Init()
 	dialogueTimer = 0;
 	cutsceneStage = -1;
 	cutsceneSkipped = false;
+
+	showEndScreen = false;
 
 	// Check if we need to restore state after initialization
 	if (hasStateToRestore) {
@@ -1165,12 +1168,20 @@ void SceneMain::RenderUI()
 		RenderMeshOnScreen(meshList[GEO_KEY_E], 40, 120, 20, 20);
 		RenderTextOnScreen(meshList[GEO_TEXT], "Take Money Bag", glm::vec3(1, 1, 1), 30, 80, 105);
 	}
+
+	if (showEndScreen) 
+	{
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
+		RenderTextOnScreen(meshList[GEO_TEXT], "THE END!", glm::vec3(1, 1, 0), 50, 220, 350);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Thanks for playing!", glm::vec3(1, 1, 1), 20, 220, 300);
+		RenderTextOnScreen(meshList[GEO_TEXT], "[ESC] to Exit Game", glm::vec3(1, 1, 1), 20, 222, 250);
+	}
 }
 
 void SceneMain::RenderDialogue() {
 	bool anyDialogueActive = isCutsceneDialogueActive || isSignDialogueActive ||
 		isSpinningRingDialogueActive || isAllTentsCompletedDialogueActive ||
-		isFCCDialogueActive || isEndingDialogueActive;
+		isFCCDialogueActive || isEndingDialogueActive || isCompletedTentDialogueActive;
 
 	if (!anyDialogueActive) {
 		return; // exit function early if no dialogue is active
@@ -1216,6 +1227,11 @@ void SceneMain::UpdateDialogue(double dt) {
 		StartDialogue(signDialogueLines, &isSignDialogueActive);
 	}
 
+	// completed tent dialogue activation
+	if (isCompletedTentDialogueActive && !anyOtherDialogueActive()) {
+		StartDialogue(completedTentDialogueLines, &isCompletedTentDialogueActive);
+	}
+
 	// Spinning Ring dialogue activation
 	if (interactWithSpinningRing && !isSpinningRingDialogueActive && !anyOtherDialogueActive()) {
 		StartDialogue(spinningRingTentDialogueLines, &isSpinningRingDialogueActive);
@@ -1239,9 +1255,9 @@ void SceneMain::UpdateDialogue(double dt) {
 	UpdateActiveDialogue(dt);
 }
 
-// check if any idalogue is active function
+// check if any dialogue is active function
 bool SceneMain::anyOtherDialogueActive() {
-	return isCutsceneDialogueActive || isSignDialogueActive || isSpinningRingDialogueActive ||
+	return isCutsceneDialogueActive || isSignDialogueActive || isCompletedTentDialogueActive || isSpinningRingDialogueActive ||
 		isAllTentsCompletedDialogueActive || isFCCDialogueActive || isEndingDialogueActive;
 }
 
@@ -1286,6 +1302,11 @@ void SceneMain::UpdateActiveDialogue(double dt) {
 		activeDialogueLines = &signDialogueLines;
 		activeDialogueFlag = &isSignDialogueActive;
 		hasPlayedFlag = nullptr; // sign can be played multiple times
+	}
+	else if (isCompletedTentDialogueActive) {
+		activeDialogueLines = &completedTentDialogueLines;
+		activeDialogueFlag = &isCompletedTentDialogueActive;
+		hasPlayedFlag = nullptr; // completed games dialogue can be played multiple times
 	}
 	else if (isSpinningRingDialogueActive) {
 		activeDialogueLines = &spinningRingTentDialogueLines;
@@ -1362,37 +1383,50 @@ void SceneMain::UpdateActiveDialogue(double dt) {
 	else {
 		// next line delay
 		dialogueTimer += dt;
-		if (dialogueTimer >= (currentLineIndex == 0 ? 4.5f : 4.0f)) { // shorter delay for the first line
+		float delayTime;
+		if (currentLineIndex == 0) {
+			delayTime = 4.5f; 
+		}
+		else {
+			delayTime = 4.0f; 
+		}
+
+		if (dialogueTimer >= delayTime) {
 			dialogueTimer = 0;
 			currentLineIndex++;
 
-			// check if reached end of dialogue
+			// Check if reached end of dialogue
 			if (currentLineIndex >= activeDialogueLines->size()) {
 				*activeDialogueFlag = false;
 				if (hasPlayedFlag != nullptr) {
 					*hasPlayedFlag = true;
 				}
 
-				// re enable camera controls
+				// Re-enable camera controls
 				camera.enableFNAF = false;
 				camera.allowMovement = true;
 				camera.allowJump = true;
 				camera.allowLocomotiveTilt = true;
 
-				// derender readsign and spinning ring dialogues after finished dialogue
+				// Derender read sign and spinning ring dialogues after finished dialogue
 				if (activeDialogueFlag == &isSignDialogueActive) {
 					readSign = false;
 				}
 				else if (activeDialogueFlag == &isSpinningRingDialogueActive) {
 					interactWithSpinningRing = false;
 				}
+
+				// Show end screen if ending dialogue has finished
+				if (activeDialogueFlag == &isEndingDialogueActive) {
+					showEndScreen = true;
+				}
 			}
 			else {
-				// type next line
+				// Type next line
 				isTyping = true;
 				typewriterTimer = 0.0f;
 
-				// set new line text
+				// Set new line text
 				const DialogueLine& currentDialogue = (*activeDialogueLines)[currentLineIndex];
 				if (currentDialogue.isMultiLine) {
 					currentText = currentDialogue.textLines[0] + "\n" + currentDialogue.textLines[1];
@@ -1720,32 +1754,47 @@ void SceneMain::HandleKeyPress()
 					if (!SceneArchery::scenecomplete) {
 						shouldEnterArchery = true;
 					}
+					else {
+						StartDialogue(completedTentDialogueLines, &isCompletedTentDialogueActive);
+					}
 					break;
 				case 1:
 					if (!SceneBalloonPop::scenecomplete) {
 						shouldEnterBalloonPop = true;
+					}
+					else {
+						StartDialogue(completedTentDialogueLines, &isCompletedTentDialogueActive);
 					}
 					break;
 				case 2:
 					if (!SceneHole::scenecomplete) {
 						shouldEnterHole = true;
 					}
+					else {
+						StartDialogue(completedTentDialogueLines, &isCompletedTentDialogueActive);
+					}
 					break;
 				case 3:
 					if (!SceneWhackAMole::scenecomplete) {
 						shouldEnterWhackAMole = true;
 					}
+					else {
+						StartDialogue(completedTentDialogueLines, &isCompletedTentDialogueActive);
+					}
 					break;
 				case 4:
 					// check if the player is interacting with the spinning ring tent
 					if (showEnterTentText[4] &&
-						KeyboardController::GetInstance()->IsKeyPressed('E') &&	!anyOtherDialogueActive()) {
+						KeyboardController::GetInstance()->IsKeyPressed('E') && !anyOtherDialogueActive()) {
 						interactWithSpinningRing = true;
 					}
 					break;
 				case 5:
 					if (!SceneBumperBalls::scenecomplete) {
 						shouldEnterBumperBalls = true;
+					}
+					else {
+						StartDialogue(completedTentDialogueLines, &isCompletedTentDialogueActive);
 					}
 					break;
 				}
