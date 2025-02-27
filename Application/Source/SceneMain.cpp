@@ -468,15 +468,34 @@ void SceneMain::Init()
 		tentCompleted[i] = false;
 	}
 
+	// Initialize dialogue flags
+	isSignDialogueActive = false;
+	isSpinningRingDialogueActive = false;
+	isAllTentsCompletedDialogueActive = false;
+	isFCCDialogueActive = false;
+	isEndingDialogueActive = false;
+
+	// Initialize played flags
+	hasReadSign = false;
+	hasPlayedAllTentsCompletedDialogue = false;
+	hasPlayedFCCDialogue = false;
+	hasPlayedEndingDialogue = false;
+
+	// Initialize interaction flags
+	interactWithSpinningRing = false;
+
 	finalTentPosition = glm::vec3(0.f, 0.f, 70.f);
 	showEnterFinalTentText = false;
 	isFinalChallengeCompleted = false;
-	hasReadSign = false;
+
+	moneybagPosition = glm::vec3{ 0.f, 0.f, -60.f };
+	tookMoneyBag = false;
+	showInteractMBText = false;
+
 	showReadSignText = false;
 	readSignTextTimer = 0.0f;
 	signPosition = glm::vec3(30.f, 3.f, -70.f);
 	showSignText = false;
-	isSignDialogueActive = false;
 	currentLineIndex = -1;
 	dialogueTimer = 0;
 	cutsceneStage = -1;
@@ -499,22 +518,8 @@ void SceneMain::Init()
 
 void SceneMain::Update(double dt)
 {
-
 	Application::SetPointerStatus(false);
 	HandleKeyPress();
-
-	//if (KeyboardController::GetInstance()->IsKeyDown('I'))
-	//	light[0].position.z -= static_cast<float>(dt) * 5.f;
-	//if (KeyboardController::GetInstance()->IsKeyDown('K'))
-	//	light[0].position.z += static_cast<float>(dt) * 5.f;
-	//if (KeyboardController::GetInstance()->IsKeyDown('J'))
-	//	light[0].position.x -= static_cast<float>(dt) * 5.f;
-	//if (KeyboardController::GetInstance()->IsKeyDown('L'))
-	//	light[0].position.x += static_cast<float>(dt) * 5.f;
-	//if (KeyboardController::GetInstance()->IsKeyDown('O'))
-	//	light[0].position.y -= static_cast<float>(dt) * 5.f;
-	//if (KeyboardController::GetInstance()->IsKeyDown('P'))
-	//	light[0].position.y += static_cast<float>(dt) * 5.f;
 
 	//light[0].spotDirection = -glm::normalize (camera.target - camera.pos);
 	//light[0].position = camera.pos;
@@ -663,7 +668,7 @@ void SceneMain::Update(double dt)
 		frontBoundary[0].UpdatePhysics(dt);
 	}
 
-	// Interaction between Sign and Tents
+	// Interaction between sign, tents and objects
 	{
 		float distance = glm::distance(camera.pos, signPosition);
 		if (distance < 12.0f)
@@ -720,6 +725,18 @@ void SceneMain::Update(double dt)
 				readSignTextTimer = 0.0f;
 			}
 		}
+
+		if (isFinalChallengeCompleted) {
+			float distanceToMoneyBag = glm::distance(camera.pos, moneybagPosition);
+			if (distanceToMoneyBag < 12.0f)
+			{
+				showInteractMBText = true;
+			}
+			else
+			{
+				showInteractMBText = false;
+			}
+		}
 	}
 
 	// FPS
@@ -727,46 +744,6 @@ void SceneMain::Update(double dt)
 	fps = glm::round(temp * 100.f) / 100.f;
 
 	UpdateDialogue(dt);
-
-	//if (KeyboardController::GetInstance()->IsKeyPressed('1')) {
-	//	// Force enter Archery scene
-	//	shouldEnterArchery = true;
-	//}
-	//
-	//if (KeyboardController::GetInstance()->IsKeyPressed('2')) {
-	//	// Force enter BalloonPop scene
-	//	shouldEnterBalloonPop = true;
-	//}
-	//
-	//if (KeyboardController::GetInstance()->IsKeyPressed('3')) {
-	//	// Force enter Hole scene
-	//	shouldEnterHole = true;
-	//}
-	//
-	//if (KeyboardController::GetInstance()->IsKeyPressed('4')) {
-	//	// Force enter WhackAMole scene
-	//	shouldEnterWhackAMole = true;
-	//}
-	//
-	//if (KeyboardController::GetInstance()->IsKeyPressed('5')) {
-	//	// Force enter Spinning Ring scene
-	//	shouldEnterSpinningRing = true;
-	//}
-	//
-	//if (KeyboardController::GetInstance()->IsKeyPressed('6')) {
-	//	// Force enter WIU Test scene
-	//	shouldEnterBumperBalls= true;
-	//}
-	//
-	//if (KeyboardController::GetInstance()->IsKeyPressed('7')) {
-	//	// Force enter Final scene (after completing all games)
-	//	for (int i = 0; i < 6; i++) {
-	//		tentCompleted[i] = true;
-	//	}
-	//	shouldEnterFinal = true;
-	//}
-
-
 }
 
 void SceneMain::Render()

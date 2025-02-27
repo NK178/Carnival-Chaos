@@ -238,27 +238,38 @@ private:
 		{{"A... money bag?"}, false},
 		{{"Oh! I remember now!", "The million-dollar reward!"}, true},
 		{{"...It's fake money?"}, false},
-		{{"...That bear wasted my time", "with his games!!"}, true}
+		{{"...That bear wasted my time", "with his stupid games!!"}, true},
+		{{"I swear I'll find you again on day!"}, false}
 	};
+
+	// Dialogue system flags
+	bool isCutsceneDialogueActive;
+	bool isSignDialogueActive;
+	bool isSpinningRingDialogueActive;
+	bool isAllTentsCompletedDialogueActive;
+	bool isFCCDialogueActive;
+	bool isEndingDialogueActive;
+
+	// Flags to track if dialogues have been played
+	bool hasPlayedCutsceneDialogue;
+	bool hasReadSign;
+	bool hasPlayedAllTentsCompletedDialogue;
+	bool hasPlayedFCCDialogue;
+	bool hasPlayedEndingDialogue;
 
 	// dialogue displays
 	int currentLineIndex = -1;
 	float dialogueTimer = 0;
 	bool isTyping;
-	float typewriterTimer; 
-	std::string currentText; 
+	float typewriterTimer;
+	std::string currentText;
 	int currentCharIndex;
-
-	bool isCutsceneDialogueActive;
-	bool hasPlayedCutsceneDialogue;
 
 	// sign interaction
 	glm::vec3 signPosition;
 	bool showSignText;
 	bool readSign;
 
-	bool isSignDialogueActive;
-	bool hasReadSign;
 	bool showReadSignText;
 	float readSignTextTimer;
 
@@ -271,6 +282,11 @@ private:
 	glm::vec3 finalTentPosition;
 	bool showEnterFinalTentText;
 	bool isFinalChallengeCompleted;
+
+	bool interactWithSpinningRing;
+	glm::vec3 moneybagPosition;
+	bool tookMoneyBag;
+	bool showInteractMBText = false; // MB = moneybag
 
 	//Camera store positions
 	glm::vec3 storedsignpos{ 20,10,-70 };
@@ -329,9 +345,14 @@ private:
 
 	void RenderUI();
 	void RenderObjectives();
+
+	// Dialogue Functions
 	void RenderDialogue();
 	void UpdateDialogue(double dt);
 	void UpdateSignText();
+	bool anyOtherDialogueActive();
+	void StartDialogue(const std::vector<DialogueLine>& dialogueLines, bool* dialogueActiveFlag);
+	void UpdateActiveDialogue(double dt);
 
 	void RenderMeshOnScreen(Mesh* mesh, float x, float y, float sizex, float sizey);
 	void RenderText(Mesh* mesh, std::string text, glm::vec3 color);
