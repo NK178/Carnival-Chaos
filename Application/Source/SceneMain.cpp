@@ -726,7 +726,7 @@ void SceneMain::Update(double dt)
 
 		if (isFinalChallengeCompleted) {
 			float distanceToMoneyBag = glm::distance(camera.pos, moneybagPosition);
-			if (distanceToMoneyBag < 12.0f)
+			if (distanceToMoneyBag < 20.0f)
 			{
 				showInteractMBText = true;
 			}
@@ -735,6 +735,23 @@ void SceneMain::Update(double dt)
 				showInteractMBText = false;
 			}
 		}
+	}
+
+	// Update tentCompleted array based on scene completion flags
+	if (SceneArchery::scenecomplete) {
+		tentCompleted[0] = true;
+	}
+	if (SceneBalloonPop::scenecomplete) {
+		tentCompleted[1] = true;
+	}
+	if (SceneHole::scenecomplete) {
+		tentCompleted[2] = true;
+	}
+	if (SceneWhackAMole::scenecomplete) {
+		tentCompleted[3] = true;
+	}
+	if (SceneBumperBalls::scenecomplete) {
+		tentCompleted[5] = true;
 	}
 
 	// FPS
@@ -865,19 +882,6 @@ void SceneMain::Render()
 				modelStack.Scale(0.05f, 0.05f, 0.05f);
 				RenderMesh(meshList[GEO_TENT], true);
 				modelStack.PopMatrix();
-
-				//modelStack.PushMatrix();
-				//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-				//modelStack.Translate(finalTent[0].pos.x, finalTent[0].pos.y, finalTent[0].pos.z);
-				//modelStack.Rotate(finalTent[0].angleDeg, 0, 1, 0);
-				//modelStack.Scale(2 * finalTent[0].tentDimensions.x, 2 * finalTent[0].tentDimensions.y, 2 * finalTent[0].tentDimensions.z);
-				//meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-				//meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-				//meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-				//meshList[GEO_CUBE]->material.kShininess = 1.0f;
-				//RenderMesh(meshList[GEO_CUBE], true);
-				//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-				//modelStack.PopMatrix();
 			}
 		}
 	}
@@ -1092,7 +1096,7 @@ void SceneMain::Render()
 	}
 
 	// Render Money Bag (if player completes final challenge)
-	if (isFinalChallengeCompleted) {
+	if (isFinalChallengeCompleted !tookMoneyBag) {
 		modelStack.PushMatrix();
 		modelStack.Translate(0.f, 0.f, -60.f);
 		modelStack.Scale(30.f, 50.f, 30.f);
@@ -1579,7 +1583,6 @@ void SceneMain::RenderMesh(Mesh* mesh, bool enableLight)
 
 }
 
-
 void SceneMain::Exit()
 {
 	// Cleanup VBO here
@@ -1712,40 +1715,33 @@ void SceneMain::HandleKeyPress()
 				case 0:
 					if (!SceneArchery::scenecomplete) {
 						shouldEnterArchery = true;
-						tentCompleted[0] = true;
 					}
 					break;
 				case 1:
 					if (!SceneBalloonPop::scenecomplete) {
 						shouldEnterBalloonPop = true;
-						tentCompleted[1] = true;
 					}
 					break;
 				case 2:
 					if (!SceneHole::scenecomplete) {
 						shouldEnterHole = true;
-						tentCompleted[2] = true;
 					}
 					break;
 				case 3:
 					if (!SceneWhackAMole::scenecomplete) {
 						shouldEnterWhackAMole = true;
-						tentCompleted[3] = true;
 					}
 					break;
 				case 4:
 					// check if the player is interacting with the spinning ring tent
 					if (showEnterTentText[4] &&
-						KeyboardController::GetInstance()->IsKeyPressed('E') &&
-						!anyOtherDialogueActive()) {
-
+						KeyboardController::GetInstance()->IsKeyPressed('E') &&	!anyOtherDialogueActive()) {
 						interactWithSpinningRing = true;
 					}
 					break;
 				case 5:
 					if (!SceneBumperBalls::scenecomplete) {
 						shouldEnterBumperBalls = true;
-						tentCompleted[5] = true;
 					}
 					break;
 				}
@@ -1774,7 +1770,6 @@ void SceneMain::HandleKeyPress()
 	if (KeyboardController::GetInstance()->IsKeyPressed('E') && showInteractMBText) {
 		StartDialogue(endingDialogueLines, &isEndingDialogueActive);
 		tookMoneyBag = true;
-		hasPlayedEndingDialogue = true;
 	}
 }
 
