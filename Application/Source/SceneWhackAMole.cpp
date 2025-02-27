@@ -579,12 +579,13 @@ void SceneWhackAMole::Render()
 		}
 	}
 	else {
-		RenderMeshOnScreen(meshList[GEO_UI], 45, 100, 45, 3);
-		RenderMeshOnScreen(meshList[GEO_QUAD], 100, 20, 1.5*camera.GetStamina(),10);
-		RenderTextOnScreen(meshList[GEO_TEXT2], "Stamina: ", glm::vec3(1, 1, 1), 20, 15, 510);
+		RenderMeshOnScreen(meshList[GEO_UI], 45, 75, 25, 6);
+		RenderMeshOnScreen(meshList[GEO_QUAD], 80, 60, 1.5*camera.GetStamina(), 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Stamina: ", glm::vec3(1, 1, 1), 20, 10, 75);
 		if (attackcooldown > 0.1f && !isattack) {
-			RenderTextOnScreen(meshList[GEO_TEXT2], "Next Phase in: ", glm::vec3(1, 1, 1), 20, 600, 330);
-			RenderTextOnScreen(meshList[GEO_TEXT2],std::to_string(static_cast<int>(attackcooldown)) , glm::vec3(0, 1, 0), 30, 650, 300);
+			RenderMeshOnScreen(meshList[GEO_UI], 45, 560, 45, 3);
+			RenderTextOnScreen(meshList[GEO_TEXT2], "Next Phase in: ", glm::vec3(1, 1, 1), 20, 10, 550);
+			RenderTextOnScreen(meshList[GEO_TEXT2],std::to_string(static_cast<int>(attackcooldown)) , glm::vec3(1, 1, 1), 30, 650, 300);
 		}
 	}
 
@@ -593,7 +594,7 @@ void SceneWhackAMole::Render()
 		RenderTextOnScreen(meshList[GEO_TEXT2], "- WHACK A MOLE -", glm::vec3(1, 1, 0), 25, 200, 430);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "- You are the mole!", glm::vec3(1, 1, 1), 13, 270, 380);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "- Dodge the hammers to survive!", glm::vec3(1, 1, 1), 14, 180, 350);
-		RenderTextOnScreen(meshList[GEO_TEXT2], "- Each phase gets progresively", glm::vec3(1, 1, 1), 14, 180, 300);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Each phase gets progressively", glm::vec3(1, 1, 1), 14, 180, 300);
 		RenderTextOnScreen(meshList[GEO_TEXT2], " harder", glm::vec3(1, 1, 1), 14, 350, 280);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "- Survive all the waves to win! ", glm::vec3(1, 1, 1), 14, 180, 250);
 
