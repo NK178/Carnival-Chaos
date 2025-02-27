@@ -89,7 +89,6 @@ void SceneMain::Init()
 	sideBoundary.clear();
 	frontBoundary.clear();
 
-
 	tempCompensation = 0;
 	camera.enableFNAF = true;
 	camera.allowMovement = false;
@@ -506,7 +505,7 @@ void SceneMain::Update(double dt)
 		if (!camera.allowMovement) {
 			camera.enableFNAF = false;
 			camera.allowMovement = true;
-			camera.allowJump = true;
+			camera.allowJump = false;
 			camera.allowSprint = false;
 			camera.allowCrouch = true;
 			camera.allowProne = false;

@@ -183,6 +183,8 @@ private:
 	bool isballactive[4] = { true,true,true,true };
 	bool isObjectiveRead = false;
 	float countdown = 4.f;
+
+	float fps = 0.f;
 };
 
 #endif

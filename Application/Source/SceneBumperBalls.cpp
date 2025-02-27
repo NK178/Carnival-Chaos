@@ -153,8 +153,16 @@ void SceneBumperBalls::Init()
 	//UI
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16,16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Images//calibri.tga");
+	meshList[GEO_TEXT2] = MeshBuilder::GenerateText("text2", 16, 16);
+	meshList[GEO_TEXT2]->textureID = LoadTGA("Images//yugothicuisemibold.tga");
+	meshList[GEO_FPS] = MeshBuilder::GenerateText("fpstext", 16, 16);
+	meshList[GEO_FPS]->textureID = LoadTGA("Images//bizudgothic.tga");
+
 	meshList[GEO_KEY_E] = MeshBuilder::GenerateQuad("KeyE", glm::vec3(1.f, 1.f, 1.f), 2.f);
 	meshList[GEO_KEY_E]->textureID = LoadTGA("Images//keyboard_key_e.tga");
+	meshList[GEO_KEY_R] = MeshBuilder::GenerateQuad("KeyE", glm::vec3(1.f, 1.f, 1.f), 2.f);
+	meshList[GEO_KEY_R]->textureID = LoadTGA("Images//keyboard_key_r.tga");
+
 	meshList[GEO_UI] = MeshBuilder::GenerateQuad("UIBox", glm::vec3(0.12f, 0.12f, 0.12f), 10.f);
 
 
@@ -473,7 +481,8 @@ void SceneBumperBalls::Update(double dt)
 	if (KeyboardController::GetInstance()->IsKeyPressed('R') && !gamestart)
 		InitGame();
 
-
+	float temp = 1.f / dt;
+	fps = glm::round(temp * 100.f) / 100.f;
 }
 
 void SceneBumperBalls::Render()
@@ -524,10 +533,6 @@ void SceneBumperBalls::Render()
 	RenderSkyBox();
 
 	modelStack.PushMatrix();
-	RenderMesh(meshList[GEO_AXES], false);
-	modelStack.PopMatrix();
-
-	modelStack.PushMatrix();
 	modelStack.Translate(light[1].position.x, light[1].position.y, light[1].position.z);
 	modelStack.Scale(1.f, 1.f,1.f);
 	RenderMesh(meshList[GEO_SPHERE], false);
@@ -573,36 +578,59 @@ void SceneBumperBalls::Render()
 
 
 	if (!isObjectiveRead) { // Render Objective
-		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 30);
-		RenderTextOnScreen(meshList[GEO_TEXT], "- BUMPER BALLS -", glm::vec3(1, 1, 0), 25, 200, 430);
-		RenderTextOnScreen(meshList[GEO_TEXT], "- Use WASD to control the ball", glm::vec3(1, 1, 1), 13, 195, 380);
-		RenderTextOnScreen(meshList[GEO_TEXT], "- The controls are inversed!", glm::vec3(1, 1, 1), 14, 205, 350);
-		RenderTextOnScreen(meshList[GEO_TEXT], "- Pressing S moves you fowards", glm::vec3(1, 1, 1), 14, 205, 320);
-		RenderTextOnScreen(meshList[GEO_TEXT], "- Don't fall off the edge!", glm::vec3(1, 1, 1), 14, 210, 290);
-		RenderTextOnScreen(meshList[GEO_TEXT], "- Knock all your opponents off ", glm::vec3(1, 1, 1), 14, 190, 260);
-		RenderTextOnScreen(meshList[GEO_TEXT], "  to win!", glm::vec3(1, 1, 1), 14, 250, 240);
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 35);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- BUMPER BALLS -", glm::vec3(1, 1, 0), 25, 200, 450);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Use WASD to control the ball!", glm::vec3(1, 1, 1), 13, 195, 400);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- The controls are inversed!", glm::vec3(1, 1, 1), 14, 205, 370);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "eg. Pressing S will", glm::vec3(1, 1, 0), 14, 270, 340);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "move forward!", glm::vec3(1, 1, 0), 14, 300, 310);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Don't fall off the edge!", glm::vec3(1, 1, 1), 14, 210, 280);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Knock all your opponents off ", glm::vec3(1, 1, 1), 14, 190, 250);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "  to win!", glm::vec3(1, 1, 1), 14, 320, 220);
 
-		RenderMeshOnScreen(meshList[GEO_KEY_E], 310, 210, 15, 15);
-		RenderTextOnScreen(meshList[GEO_TEXT], "Continue", glm::vec3(1, 1, 1), 20, 340, 200);
+		RenderMeshOnScreen(meshList[GEO_KEY_E], 310, 170, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Continue", glm::vec3(1, 1, 1), 20, 340, 160);
 	}
 	else if (countdown > 0.f && isObjectiveRead){
-		if (countdown < 1.f)
-			RenderTextOnScreen(meshList[GEO_TEXT], "Start!", glm::vec3(0, 1, 0), 40, 350, 400);
-		else
-			RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(static_cast<int>(countdown)), glm::vec3(0, 1, 0), 40, 400, 400);
+		if (countdown > 0) {
+			std::string countdownText;
+			if (countdown > 3.0f) {
+				countdownText = "3..";
+			}
+			else if (countdown > 2.0f) {
+				countdownText = "2..";
+			}
+			else if (countdown > 1.0f) {
+				countdownText = "1..";
+			}
+			else {
+				countdownText = "GO!";
+			}
+			RenderTextOnScreen(meshList[GEO_TEXT2], countdownText, glm::vec3(1, 1, 1), 50, 350, 300);
+		}
 	}
 
 	if (gamelose) {
-		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 30);
-		RenderTextOnScreen(meshList[GEO_TEXT], "Game Over!", glm::vec3(1, 0, 0), 25, 220, 340);
-		RenderTextOnScreen(meshList[GEO_TEXT], "Press R to restart", glm::vec3(1, 0, 0), 25, 190, 300);
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 20);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "GAME OVER!", glm::vec3(1, 0, 0), 40, 210, 350);
+
+		RenderTextOnScreen(meshList[GEO_TEXT2], "You fell off!", glm::vec3(1, 1, 1), 20, 280, 300);
+
+		RenderMeshOnScreen(meshList[GEO_KEY_R], 350, 250, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Retry", glm::vec3(1, 1, 1), 20, 390, 240);
 	}
 	if (gamewin) {
-		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 30);
-		RenderTextOnScreen(meshList[GEO_TEXT], "Game Win!", glm::vec3(0, 1, 0), 25, 240, 340);
-		RenderTextOnScreen(meshList[GEO_TEXT], "Returning ", glm::vec3(0, 1, 0), 25, 210, 300);
-		RenderTextOnScreen(meshList[GEO_TEXT], "to carnival...", glm::vec3(0, 1, 0), 25, 210, 270);
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "YOU WON!", glm::vec3(0, 1, 0), 50, 220, 350);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "You've beaten the", glm::vec3(1, 1, 1), 20, 240, 300);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Bumper Balls Game!", glm::vec3(1, 1, 1), 20, 235, 270);
+
+		RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
 	}
+
+	std::string temp("FPS:" + std::to_string(fps));
+	RenderTextOnScreen(meshList[GEO_FPS], temp.substr(0, 9), glm::vec3(0, 1, 0), 20, 620, 20);
 }
 
 void SceneBumperBalls::InitGame() {
