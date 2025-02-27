@@ -183,7 +183,7 @@ void SceneWhackAMole::Init()
 	light[0].exponent = 3.f;
 	light[0].spotDirection = glm::vec3(0.f, 1.f, 0.f);
 
-	light[1].position = glm::vec3(0, 3, 0);
+	light[1].position = glm::vec3(0, 80, 0);
 	light[1].color = glm::vec3(1, 1, 1);
 	light[1].type = Light::LIGHT_SPOT;
 	light[1].power = 0.4f;
@@ -195,7 +195,7 @@ void SceneWhackAMole::Init()
 	light[1].exponent = 3.f;
 	light[1].spotDirection = glm::vec3(0.f, 1.f, 0.f);
 
-	light[2].position = glm::vec3(-50,4,0);
+	light[2].position = glm::vec3(0,-20,0);
 	light[2].color = glm::vec3(1, 1, 1);
 	light[2].type = Light::LIGHT_POINT;
 	light[2].power = 1.f;
@@ -413,7 +413,6 @@ void SceneWhackAMole::Update(double dt)
 	}
 	if (attackorder.size == 0 && inactionorder.empty())
 		gamewin = true;
-	std::cout << attackorder.size << std::endl;
 	if (KeyboardController::GetInstance()->IsKeyDown('R') && !gamestart) 
 		InitGame();
 	for (int i = 0; i < walllist.size(); i++) {
@@ -605,16 +604,19 @@ void SceneWhackAMole::Render()
 		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 20);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "GAME OVER!", glm::vec3(1, 0, 0), 40, 210, 350);
 
-		RenderTextOnScreen(meshList[GEO_TEXT2], "You got hit!", glm::vec3(1, 1, 1), 20, 190, 300);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "You got hit!", glm::vec3(1, 1, 1), 20, 300, 300);
 
 		RenderMeshOnScreen(meshList[GEO_KEY_R], 350, 250, 15, 15);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "Retry", glm::vec3(1, 1, 1), 20, 390, 240);
 	}
 	if (gamewin) {
-		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 30);
-		RenderTextOnScreen(meshList[GEO_TEXT], "You win!", glm::vec3(0, 1, 0), 35, 220, 350);
-		RenderTextOnScreen(meshList[GEO_TEXT], "Press E ", glm::vec3(0, 1, 0), 25, 210, 300);
-		RenderTextOnScreen(meshList[GEO_TEXT], "to return", glm::vec3(0, 1, 0), 25, 210, 270);
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "YOU WON!", glm::vec3(0, 1, 0), 50, 220, 350);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "You've beaten the", glm::vec3(1, 1, 1), 20, 240, 300);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Whack-A-Mole Game!", glm::vec3(1, 1, 1), 20, 230, 270);
+
+		RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
 	}
 }
 
