@@ -1712,21 +1712,27 @@ void SceneMain::HandleKeyPress()
 				switch (i) {
 				case 0:
 					shouldEnterArchery = true;
+					tentCompleted[0] = true;
 					break;
 				case 1:
 					shouldEnterBalloonPop = true;
+					tentCompleted[1] = true;
 					break;
 				case 2:
 					shouldEnterHole = true;
+					tentCompleted[2] = true;
 					break;
 				case 3:
 					shouldEnterWhackAMole = true;
+					tentCompleted[3] = true;
 					break;
 				case 4:
 					shouldEnterSpinningRing = true;
+					tentCompleted[4] = true;
 					break;
 				case 5:
 					shouldEnterBumperBalls = true;
+					tentCompleted[5] = true;
 					break;
 				}
 			}
