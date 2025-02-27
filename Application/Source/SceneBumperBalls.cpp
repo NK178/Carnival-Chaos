@@ -623,7 +623,7 @@ void SceneBumperBalls::Render()
 	}
 	if (gamewin) {
 		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
-		RenderTextOnScreen(meshList[GEO_TEXT2], "YOU WON!", glm::vec3(0, 1, 0), 50, 220, 350);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "YOU WIN!", glm::vec3(0, 1, 0), 50, 220, 350);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "You've beaten the", glm::vec3(1, 1, 1), 20, 240, 300);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "Bumper Balls Game!", glm::vec3(1, 1, 1), 20, 235, 270);
 

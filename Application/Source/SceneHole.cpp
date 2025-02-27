@@ -674,10 +674,20 @@ void SceneHole::Render()
 		}
 	}
 	else if (countdown > 0.f && m_hasReadObjective) {
-		if (countdown < 1.f)
-			RenderTextOnScreen(meshList[GEO_TEXT], "Start!", glm::vec3(0, 1, 0), 40, 350, 400);
-		else
-			RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(static_cast<int>(countdown)), glm::vec3(0, 1, 0), 40, 400, 400);
+		std::string countdownText;
+		if (countdown > 3.0f) {
+			countdownText = "3..";
+		}
+		else if (countdown > 2.0f) {
+			countdownText = "2..";
+		}
+		else if (countdown > 1.0f) {
+			countdownText = "1..";
+		}
+		else {
+			countdownText = "GO!";
+		}
+		RenderTextOnScreen(meshList[GEO_TEXT2], countdownText, glm::vec3(1, 1, 1), 50, 350, 300);
 	}
 
 	if (gameResult == -1)
@@ -695,9 +705,10 @@ void SceneHole::Render()
 	else if (gameResult == 1)
 	{
 		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
-		RenderTextOnScreen(meshList[GEO_TEXT2], "YOU WIN!", glm::vec3(0, 1, 0), 40, 270, 370);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "YOU WIN!", glm::vec3(0, 1, 0), 40, 270, 350);
 
-		RenderTextOnScreen(meshList[GEO_TEXT2], "You beat HITW!", glm::vec3(1, 1, 1), 20, 280, 320);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "You've beaten the", glm::vec3(1, 1, 1), 20, 240, 300);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Hole In the Wall Game!", glm::vec3(1, 1, 1), 20, 190, 270);
 
 		RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
