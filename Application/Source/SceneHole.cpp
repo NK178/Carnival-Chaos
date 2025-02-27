@@ -848,7 +848,7 @@ void SceneHole::HandleKeyPress()
 		camera.allowLocomotiveTilt = true;
 		camera.allowLocomotiveBop = false;
 	}
-	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E) && gameResult != 0)
+	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E) && gameResult != 0 && gameResult != 2)
 	{
 		//ADD CODE TO HANDLE LOADING CARNIVAL SCENE
 		//
