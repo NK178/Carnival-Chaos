@@ -336,18 +336,16 @@ void MainMenu::Render()
 			RenderTextOnScreen(meshList[GEO_TITLE], "- Binary Tree ", glm::vec3(1, 1, 1), 15, 280, 470);
 			RenderTextOnScreen(meshList[GEO_TITLE], "- Whack-A-Mole Minigame ", glm::vec3(1, 1, 1), 15, 280, 440);
 			RenderTextOnScreen(meshList[GEO_TITLE], "- Bumper Balls Minigame ", glm::vec3(1, 1, 1), 15, 280, 410);
-			RenderTextOnScreen(meshList[GEO_TITLE], "- Final Minigame (Ray Tracing) ", glm::vec3(1, 1, 1), 15, 280, 380);
 
 			// Mathea
-			RenderTextOnScreen(meshList[GEO_TITLE], "Mathea", glm::vec3(1, 0, 0), 15, 280, 330);
-			RenderTextOnScreen(meshList[GEO_TITLE], "- Archery Minigame ", glm::vec3(1, 1, 1), 15, 280, 300);
-			RenderTextOnScreen(meshList[GEO_TITLE], "- Balloon Pop Minigame ", glm::vec3(1, 1, 1), 15, 280, 270);
-			RenderTextOnScreen(meshList[GEO_TITLE], "- Final Minigame ", glm::vec3(1, 1, 1), 15, 280, 240);
-			RenderTextOnScreen(meshList[GEO_TITLE], "- Scene Manager ", glm::vec3(1, 1, 1), 15, 280, 210);
-
-			// Yong Quan
-			RenderTextOnScreen(meshList[GEO_TITLE], "Yong Quan", glm::vec3(1, 0, 0), 15, 280, 160);
-			RenderTextOnScreen(meshList[GEO_TITLE], "- Carnival Scene ", glm::vec3(1, 1, 1), 15, 280, 130);
+			RenderTextOnScreen(meshList[GEO_TITLE], "Mathea", glm::vec3(1, 0, 0), 15, 280, 360);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Archery Minigame ", glm::vec3(1, 1, 1), 15, 280, 330);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Balloon Pop Minigame ", glm::vec3(1, 1, 1), 15, 280, 300);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Final Minigame ", glm::vec3(1, 1, 1), 15, 280, 270);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Scene Manager &", glm::vec3(1, 1, 1), 15, 280, 240);
+			RenderTextOnScreen(meshList[GEO_TITLE], "  Linking Scenes Together ", glm::vec3(1, 1, 1), 15, 280, 210);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Game Audio", glm::vec3(1, 1, 1), 15, 280, 180);
+			RenderTextOnScreen(meshList[GEO_TITLE], "  (source: Deepwoken OST)", glm::vec3(1, 1, 1), 15, 280, 150);
 
 			// Scroll Down Text
 			RenderTextOnScreen(meshList[GEO_TITLE], "Press 'S' to scroll down", glm::vec3(1, 1, 0), 15, 400, 70); 
@@ -355,15 +353,15 @@ void MainMenu::Render()
 
 		if (isScrollDown) {
 			// Yong Quan (cont.)
-			RenderTextOnScreen(meshList[GEO_TITLE], "Yong Quan (cont.) ", glm::vec3(1, 0, 0), 15, 280, 530);
+			RenderTextOnScreen(meshList[GEO_TITLE], "Yong Quan ", glm::vec3(1, 0, 0), 15, 280, 530);
 			RenderTextOnScreen(meshList[GEO_TITLE], "- Main Menu", glm::vec3(1, 1, 1), 15, 280, 500);
-			RenderTextOnScreen(meshList[GEO_TITLE], "- Game UI", glm::vec3(1, 1, 1), 15, 280, 470);
-			RenderTextOnScreen(meshList[GEO_TITLE], "- Spinning Ring Minigame ", glm::vec3(1, 1, 1), 15, 280, 440);
-			RenderTextOnScreen(meshList[GEO_TITLE], "- Linking Scenes Together ", glm::vec3(1, 1, 1), 15, 280, 410);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Carnival Scene", glm::vec3(1, 1, 1), 15, 280, 470);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Game UI & Story", glm::vec3(1, 1, 1), 15, 280, 440);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Spinning Ring Minigame ", glm::vec3(1, 1, 1), 15, 280, 410);
 
 			// Wilson
 			RenderTextOnScreen(meshList[GEO_TITLE], "Wilson ", glm::vec3(1, 0, 0), 15, 280, 360);
-			RenderTextOnScreen(meshList[GEO_TITLE], "- Camera ", glm::vec3(1, 1, 1), 15, 280, 330);
+			RenderTextOnScreen(meshList[GEO_TITLE], "- Cutscene & Camera ", glm::vec3(1, 1, 1), 15, 280, 330);
 			RenderTextOnScreen(meshList[GEO_TITLE], "- Hole in the Wall Minigame ", glm::vec3(1, 1, 1), 15, 280, 300);
 			RenderTextOnScreen(meshList[GEO_TITLE], "- Scene Bumper Balls (Boss AI) ", glm::vec3(1, 1, 1), 15, 280, 270);
 			RenderTextOnScreen(meshList[GEO_TITLE], "- Scene Final", glm::vec3(1, 1, 1), 15, 280, 240);
@@ -387,13 +385,14 @@ void MainMenu::Render()
 		RenderTextOnScreen(meshList[GEO_TITLE], "(W,S - Backwards/Forward", glm::vec3(1, 0, 0), 15, 300, 470);
 		RenderTextOnScreen(meshList[GEO_TITLE], "([in Scene Bumper Balls])", glm::vec3(1, 1, 0), 15, 320, 440);
 		RenderTextOnScreen(meshList[GEO_TITLE], "SPACE - Jump", glm::vec3(1, 1, 1), 15, 280, 410);
-		RenderTextOnScreen(meshList[GEO_TITLE], "SHIFT - Dash", glm::vec3(1, 1, 1), 15, 280, 380);
-		RenderTextOnScreen(meshList[GEO_TITLE], "E - Enter Tent/Skip Dialogue", glm::vec3(1, 1, 1), 15, 280, 350);
-		RenderTextOnScreen(meshList[GEO_TITLE], "F - Interact", glm::vec3(1, 1, 1), 15, 280, 320);
-		RenderTextOnScreen(meshList[GEO_TITLE], "Q - Skip Cutscene/Exit Minigame", glm::vec3(1, 1, 1), 15, 280, 290);
-		RenderTextOnScreen(meshList[GEO_TITLE], "R - Restart Minigame", glm::vec3(1, 1, 1), 15, 280, 260);
-		RenderTextOnScreen(meshList[GEO_TITLE], "C - Crouch", glm::vec3(1, 1, 1), 15, 280, 230); 
-		RenderTextOnScreen(meshList[GEO_TITLE], "[in Hole in Wall Minigame]", glm::vec3(1, 1, 0), 15, 300, 200);
+		RenderTextOnScreen(meshList[GEO_TITLE], "SHIFT - Sprint", glm::vec3(1, 1, 1), 15, 280, 380);
+		RenderTextOnScreen(meshList[GEO_TITLE], "[in Whack-A-Mole Minigame]", glm::vec3(1, 1, 0), 15, 300, 350);
+		RenderTextOnScreen(meshList[GEO_TITLE], "E - Enter Tent/Skip Dialogue", glm::vec3(1, 1, 1), 15, 280, 320);
+		RenderTextOnScreen(meshList[GEO_TITLE], "F - Interact", glm::vec3(1, 1, 1), 15, 280, 290);
+		RenderTextOnScreen(meshList[GEO_TITLE], "Q - Skip Cutscene/Exit Minigame", glm::vec3(1, 1, 1), 15, 280, 260);
+		RenderTextOnScreen(meshList[GEO_TITLE], "R - Restart Minigame", glm::vec3(1, 1, 1), 15, 280, 230);
+		RenderTextOnScreen(meshList[GEO_TITLE], "C - Crouch", glm::vec3(1, 1, 1), 15, 280, 200); 
+		RenderTextOnScreen(meshList[GEO_TITLE], "[in Hole in Wall Minigame]", glm::vec3(1, 1, 0), 15, 300, 170);
 	}
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
