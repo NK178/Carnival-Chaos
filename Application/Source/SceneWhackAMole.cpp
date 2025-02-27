@@ -421,6 +421,9 @@ void SceneWhackAMole::Update(double dt)
 	player[0].UpdatePhysics(dt);
 	if (iscameramove)
 		camera.Update(dt);
+
+	float temp = 1.f / dt;
+	fps = glm::round(temp * 100.f) / 100.f;
 }
 
 void SceneWhackAMole::Render()
@@ -618,6 +621,9 @@ void SceneWhackAMole::Render()
 		RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
 	}
+
+	std::string temp("FPS:" + std::to_string(fps));
+	RenderTextOnScreen(meshList[GEO_FPS], temp.substr(0, 9), glm::vec3(0, 1, 0), 20, 620, 20);
 }
 
 void SceneWhackAMole::RenderMesh(Mesh* mesh, bool enableLight)

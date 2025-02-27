@@ -28,11 +28,13 @@ public:
 		GEO_BASKETBALL,
 		GEO_BARREL,
 
-
 		//UI
 		GEO_TEXT,
+		GEO_TEXT2,
 		GEO_UI,
 		GEO_KEY_E,
+		GEO_KEY_R,
+		GEO_FPS,
 
 		//SKybox
 		GEO_LEFT,
