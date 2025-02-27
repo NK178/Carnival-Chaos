@@ -157,10 +157,16 @@ void SceneWhackAMole::Init()
 
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16,16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Images//calibri.tga");
+	meshList[GEO_TEXT2] = MeshBuilder::GenerateText("text2", 16, 16);
+	meshList[GEO_TEXT2]->textureID = LoadTGA("Images//yugothicuisemibold.tga");
+	meshList[GEO_FPS] = MeshBuilder::GenerateText("fpstext", 16, 16);
+	meshList[GEO_FPS]->textureID = LoadTGA("Images//bizudgothic.tga");
+
 	meshList[GEO_KEY_E] = MeshBuilder::GenerateQuad("KeyE", glm::vec3(1.f, 1.f, 1.f), 2.f);
 	meshList[GEO_KEY_E]->textureID = LoadTGA("Images//keyboard_key_e.tga");
+	meshList[GEO_KEY_R] = MeshBuilder::GenerateQuad("KeyE", glm::vec3(1.f, 1.f, 1.f), 2.f);
+	meshList[GEO_KEY_R]->textureID = LoadTGA("Images//keyboard_key_r.tga");
 	meshList[GEO_UI] = MeshBuilder::GenerateQuad("UIBox", glm::vec3(0.12f, 0.12f, 0.12f), 10.f);
-
 
 	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 1000.0f);
 	projectionStack.LoadMatrix(projection);
@@ -179,7 +185,7 @@ void SceneWhackAMole::Init()
 	light[0].exponent = 3.f;
 	light[0].spotDirection = glm::vec3(0.f, 1.f, 0.f);
 
-	light[1].position = glm::vec3(0, 3, 0);
+	light[1].position = glm::vec3(0, 80, 0);
 	light[1].color = glm::vec3(1, 1, 1);
 	light[1].type = Light::LIGHT_SPOT;
 	light[1].power = 0.4f;
@@ -191,7 +197,7 @@ void SceneWhackAMole::Init()
 	light[1].exponent = 3.f;
 	light[1].spotDirection = glm::vec3(0.f, 1.f, 0.f);
 
-	light[2].position = glm::vec3(-50,4,0);
+	light[2].position = glm::vec3(0,-20,0);
 	light[2].color = glm::vec3(1, 1, 1);
 	light[2].type = Light::LIGHT_POINT;
 	light[2].power = 1.f;
@@ -409,7 +415,6 @@ void SceneWhackAMole::Update(double dt)
 	}
 	if (attackorder.size == 0 && inactionorder.empty())
 		gamewin = true;
-	std::cout << attackorder.size << std::endl;
 	if (KeyboardController::GetInstance()->IsKeyDown('R') && !gamestart) 
 		InitGame();
 	for (int i = 0; i < walllist.size(); i++) {
@@ -418,6 +423,9 @@ void SceneWhackAMole::Update(double dt)
 	player[0].UpdatePhysics(dt);
 	if (iscameramove)
 		camera.Update(dt);
+
+	float temp = 1.f / dt;
+	fps = glm::round(temp * 100.f) / 100.f;
 }
 
 void SceneWhackAMole::Render()
@@ -557,43 +565,67 @@ void SceneWhackAMole::Render()
 		inactionorder.clear();
 
 	if (!gamestart && !isplayerhit) {
-		if (startcountdown < 1.f)
-			RenderTextOnScreen(meshList[GEO_TEXT], "Start!", glm::vec3(0, 1, 0), 40, 350, 400);
-		else
-			RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(static_cast<int>(startcountdown)), glm::vec3(0, 1, 0), 40, 400, 400);
+		if (startcountdown > 0) {
+			std::string countdownText;
+			if (startcountdown > 3.0f) {
+				countdownText = "3..";
+			}
+			else if (startcountdown > 2.0f) {
+				countdownText = "2..";
+			}
+			else if (startcountdown > 1.0f) {
+				countdownText = "1..";
+			}
+			else {
+				countdownText = "GO!";
+			}
+			RenderTextOnScreen(meshList[GEO_TEXT2], countdownText, glm::vec3(1, 1, 1), 50, 350, 300);
+		}
 	}
 	else {
-		RenderMeshOnScreen(meshList[GEO_QUAD], 100, 20, 1.5*camera.GetStamina(),10);
-		RenderTextOnScreen(meshList[GEO_TEXT], "Stamina", glm::vec3(0, 1, 0), 40, 0, 30);
+		RenderMeshOnScreen(meshList[GEO_UI], 45, 75, 25, 6);
+		RenderMeshOnScreen(meshList[GEO_QUAD], 80, 60, 1.5*camera.GetStamina(), 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Stamina: ", glm::vec3(1, 1, 1), 20, 10, 75);
 		if (attackcooldown > 0.1f && !isattack) {
-			RenderTextOnScreen(meshList[GEO_TEXT], "Next Phase", glm::vec3(0, 1, 0), 20, 600, 330);
-			RenderTextOnScreen(meshList[GEO_TEXT],std::to_string(static_cast<int>(attackcooldown)) , glm::vec3(0, 1, 0), 30, 650, 300);
+			RenderMeshOnScreen(meshList[GEO_UI], 55, 560, 55, 3);
+			RenderTextOnScreen(meshList[GEO_TEXT2], "Next phase in: ", glm::vec3(1, 1, 1), 20, 10, 550);
+			RenderTextOnScreen(meshList[GEO_TEXT2],std::to_string(static_cast<int>(attackcooldown)) , glm::vec3(1, 1, 1), 20, 300, 550);
 		}
 	}
 
 	if (!isObjectiveRead) { // Render Objective
 		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 30);
-		RenderTextOnScreen(meshList[GEO_TEXT], "- WHACK A MOLE -", glm::vec3(1, 1, 0), 25, 200, 430);
-		RenderTextOnScreen(meshList[GEO_TEXT], "- You are the mole!", glm::vec3(1, 1, 1), 13, 180, 380);
-		RenderTextOnScreen(meshList[GEO_TEXT], "- Dodge the hammers to survive!", glm::vec3(1, 1, 1), 14, 180, 350);
-		RenderTextOnScreen(meshList[GEO_TEXT], "- Each phase gets progresively", glm::vec3(1, 1, 1), 14, 180, 300);
-		RenderTextOnScreen(meshList[GEO_TEXT], " harder", glm::vec3(1, 1, 1), 14, 190, 280);
-		RenderTextOnScreen(meshList[GEO_TEXT], "- Survive all the waves to win! ", glm::vec3(1, 1, 1), 14, 180, 250);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- WHACK A MOLE -", glm::vec3(1, 1, 0), 25, 200, 430);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- You are the mole!", glm::vec3(1, 1, 1), 13, 270, 380);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Dodge the hammers to survive!", glm::vec3(1, 1, 1), 14, 180, 350);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Each phase gets progressively", glm::vec3(1, 1, 1), 14, 180, 300);
+		RenderTextOnScreen(meshList[GEO_TEXT2], " harder", glm::vec3(1, 1, 1), 14, 350, 280);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Survive all the waves to win! ", glm::vec3(1, 1, 1), 14, 180, 250);
 
 		RenderMeshOnScreen(meshList[GEO_KEY_E], 310, 210, 15, 15);
 		RenderTextOnScreen(meshList[GEO_TEXT], "Continue", glm::vec3(1, 1, 1), 20, 340, 200);
 	}
 	if (isplayerhit && !gamewin) {
-		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 30);
-		RenderTextOnScreen(meshList[GEO_TEXT], "Game Over!", glm::vec3(1, 0, 0), 35, 220, 350);
-		RenderTextOnScreen(meshList[GEO_TEXT], "Press R to restart", glm::vec3(1, 0, 0), 25, 180, 250);
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 20);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "GAME OVER!", glm::vec3(1, 0, 0), 40, 210, 350);
+
+		RenderTextOnScreen(meshList[GEO_TEXT2], "You got hit!", glm::vec3(1, 1, 1), 20, 300, 300);
+
+		RenderMeshOnScreen(meshList[GEO_KEY_R], 350, 250, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Retry", glm::vec3(1, 1, 1), 20, 390, 240);
 	}
 	if (gamewin) {
-		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 30);
-		RenderTextOnScreen(meshList[GEO_TEXT], "You win!", glm::vec3(0, 1, 0), 35, 220, 350);
-		RenderTextOnScreen(meshList[GEO_TEXT], "Press E ", glm::vec3(0, 1, 0), 25, 210, 300);
-		RenderTextOnScreen(meshList[GEO_TEXT], "to return", glm::vec3(0, 1, 0), 25, 210, 270);
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "YOU WON!", glm::vec3(0, 1, 0), 50, 220, 350);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "You've beaten the", glm::vec3(1, 1, 1), 20, 240, 300);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Whack-A-Mole Game!", glm::vec3(1, 1, 1), 20, 230, 270);
+
+		RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
 	}
+
+	std::string temp("FPS:" + std::to_string(fps));
+	RenderTextOnScreen(meshList[GEO_FPS], temp.substr(0, 9), glm::vec3(0, 1, 0), 20, 620, 20);
 }
 
 void SceneWhackAMole::RenderMesh(Mesh* mesh, bool enableLight)

@@ -32,8 +32,11 @@ public:
 
 		//Text
 		GEO_TEXT,
+		GEO_TEXT2,
 		GEO_UI,
 		GEO_KEY_E,
+		GEO_KEY_R,
+		GEO_FPS,
 
 		//SKybox
 		GEO_LEFT,
@@ -290,7 +293,7 @@ private:
 		Player(int id, int type) : GameObject(id,type) {}
 	};
 
-
+	float fps = 0;
 
 	bool activate = false;
 	std::vector<HammerCollide> cubelist;
@@ -310,14 +313,10 @@ private:
 	bool isplayerhit = false;
 	bool iscameramove = false;
 
-
 	//Testing 
 	bool shockwave = false;
 	bool gravity = false;
 	bool isObjectiveRead = false;
-
-
-
 };
 
 #endif

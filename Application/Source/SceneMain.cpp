@@ -62,6 +62,20 @@ void SceneMain::RestoreState() {
 		isSignDialogueActive = false;
 		isCutsceneDialogueActive = false;
 		readSign = false;
+
+		// IMPORTANT: Skip the cutscene by setting its state to completed
+		cutsceneStage = 4;
+		cutsceneSkipped = true;
+
+		// Enable player movement immediately
+		camera.enableFNAF = false;
+		camera.allowMovement = true;
+		camera.allowJump = true;
+		camera.allowSprint = false;
+		camera.allowCrouch = true;
+		camera.allowProne = false;
+		camera.allowLocomotiveTilt = true;
+		camera.allowLocomotiveBop = false;
 	}
 }
 
@@ -74,7 +88,6 @@ void SceneMain::Init()
 	frontFenceList.clear();
 	sideBoundary.clear();
 	frontBoundary.clear();
-
 
 	tempCompensation = 0;
 	camera.enableFNAF = true;
@@ -467,73 +480,89 @@ void SceneMain::Update(double dt)
 	Application::SetPointerStatus(false);
 	HandleKeyPress();
 
-	if (KeyboardController::GetInstance()->IsKeyDown('I'))
-		light[0].position.z -= static_cast<float>(dt) * 5.f;
-	if (KeyboardController::GetInstance()->IsKeyDown('K'))
-		light[0].position.z += static_cast<float>(dt) * 5.f;
-	if (KeyboardController::GetInstance()->IsKeyDown('J'))
-		light[0].position.x -= static_cast<float>(dt) * 5.f;
-	if (KeyboardController::GetInstance()->IsKeyDown('L'))
-		light[0].position.x += static_cast<float>(dt) * 5.f;
-	if (KeyboardController::GetInstance()->IsKeyDown('O'))
-		light[0].position.y -= static_cast<float>(dt) * 5.f;
-	if (KeyboardController::GetInstance()->IsKeyDown('P'))
-		light[0].position.y += static_cast<float>(dt) * 5.f;
+	//if (KeyboardController::GetInstance()->IsKeyDown('I'))
+	//	light[0].position.z -= static_cast<float>(dt) * 5.f;
+	//if (KeyboardController::GetInstance()->IsKeyDown('K'))
+	//	light[0].position.z += static_cast<float>(dt) * 5.f;
+	//if (KeyboardController::GetInstance()->IsKeyDown('J'))
+	//	light[0].position.x -= static_cast<float>(dt) * 5.f;
+	//if (KeyboardController::GetInstance()->IsKeyDown('L'))
+	//	light[0].position.x += static_cast<float>(dt) * 5.f;
+	//if (KeyboardController::GetInstance()->IsKeyDown('O'))
+	//	light[0].position.y -= static_cast<float>(dt) * 5.f;
+	//if (KeyboardController::GetInstance()->IsKeyDown('P'))
+	//	light[0].position.y += static_cast<float>(dt) * 5.f;
 
 	//light[0].spotDirection = -glm::normalize (camera.target - camera.pos);
 	//light[0].position = camera.pos;
 
-	switch (cutsceneStage)
-	{
-	case 0:
-		camera.pos.x = -50;
-		camera.pos.y = 10;
-		camera.pos.z = -90;
-		cutsceneStage = 1;
-		break;
-	case -1:
-		camera.pos.x = -50;
-		camera.pos.y = 10;
-		camera.pos.z = -90;
-		cutsceneStage = 0;
-		break;
-	case 1:
-		camera.pos.x += abs(camera.pos.x + 10) / 2 * dt;
-		camera.pos.z += 1 * dt;
+	 // Skip cutscene logic if it's already been played
+	if (hasPlayedCutsceneDialogue) {
+		// Force the cutscene to be in its final state
+		cutsceneStage = 4;
 
-		if (camera.pos.x > -10.005)
-		{
-			cutsceneStage = 2;
-		}
-		break;
-	case 2:
-		camera.pos.x += abs(72.15 + camera.pos.z) * dt;
-		tempCompensation = abs(camera.pos.z + 70) / 2;
-		camera.pos.z += tempCompensation * dt;
-
-		if (camera.pos.x > -3)
-		{
-			cutsceneStage = 3;
-		}
-		break;
-	case 3:
-		//camera.pos.x += abs(camera.pos.x + 1) / 2 * dt;
-		//camera.pos.z += tempCompensation * abs(camera.pos.x + 2.5) * dt;
-
-		if (1)
-		{
-			cutsceneStage = 4;
+		// Ensure camera controls are enabled
+		if (!camera.allowMovement) {
 			camera.enableFNAF = false;
 			camera.allowMovement = true;
-			camera.allowJump = true;
+			camera.allowJump = false;
 			camera.allowSprint = false;
 			camera.allowCrouch = true;
 			camera.allowProne = false;
 			camera.allowLocomotiveTilt = true;
 			camera.allowLocomotiveBop = false;
 		}
+	}
+	else {
+		// Existing cutscene logic
+		switch (cutsceneStage)
+		{
+		case 0:
+			camera.pos.x = -50;
+			camera.pos.y = 10;
+			camera.pos.z = -90;
+			cutsceneStage = 1;
+			break;
+		case -1:
+			camera.pos.x = -50;
+			camera.pos.y = 10;
+			camera.pos.z = -90;
+			cutsceneStage = 0;
+			break;
+		case 1:
+			camera.pos.x += abs(camera.pos.x + 10) / 2 * dt;
+			camera.pos.z += 1 * dt;
 
-		break;
+			if (camera.pos.x > -10.005)
+			{
+				cutsceneStage = 2;
+			}
+			break;
+		case 2:
+			camera.pos.x += abs(72.15 + camera.pos.z) * dt;
+			tempCompensation = abs(camera.pos.z + 70) / 2;
+			camera.pos.z += tempCompensation * dt;
+
+			if (camera.pos.x > -3)
+			{
+				cutsceneStage = 3;
+			}
+			break;
+		case 3:
+			if (1)
+			{
+				cutsceneStage = 4;
+				camera.enableFNAF = false;
+				camera.allowMovement = true;
+				camera.allowJump = true;
+				camera.allowSprint = false;
+				camera.allowCrouch = true;
+				camera.allowProne = false;
+				camera.allowLocomotiveTilt = true;
+				camera.allowLocomotiveBop = false;
+			}
+			break;
+		}
 	}
 
 	// camera

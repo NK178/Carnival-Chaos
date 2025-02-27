@@ -149,7 +149,7 @@ void Application::Init()
 		glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
 	// Initialize scene manager with main menu scene
-	sceneManager.Init(SCENE_HOLE);
+	sceneManager.Init(SCENE_BUMPERBALLS);
 }
 
 void Application::Run()
@@ -185,14 +185,14 @@ void Application::Run()
 
 void Application::ProcessInput()
 {
-    // Global go back to carnival
-    if (KeyboardController::GetInstance()->IsKeyPressed('Q')) {
-        // If not in main menu or carnival scene, pop back to carnival
-        if (sceneManager.GetCurrentSceneType() != SCENE_MAINMENU &&
-            sceneManager.GetCurrentSceneType() != SCENE_CARNIVAL) {
-            sceneManager.PopScene();
-        }
-    }
+    //// Global go back to carnival
+    //if (KeyboardController::GetInstance()->IsKeyPressed('Q')) {
+    //    // If not in main menu or carnival scene, pop back to carnival
+    //    if (sceneManager.GetCurrentSceneType() != SCENE_MAINMENU &&
+    //        sceneManager.GetCurrentSceneType() != SCENE_CARNIVAL) {
+    //        sceneManager.PopScene();
+    //    }
+    //}
 
     // Example: Handle special game transitions based on current scene
     Scene* currentScene = sceneManager.GetCurrentScene();
