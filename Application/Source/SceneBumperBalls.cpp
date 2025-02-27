@@ -500,6 +500,12 @@ void SceneBumperBalls::Update(double dt)
 	if (KeyboardController::GetInstance()->IsKeyPressed('R') && !gamestart)
 		InitGame();
 
+	//DEV KEY
+	if (KeyboardController::GetInstance()->IsKeyDown('O')) {
+		scenecomplete = true;
+		gamewin = true;
+	}
+
 	float temp = 1.f / dt;
 	fps = glm::round(temp * 100.f) / 100.f;
 }

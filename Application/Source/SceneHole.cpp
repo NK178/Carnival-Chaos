@@ -437,6 +437,13 @@ void SceneHole::Update(double dt)
 
 		camera.Update(dt);
 	}
+
+	//DEV KEY
+	if (KeyboardController::GetInstance()->IsKeyDown('O')) {
+		scenecomplete = true;
+		gameResult = 1;
+		wallDisp = 100000000;
+	}
 }
 
 void SceneHole::Render()
