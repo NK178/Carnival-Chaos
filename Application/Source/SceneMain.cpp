@@ -708,7 +708,7 @@ void SceneMain::Update(double dt)
 		if (SceneArchery::scenecomplete || SceneBalloonPop::scenecomplete || SceneBumperBalls::scenecomplete || SceneHole::scenecomplete || SceneWhackAMole::scenecomplete) 
 		{
 			float distanceToFinalTent = glm::distance(camera.pos, finalTentPosition);
-			if (distanceToFinalTent < 30.0f)
+			if (distanceToFinalTent < 25.0f)
 			{
 				showEnterFinalTentText = true;
 			}
@@ -872,15 +872,15 @@ void SceneMain::Render()
 			RenderMesh(meshList[GEO_TENT], true);
 			modelStack.PopMatrix();
 
-			bool allTentsCompleted = true;
-			for (int i = 0; i < 6; i++)
-			{
-				if (!tentCompleted[i])
-				{
-					allTentsCompleted = false;
-					break;
-				}
-			}
+			//bool allTentsCompleted = true;
+			//for (int i = 0; i < 6; i++)
+			//{
+			//	if (!tentCompleted[i])
+			//	{
+			//		allTentsCompleted = false;
+			//		break;
+			//	}
+			//}
 
 			if (CheckAllTentsCompleted())
 			{
@@ -1115,9 +1115,9 @@ void SceneMain::Render()
 		RenderMesh(meshList[GEO_MONEYBAG], true);
 		modelStack.PopMatrix();
 	}
-
-	RenderUI();
+;
 	RenderObjectives();
+	RenderUI();
 	RenderDialogue();
 
 	std::string temp("FPS:" + std::to_string(fps));
@@ -1472,7 +1472,15 @@ void SceneMain::UpdateSignText() {
 			{{"Better keep going."}, false}
 		};
 	}
-	else if (completedTents == 6 && !isFinalChallengeCompleted && SceneFinal::scenecomplete) {
+	//else if (completedTents == 6 && !isFinalChallengeCompleted && SceneFinal::scenecomplete) {
+	//	// all minigames complete and final challenge not completed
+	//	signDialogueLines = {
+	//		{{"Alright! I finished all six games!"}, false},
+	//		{{"Now it's time for the final challenge..."}, false},
+	//		{{"I wonder what kind of challenge awaits."}, false}
+	//	};
+	//}
+	else if (completedTents == 6 && !isFinalChallengeCompleted) {
 		// all minigames complete and final challenge not completed
 		signDialogueLines = {
 			{{"Alright! I finished all six games!"}, false},
@@ -1971,13 +1979,6 @@ void SceneMain::Material(GEOMETRY_TYPE obj, float AmR, float AmG, float AmB, flo
 
 void SceneMain::RenderSkyBox() {
 	modelStack.PushMatrix();
-
-	//int completedGames = 0;
-	//for (int i = 0; i < 5; i++) {
-	//	if (tentCompleted[i]) {
-	//		completedGames++;
-	//	}
-	//}
 
 	bool useFinalSkybox = isFinalChallengeCompleted;
 
