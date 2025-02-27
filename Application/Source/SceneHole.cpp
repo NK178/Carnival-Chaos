@@ -18,6 +18,10 @@
 #include "MouseController.h"
 #include "LoadTGA.h"
 
+
+bool SceneHole::scenecomplete = false;
+
+
 SceneHole::SceneHole()
 {
 }
@@ -320,7 +324,9 @@ void SceneHole::Update(double dt)
 			{
 				//std::cout << "SUCCESS\n";
 				m_hasReadObjective = false;
+				scenecomplete = true;
 				gameResult = 1;
+
 			}
 		}
 

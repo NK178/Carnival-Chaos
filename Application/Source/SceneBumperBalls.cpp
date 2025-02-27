@@ -18,6 +18,8 @@
 #include "MouseController.h"
 #include "LoadTGA.h"
 
+bool SceneBumperBalls::scenecomplete = false;
+
 
 SceneBumperBalls::SceneBumperBalls()
 {
@@ -486,8 +488,10 @@ void SceneBumperBalls::Update(double dt)
 		gamelose = true;
 
 	//check if player win 
-	if (!isballactive[0]&& !isballactive[1] && !isballactive[2] && !isballactive[3])
+	if (!isballactive[0] && !isballactive[1] && !isballactive[2] && !isballactive[3]) {
 		gamewin = true;
+		scenecomplete = true;
+	}
 
 	if (gamelose || gamewin) {
 		gamestart = false;

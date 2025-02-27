@@ -17,6 +17,9 @@
 #include "MouseController.h"
 #include "LoadTGA.h"
 
+
+bool SceneArchery::scenecomplete = false;
+
 SceneArchery::SceneArchery() :
 	m_vertexArrayID(0),
 	m_programID(0),
@@ -475,6 +478,7 @@ void SceneArchery::CheckArrowCollisions()
 
 						// **Check for Win Condition**
 						if (m_playerScore >= 20) {
+							scenecomplete = true;
 							m_hasWon = true;
 							m_isGameOver = false;
 						}

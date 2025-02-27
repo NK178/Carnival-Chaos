@@ -118,6 +118,8 @@ public:
 
         signed short int gameResult = 0;
 
+	static bool scenecomplete;
+
 private:
 	void HandleKeyPress();
 	void RenderMesh(Mesh* mesh, bool enableLight);

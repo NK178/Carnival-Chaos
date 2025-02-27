@@ -19,6 +19,7 @@
 
 #include <iostream>
 
+bool SceneBalloonPop::scenecomplete = false;
 
 
 SceneBalloonPop::SceneBalloonPop() :
@@ -411,6 +412,7 @@ void SceneBalloonPop::CheckDartCollisions() {
 							// Set win condition flags
 							gameOver = true;
 							m_hasWon = true;
+							scenecomplete = true;
 							m_isGameOver = false;  // Ensure game over is false for win state
 						}
 						break;

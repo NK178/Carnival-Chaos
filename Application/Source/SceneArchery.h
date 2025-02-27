@@ -110,6 +110,9 @@ public:
     virtual void Exit();
 
     bool m_hasWon;
+
+    static bool scenecomplete;
+
 private:
  
 
