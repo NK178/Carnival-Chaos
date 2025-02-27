@@ -1061,77 +1061,6 @@ void SceneMain::Render()
 
 	std::string temp("FPS:" + std::to_string(fps));
 	RenderTextOnScreen(meshList[GEO_FPS], temp.substr(0, 9), glm::vec3(0, 1, 0), 20, 620, 20);
-
-	//for (int n = 0; n < tentList.size(); n++) {
-	//	modelStack.PushMatrix();
-	//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	//	modelStack.Translate(tentList[n].pos.x, tentList[n].pos.y, tentList[n].pos.z);
-	//	modelStack.Rotate(tentList[n].angleDeg, 0, 1, 0);
-	//  modelStack.Scale(2 * tentList[n].tentDimensions.x, 2 * tentList[n].tentDimensions.y, 2 * tentList[n].tentDimensions.z);
-	//	meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-	//	meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-	//	meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	//	meshList[GEO_CUBE]->material.kShininess = 1.0f;
-	//	RenderMesh(meshList[GEO_CUBE], true);
-	//	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	//	modelStack.PopMatrix();
-	//}
-
-	//for (int n = 0; n < sideFenceList.size(); n++) {
-	//	modelStack.PushMatrix();
-	//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	//	modelStack.Translate(sideFenceList[n].pos.x, sideFenceList[n].pos.y, sideFenceList[n].pos.z);
-	//	modelStack.Rotate(sideFenceList[n].angleDeg, 0, 1, 0);
-	//	modelStack.Scale(2 * sideFenceList[n].fenceDimensions.x, 2 * sideFenceList[n].fenceDimensions.y, 2 * sideFenceList[n].fenceDimensions.z);
-	//	meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-	//	meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-	//	meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	//	meshList[GEO_CUBE]->material.kShininess = 1.0f;
-	//	RenderMesh(meshList[GEO_CUBE], true);
-	//	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	//	modelStack.PopMatrix();
-	//}
-	//for (int n = 0; n < frontFenceList.size(); n++) {
-	//	modelStack.PushMatrix();
-	//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	//	modelStack.Translate(frontFenceList[n].pos.x, frontFenceList[n].pos.y, frontFenceList[n].pos.z);
-	//	modelStack.Rotate(frontFenceList[n].angleDeg, 0, 1, 0);
-	//	modelStack.Scale(2 * frontFenceList[n].fenceDimensions.x, 2 * frontFenceList[n].fenceDimensions.y, 2 * frontFenceList[n].fenceDimensions.z);
-	//	meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-	//	meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-	//	meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	//	meshList[GEO_CUBE]->material.kShininess = 1.0f;
-	//	RenderMesh(meshList[GEO_CUBE], true);
-	//	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	//	modelStack.PopMatrix();
-	//}
-	//for (int n = 0; n < sideBoundary.size(); n++) {
-	//	modelStack.PushMatrix();
-	//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	//	modelStack.Translate(sideBoundary[n].pos.x, sideBoundary[n].pos.y, sideBoundary[n].pos.z);
-	//	modelStack.Rotate(sideBoundary[n].angleDeg, 0, 1, 0);
-	//	modelStack.Scale(2 * sideBoundary[n].boundaryDimensions.x, 2 * sideBoundary[n].boundaryDimensions.y, 2 * sideBoundary[n].boundaryDimensions.z);
-	//	meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-	//	meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-	//	meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	//	meshList[GEO_CUBE]->material.kShininess = 1.0f;
-	//	RenderMesh(meshList[GEO_CUBE], true);
-	//	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	//	modelStack.PopMatrix();
-	//}
-
-	//modelStack.PushMatrix();
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	//modelStack.Translate(frontBoundary[0].pos.x, frontBoundary[0].pos.y, frontBoundary[0].pos.z);
-	//modelStack.Rotate(frontBoundary[0].angleDeg, 0, 1, 0);
-	//modelStack.Scale(2 * frontBoundary[0].boundaryDimensions.x, 2 * frontBoundary[0].boundaryDimensions.y, 2 * frontBoundary[0].boundaryDimensions.z);
-	//meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-	//meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-	//meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-	//meshList[GEO_CUBE]->material.kShininess = 1.0f;
-	//RenderMesh(meshList[GEO_CUBE], true);
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	//modelStack.PopMatrix();
 }
 
 // boolean to check if player complete all 6 minigames
@@ -1216,8 +1145,6 @@ void SceneMain::RenderDialogue() {
 }
 
 void SceneMain::UpdateDialogue(double dt) {
-	// Check for new dialogue activations
-
 	// Sign dialogue activation
 	if (readSign && !isSignDialogueActive && !anyOtherDialogueActive()) {
 		UpdateSignText();
@@ -1231,13 +1158,13 @@ void SceneMain::UpdateDialogue(double dt) {
 		tentCompleted[4] = true;
 	}
 
-	// All tents completed dialogue activation
+	// all tents completed dialogue activation
 	if (CheckAllTentsCompleted() && !hasPlayedAllTentsCompletedDialogue && !anyOtherDialogueActive()) {
 		StartDialogue(allTentsCompletedLines, &isAllTentsCompletedDialogueActive);
 		hasPlayedAllTentsCompletedDialogue = true;
 	}
 
-	// Final challenge completed dialogue activation
+	// final challenge completed dialogue activation
 	if (isFinalChallengeCompleted && !hasPlayedFCCDialogue && !anyOtherDialogueActive()) {
 		StartDialogue(isFCCDialogueLines, &isFCCDialogueActive);
 		hasPlayedFCCDialogue = true;
@@ -1245,17 +1172,17 @@ void SceneMain::UpdateDialogue(double dt) {
 
 	// Ending dialogue activation (can be triggered elsewhere in your code)
 
-	// Update the active dialogue
+	// update active dialogue
 	UpdateActiveDialogue(dt);
 }
 
-// Helper function to check if any dialogue is currently active
+// check if any idalogue is active function
 bool SceneMain::anyOtherDialogueActive() {
 	return isCutsceneDialogueActive || isSignDialogueActive || isSpinningRingDialogueActive ||
 		isAllTentsCompletedDialogueActive || isFCCDialogueActive || isEndingDialogueActive;
 }
 
-// Helper function to start a new dialogue
+// start a new dialogue function
 void SceneMain::StartDialogue(const std::vector<DialogueLine>& dialogueLines, bool* dialogueActiveFlag) {
 	*dialogueActiveFlag = true;
 	currentLineIndex = 0;
@@ -1263,7 +1190,7 @@ void SceneMain::StartDialogue(const std::vector<DialogueLine>& dialogueLines, bo
 	isTyping = true;
 	typewriterTimer = 0.0f;
 
-	// Set up the first line of dialogue
+	// set up first line of the dialogue
 	const DialogueLine& currentDialogue = dialogueLines[currentLineIndex];
 	if (currentDialogue.isMultiLine) {
 		currentText = currentDialogue.textLines[0] + "\n" + currentDialogue.textLines[1];
@@ -1273,16 +1200,16 @@ void SceneMain::StartDialogue(const std::vector<DialogueLine>& dialogueLines, bo
 	}
 	currentCharIndex = 0;
 
-	// Disable camera movement during dialogue
+	// disable camera movement during dialogue
 	camera.enableFNAF = true;
 	camera.allowMovement = false;
 	camera.allowJump = false;
 	camera.allowLocomotiveTilt = false;
 }
 
-// Helper function to update the currently active dialogue
+// update current active dialogue
 void SceneMain::UpdateActiveDialogue(double dt) {
-	// Determine which dialogue is active and get the corresponding dialogue lines
+	// determine which dialogue is active 
 	std::vector<DialogueLine>* activeDialogueLines = nullptr;
 	bool* activeDialogueFlag = nullptr;
 	bool* hasPlayedFlag = nullptr;
@@ -1295,12 +1222,12 @@ void SceneMain::UpdateActiveDialogue(double dt) {
 	else if (isSignDialogueActive) {
 		activeDialogueLines = &signDialogueLines;
 		activeDialogueFlag = &isSignDialogueActive;
-		hasPlayedFlag = nullptr; // Sign can be read multiple times
+		hasPlayedFlag = nullptr; // sign can be played multiple times
 	}
 	else if (isSpinningRingDialogueActive) {
 		activeDialogueLines = &spinningRingTentDialogueLines;
 		activeDialogueFlag = &isSpinningRingDialogueActive;
-		hasPlayedFlag = nullptr; // No flag for this dialogue
+		hasPlayedFlag = nullptr; // spinning ring tent can be played multiple times
 	}
 	else if (isAllTentsCompletedDialogueActive) {
 		activeDialogueLines = &allTentsCompletedLines;
@@ -1318,36 +1245,36 @@ void SceneMain::UpdateActiveDialogue(double dt) {
 		hasPlayedFlag = &hasPlayedEndingDialogue;
 	}
 	else {
-		return; // No active dialogue
+		return; // return if there is no active dialogue
 	}
 
-	// Handle skip or next dialogue input
+	// skip dialogue input
 	if (KeyboardController::GetInstance()->IsKeyPressed('E')) {
 		if (isTyping) {
-			// Skip typing the current text
+			// skip typing
 			currentCharIndex = currentText.length();
 			isTyping = false;
 		}
 		else {
-			// Skip to the next line
+			// skip to next line
 			dialogueTimer = 4.0f;
 		}
 	}
 
-	// Skip entire dialogue if Q is pressed
+	// skip whole dialogue
 	if (KeyboardController::GetInstance()->IsKeyPressed('Q')) {
 		*activeDialogueFlag = false;
 		if (hasPlayedFlag != nullptr) {
 			*hasPlayedFlag = true;
 		}
 
-		// Re-enable camera controls
+		// re enable camera controls
 		camera.enableFNAF = false;
 		camera.allowMovement = true;
 		camera.allowJump = true;
 		camera.allowLocomotiveTilt = true;
 
-		// Special case handling after dialogues
+		// derender readsign and spinning ring dialogues after finished dialogue
 		if (activeDialogueFlag == &isSignDialogueActive) {
 			readSign = false;
 		}
@@ -1358,10 +1285,10 @@ void SceneMain::UpdateActiveDialogue(double dt) {
 		return;
 	}
 
-	// Update typewriter effect
+	// typewriter effect
 	if (isTyping) {
 		typewriterTimer += dt;
-		if (typewriterTimer >= 0.05f) { // Typing speed
+		if (typewriterTimer >= 0.05f) { 
 			typewriterTimer = 0.0f;
 			currentCharIndex++;
 			if (currentCharIndex >= currentText.length()) {
@@ -1370,26 +1297,26 @@ void SceneMain::UpdateActiveDialogue(double dt) {
 		}
 	}
 	else {
-		// Delay before next line
+		// next line delay
 		dialogueTimer += dt;
 		if (dialogueTimer >= 4.0f) {
 			dialogueTimer = 0;
 			currentLineIndex++;
 
-			// Check if we've reached the end of the dialogue
+			// check if reached end of dialogue
 			if (currentLineIndex >= activeDialogueLines->size()) {
 				*activeDialogueFlag = false;
 				if (hasPlayedFlag != nullptr) {
 					*hasPlayedFlag = true;
 				}
 
-				// Re-enable camera controls
+				// re endable camera controls
 				camera.enableFNAF = false;
 				camera.allowMovement = true;
 				camera.allowJump = true;
 				camera.allowLocomotiveTilt = true;
 
-				// Special case handling after dialogues
+				// derender readsign and spinning ring dialogues after finished dialogue
 				if (activeDialogueFlag == &isSignDialogueActive) {
 					readSign = false;
 				}
@@ -1398,11 +1325,11 @@ void SceneMain::UpdateActiveDialogue(double dt) {
 				}
 			}
 			else {
-				// Start typing the next line
+				// type next line
 				isTyping = true;
 				typewriterTimer = 0.0f;
 
-				// Set the new line text
+				// set new line text
 				const DialogueLine& currentDialogue = (*activeDialogueLines)[currentLineIndex];
 				if (currentDialogue.isMultiLine) {
 					currentText = currentDialogue.textLines[0] + "\n" + currentDialogue.textLines[1];
