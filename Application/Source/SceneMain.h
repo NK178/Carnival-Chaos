@@ -291,10 +291,7 @@ private:
 	void RenderText(Mesh* mesh, std::string text, glm::vec3 color);
 	void RenderTextOnScreen(Mesh* mesh, std::string text, glm::vec3 color, float size, float x, float y);
 	void Material(GEOMETRY_TYPE obj, float AmR, float AmG, float AmB, float DifA, float DifG, float DifB, float SpA, float SpG, float SpB, float Shiny);
-
-
 	void RenderSkyBox();
-
 
 	// Structure to hold saved state
 	static struct SavedState {
@@ -304,8 +301,6 @@ private:
 		bool isFinalChallengeCompleted;
 		bool isInitialized;
 	} savedState;
-
-	
 };
 
 #endif
