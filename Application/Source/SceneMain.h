@@ -31,7 +31,6 @@ public:
 
 		//Models
 		GEO_TENT,
-		GEO_TREE,
 		GEO_FENCE,
 		GEO_SIGN,
 		GEO_HOUSE,
