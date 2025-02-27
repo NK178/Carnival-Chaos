@@ -178,6 +178,15 @@ private:
 	Light light[NUM_LIGHTS];
 	bool enableLight;
 
+	// Structure to hold saved state
+	static struct SavedState {
+		bool tentCompleted[6];
+		bool hasReadSign;
+		bool hasPlayedCutsceneDialogue;
+		bool isFinalChallengeCompleted;
+		bool isInitialized;
+	} savedState;
+
 	// structure for dialogue lines
 	struct DialogueLine {
 		std::vector<std::string> textLines;  
@@ -292,15 +301,6 @@ private:
 	void RenderTextOnScreen(Mesh* mesh, std::string text, glm::vec3 color, float size, float x, float y);
 	void Material(GEOMETRY_TYPE obj, float AmR, float AmG, float AmB, float DifA, float DifG, float DifB, float SpA, float SpG, float SpB, float Shiny);
 	void RenderSkyBox();
-
-	// Structure to hold saved state
-	static struct SavedState {
-		bool tentCompleted[6];
-		bool hasReadSign;
-		bool hasPlayedCutsceneDialogue;
-		bool isFinalChallengeCompleted;
-		bool isInitialized;
-	} savedState;
 };
 
 #endif
