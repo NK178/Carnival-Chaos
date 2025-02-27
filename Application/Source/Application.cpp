@@ -269,7 +269,8 @@ void Application::ProcessInput()
         {
             SceneHole* holeScene = static_cast<SceneHole*>(currentScene);
             // For SceneHole, check if gameResult > 0 (indicating a win)
-            if (holeScene->gameResult > 0 && KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E)) {
+            if (holeScene->gameResult != 0 && holeScene->gameResult != 2 && KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E)) {
+              
                 sceneManager.PopScene();
             }
             break;
