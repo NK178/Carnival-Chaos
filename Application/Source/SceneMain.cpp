@@ -487,7 +487,7 @@ void SceneMain::Init()
 	showEnterFinalTentText = false;
 	isFinalChallengeCompleted = false;
 
-	moneybagPosition = glm::vec3{ 0.f, 0.f, -60.f };
+	moneybagPosition = glm::vec3{ 0.f, 0.f, -80.f };
 	tookMoneyBag = false;
 	showInteractMBText = false;
 
@@ -705,7 +705,7 @@ void SceneMain::Update(double dt)
 		if (SceneArchery::scenecomplete || SceneBalloonPop::scenecomplete || SceneBumperBalls::scenecomplete || SceneHole::scenecomplete || SceneWhackAMole::scenecomplete) 
 		{
 			float distanceToFinalTent = glm::distance(camera.pos, finalTentPosition);
-			if (distanceToFinalTent < 25.0f)
+			if (distanceToFinalTent < 30.0f)
 			{
 				showEnterFinalTentText = true;
 			}
@@ -725,7 +725,11 @@ void SceneMain::Update(double dt)
 			}
 		}
 
-		if (isFinalChallengeCompleted) {
+		if (SceneFinal::scenecomplete && !isFinalChallengeCompleted) {
+			isFinalChallengeCompleted = true;
+		}
+
+		if (isFinalChallengeCompleted && !tookMoneyBag) {
 			float distanceToMoneyBag = glm::distance(camera.pos, moneybagPosition);
 			if (distanceToMoneyBag < 20.0f)
 			{
@@ -1099,7 +1103,7 @@ void SceneMain::Render()
 	// Render Money Bag (if player completes final challenge)
 	if (isFinalChallengeCompleted && !tookMoneyBag) {
 		modelStack.PushMatrix();
-		modelStack.Translate(0.f, 0.f, -60.f);
+		modelStack.Translate(0.f, 0.f, -80.f);
 		modelStack.Scale(30.f, 50.f, 30.f);
 		meshList[GEO_MONEYBAG]->material.kAmbient = glm::vec3(0.5f, 0.5f, 0.5f);
 		meshList[GEO_MONEYBAG]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
@@ -1218,7 +1222,7 @@ void SceneMain::UpdateDialogue(double dt) {
 		// Mark the tent as completed
 		tentCompleted[4] = true;
 	}
-	
+
 	// all tents completed dialogue activation
 	if (CheckAllTentsCompleted() && !hasPlayedAllTentsCompletedDialogue && !anyOtherDialogueActive() && !isFinalChallengeCompleted) {
 		StartDialogue(allTentsCompletedLines, &isAllTentsCompletedDialogueActive);
@@ -1230,8 +1234,6 @@ void SceneMain::UpdateDialogue(double dt) {
 		StartDialogue(isFCCDialogueLines, &isFCCDialogueActive);
 		hasPlayedFCCDialogue = true;
 	}
-
-	// Ending dialogue activation (can be triggered elsewhere in your code)
 
 	// update active dialogue
 	UpdateActiveDialogue(dt);
@@ -1360,7 +1362,7 @@ void SceneMain::UpdateActiveDialogue(double dt) {
 	else {
 		// next line delay
 		dialogueTimer += dt;
-		if (dialogueTimer >= 4.0f) {
+		if (dialogueTimer >= (currentLineIndex == 0 ? 4.5f : 4.0f)) { // shorter delay for the first line
 			dialogueTimer = 0;
 			currentLineIndex++;
 
@@ -1371,7 +1373,7 @@ void SceneMain::UpdateActiveDialogue(double dt) {
 					*hasPlayedFlag = true;
 				}
 
-				// re endable camera controls
+				// re enable camera controls
 				camera.enableFNAF = false;
 				camera.allowMovement = true;
 				camera.allowJump = true;
@@ -1764,8 +1766,6 @@ void SceneMain::HandleKeyPress()
 
 			// Set the flag to enter final challenge
 			shouldEnterFinal = true;
-
-			isFinalChallengeCompleted = true;
 		}
 	}
 
