@@ -133,11 +133,10 @@ public:
 	~SceneMain();
 
 	virtual void Init();
-	void RestoreState();
 	virtual void Update(double dt);
 	virtual void Render();
-	void SaveState();
 	virtual void Exit();
+	void SetTentCompleted(int tentIndex, bool completed);
 
      bool shouldEnterArchery = false;      // Flag to enter the archery minigame
      bool shouldEnterBalloonPop = false;   // Flag to enter the balloon pop minigame
@@ -147,8 +146,19 @@ public:
      bool shouldEnterSpinningRing = false; // Flag to enter the spinning ring minigame
      bool shouldEnterFinal = false;        // Flag to enter the final scene
 
+	 // Save the current state (to be called before Exit())
+	 void SaveState();
+
+	 // Restore the previously saved state (to be called after Init())
+	 void RestoreState();
+
+	 // Flag to check if state should be restored
 	 static bool hasStateToRestore;
 private:
+	void HandleKeyPress();
+	void RenderMesh(Mesh* mesh, bool enableLight);
+
+	// store saved state
 	static struct SavedState {
 		bool tentCompleted[6];
 		bool hasReadSign;
@@ -156,9 +166,6 @@ private:
 		bool isFinalChallengeCompleted;
 		bool isInitialized;
 	} savedState;
-
-	void HandleKeyPress();
-	void RenderMesh(Mesh* mesh, bool enableLight);
 
 	unsigned m_vertexArrayID;
 	Mesh* meshList[NUM_GEOMETRY];
