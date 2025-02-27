@@ -1365,7 +1365,6 @@ void SceneMain::UpdateActiveDialogue(double dt) {
 		else if (activeDialogueFlag == &isSpinningRingDialogueActive) {
 			interactWithSpinningRing = false;
 		}
-
 		return;
 	}
 
@@ -1715,6 +1714,13 @@ void SceneMain::HandleKeyPress()
 		camera.allowLocomotiveTilt = true;
 		camera.allowLocomotiveBop = false;
 	}
+	//if (KeyboardController::GetInstance()->IsKeyPressed('Q') && isFCCDialogueActive) {
+	//	// Skip the entire fcc dialogue
+	//	isFCCDialogueActive = false;
+	//	camera.enableFNAF = false;
+	//	camera.allowMovement = true;
+	//	camera.allowLocomotiveTilt = true;
+	//}
 	static bool isRightUp = false;
 	if (!isRightUp && MouseController::GetInstance()->IsButtonDown(GLFW_MOUSE_BUTTON_RIGHT))
 	{
