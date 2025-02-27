@@ -587,6 +587,12 @@ void SceneBalloonPop::Update(double dt)
 	fps = glm::round(temp * 100.f) / 100.f;
 
 	camera.Update(dt);
+
+	//DEV KEY
+	if (KeyboardController::GetInstance()->IsKeyDown('O')) {
+		scenecomplete = true;
+		m_hasWon = true;
+	}
 }
 
 void SceneBalloonPop::Render()

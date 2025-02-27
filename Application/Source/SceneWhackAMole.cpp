@@ -434,6 +434,12 @@ void SceneWhackAMole::Update(double dt)
 
 	float temp = 1.f / dt;
 	fps = glm::round(temp * 100.f) / 100.f;
+
+	//DEV KEY
+	if (KeyboardController::GetInstance()->IsKeyDown('O')) {
+		scenecomplete = true;
+		gamewin = true;
+	}
 }
 
 void SceneWhackAMole::Render()

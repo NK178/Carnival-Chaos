@@ -573,6 +573,12 @@ void SceneArchery::Update(double dt)
 			}
 		}
 	}
+
+	//DEV KEY
+	if (KeyboardController::GetInstance()->IsKeyDown('O')) {
+		scenecomplete = true;
+		m_hasWon = true;
+	}
 }
 
 void SceneArchery::Render()

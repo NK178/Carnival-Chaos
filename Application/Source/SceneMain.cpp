@@ -1119,10 +1119,11 @@ void SceneMain::Render()
 // boolean to check if player complete all 6 minigames
 bool SceneMain::CheckAllTentsCompleted()
 {
-	for (int i = 0; i < 6; i++) {
-		if (!tentCompleted[i]) return false;
+	if (SceneArchery::scenecomplete && SceneBalloonPop::scenecomplete && SceneBumperBalls::scenecomplete && SceneHole::scenecomplete && SceneWhackAMole::scenecomplete) {
+		return true;
 	}
-	return true;
+	else
+		return false;
 }
 
 void SceneMain::RenderUI()
@@ -1216,9 +1217,9 @@ void SceneMain::UpdateDialogue(double dt) {
 		// Mark the tent as completed
 		tentCompleted[4] = true;
 	}
-
+	
 	// all tents completed dialogue activation
-	if (CheckAllTentsCompleted() && !hasPlayedAllTentsCompletedDialogue && !anyOtherDialogueActive()) {
+	if (CheckAllTentsCompleted() && !hasPlayedAllTentsCompletedDialogue && !anyOtherDialogueActive() && !isFinalChallengeCompleted) {
 		StartDialogue(allTentsCompletedLines, &isAllTentsCompletedDialogueActive);
 		hasPlayedAllTentsCompletedDialogue = true;
 	}
@@ -1895,12 +1896,12 @@ void SceneMain::Material(GEOMETRY_TYPE obj, float AmR, float AmG, float AmB, flo
 void SceneMain::RenderSkyBox() {
 	modelStack.PushMatrix();
 
-	int completedGames = 0;
-	for (int i = 0; i < 6; i++) {
-		if (tentCompleted[i]) {
-			completedGames++;
-		}
-	}
+	//int completedGames = 0;
+	//for (int i = 0; i < 5; i++) {
+	//	if (tentCompleted[i]) {
+	//		completedGames++;
+	//	}
+	//}
 
 	bool useFinalSkybox = isFinalChallengeCompleted;
 
@@ -1947,7 +1948,8 @@ void SceneMain::RenderSkyBox() {
 		RenderMesh(meshList[GEO_BOTTOM3], false);
 		modelStack.PopMatrix();
 	}
-	else if (completedGames >= 6) {
+	else if (SceneArchery::scenecomplete && SceneBalloonPop::scenecomplete && SceneBumperBalls::scenecomplete && SceneHole::scenecomplete && SceneWhackAMole::scenecomplete)
+	{
 		modelStack.PushMatrix();
 		modelStack.Translate(0.f, 0.f, 250.f);
 		modelStack.Rotate(180, 0, 1, 0);
