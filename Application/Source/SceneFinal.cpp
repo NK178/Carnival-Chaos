@@ -351,7 +351,7 @@ bool SceneFinal::CheckRayBalloonCollision(glm::vec3 rayOrigin, glm::vec3 rayDire
 			// If the distance is less than the radius, the ray hits the balloon
 			if (distance < balloonRadius)
 			{
-				std::cout << "HIT BALLOON " << i << "!" << std::endl;
+				//std::cout << "HIT BALLOON " << i << "!" << std::endl;
 
 				// Balloon hit! Deactivate it and deal damage.
 				m_balloons[i].active = false;
@@ -384,7 +384,7 @@ bool SceneFinal::CheckRayBalloonCollision(glm::vec3 rayOrigin, glm::vec3 rayDire
 					}
 					currentCharIndex = 0;
 
-					std::cout << "BOSS DEFEATED!" << std::endl;
+					//std::cout << "BOSS DEFEATED!" << std::endl;
 				}
 
 				return true; // Collision detected.
@@ -656,7 +656,7 @@ void SceneFinal::Update(double dt) {
 				m_balloons[i].pos = m_cpu.pos + m_balloons[i].offset;
 			}
 
-			std::cout << "All balloons respawned!" << std::endl;
+			//std::cout << "All balloons respawned!" << std::endl;
 		}
 	}
 
@@ -1383,7 +1383,6 @@ void SceneFinal::HandleKeyPress()
 
 
 	if (MouseController::GetInstance()->IsButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
-		std::cout << "LEFT MOUSE BUTTON PRESSED" << std::endl;
 
 		// Create a ray from the camera's position in the direction the camera is facing
 		glm::vec3 rayOrigin = camera.pos;

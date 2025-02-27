@@ -1735,23 +1735,23 @@ void SceneMain::HandleKeyPress()
 		isRightUp = false;
 	}
 
-	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_TAB))
-	{
-		if (light[0].type == Light::LIGHT_POINT) {
-			light[0].type = Light::LIGHT_DIRECTIONAL;
-			std::cout << "DIRECTIONAL" << std::endl;
-		}
-		else if (light[0].type == Light::LIGHT_DIRECTIONAL) {
-			light[0].type = Light::LIGHT_SPOT;
-			std::cout << "LIGHT SPOT" << std::endl;
-		}
-		else {
-			light[0].type = Light::LIGHT_POINT;
-			std::cout << "LIGHT POINT" << std::endl;
-		}
+	//if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_TAB))
+	//{
+	//	if (light[0].type == Light::LIGHT_POINT) {
+	//		light[0].type = Light::LIGHT_DIRECTIONAL;
+	//		std::cout << "DIRECTIONAL" << std::endl;
+	//	}
+	//	else if (light[0].type == Light::LIGHT_DIRECTIONAL) {
+	//		light[0].type = Light::LIGHT_SPOT;
+	//		std::cout << "LIGHT SPOT" << std::endl;
+	//	}
+	//	else {
+	//		light[0].type = Light::LIGHT_POINT;
+	//		std::cout << "LIGHT POINT" << std::endl;
+	//	}
 
-		glUniform1i(m_parameters[U_LIGHT0_TYPE], light[0].type);
-	}
+	//	glUniform1i(m_parameters[U_LIGHT0_TYPE], light[0].type);
+	//}
 
 	if (KeyboardController::GetInstance()->IsKeyPressed('F') && showSignText)
 	{
