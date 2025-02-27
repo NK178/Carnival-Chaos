@@ -419,10 +419,6 @@ void SceneWhackAMole::Update(double dt)
 	player[0].UpdatePhysics(dt);
 	if (iscameramove)
 		camera.Update(dt);
-
-
-
-
 }
 
 void SceneWhackAMole::Render()

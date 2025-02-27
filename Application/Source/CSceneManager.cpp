@@ -84,33 +84,74 @@ void CSceneManager::PushScene(SCENE_TYPE newScene)
 
 void CSceneManager::PopScene()
 {
-    // Check if we're returning to the Carnival scene
+    // Check if we're popping from a minigame and if the player won
     bool returningToCarnival = false;
-    if (sceneStack.size() > 1) {
-        // Check the second scene from the top (the one we'll return to)
-        Scene* temp = nullptr;
-        Scene* topScene = sceneStack.top();
-        sceneStack.pop();
-        if (!sceneStack.empty()) {
-            temp = sceneStack.top();
-            if (typeStack.size() > 1) {
-                std::stack<SCENE_TYPE> tempStack = typeStack;
-                tempStack.pop();
-                SCENE_TYPE nextType = tempStack.top();
-                if (nextType == SCENE_CARNIVAL) {
+    int minigameIndex = -1;
+    bool hasWon = false;
+
+    if (!sceneStack.empty()) {
+        Scene* currentScene = sceneStack.top();
+
+        // Check which minigame we're popping from and if it was won
+        if (dynamic_cast<SceneArchery*>(currentScene)) {
+            minigameIndex = 0;
+            hasWon = dynamic_cast<SceneArchery*>(currentScene)->m_hasWon;
+        }
+        else if (dynamic_cast<SceneBalloonPop*>(currentScene)) {
+            minigameIndex = 1;
+            hasWon = dynamic_cast<SceneBalloonPop*>(currentScene)->m_hasWon;
+        }
+        else if (dynamic_cast<SceneHole*>(currentScene)) {
+            minigameIndex = 2;
+            hasWon = dynamic_cast<SceneHole*>(currentScene);
+            if (dynamic_cast<SceneHole*>(currentScene)->gameResult == 1) {
+                hasWon = true;
+            }
+            else {
+                hasWon = false;
+            }
+        }
+        else if (dynamic_cast<SceneWhackAMole*>(currentScene)) {
+            minigameIndex = 3;
+            hasWon = dynamic_cast<SceneWhackAMole*>(currentScene)->gamewin;
+        }
+        else if (dynamic_cast<SceneSpinningRing*>(currentScene)) {
+            minigameIndex = 4;
+            hasWon = dynamic_cast<SceneSpinningRing*>(currentScene)->playerWon;
+        }
+        else if (dynamic_cast<SceneBumperBalls*>(currentScene)) {
+            minigameIndex = 5;
+            hasWon = dynamic_cast<SceneBumperBalls*>(currentScene)->gamewin;
+        }
+
+        // Check if next scene is the carnival scene
+        if (sceneStack.size() > 1) {
+            Scene* temp = nullptr;
+            sceneStack.pop();
+            if (!sceneStack.empty()) {
+                temp = sceneStack.top();
+                if (dynamic_cast<SceneMain*>(temp)) {
                     returningToCarnival = true;
-                    // Save state before we exit SceneMain
+
+                    // If player won, mark the tent as completed
+                    if (hasWon && minigameIndex >= 0) {
+                        SceneMain* mainScene = dynamic_cast<SceneMain*>(temp);
+                        if (mainScene) {
+                            mainScene->SetTentCompleted(minigameIndex, true);
+                        }
+                    }
+
+                    // Save state before we pop
                     SceneMain* mainScene = dynamic_cast<SceneMain*>(temp);
                     if (mainScene) {
                         mainScene->SaveState();
                     }
                 }
             }
+            // Restore the stack
+            sceneStack.push(currentScene);
         }
-        // Put top scene back
-        sceneStack.push(topScene);
     }
-
 
     // Pop scenes until we reach the Carnival scene
     while (sceneStack.size() > 1 && currentSceneType != SCENE_CARNIVAL)
@@ -121,14 +162,13 @@ void CSceneManager::PopScene()
         sceneStack.pop();
         typeStack.pop();
 
-        if (!typeStack.empty())
-        {
+        if (!typeStack.empty()) {
             currentSceneType = typeStack.top();
         }
     }
 
-    // If we're already at Carnival, reinitialize it but restore the state
-    if (currentSceneType == SCENE_CARNIVAL && returningToCarnival)
+    // If we're at Carnival, reinitialize it and restore state
+    if (currentSceneType == SCENE_CARNIVAL)
     {
         std::cout << "Returning to Carnival scene with preserved state." << std::endl;
         Scene* carnivalScene = sceneStack.top();
@@ -139,17 +179,7 @@ void CSceneManager::PopScene()
 
         return;
     }
-    // If we're at Carnival but not returning from a game, just reinitialize normally
-    else if (currentSceneType == SCENE_CARNIVAL)
-    {
-        std::cout << "Already at Carnival scene. Reinitializing the carnival scene." << std::endl;
-        Scene* carnivalScene = sceneStack.top();
-        carnivalScene->Exit();
-        carnivalScene->Init();
-        return;
-    }
 }
-
 
 void CSceneManager::ReplaceScene(SCENE_TYPE newScene)
 {

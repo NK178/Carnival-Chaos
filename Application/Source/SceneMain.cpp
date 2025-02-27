@@ -427,6 +427,7 @@ void SceneMain::Init()
 
 	readSign = true;
 	UpdateSignText();
+
 	// Tent Position (for interaction use)
 	tentPositions[0] = glm::vec3(30.f, 0.f, -40.f);
 	tentPositions[1] = glm::vec3(30.f, 0.f, 0.f);
@@ -434,11 +435,13 @@ void SceneMain::Init()
 	tentPositions[3] = glm::vec3(-30.f, 0.f, -40.f);
 	tentPositions[4] = glm::vec3(-30.f, 0.f, 0.f);
 	tentPositions[5] = glm::vec3(-30.f, 0.f, 40.f);
+
 	for (int i = 0; i < 6; i++)
 	{
 		showEnterTentText[i] = false;
 		tentCompleted[i] = false;
 	}
+
 	finalTentPosition = glm::vec3(0.f, 0.f, 70.f);
 	showEnterFinalTentText = false;
 	isFinalChallengeCompleted = false;
@@ -452,8 +455,6 @@ void SceneMain::Init()
 	dialogueTimer = 0;
 	cutsceneStage = -1;
 	cutsceneSkipped = false;
-
-	// Rest of initialization code...
 
 	// Check if we need to restore state after initialization
 	if (hasStateToRestore) {
@@ -1563,6 +1564,13 @@ void SceneMain::Exit()
 	glDeleteProgram(m_programID);
 }
 
+// Method to mark a tent as completed
+void SceneMain::SetTentCompleted(int tentIndex, bool completed) {
+	if (tentIndex >= 0 && tentIndex < 6) {
+		tentCompleted[tentIndex] = completed;
+	}
+}
+
 void SceneMain::HandleKeyPress()
 {
 	if (KeyboardController::GetInstance()->IsKeyPressed(0x31))
@@ -1672,27 +1680,21 @@ void SceneMain::HandleKeyPress()
 				switch (i) {
 				case 0:
 					shouldEnterArchery = true;
-					tentCompleted[0] = true; // Mark archery tent as completed
 					break;
 				case 1:
 					shouldEnterBalloonPop = true;
-					tentCompleted[1] = true; // Mark balloon pop tent as completed
 					break;
 				case 2:
 					shouldEnterHole = true;
-					tentCompleted[2] = true; // Mark hole tent as completed
 					break;
 				case 3:
 					shouldEnterWhackAMole = true;
-					tentCompleted[3] = true; // Mark whack-a-mole tent as completed
 					break;
 				case 4:
 					shouldEnterSpinningRing = true;
-					tentCompleted[4] = true; // Mark spinning ring tent as completed
 					break;
 				case 5:
 					shouldEnterBumperBalls = true;
-					tentCompleted[5] = true; // Mark bumper balls tent as completed
 					break;
 				}
 			}

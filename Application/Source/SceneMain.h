@@ -136,6 +136,7 @@ public:
 	virtual void Update(double dt);
 	virtual void Render();
 	virtual void Exit();
+	void SetTentCompleted(int tentIndex, bool completed);
 
      bool shouldEnterArchery = false;      // Flag to enter the archery minigame
      bool shouldEnterBalloonPop = false;   // Flag to enter the balloon pop minigame
@@ -153,11 +154,18 @@ public:
 
 	 // Flag to check if state should be restored
 	 static bool hasStateToRestore;
-
-
 private:
 	void HandleKeyPress();
 	void RenderMesh(Mesh* mesh, bool enableLight);
+
+	// store saved state
+	static struct SavedState {
+		bool tentCompleted[6];
+		bool hasReadSign;
+		bool hasPlayedCutsceneDialogue;
+		bool isFinalChallengeCompleted;
+		bool isInitialized;
+	} savedState;
 
 	unsigned m_vertexArrayID;
 	Mesh* meshList[NUM_GEOMETRY];
@@ -294,19 +302,7 @@ private:
 	void RenderText(Mesh* mesh, std::string text, glm::vec3 color);
 	void RenderTextOnScreen(Mesh* mesh, std::string text, glm::vec3 color, float size, float x, float y);
 	void Material(GEOMETRY_TYPE obj, float AmR, float AmG, float AmB, float DifA, float DifG, float DifB, float SpA, float SpG, float SpB, float Shiny);
-
-
 	void RenderSkyBox();
-
-
-	// Structure to hold saved state
-	static struct SavedState {
-		bool tentCompleted[6];
-		bool hasReadSign;
-		bool hasPlayedCutsceneDialogue;
-		bool isFinalChallengeCompleted;
-		bool isInitialized;
-	} savedState;
 };
 
 #endif
