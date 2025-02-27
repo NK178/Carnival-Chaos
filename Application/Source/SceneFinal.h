@@ -127,6 +127,8 @@ public:
 	bool m_playerWon;             // Flag to track if player won
 	bool isWinScreenActive;
 
+	static bool scenecomplete;
+
 private:
 	void HandleKeyPress();
 	void RenderMesh(Mesh* mesh, bool enableLight);

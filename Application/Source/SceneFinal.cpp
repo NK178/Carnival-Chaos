@@ -18,6 +18,7 @@
 #include "MouseController.h"
 #include "LoadTGA.h"
 
+bool SceneFinal::scenecomplete = false;
 
 SceneFinal::SceneFinal()
 {
@@ -739,6 +740,17 @@ void SceneFinal::Update(double dt) {
 
 
 	UpdateDialogue(dt);
+
+	if (m_battleEnded) {
+		scenecomplete = true;
+	}
+
+	//DEV KEY
+	if (KeyboardController::GetInstance()->IsKeyDown('O')) {
+		scenecomplete = true;
+		m_battleEnded = true;
+	}
+
 }
 
 void SceneFinal::Render()

@@ -227,7 +227,7 @@ private:
 	};
 
 	std::vector<DialogueLine> isFCCDialogueLines = { // Final Challenge Completed dialogue lines
-		{{"What a tough day..."}, false},
+		{{"What a tough day..."}, false},	
 		{{"It's getting late,", "I should hurry home."}, true},
 		{{"Huh? I think I see", "something in front of me."}, true},
 		{{"I should go take a look."}, false}

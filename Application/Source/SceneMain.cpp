@@ -23,6 +23,7 @@
 #include "SceneHole.h"
 #include "SceneWhackAMole.h"
 #include "SceneBumperBalls.h"
+#include "SceneFinal.h"
 
 
 bool SceneMain::triggersignpos = false;
@@ -691,17 +692,17 @@ void SceneMain::Update(double dt)
 			}
 		}
 
-		bool allTentsCompleted = true;
-		for (int i = 0; i < 6; ++i)
-		{
-			if (!tentCompleted[i])
-			{
-				allTentsCompleted = false;
-				break;
-			}
-		}
+		//bool allTentsCompleted = true;
+		//for (int i = 0; i < 6; ++i)
+		//{
+		//	if (!tentCompleted[i])
+		//	{
+		//		allTentsCompleted = false;
+		//		break;
+		//	}
+		//}
 
-		if (allTentsCompleted)
+		if (SceneArchery::scenecomplete || SceneBalloonPop::scenecomplete || SceneBumperBalls::scenecomplete || SceneHole::scenecomplete || SceneWhackAMole::scenecomplete) 
 		{
 			float distanceToFinalTent = glm::distance(camera.pos, finalTentPosition);
 			if (distanceToFinalTent < 25.0f)
@@ -1435,7 +1436,7 @@ void SceneMain::UpdateSignText() {
 			{{"Better keep going."}, false}
 		};
 	}
-	else if (completedTents == 6 && !isFinalChallengeCompleted) {
+	else if (completedTents == 6 && !isFinalChallengeCompleted && SceneFinal::scenecomplete) {
 		// all minigames complete and final challenge not completed
 		signDialogueLines = {
 			{{"Alright! I finished all six games!"}, false},
