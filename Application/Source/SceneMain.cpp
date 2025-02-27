@@ -440,7 +440,7 @@ void SceneMain::Init()
 	isCutsceneDialogueActive = true;
 	hasPlayedCutsceneDialogue = false;
 
-	readSign = true;
+	readSign = false;
 	UpdateSignText();
 
 	// Tent Position (for interaction use)
@@ -1416,7 +1416,7 @@ void SceneMain::UpdateSignText() {
 			{{"Let me see..."}, false},
 			{{"If you complete all six games..."}, false},
 			{{"And the final challenge..."}, false},
-			{{"You get to bring home", "a grand prize of..."}, true},
+			{{"You get to bring home", "a grand prize of.."}, true},
 			{{"A million dollars?!"}, false},
 			{{"Sounds too good to be true..."}, false},
 			{{"Whatever, since I'm already here,", "why not do it anyway?"}, true},
