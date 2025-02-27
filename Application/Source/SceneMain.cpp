@@ -1242,31 +1242,6 @@ bool SceneMain::anyOtherDialogueActive() {
 }
 
 // start a new dialogue function
-void SceneMain::StartDialogue(const std::vector<DialogueLine>& dialogueLines, bool* dialogueActiveFlag) {
-	*dialogueActiveFlag = true;
-	currentLineIndex = 0;
-	dialogueTimer = 0;
-	isTyping = true;
-	typewriterTimer = 0.0f;
-
-	// set up first line of the dialogue
-	const DialogueLine& currentDialogue = dialogueLines[currentLineIndex];
-	if (currentDialogue.isMultiLine) {
-		currentText = currentDialogue.textLines[0] + "\n" + currentDialogue.textLines[1];
-	}
-	else {
-		currentText = currentDialogue.textLines[0];
-	}
-	currentCharIndex = 0;
-
-	// disable camera movement during dialogue
-	camera.enableFNAF = true;
-	camera.allowMovement = false;
-	camera.allowJump = false;
-	camera.allowLocomotiveTilt = false;
-}
-
-// update current active dialogue
 void SceneMain::UpdateActiveDialogue(double dt) {
 	// determine which dialogue is active 
 	std::vector<DialogueLine>* activeDialogueLines = nullptr;
@@ -1319,7 +1294,7 @@ void SceneMain::UpdateActiveDialogue(double dt) {
 			dialogueTimer = 4.0f;
 		}
 	}
-	
+
 	// skip whole dialogue
 	if (KeyboardController::GetInstance()->IsKeyPressed('Q')) {
 		*activeDialogueFlag = false;

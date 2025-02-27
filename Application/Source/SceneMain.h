@@ -238,7 +238,7 @@ private:
 		{{"Oh! I remember now!", "The million-dollar reward!"}, true},
 		{{"...It's fake money?"}, false},
 		{{"...That bear wasted my time", "with his stupid games!!"}, true},
-		{{"I swear I'll find you again on day!"}, false}
+		{{"I swear I'll find you again one day!"}, false}
 	};
 
 	// Dialogue system flags
