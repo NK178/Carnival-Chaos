@@ -409,8 +409,7 @@ void SceneWhackAMole::Update(double dt)
 	}
 	if (attackorder.size == 0 && inactionorder.empty())
 		gamewin = true;
-	
-
+	std::cout << attackorder.size << std::endl;
 	if (KeyboardController::GetInstance()->IsKeyDown('R') && !gamestart) 
 		InitGame();
 	for (int i = 0; i < walllist.size(); i++) {
@@ -472,51 +471,40 @@ void SceneWhackAMole::Render()
 
 	RenderSkyBox();
 
-	modelStack.PushMatrix();
-	RenderMesh(meshList[GEO_AXES], false);
-	modelStack.PopMatrix();
+	//for (int i = 0; i < cubelist.size(); i++) {
+	//	glm::vec3 material;
+	//	if (!cubelist[i].iscollide)
+	//		material = glm::vec3(0.1f, 1.f, 0.1f);
+	//	else
+	//		material = glm::vec3(1.f, 0.1f, 0.1f);
 
-	modelStack.PushMatrix();
-	modelStack.Translate(light[0].position.x, light[0].position.y, light[0].position.z);
-	modelStack.Scale(0.1f, 0.1f, 0.1f);
-	RenderMesh(meshList[GEO_SPHERE], false);
-	modelStack.PopMatrix();
-
-
-	for (int i = 0; i < cubelist.size(); i++) {
-		glm::vec3 material;
-		if (!cubelist[i].iscollide)
-			material = glm::vec3(0.1f, 1.f, 0.1f);
-		else
-			material = glm::vec3(1.f, 0.1f, 0.1f);
-
-		modelStack.PushMatrix();
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		modelStack.Translate(cubelist[i].pos.x, cubelist[i].pos.y, cubelist[i].pos.z);
-		modelStack.Scale(2*cubelist[i].boxextent.x, 2*cubelist[i].boxextent.y, 2*cubelist[i].boxextent.z);
-		meshList[GEO_CUBE]->material.kAmbient = material;
-		meshList[GEO_CUBE]->material.kDiffuse = material;
-		meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-		meshList[GEO_CUBE]->material.kShininess = 2.0f;
-		RenderMesh(meshList[GEO_CUBE], true);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		modelStack.PopMatrix();
-	}
+	//	modelStack.PushMatrix();
+	//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//	modelStack.Translate(cubelist[i].pos.x, cubelist[i].pos.y, cubelist[i].pos.z);
+	//	modelStack.Scale(2*cubelist[i].boxextent.x, 2*cubelist[i].boxextent.y, 2*cubelist[i].boxextent.z);
+	//	meshList[GEO_CUBE]->material.kAmbient = material;
+	//	meshList[GEO_CUBE]->material.kDiffuse = material;
+	//	meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	//	meshList[GEO_CUBE]->material.kShininess = 2.0f;
+	//	RenderMesh(meshList[GEO_CUBE], true);
+	//	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	//	modelStack.PopMatrix();
+	//}
 
 
-	for (int i = 0; i < walllist.size(); i++) {
-		modelStack.PushMatrix();
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		modelStack.Translate(walllist[i].pos.x, walllist[i].pos.y, walllist[i].pos.z);
-		modelStack.Scale( 2*walllist[i].boxextent.x, 2*walllist[i].boxextent.y, 2*walllist[i].boxextent.z);
-		meshList[GEO_CUBE]->material.kAmbient = glm::vec3(1.f, 0.1f, 0.1f);
-		meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(1.f, 0.1f, 0.1f);
-		meshList[GEO_CUBE]->material.kSpecular = glm::vec3(1.f, 0.2f, 0.2f);
-		meshList[GEO_CUBE]->material.kShininess = 2.0f;
-		RenderMesh(meshList[GEO_CUBE], true);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		modelStack.PopMatrix();
-	}
+	//for (int i = 0; i < walllist.size(); i++) {
+	//	modelStack.PushMatrix();
+	//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//	modelStack.Translate(walllist[i].pos.x, walllist[i].pos.y, walllist[i].pos.z);
+	//	modelStack.Scale( 2*walllist[i].boxextent.x, 2*walllist[i].boxextent.y, 2*walllist[i].boxextent.z);
+	//	meshList[GEO_CUBE]->material.kAmbient = glm::vec3(1.f, 0.1f, 0.1f);
+	//	meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(1.f, 0.1f, 0.1f);
+	//	meshList[GEO_CUBE]->material.kSpecular = glm::vec3(1.f, 0.2f, 0.2f);
+	//	meshList[GEO_CUBE]->material.kShininess = 2.0f;
+	//	RenderMesh(meshList[GEO_CUBE], true);
+	//	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	//	modelStack.PopMatrix();
+	//}
 
 	modelStack.PushMatrix();
 	modelStack.Rotate(-90.f, 1, 0, 0);
@@ -604,11 +592,11 @@ void SceneWhackAMole::Render()
 		RenderTextOnScreen(meshList[GEO_TEXT], "Game Over!", glm::vec3(1, 0, 0), 35, 220, 350);
 		RenderTextOnScreen(meshList[GEO_TEXT], "Press R to restart", glm::vec3(1, 0, 0), 25, 180, 250);
 	}
-	if (!isplayerhit && gamewin) {
+	if (gamewin) {
 		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 30);
 		RenderTextOnScreen(meshList[GEO_TEXT], "You win!", glm::vec3(0, 1, 0), 35, 220, 350);
-		RenderTextOnScreen(meshList[GEO_TEXT], "Returning ", glm::vec3(0, 1, 0), 25, 210, 300);
-		RenderTextOnScreen(meshList[GEO_TEXT], "to carnival...", glm::vec3(0, 1, 0), 25, 210, 270);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Press E ", glm::vec3(0, 1, 0), 25, 210, 300);
+		RenderTextOnScreen(meshList[GEO_TEXT], "to return", glm::vec3(0, 1, 0), 25, 210, 270);
 	}
 }
 

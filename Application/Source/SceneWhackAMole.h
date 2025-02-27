@@ -262,6 +262,7 @@ private:
 		}
 		void Clear(void) {
 			if (head != nullptr) {
+				size = 0;
 				current = head;
 				while (current != nullptr) {
 					head = current->next;

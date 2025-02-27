@@ -145,6 +145,16 @@ public:
      bool shouldEnterSpinningRing = false; // Flag to enter the spinning ring minigame
      bool shouldEnterFinal = false;        // Flag to enter the final scene
 
+	 // Save the current state (to be called before Exit())
+	 void SaveState();
+
+	 // Restore the previously saved state (to be called after Init())
+	 void RestoreState();
+
+	 // Flag to check if state should be restored
+	 static bool hasStateToRestore;
+
+
 private:
 	void HandleKeyPress();
 	void RenderMesh(Mesh* mesh, bool enableLight);
@@ -278,7 +288,19 @@ private:
 	void RenderText(Mesh* mesh, std::string text, glm::vec3 color);
 	void RenderTextOnScreen(Mesh* mesh, std::string text, glm::vec3 color, float size, float x, float y);
 	void Material(GEOMETRY_TYPE obj, float AmR, float AmG, float AmB, float DifA, float DifG, float DifB, float SpA, float SpG, float SpB, float Shiny);
+
+
 	void RenderSkyBox();
+
+
+	// Structure to hold saved state
+	static struct SavedState {
+		bool tentCompleted[6];
+		bool hasReadSign;
+		bool hasPlayedCutsceneDialogue;
+		bool isFinalChallengeCompleted;
+		bool isInitialized;
+	} savedState;
 };
 
 #endif
