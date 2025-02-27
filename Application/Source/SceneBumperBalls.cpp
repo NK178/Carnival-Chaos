@@ -273,6 +273,19 @@ void SceneBumperBalls::Init()
 	camera.allowProne = false; // 
 	camera.allowLocomotiveTilt = false;
 	camera.allowLocomotiveBop = false;
+
+	player[0].xrot = 0;
+	player[0].zrot = 0;
+	player[0].xrotvel = 0;
+	player[0].zrotvel = 0;
+
+	for (int i = 0; i < spherelist.size(); ++i)
+	{
+		spherelist[i].xrot = 0;
+		spherelist[i].zrot = 0;
+		spherelist[i].xrotvel = 0;
+		spherelist[i].zrotvel = 0;
+	}
 }
 
 void SceneBumperBalls::Update(double dt)
@@ -366,7 +379,7 @@ void SceneBumperBalls::Update(double dt)
 		spherelist[2].target = spherelist[0].pos * 0.9f;
 		spherelist[3].target = spherelist[2].pos * 1.f;
 
-		float enemyNerf = 1.5f;
+		float enemyNerf = 12.f;
 		const float BALL_ROT = 150.f;
 
 		//all AI enemy movement systems
