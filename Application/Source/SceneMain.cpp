@@ -1242,6 +1242,44 @@ bool SceneMain::anyOtherDialogueActive() {
 		isAllTentsCompletedDialogueActive || isFCCDialogueActive || isEndingDialogueActive;
 }
 
+void SceneMain::UpdateDialogue(double dt) {
+	// Sign dialogue activation
+	if (readSign && !isSignDialogueActive && !anyOtherDialogueActive()) {
+		UpdateSignText();
+		StartDialogue(signDialogueLines, &isSignDialogueActive);
+	}
+
+	// Spinning Ring dialogue activation
+	if (interactWithSpinningRing && !isSpinningRingDialogueActive && !anyOtherDialogueActive()) {
+		StartDialogue(spinningRingTentDialogueLines, &isSpinningRingDialogueActive);
+		// Mark the tent as completed
+		tentCompleted[4] = true;
+	}
+
+	// all tents completed dialogue activation
+	if (CheckAllTentsCompleted() && !hasPlayedAllTentsCompletedDialogue && !anyOtherDialogueActive()) {
+		StartDialogue(allTentsCompletedLines, &isAllTentsCompletedDialogueActive);
+		hasPlayedAllTentsCompletedDialogue = true;
+	}
+
+	// final challenge completed dialogue activation
+	if (isFinalChallengeCompleted && !hasPlayedFCCDialogue && !anyOtherDialogueActive()) {
+		StartDialogue(isFCCDialogueLines, &isFCCDialogueActive);
+		hasPlayedFCCDialogue = true;
+	}
+
+	// Ending dialogue activation (can be triggered elsewhere in your code)
+
+	// update active dialogue
+	UpdateActiveDialogue(dt);
+}
+
+// check if any idalogue is active function
+bool SceneMain::anyOtherDialogueActive() {
+	return isCutsceneDialogueActive || isSignDialogueActive || isSpinningRingDialogueActive ||
+		isAllTentsCompletedDialogueActive || isFCCDialogueActive || isEndingDialogueActive;
+}
+
 // start a new dialogue function
 void SceneMain::UpdateActiveDialogue(double dt) {
 	// determine which dialogue is active 
