@@ -598,13 +598,13 @@ void SceneWhackAMole::Render()
 			RenderMeshOnScreen(meshList[GEO_UI], 55, 560, 55, 3);
 			RenderTextOnScreen(meshList[GEO_TEXT2], "Next phase in: ", glm::vec3(1, 1, 1), 20, 10, 550);
 			std::string attackcountdown;
-			if (attackcooldown > 3.0f) {
+			if (attackcooldown > 2.0f) {
 				attackcountdown = "3";
 			}
-			else if (attackcooldown > 2.0f) {
+			else if (attackcooldown > 1.0f) {
 				attackcountdown = "2";
 			}
-			else if (attackcooldown > 1.0f) {
+			else if (attackcooldown > 0.0f) {
 				attackcountdown = "1";
 			}
 			RenderTextOnScreen(meshList[GEO_TEXT2], attackcountdown, glm::vec3(1, 1, 1), 20, 300, 550);
