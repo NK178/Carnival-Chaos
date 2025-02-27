@@ -1096,7 +1096,7 @@ void SceneMain::Render()
 	}
 
 	// Render Money Bag (if player completes final challenge)
-	if (isFinalChallengeCompleted !tookMoneyBag) {
+	if (isFinalChallengeCompleted && !tookMoneyBag) {
 		modelStack.PushMatrix();
 		modelStack.Translate(0.f, 0.f, -60.f);
 		modelStack.Scale(30.f, 50.f, 30.f);
