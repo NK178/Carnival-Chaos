@@ -84,6 +84,13 @@ void CSceneManager::PushScene(SCENE_TYPE newScene)
 
 void CSceneManager::PopScene()
 {
+    //For scene main boolean trigger
+    if (SceneArchery::scenecomplete || SceneBalloonPop::scenecomplete || SceneBumperBalls::scenecomplete || SceneHole::scenecomplete || SceneWhackAMole::scenecomplete) {
+        SceneMain::triggersignpos = true;
+    }
+    if (SceneArchery::scenecomplete && SceneBalloonPop::scenecomplete && SceneBumperBalls::scenecomplete && SceneHole::scenecomplete && SceneWhackAMole::scenecomplete)
+        SceneMain::triggermainpos = true;
+
     // Check if we're returning to the Carnival scene
     bool returningToCarnival = false;
     if (sceneStack.size() > 1) {

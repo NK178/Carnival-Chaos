@@ -17,6 +17,17 @@
 #include "MouseController.h"
 #include "LoadTGA.h"
 #include <iostream>
+//Dont remove 
+#include "SceneBalloonPop.h"
+#include "SceneArchery.h"
+#include "SceneHole.h"
+#include "SceneWhackAMole.h"
+#include "SceneBumperBalls.h"
+
+
+bool SceneMain::triggersignpos = false;
+
+bool SceneMain::triggermainpos = false;
 
 SceneMain::SceneMain()
 {
@@ -256,6 +267,8 @@ void SceneMain::Init()
 	meshList[GEO_TENT]->textureID = LoadTGA("Images//circus_tent.tga");
 	meshList[GEO_SIGN] = MeshBuilder::GenerateOBJ("Sign", "Models//sign.obj");
 	meshList[GEO_SIGN]->textureID = LoadTGA("Images//sign.tga");
+	meshList[GEO_TREE] = MeshBuilder::GenerateOBJMTL("Tree", "Models//tree.obj", "Models//tree.mtl");
+	meshList[GEO_TREE]->textureID = LoadTGA("Images//tree.tga");
 	meshList[GEO_FENCE] = MeshBuilder::GenerateOBJMTL("Fence", "Models//fence.obj", "Models//fence.mtl");
 	meshList[GEO_FENCE]->textureID = LoadTGA("Images//fence.tga");
 	meshList[GEO_HOUSE] = MeshBuilder::GenerateOBJMTL("House", "Models//cottage_obj.obj", "Models//cottage_obj.mtl");
@@ -455,34 +468,15 @@ void SceneMain::Init()
 		tentCompleted[i] = false;
 	}
 
-	// Initialize dialogue flags
-	isSignDialogueActive = false;
-	isSpinningRingDialogueActive = false;
-	isAllTentsCompletedDialogueActive = false;
-	isFCCDialogueActive = false;
-	isEndingDialogueActive = false;
-
-	// Initialize played flags
-	hasReadSign = false;
-	hasPlayedAllTentsCompletedDialogue = false;
-	hasPlayedFCCDialogue = false;
-	hasPlayedEndingDialogue = false;
-
-	// Initialize interaction flags
-	interactWithSpinningRing = false;
-
 	finalTentPosition = glm::vec3(0.f, 0.f, 70.f);
 	showEnterFinalTentText = false;
 	isFinalChallengeCompleted = false;
-
-	moneybagPosition = glm::vec3{0.f, 0.f, -60.f};
-	tookMoneyBag = false;
-	showInteractMBText = false;
-	
+	hasReadSign = false;
 	showReadSignText = false;
 	readSignTextTimer = 0.0f;
 	signPosition = glm::vec3(30.f, 3.f, -70.f);
 	showSignText = false;
+	isSignDialogueActive = false;
 	currentLineIndex = -1;
 	dialogueTimer = 0;
 	cutsceneStage = -1;
@@ -492,12 +486,35 @@ void SceneMain::Init()
 	if (hasStateToRestore) {
 		RestoreState();
 	}
+
+	if (triggersignpos) {
+		camera.pos = storedsignpos;
+		camera.target = glm::vec3{ 35,3,-69 };
+	}
+	if (triggermainpos) {
+		camera.pos = storedfinaltentpos;
+		camera.target = glm::vec3{ 1.5,10,-68 };
+	}
 }
 
 void SceneMain::Update(double dt)
 {
+
 	Application::SetPointerStatus(false);
 	HandleKeyPress();
+
+	//if (KeyboardController::GetInstance()->IsKeyDown('I'))
+	//	light[0].position.z -= static_cast<float>(dt) * 5.f;
+	//if (KeyboardController::GetInstance()->IsKeyDown('K'))
+	//	light[0].position.z += static_cast<float>(dt) * 5.f;
+	//if (KeyboardController::GetInstance()->IsKeyDown('J'))
+	//	light[0].position.x -= static_cast<float>(dt) * 5.f;
+	//if (KeyboardController::GetInstance()->IsKeyDown('L'))
+	//	light[0].position.x += static_cast<float>(dt) * 5.f;
+	//if (KeyboardController::GetInstance()->IsKeyDown('O'))
+	//	light[0].position.y -= static_cast<float>(dt) * 5.f;
+	//if (KeyboardController::GetInstance()->IsKeyDown('P'))
+	//	light[0].position.y += static_cast<float>(dt) * 5.f;
 
 	//light[0].spotDirection = -glm::normalize (camera.target - camera.pos);
 	//light[0].position = camera.pos;
@@ -646,7 +663,7 @@ void SceneMain::Update(double dt)
 		frontBoundary[0].UpdatePhysics(dt);
 	}
 
-	// Interaction between sign, tents and objects
+	// Interaction between Sign and Tents
 	{
 		float distance = glm::distance(camera.pos, signPosition);
 		if (distance < 12.0f)
@@ -703,18 +720,6 @@ void SceneMain::Update(double dt)
 				readSignTextTimer = 0.0f;
 			}
 		}
-
-		if (isFinalChallengeCompleted) {
-			float distanceToMoneyBag = glm::distance(camera.pos, moneybagPosition);
-			if (distanceToMoneyBag < 12.0f)
-			{
-				showInteractMBText = true;
-			}
-			else
-			{
-				showInteractMBText = false;
-			}
-		}
 	}
 
 	// FPS
@@ -722,6 +727,46 @@ void SceneMain::Update(double dt)
 	fps = glm::round(temp * 100.f) / 100.f;
 
 	UpdateDialogue(dt);
+
+	//if (KeyboardController::GetInstance()->IsKeyPressed('1')) {
+	//	// Force enter Archery scene
+	//	shouldEnterArchery = true;
+	//}
+	//
+	//if (KeyboardController::GetInstance()->IsKeyPressed('2')) {
+	//	// Force enter BalloonPop scene
+	//	shouldEnterBalloonPop = true;
+	//}
+	//
+	//if (KeyboardController::GetInstance()->IsKeyPressed('3')) {
+	//	// Force enter Hole scene
+	//	shouldEnterHole = true;
+	//}
+	//
+	//if (KeyboardController::GetInstance()->IsKeyPressed('4')) {
+	//	// Force enter WhackAMole scene
+	//	shouldEnterWhackAMole = true;
+	//}
+	//
+	//if (KeyboardController::GetInstance()->IsKeyPressed('5')) {
+	//	// Force enter Spinning Ring scene
+	//	shouldEnterSpinningRing = true;
+	//}
+	//
+	//if (KeyboardController::GetInstance()->IsKeyPressed('6')) {
+	//	// Force enter WIU Test scene
+	//	shouldEnterBumperBalls= true;
+	//}
+	//
+	//if (KeyboardController::GetInstance()->IsKeyPressed('7')) {
+	//	// Force enter Final scene (after completing all games)
+	//	for (int i = 0; i < 6; i++) {
+	//		tentCompleted[i] = true;
+	//	}
+	//	shouldEnterFinal = true;
+	//}
+
+
 }
 
 void SceneMain::Render()
@@ -845,6 +890,19 @@ void SceneMain::Render()
 				modelStack.Scale(0.05f, 0.05f, 0.05f);
 				RenderMesh(meshList[GEO_TENT], true);
 				modelStack.PopMatrix();
+
+				//modelStack.PushMatrix();
+				//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+				//modelStack.Translate(finalTent[0].pos.x, finalTent[0].pos.y, finalTent[0].pos.z);
+				//modelStack.Rotate(finalTent[0].angleDeg, 0, 1, 0);
+				//modelStack.Scale(2 * finalTent[0].tentDimensions.x, 2 * finalTent[0].tentDimensions.y, 2 * finalTent[0].tentDimensions.z);
+				//meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+				//meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+				//meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+				//meshList[GEO_CUBE]->material.kShininess = 1.0f;
+				//RenderMesh(meshList[GEO_CUBE], true);
+				//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+				//modelStack.PopMatrix();
 			}
 		}
 	}
@@ -1059,7 +1117,7 @@ void SceneMain::Render()
 	}
 
 	// Render Money Bag (if player completes final challenge)
-	if (isFinalChallengeCompleted && !tookMoneyBag) {
+	if (isFinalChallengeCompleted) {
 		modelStack.PushMatrix();
 		modelStack.Translate(0.f, 0.f, -60.f);
 		modelStack.Scale(30.f, 50.f, 30.f);
@@ -1077,6 +1135,77 @@ void SceneMain::Render()
 
 	std::string temp("FPS:" + std::to_string(fps));
 	RenderTextOnScreen(meshList[GEO_FPS], temp.substr(0, 9), glm::vec3(0, 1, 0), 20, 620, 20);
+
+	//for (int n = 0; n < tentList.size(); n++) {
+	//	modelStack.PushMatrix();
+	//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//	modelStack.Translate(tentList[n].pos.x, tentList[n].pos.y, tentList[n].pos.z);
+	//	modelStack.Rotate(tentList[n].angleDeg, 0, 1, 0);
+	//  modelStack.Scale(2 * tentList[n].tentDimensions.x, 2 * tentList[n].tentDimensions.y, 2 * tentList[n].tentDimensions.z);
+	//	meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+	//	meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	//	meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	//	meshList[GEO_CUBE]->material.kShininess = 1.0f;
+	//	RenderMesh(meshList[GEO_CUBE], true);
+	//	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	//	modelStack.PopMatrix();
+	//}
+
+	//for (int n = 0; n < sideFenceList.size(); n++) {
+	//	modelStack.PushMatrix();
+	//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//	modelStack.Translate(sideFenceList[n].pos.x, sideFenceList[n].pos.y, sideFenceList[n].pos.z);
+	//	modelStack.Rotate(sideFenceList[n].angleDeg, 0, 1, 0);
+	//	modelStack.Scale(2 * sideFenceList[n].fenceDimensions.x, 2 * sideFenceList[n].fenceDimensions.y, 2 * sideFenceList[n].fenceDimensions.z);
+	//	meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+	//	meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	//	meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	//	meshList[GEO_CUBE]->material.kShininess = 1.0f;
+	//	RenderMesh(meshList[GEO_CUBE], true);
+	//	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	//	modelStack.PopMatrix();
+	//}
+	//for (int n = 0; n < frontFenceList.size(); n++) {
+	//	modelStack.PushMatrix();
+	//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//	modelStack.Translate(frontFenceList[n].pos.x, frontFenceList[n].pos.y, frontFenceList[n].pos.z);
+	//	modelStack.Rotate(frontFenceList[n].angleDeg, 0, 1, 0);
+	//	modelStack.Scale(2 * frontFenceList[n].fenceDimensions.x, 2 * frontFenceList[n].fenceDimensions.y, 2 * frontFenceList[n].fenceDimensions.z);
+	//	meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+	//	meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	//	meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	//	meshList[GEO_CUBE]->material.kShininess = 1.0f;
+	//	RenderMesh(meshList[GEO_CUBE], true);
+	//	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	//	modelStack.PopMatrix();
+	//}
+	//for (int n = 0; n < sideBoundary.size(); n++) {
+	//	modelStack.PushMatrix();
+	//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//	modelStack.Translate(sideBoundary[n].pos.x, sideBoundary[n].pos.y, sideBoundary[n].pos.z);
+	//	modelStack.Rotate(sideBoundary[n].angleDeg, 0, 1, 0);
+	//	modelStack.Scale(2 * sideBoundary[n].boundaryDimensions.x, 2 * sideBoundary[n].boundaryDimensions.y, 2 * sideBoundary[n].boundaryDimensions.z);
+	//	meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+	//	meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	//	meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	//	meshList[GEO_CUBE]->material.kShininess = 1.0f;
+	//	RenderMesh(meshList[GEO_CUBE], true);
+	//	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	//	modelStack.PopMatrix();
+	//}
+
+	//modelStack.PushMatrix();
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//modelStack.Translate(frontBoundary[0].pos.x, frontBoundary[0].pos.y, frontBoundary[0].pos.z);
+	//modelStack.Rotate(frontBoundary[0].angleDeg, 0, 1, 0);
+	//modelStack.Scale(2 * frontBoundary[0].boundaryDimensions.x, 2 * frontBoundary[0].boundaryDimensions.y, 2 * frontBoundary[0].boundaryDimensions.z);
+	//meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
+	//meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	//meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
+	//meshList[GEO_CUBE]->material.kShininess = 1.0f;
+	//RenderMesh(meshList[GEO_CUBE], true);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	//modelStack.PopMatrix();
 }
 
 // boolean to check if player complete all 6 minigames
@@ -1116,250 +1245,178 @@ void SceneMain::RenderUI()
 		RenderMeshOnScreen(meshList[GEO_UI], 150, 550, 150, 6);
 		RenderTextOnScreen(meshList[GEO_TEXT], "How about we read the sign first?", glm::vec3(1, 1, 1), 20, 10, 550);
 	}
-
-	if (showInteractMBText)
-	{
-		RenderMeshOnScreen(meshList[GEO_KEY_E], 40, 120, 20, 20);
-		RenderTextOnScreen(meshList[GEO_TEXT], "Take Money Bag", glm::vec3(1, 1, 1), 30, 80, 105);
-	}
 }
 
 void SceneMain::RenderDialogue() {
-	bool anyDialogueActive = isCutsceneDialogueActive || isSignDialogueActive ||
-		isSpinningRingDialogueActive || isAllTentsCompletedDialogueActive ||
-		isFCCDialogueActive || isEndingDialogueActive;
-
-	if (!anyDialogueActive) {
-		return; // exit function early if no dialogue is active
-	}
-
 	if (isCutsceneDialogueActive) {
 		RenderMeshOnScreen(meshList[GEO_UI], 150, 535, 150, 9);
 		RenderMeshOnScreen(meshList[GEO_KEY_Q], 20, 510, 10, 10);
 		RenderTextOnScreen(meshList[GEO_TEXT], "[ SKIP CUTSCENE ]", glm::vec3(1, 1, 1), 15, 40, 505);
 	}
-	else if (anyDialogueActive) {
+	else if (isSignDialogueActive) {
 		RenderMeshOnScreen(meshList[GEO_UI], 150, 535, 150, 9);
 		RenderMeshOnScreen(meshList[GEO_KEY_Q], 20, 510, 10, 10);
 		RenderTextOnScreen(meshList[GEO_TEXT], "[ SKIP ]", glm::vec3(1, 1, 1), 15, 40, 505);
 		RenderMeshOnScreen(meshList[GEO_KEY_E], 170, 510, 10, 10);
 		RenderTextOnScreen(meshList[GEO_TEXT], "[ NEXT DIALOGUE ]", glm::vec3(1, 1, 1), 15, 200, 505);
 	}
-
-	// Render the current text based on which dialogue is active
-	std::string textToRender = currentText.substr(0, currentCharIndex);
-
-	if (textToRender.empty()) {
-		return;
-	}
-
-	// Check and render text (handling multi-line text)
-	if (textToRender.find('\n') != std::string::npos) {
-		size_t newlinePos = textToRender.find('\n');
-		std::string firstLine = textToRender.substr(0, newlinePos);
-		std::string secondLine = textToRender.substr(newlinePos + 1);
-		RenderTextOnScreen(meshList[GEO_TEXT], firstLine, glm::vec3(1, 1, 1), 20, 10, 550);
-		RenderTextOnScreen(meshList[GEO_TEXT], secondLine, glm::vec3(1, 1, 1), 20, 10, 530);
-	}
 	else {
-		RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 550);
-	}
-}
-
-void SceneMain::UpdateDialogue(double dt) {
-	// Sign dialogue activation
-	if (readSign && !isSignDialogueActive && !anyOtherDialogueActive()) {
-		UpdateSignText();
-		StartDialogue(signDialogueLines, &isSignDialogueActive);
+		return; // exit function early if no dialogue is active
 	}
 
-	// Spinning Ring dialogue activation
-	if (interactWithSpinningRing && !isSpinningRingDialogueActive && !anyOtherDialogueActive()) {
-		StartDialogue(spinningRingTentDialogueLines, &isSpinningRingDialogueActive);
-		// Mark the tent as completed
-		tentCompleted[4] = true;
-	}
+	// rendering of dialogue when player read the sign
+	RenderMeshOnScreen(meshList[GEO_UI], 150, 550, 150, 6);
+	if (isSignDialogueActive && currentLineIndex < signDialogueLines.size()) {
+		const DialogueLine& currentDialogue = signDialogueLines[currentLineIndex];
 
-	// all tents completed dialogue activation
-	if (CheckAllTentsCompleted() && !hasPlayedAllTentsCompletedDialogue && !anyOtherDialogueActive()) {
-		StartDialogue(allTentsCompletedLines, &isAllTentsCompletedDialogueActive);
-		hasPlayedAllTentsCompletedDialogue = true;
-	}
-
-	// final challenge completed dialogue activation
-	if (isFinalChallengeCompleted && !hasPlayedFCCDialogue && !anyOtherDialogueActive()) {
-		StartDialogue(isFCCDialogueLines, &isFCCDialogueActive);
-		hasPlayedFCCDialogue = true;
-	}
-
-	// Ending dialogue activation (can be triggered elsewhere in your code)
-
-	// update active dialogue
-	UpdateActiveDialogue(dt);
-}
-
-// check if any idalogue is active function
-bool SceneMain::anyOtherDialogueActive() {
-	return isCutsceneDialogueActive || isSignDialogueActive || isSpinningRingDialogueActive ||
-		isAllTentsCompletedDialogueActive || isFCCDialogueActive || isEndingDialogueActive;
-}
-
-// start a new dialogue function
-void SceneMain::StartDialogue(const std::vector<DialogueLine>& dialogueLines, bool* dialogueActiveFlag) {
-	*dialogueActiveFlag = true;
-	currentLineIndex = 0;
-	dialogueTimer = 0;
-	isTyping = true;
-	typewriterTimer = 0.0f;
-
-	// set up first line of the dialogue
-	const DialogueLine& currentDialogue = dialogueLines[currentLineIndex];
-	if (currentDialogue.isMultiLine) {
-		currentText = currentDialogue.textLines[0] + "\n" + currentDialogue.textLines[1];
-	}
-	else {
-		currentText = currentDialogue.textLines[0];
-	}
-	currentCharIndex = 0;
-
-	// disable camera movement during dialogue
-	camera.enableFNAF = true;
-	camera.allowMovement = false;
-	camera.allowJump = false;
-	camera.allowLocomotiveTilt = false;
-}
-
-// update current active dialogue
-void SceneMain::UpdateActiveDialogue(double dt) {
-	// determine which dialogue is active 
-	std::vector<DialogueLine>* activeDialogueLines = nullptr;
-	bool* activeDialogueFlag = nullptr;
-	bool* hasPlayedFlag = nullptr;
-
-	if (isCutsceneDialogueActive) {
-		activeDialogueLines = &sceneMainCutsceneLines;
-		activeDialogueFlag = &isCutsceneDialogueActive;
-		hasPlayedFlag = &hasPlayedCutsceneDialogue;
-	}
-	else if (isSignDialogueActive) {
-		activeDialogueLines = &signDialogueLines;
-		activeDialogueFlag = &isSignDialogueActive;
-		hasPlayedFlag = nullptr; // sign can be played multiple times
-	}
-	else if (isSpinningRingDialogueActive) {
-		activeDialogueLines = &spinningRingTentDialogueLines;
-		activeDialogueFlag = &isSpinningRingDialogueActive;
-		hasPlayedFlag = nullptr; // spinning ring tent can be played multiple times
-	}
-	else if (isAllTentsCompletedDialogueActive) {
-		activeDialogueLines = &allTentsCompletedLines;
-		activeDialogueFlag = &isAllTentsCompletedDialogueActive;
-		hasPlayedFlag = &hasPlayedAllTentsCompletedDialogue;
-	}
-	else if (isFCCDialogueActive) {
-		activeDialogueLines = &isFCCDialogueLines;
-		activeDialogueFlag = &isFCCDialogueActive;
-		hasPlayedFlag = &hasPlayedFCCDialogue;
-	}
-	else if (isEndingDialogueActive) {
-		activeDialogueLines = &endingDialogueLines;
-		activeDialogueFlag = &isEndingDialogueActive;
-		hasPlayedFlag = &hasPlayedEndingDialogue;
-	}
-	else {
-		return; // return if there is no active dialogue
-	}
-
-	// skip dialogue input
-	if (KeyboardController::GetInstance()->IsKeyPressed('E')) {
-		if (isTyping) {
-			// skip typing
-			currentCharIndex = currentText.length();
-			isTyping = false;
-		}
-		else {
-			// skip to next line
-			dialogueTimer = 4.0f;
-		}
-	}
-
-	// skip whole dialogue
-	if (KeyboardController::GetInstance()->IsKeyPressed('Q')) {
-		*activeDialogueFlag = false;
-		if (hasPlayedFlag != nullptr) {
-			*hasPlayedFlag = true;
-		}
-
-		// re enable camera controls
-		camera.enableFNAF = false;
-		camera.allowMovement = true;
-		camera.allowJump = true;
-		camera.allowLocomotiveTilt = true;
-
-		// derender readsign and spinning ring dialogues after finished dialogue
-		if (activeDialogueFlag == &isSignDialogueActive) {
-			readSign = false;
-		}
-		else if (activeDialogueFlag == &isSpinningRingDialogueActive) {
-			interactWithSpinningRing = false;
-		}
-
-		return;
-	}
-
-	// typewriter effect
-	if (isTyping) {
-		typewriterTimer += dt;
-		if (typewriterTimer >= 0.05f) { 
-			typewriterTimer = 0.0f;
-			currentCharIndex++;
-			if (currentCharIndex >= currentText.length()) {
-				isTyping = false;
-			}
-		}
-	}
-	else {
-		// next line delay
-		dialogueTimer += dt;
-		if (dialogueTimer >= 4.0f) {
-			dialogueTimer = 0;
-			currentLineIndex++;
-
-			// check if reached end of dialogue
-			if (currentLineIndex >= activeDialogueLines->size()) {
-				*activeDialogueFlag = false;
-				if (hasPlayedFlag != nullptr) {
-					*hasPlayedFlag = true;
-				}
-
-				// re endable camera controls
-				camera.enableFNAF = false;
-				camera.allowMovement = true;
-				camera.allowJump = true;
-				camera.allowLocomotiveTilt = true;
-
-				// derender readsign and spinning ring dialogues after finished dialogue
-				if (activeDialogueFlag == &isSignDialogueActive) {
-					readSign = false;
-				}
-				else if (activeDialogueFlag == &isSpinningRingDialogueActive) {
-					interactWithSpinningRing = false;
-				}
+		if (currentDialogue.isMultiLine) {
+			std::string textToRender = currentText.substr(0, currentCharIndex);
+			size_t newlinePos = textToRender.find('\n');
+			if (newlinePos != std::string::npos) {
+				std::string firstLine = textToRender.substr(0, newlinePos);
+				std::string secondLine = textToRender.substr(newlinePos + 1);
+				RenderTextOnScreen(meshList[GEO_TEXT], firstLine, glm::vec3(1, 1, 1), 20, 10, 550);
+				RenderTextOnScreen(meshList[GEO_TEXT], secondLine, glm::vec3(1, 1, 1), 20, 10, 530);
 			}
 			else {
-				// type next line
-				isTyping = true;
-				typewriterTimer = 0.0f;
+				RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 550);
+			}
+		}
+		else {
+			std::string textToRender = currentText.substr(0, currentCharIndex);
+			RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 550);
+		}
+	}
 
-				// set new line text
-				const DialogueLine& currentDialogue = (*activeDialogueLines)[currentLineIndex];
-				if (currentDialogue.isMultiLine) {
-					currentText = currentDialogue.textLines[0] + "\n" + currentDialogue.textLines[1];
+	// rendering of dialogue when player first enter the game
+	if (isCutsceneDialogueActive && currentLineIndex < sceneMainCutsceneLines.size()) {
+		const DialogueLine& currentDialogue = sceneMainCutsceneLines[currentLineIndex];
+
+		if (currentDialogue.isMultiLine) {
+			std::string textToRender = currentText.substr(0, currentCharIndex);
+			size_t newlinePos = textToRender.find('\n');
+			if (newlinePos != std::string::npos) {
+				std::string firstLine = textToRender.substr(0, newlinePos);
+				std::string secondLine = textToRender.substr(newlinePos + 1);
+				RenderTextOnScreen(meshList[GEO_TEXT], firstLine, glm::vec3(1, 1, 1), 20, 10, 550);
+				RenderTextOnScreen(meshList[GEO_TEXT], secondLine, glm::vec3(1, 1, 1), 20, 10, 530);
+			}
+			else {
+				RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 550);
+			}
+		}
+		else {
+			std::string textToRender = currentText.substr(0, currentCharIndex);
+			RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 550);
+		}
+	}
+}
+
+// typing speed for the dialogues
+void SceneMain::UpdateDialogue(double dt) {
+	if (readSign && !isSignDialogueActive) {
+		UpdateSignText();
+
+		isSignDialogueActive = true;
+		currentLineIndex = 0;
+		dialogueTimer = 0;
+		isTyping = true; // Start typing the first line
+		typewriterTimer = 0.0f;
+		const DialogueLine& currentDialogue = signDialogueLines[currentLineIndex];
+		if (currentDialogue.isMultiLine) {
+			// Store both lines
+			currentText = currentDialogue.textLines[0] + "\n" + currentDialogue.textLines[1];
+		}
+		else {
+			currentText = currentDialogue.textLines[0];
+		}
+		currentCharIndex = 0;
+	}
+
+	if (isSignDialogueActive) {
+		if (KeyboardController::GetInstance()->IsKeyPressed('E')) {
+			if (isTyping) {
+				// Skip rendering the current text
+				currentCharIndex = currentText.length();
+				isTyping = false;
+			}
+			else {
+				// Skip to the next line
+				dialogueTimer = 4.0f;
+			}
+		}
+
+		if (isTyping) {
+			typewriterTimer += dt;
+			if (typewriterTimer >= 0.05f) { // Adjust the typing speed here
+				typewriterTimer = 0.0f;
+				currentCharIndex++;
+				if (currentCharIndex >= currentText.length()) {
+					isTyping = false;
+				}
+			}
+		}
+		else {
+			dialogueTimer += dt;
+			if (dialogueTimer >= 4.0f) {
+				dialogueTimer = 0;
+				currentLineIndex++;
+				if (currentLineIndex >= signDialogueLines.size()) {
+					isSignDialogueActive = false;
+					readSign = false;
+					camera.enableFNAF = false;
+					camera.allowMovement = true;
+					camera.allowJump = true;
+					camera.allowLocomotiveTilt = true;
 				}
 				else {
-					currentText = currentDialogue.textLines[0];
+					isTyping = true;
+					typewriterTimer = 0.0f;
+					const DialogueLine& currentDialogue = signDialogueLines[currentLineIndex];
+					if (currentDialogue.isMultiLine) {
+						currentText = currentDialogue.textLines[0] + "\n" + currentDialogue.textLines[1];
+					}
+					else {
+						currentText = currentDialogue.textLines[0];
+					}
+					currentCharIndex = 0;
 				}
-				currentCharIndex = 0;
+			}
+		}
+	}
+
+	if (isCutsceneDialogueActive && !hasPlayedCutsceneDialogue) {
+		if (isTyping) {
+			typewriterTimer += dt;
+			if (typewriterTimer >= 0.05f) { // Adjust the typing speed here
+				typewriterTimer = 0.0f;
+				currentCharIndex++;
+				if (currentCharIndex >= currentText.length()) {
+					isTyping = false;
+				}
+			}
+		}
+		else {
+			dialogueTimer += dt;
+			if (dialogueTimer >= 4.0f) {
+				dialogueTimer = 0;
+				currentLineIndex++;
+				if (currentLineIndex >= sceneMainCutsceneLines.size()) {
+					isCutsceneDialogueActive = false;
+					hasPlayedCutsceneDialogue = true;
+				}
+				else {
+					isTyping = true;
+					typewriterTimer = 0.0f;
+					const DialogueLine& currentDialogue = sceneMainCutsceneLines[currentLineIndex];
+					if (currentDialogue.isMultiLine) {
+						currentText = currentDialogue.textLines[0] + "\n" + currentDialogue.textLines[1];
+					}
+					else {
+						currentText = currentDialogue.textLines[0];
+					}
+					currentCharIndex = 0;
+				}
 			}
 		}
 	}
@@ -1677,34 +1734,38 @@ void SceneMain::HandleKeyPress()
 				// Based on which tent (i) is being entered, set the appropriate flag
 				switch (i) {
 				case 0:
-					shouldEnterArchery = true;
-					tentCompleted[0] = true;
+					if (!SceneArchery::scenecomplete) {
+						shouldEnterArchery = true;
+						tentCompleted[0] = true;
+					}
 					break;
 				case 1:
-					shouldEnterBalloonPop = true;
-					tentCompleted[1] = true;
+					if (!SceneBalloonPop::scenecomplete) {
+						shouldEnterBalloonPop = true;
+						tentCompleted[1] = true;
+					}
 					break;
 				case 2:
-					shouldEnterHole = true;
-					tentCompleted[2] = true;
+					if (!SceneHole::scenecomplete) {
+						shouldEnterHole = true;
+						tentCompleted[2] = true;
+					}
 					break;
 				case 3:
-					shouldEnterWhackAMole = true;
-					tentCompleted[3] = true;
+					if (!SceneWhackAMole::scenecomplete) {
+						shouldEnterWhackAMole = true;
+						tentCompleted[3] = true;
+					}
 					break;
 				case 4:
 					//shouldEnterSpinningRing = true;
-					// check if the player is interacting with the spinning ring tent
-					if (showEnterTentText[4] &&
-						KeyboardController::GetInstance()->IsKeyPressed('E') &&
-						!anyOtherDialogueActive()) {
-
-						interactWithSpinningRing = true;
-					}
+					tentCompleted[4] = true;
 					break;
 				case 5:
-					shouldEnterBumperBalls = true;
-					tentCompleted[5] = true;
+					if (!SceneBumperBalls::scenecomplete) {
+						shouldEnterBumperBalls = true;
+						tentCompleted[5] = true;
+					}
 					break;
 				}
 			}
@@ -1727,11 +1788,6 @@ void SceneMain::HandleKeyPress()
 
 			isFinalChallengeCompleted = true;
 		}
-	}
-	if (KeyboardController::GetInstance()->IsKeyPressed('E') && showInteractMBText) {
-		StartDialogue(endingDialogueLines, &isEndingDialogueActive);
-		tookMoneyBag = true;
-		hasPlayedEndingDialogue = true;
 	}
 }
 
