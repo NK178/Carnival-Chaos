@@ -457,15 +457,30 @@ void SceneMain::Init()
 		tentCompleted[i] = false;
 	}
 
+	// Initialize dialogue flags
+	isSignDialogueActive = false;
+	isSpinningRingDialogueActive = false;
+	isAllTentsCompletedDialogueActive = false;
+	isFCCDialogueActive = false;
+	isEndingDialogueActive = false;
+
+	// Initialize played flags
+	hasReadSign = false;
+	hasPlayedAllTentsCompletedDialogue = false;
+	hasPlayedFCCDialogue = false;
+	hasPlayedEndingDialogue = false;
+
+	// Initialize interaction flags
+	interactWithSpinningRing = false;
+
 	finalTentPosition = glm::vec3(0.f, 0.f, 70.f);
 	showEnterFinalTentText = false;
 	isFinalChallengeCompleted = false;
-	hasReadSign = false;
+	
 	showReadSignText = false;
 	readSignTextTimer = 0.0f;
 	signPosition = glm::vec3(30.f, 3.f, -70.f);
 	showSignText = false;
-	isSignDialogueActive = false;
 	currentLineIndex = -1;
 	dialogueTimer = 0;
 	cutsceneStage = -1;
@@ -1225,175 +1240,243 @@ void SceneMain::RenderUI()
 }
 
 void SceneMain::RenderDialogue() {
+	bool anyDialogueActive = isCutsceneDialogueActive || isSignDialogueActive ||
+		isSpinningRingDialogueActive || isAllTentsCompletedDialogueActive ||
+		isFCCDialogueActive || isEndingDialogueActive;
+
+	if (!anyDialogueActive) {
+		return; // exit function early if no dialogue is active
+	}
+
 	if (isCutsceneDialogueActive) {
 		RenderMeshOnScreen(meshList[GEO_UI], 150, 535, 150, 9);
 		RenderMeshOnScreen(meshList[GEO_KEY_Q], 20, 510, 10, 10);
 		RenderTextOnScreen(meshList[GEO_TEXT], "[ SKIP CUTSCENE ]", glm::vec3(1, 1, 1), 15, 40, 505);
 	}
-	else if (isSignDialogueActive) {
+	else if (anyDialogueActive) {
 		RenderMeshOnScreen(meshList[GEO_UI], 150, 535, 150, 9);
 		RenderMeshOnScreen(meshList[GEO_KEY_Q], 20, 510, 10, 10);
 		RenderTextOnScreen(meshList[GEO_TEXT], "[ SKIP ]", glm::vec3(1, 1, 1), 15, 40, 505);
 		RenderMeshOnScreen(meshList[GEO_KEY_E], 170, 510, 10, 10);
 		RenderTextOnScreen(meshList[GEO_TEXT], "[ NEXT DIALOGUE ]", glm::vec3(1, 1, 1), 15, 200, 505);
 	}
+
+	// Render the current text based on which dialogue is active
+	std::string textToRender = currentText.substr(0, currentCharIndex);
+
+	if (textToRender.empty()) {
+		return;
+	}
+
+	// Check and render text (handling multi-line text)
+	if (textToRender.find('\n') != std::string::npos) {
+		size_t newlinePos = textToRender.find('\n');
+		std::string firstLine = textToRender.substr(0, newlinePos);
+		std::string secondLine = textToRender.substr(newlinePos + 1);
+		RenderTextOnScreen(meshList[GEO_TEXT], firstLine, glm::vec3(1, 1, 1), 20, 10, 550);
+		RenderTextOnScreen(meshList[GEO_TEXT], secondLine, glm::vec3(1, 1, 1), 20, 10, 530);
+	}
 	else {
-		return; // exit function early if no dialogue is active
-	}
-
-	// rendering of dialogue when player read the sign
-	RenderMeshOnScreen(meshList[GEO_UI], 150, 550, 150, 6);
-	if (isSignDialogueActive && currentLineIndex < signDialogueLines.size()) {
-		const DialogueLine& currentDialogue = signDialogueLines[currentLineIndex];
-
-		if (currentDialogue.isMultiLine) {
-			std::string textToRender = currentText.substr(0, currentCharIndex);
-			size_t newlinePos = textToRender.find('\n');
-			if (newlinePos != std::string::npos) {
-				std::string firstLine = textToRender.substr(0, newlinePos);
-				std::string secondLine = textToRender.substr(newlinePos + 1);
-				RenderTextOnScreen(meshList[GEO_TEXT], firstLine, glm::vec3(1, 1, 1), 20, 10, 550);
-				RenderTextOnScreen(meshList[GEO_TEXT], secondLine, glm::vec3(1, 1, 1), 20, 10, 530);
-			}
-			else {
-				RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 550);
-			}
-		}
-		else {
-			std::string textToRender = currentText.substr(0, currentCharIndex);
-			RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 550);
-		}
-	}
-
-	// rendering of dialogue when player first enter the game
-	if (isCutsceneDialogueActive && currentLineIndex < sceneMainCutsceneLines.size()) {
-		const DialogueLine& currentDialogue = sceneMainCutsceneLines[currentLineIndex];
-
-		if (currentDialogue.isMultiLine) {
-			std::string textToRender = currentText.substr(0, currentCharIndex);
-			size_t newlinePos = textToRender.find('\n');
-			if (newlinePos != std::string::npos) {
-				std::string firstLine = textToRender.substr(0, newlinePos);
-				std::string secondLine = textToRender.substr(newlinePos + 1);
-				RenderTextOnScreen(meshList[GEO_TEXT], firstLine, glm::vec3(1, 1, 1), 20, 10, 550);
-				RenderTextOnScreen(meshList[GEO_TEXT], secondLine, glm::vec3(1, 1, 1), 20, 10, 530);
-			}
-			else {
-				RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 550);
-			}
-		}
-		else {
-			std::string textToRender = currentText.substr(0, currentCharIndex);
-			RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 550);
-		}
+		RenderTextOnScreen(meshList[GEO_TEXT], textToRender, glm::vec3(1, 1, 1), 20, 10, 550);
 	}
 }
 
-// typing speed for the dialogues
 void SceneMain::UpdateDialogue(double dt) {
-	if (readSign && !isSignDialogueActive) {
-		UpdateSignText();
+	// Check for new dialogue activations
 
-		isSignDialogueActive = true;
-		currentLineIndex = 0;
-		dialogueTimer = 0;
-		isTyping = true; // Start typing the first line
-		typewriterTimer = 0.0f;
-		const DialogueLine& currentDialogue = signDialogueLines[currentLineIndex];
-		if (currentDialogue.isMultiLine) {
-			// Store both lines
-			currentText = currentDialogue.textLines[0] + "\n" + currentDialogue.textLines[1];
-		}
-		else {
-			currentText = currentDialogue.textLines[0];
-		}
-		currentCharIndex = 0;
+	// Sign dialogue activation
+	if (readSign && !isSignDialogueActive && !anyOtherDialogueActive()) {
+		UpdateSignText();
+		StartDialogue(signDialogueLines, &isSignDialogueActive);
 	}
 
-	if (isSignDialogueActive) {
-		if (KeyboardController::GetInstance()->IsKeyPressed('E')) {
-			if (isTyping) {
-				// Skip rendering the current text
-				currentCharIndex = currentText.length();
+	// Spinning Ring dialogue activation
+	if (interactWithSpinningRing && !isSpinningRingDialogueActive && !anyOtherDialogueActive()) {
+		StartDialogue(spinningRingTentDialogueLines, &isSpinningRingDialogueActive);
+		// Mark the tent as completed
+		tentCompleted[SPINNING_RING_TENT_INDEX] = true;
+	}
+
+	// All tents completed dialogue activation
+	if (CheckAllTentsCompleted() && !hasPlayedAllTentsCompletedDialogue && !anyOtherDialogueActive()) {
+		StartDialogue(allTentsCompletedLines, &isAllTentsCompletedDialogueActive);
+		hasPlayedAllTentsCompletedDialogue = true;
+	}
+
+	// Final challenge completed dialogue activation
+	if (isFinalChallengeCompleted && !hasPlayedFCCDialogue && !anyOtherDialogueActive()) {
+		StartDialogue(isFCCDialogueLines, &isFCCDialogueActive);
+		hasPlayedFCCDialogue = true;
+	}
+
+	// Ending dialogue activation (can be triggered elsewhere in your code)
+
+	// Update the active dialogue
+	UpdateActiveDialogue(dt);
+}
+
+// Helper function to check if any dialogue is currently active
+bool SceneMain::anyOtherDialogueActive() {
+	return isCutsceneDialogueActive || isSignDialogueActive || isSpinningRingDialogueActive ||
+		isAllTentsCompletedDialogueActive || isFCCDialogueActive || isEndingDialogueActive;
+}
+
+// Helper function to start a new dialogue
+void SceneMain::StartDialogue(const std::vector<DialogueLine>& dialogueLines, bool* dialogueActiveFlag) {
+	*dialogueActiveFlag = true;
+	currentLineIndex = 0;
+	dialogueTimer = 0;
+	isTyping = true;
+	typewriterTimer = 0.0f;
+
+	// Set up the first line of dialogue
+	const DialogueLine& currentDialogue = dialogueLines[currentLineIndex];
+	if (currentDialogue.isMultiLine) {
+		currentText = currentDialogue.textLines[0] + "\n" + currentDialogue.textLines[1];
+	}
+	else {
+		currentText = currentDialogue.textLines[0];
+	}
+	currentCharIndex = 0;
+
+	// Disable camera movement during dialogue
+	camera.enableFNAF = true;
+	camera.allowMovement = false;
+	camera.allowJump = false;
+	camera.allowLocomotiveTilt = false;
+}
+
+// Helper function to update the currently active dialogue
+void SceneMain::UpdateActiveDialogue(double dt) {
+	// Determine which dialogue is active and get the corresponding dialogue lines
+	std::vector<DialogueLine>* activeDialogueLines = nullptr;
+	bool* activeDialogueFlag = nullptr;
+	bool* hasPlayedFlag = nullptr;
+
+	if (isCutsceneDialogueActive) {
+		activeDialogueLines = &sceneMainCutsceneLines;
+		activeDialogueFlag = &isCutsceneDialogueActive;
+		hasPlayedFlag = &hasPlayedCutsceneDialogue;
+	}
+	else if (isSignDialogueActive) {
+		activeDialogueLines = &signDialogueLines;
+		activeDialogueFlag = &isSignDialogueActive;
+		hasPlayedFlag = nullptr; // Sign can be read multiple times
+	}
+	else if (isSpinningRingDialogueActive) {
+		activeDialogueLines = &spinningRingTentDialogueLines;
+		activeDialogueFlag = &isSpinningRingDialogueActive;
+		hasPlayedFlag = nullptr; // No flag for this dialogue
+	}
+	else if (isAllTentsCompletedDialogueActive) {
+		activeDialogueLines = &allTentsCompletedLines;
+		activeDialogueFlag = &isAllTentsCompletedDialogueActive;
+		hasPlayedFlag = &hasPlayedAllTentsCompletedDialogue;
+	}
+	else if (isFCCDialogueActive) {
+		activeDialogueLines = &isFCCDialogueLines;
+		activeDialogueFlag = &isFCCDialogueActive;
+		hasPlayedFlag = &hasPlayedFCCDialogue;
+	}
+	else if (isEndingDialogueActive) {
+		activeDialogueLines = &endingDialogueLines;
+		activeDialogueFlag = &isEndingDialogueActive;
+		hasPlayedFlag = &hasPlayedEndingDialogue;
+	}
+	else {
+		return; // No active dialogue
+	}
+
+	// Handle skip or next dialogue input
+	if (KeyboardController::GetInstance()->IsKeyPressed('E')) {
+		if (isTyping) {
+			// Skip typing the current text
+			currentCharIndex = currentText.length();
+			isTyping = false;
+		}
+		else {
+			// Skip to the next line
+			dialogueTimer = 4.0f;
+		}
+	}
+
+	// Skip entire dialogue if Q is pressed
+	if (KeyboardController::GetInstance()->IsKeyPressed('Q')) {
+		*activeDialogueFlag = false;
+		if (hasPlayedFlag != nullptr) {
+			*hasPlayedFlag = true;
+		}
+
+		// Re-enable camera controls
+		camera.enableFNAF = false;
+		camera.allowMovement = true;
+		camera.allowJump = true;
+		camera.allowLocomotiveTilt = true;
+
+		// Special case handling after dialogues
+		if (activeDialogueFlag == &isSignDialogueActive) {
+			readSign = false;
+		}
+		else if (activeDialogueFlag == &isSpinningRingDialogueActive) {
+			interactWithSpinningRing = false;
+		}
+
+		return;
+	}
+
+	// Update typewriter effect
+	if (isTyping) {
+		typewriterTimer += dt;
+		if (typewriterTimer >= 0.05f) { // Typing speed
+			typewriterTimer = 0.0f;
+			currentCharIndex++;
+			if (currentCharIndex >= currentText.length()) {
 				isTyping = false;
 			}
-			else {
-				// Skip to the next line
-				dialogueTimer = 4.0f;
-			}
-		}
-
-		if (isTyping) {
-			typewriterTimer += dt;
-			if (typewriterTimer >= 0.05f) { // Adjust the typing speed here
-				typewriterTimer = 0.0f;
-				currentCharIndex++;
-				if (currentCharIndex >= currentText.length()) {
-					isTyping = false;
-				}
-			}
-		}
-		else {
-			dialogueTimer += dt;
-			if (dialogueTimer >= 4.0f) {
-				dialogueTimer = 0;
-				currentLineIndex++;
-				if (currentLineIndex >= signDialogueLines.size()) {
-					isSignDialogueActive = false;
-					readSign = false;
-					camera.enableFNAF = false;
-					camera.allowMovement = true;
-					camera.allowJump = true;
-					camera.allowLocomotiveTilt = true;
-				}
-				else {
-					isTyping = true;
-					typewriterTimer = 0.0f;
-					const DialogueLine& currentDialogue = signDialogueLines[currentLineIndex];
-					if (currentDialogue.isMultiLine) {
-						currentText = currentDialogue.textLines[0] + "\n" + currentDialogue.textLines[1];
-					}
-					else {
-						currentText = currentDialogue.textLines[0];
-					}
-					currentCharIndex = 0;
-				}
-			}
 		}
 	}
+	else {
+		// Delay before next line
+		dialogueTimer += dt;
+		if (dialogueTimer >= 4.0f) {
+			dialogueTimer = 0;
+			currentLineIndex++;
 
-	if (isCutsceneDialogueActive && !hasPlayedCutsceneDialogue) {
-		if (isTyping) {
-			typewriterTimer += dt;
-			if (typewriterTimer >= 0.05f) { // Adjust the typing speed here
-				typewriterTimer = 0.0f;
-				currentCharIndex++;
-				if (currentCharIndex >= currentText.length()) {
-					isTyping = false;
+			// Check if we've reached the end of the dialogue
+			if (currentLineIndex >= activeDialogueLines->size()) {
+				*activeDialogueFlag = false;
+				if (hasPlayedFlag != nullptr) {
+					*hasPlayedFlag = true;
+				}
+
+				// Re-enable camera controls
+				camera.enableFNAF = false;
+				camera.allowMovement = true;
+				camera.allowJump = true;
+				camera.allowLocomotiveTilt = true;
+
+				// Special case handling after dialogues
+				if (activeDialogueFlag == &isSignDialogueActive) {
+					readSign = false;
+				}
+				else if (activeDialogueFlag == &isSpinningRingDialogueActive) {
+					interactWithSpinningRing = false;
 				}
 			}
-		}
-		else {
-			dialogueTimer += dt;
-			if (dialogueTimer >= 4.0f) {
-				dialogueTimer = 0;
-				currentLineIndex++;
-				if (currentLineIndex >= sceneMainCutsceneLines.size()) {
-					isCutsceneDialogueActive = false;
-					hasPlayedCutsceneDialogue = true;
+			else {
+				// Start typing the next line
+				isTyping = true;
+				typewriterTimer = 0.0f;
+
+				// Set the new line text
+				const DialogueLine& currentDialogue = (*activeDialogueLines)[currentLineIndex];
+				if (currentDialogue.isMultiLine) {
+					currentText = currentDialogue.textLines[0] + "\n" + currentDialogue.textLines[1];
 				}
 				else {
-					isTyping = true;
-					typewriterTimer = 0.0f;
-					const DialogueLine& currentDialogue = sceneMainCutsceneLines[currentLineIndex];
-					if (currentDialogue.isMultiLine) {
-						currentText = currentDialogue.textLines[0] + "\n" + currentDialogue.textLines[1];
-					}
-					else {
-						currentText = currentDialogue.textLines[0];
-					}
-					currentCharIndex = 0;
+					currentText = currentDialogue.textLines[0];
 				}
+				currentCharIndex = 0;
 			}
 		}
 	}
