@@ -28,6 +28,8 @@ SceneHole::~SceneHole()
 
 void SceneHole::Init()
 {
+	CAudioManager::GetInstance()->PlayMusic("Audio/Naktigonis - The Windsinger's Dance (Deepwoken OST) [ ezmp3.cc ].mp3");
+
 	wallDisp = 100;
 	failedGrav = 0;
 

@@ -10,6 +10,7 @@
 #include "CSceneManager.h"
 #include "GameObject.h"
 #include "CollisionDetection.h"
+#include "CAudioManager.h"
 #include <iostream>
 
 class SceneArchery : public Scene

@@ -29,6 +29,8 @@ SceneSpinningRing::~SceneSpinningRing()
 
 void SceneSpinningRing::Init()
 {
+	CAudioManager::GetInstance()->PlayMusic("Audio/Naktigonis - The Windsinger's Dance (Deepwoken OST) [ ezmp3.cc ].mp3");
+
 	camera.enableFNAF = false;
 	camera.allowMovement = true;
 	camera.allowJump = true;

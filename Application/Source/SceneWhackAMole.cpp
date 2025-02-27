@@ -29,6 +29,9 @@ SceneWhackAMole::~SceneWhackAMole()
 
 void SceneWhackAMole::Init()
 {
+
+	CAudioManager::GetInstance()->PlayMusic("Audio/Naktigonis - The Windsinger's Dance (Deepwoken OST) [ ezmp3.cc ].mp3");
+
 	// Set background color to dark blue
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 

@@ -1,6 +1,7 @@
 #ifndef SCENE_MAIN_H
 #define SCENE_MAIN_H
 
+
 #include "Scene.h"
 #include "Mesh.h"
 #include "Application.h"
@@ -9,6 +10,8 @@
 #include "Light.h"
 #include "CollisionDetection.h"
 #include "GameObject.h"
+#include "CAudioManager.h"
+
 
 class SceneMain : public Scene
 {
@@ -136,7 +139,6 @@ public:
 	virtual void Update(double dt);
 	virtual void Render();
 	virtual void Exit();
-	void SetTentCompleted(int tentIndex, bool completed);
 
      bool shouldEnterArchery = false;      // Flag to enter the archery minigame
      bool shouldEnterBalloonPop = false;   // Flag to enter the balloon pop minigame
@@ -154,18 +156,11 @@ public:
 
 	 // Flag to check if state should be restored
 	 static bool hasStateToRestore;
+
+
 private:
 	void HandleKeyPress();
 	void RenderMesh(Mesh* mesh, bool enableLight);
-
-	// store saved state
-	static struct SavedState {
-		bool tentCompleted[6];
-		bool hasReadSign;
-		bool hasPlayedCutsceneDialogue;
-		bool isFinalChallengeCompleted;
-		bool isInitialized;
-	} savedState;
 
 	unsigned m_vertexArrayID;
 	Mesh* meshList[NUM_GEOMETRY];
@@ -271,11 +266,6 @@ private:
 		sideBoundaryBox(int id, int type) : GameObject(id, type) {}
 	};
 
-	struct moneyBagBox : public GameObject {
-		glm::vec3 boundaryDimensions{ 2.f,20.f,10.f };
-		moneyBagBox(int id, int type) : GameObject(id, type) {}
-	};
-
 	std::vector<playerBox> player;
 	std::vector<tentBoxes> tentList;
 	std::vector<finalTentBox> finalTent;
@@ -283,7 +273,6 @@ private:
 	std::vector<frontFenceBox> frontFenceList;
 	std::vector<frontBoundaryBox> frontBoundary;
 	std::vector<sideBoundaryBox> sideBoundary;
-	std::vector<moneyBagBox> moneyBag;
 
 	Application app;
 
@@ -302,7 +291,21 @@ private:
 	void RenderText(Mesh* mesh, std::string text, glm::vec3 color);
 	void RenderTextOnScreen(Mesh* mesh, std::string text, glm::vec3 color, float size, float x, float y);
 	void Material(GEOMETRY_TYPE obj, float AmR, float AmG, float AmB, float DifA, float DifG, float DifB, float SpA, float SpG, float SpB, float Shiny);
+
+
 	void RenderSkyBox();
+
+
+	// Structure to hold saved state
+	static struct SavedState {
+		bool tentCompleted[6];
+		bool hasReadSign;
+		bool hasPlayedCutsceneDialogue;
+		bool isFinalChallengeCompleted;
+		bool isInitialized;
+	} savedState;
+
+	
 };
 
 #endif

@@ -9,6 +9,7 @@
 #include "Light.h"
 #include "GameObject.h"
 #include "CSceneManager.h"
+#include "CAudioManager.h"
 
 class MainMenu : public Scene
 {

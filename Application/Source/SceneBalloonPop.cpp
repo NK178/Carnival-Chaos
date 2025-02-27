@@ -79,6 +79,8 @@ SceneBalloonPop::~SceneBalloonPop()
 void SceneBalloonPop::Init()
 {
 
+	CAudioManager::GetInstance()->PlayMusic("Audio/Naktigonis - The Windsinger's Dance (Deepwoken OST) [ ezmp3.cc ].mp3");
+
 	camera.enableFNAF = false;
 	camera.allowMovement = false;
 	camera.allowJump = false;
