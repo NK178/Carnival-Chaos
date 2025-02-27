@@ -139,6 +139,7 @@ public:
 	virtual void Update(double dt);
 	virtual void Render();
 	virtual void Exit();
+	void SetTentCompleted(int tentIndex, bool completed);
 
      bool shouldEnterArchery = false;      // Flag to enter the archery minigame
      bool shouldEnterBalloonPop = false;   // Flag to enter the balloon pop minigame
@@ -156,8 +157,6 @@ public:
 
 	 // Flag to check if state should be restored
 	 static bool hasStateToRestore;
-
-
 private:
 	void HandleKeyPress();
 	void RenderMesh(Mesh* mesh, bool enableLight);

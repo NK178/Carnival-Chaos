@@ -699,8 +699,8 @@ void SceneSpinningRing::Render()
 			RenderTextOnScreen(meshList[GEO_TEXT2], "You've beaten the", glm::vec3(1, 1, 1), 20, 240, 300);
 			RenderTextOnScreen(meshList[GEO_TEXT2], "Spinning Rings Game!", glm::vec3(1, 1, 1), 20, 210, 270);
 
-		/*	RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
-			RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);*/
+			RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
+			RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
 		}
 		else { // Render Time Left
 			RenderMeshOnScreen(meshList[GEO_UI], 45, 560, 45, 3);

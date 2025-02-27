@@ -81,10 +81,7 @@ void SceneMain::RestoreState() {
 
 void SceneMain::Init()
 {
-
 	CAudioManager::GetInstance()->PlayMusic("Audio/Naktigonis - A Memory Of Tides (Band Version) (Deepwoken OST) [ ezmp3.cc ].mp3");
-
-
 
 	player.clear();
 	tentList.clear();
@@ -1401,13 +1398,6 @@ void SceneMain::UpdateDialogue(double dt) {
 		}
 	}
 }
-//// Method to mark a tent as completed
-//void SceneMain::SetTentCompleted(int tentIndex, bool completed) {
-//	if (tentIndex >= 0 && tentIndex < 6) {
-//		tentCompleted[tentIndex] = completed;
-//	}
-//}
-
 
 void SceneMain::UpdateSignText() {
 	// clear previous dialogue
@@ -1605,7 +1595,13 @@ void SceneMain::Exit()
 	glDeleteProgram(m_programID);
 }
 
-
+// Method to mark a tent as completed
+void SceneMain::SetTentCompleted(int tentIndex, bool completed) {
+	if (tentIndex >= 0 && tentIndex < 6) {
+		tentCompleted[tentIndex] = completed;
+	}
+	std::cout << "Calling SetTentCompleted Function!" << std::endl;
+}
 
 void SceneMain::HandleKeyPress()
 {

@@ -1028,8 +1028,8 @@ void SceneFinal::Render()
 		RenderTextOnScreen(meshList[GEO_TEXT2], "You've completed the", glm::vec3(1, 1, 1), 20, 210, 300);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "Final Challenge!", glm::vec3(1, 1, 1), 20, 245, 270);
 
-		/*RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
-		RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);*/
+		RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
 	}
 
 	if (m_playerLost) {
