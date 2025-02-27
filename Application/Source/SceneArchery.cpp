@@ -933,8 +933,6 @@ void SceneArchery::Render()
 
 		RenderMeshOnScreen(meshList[GEO_KEY_R], 350, 270, 15, 15);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "Retry", glm::vec3(1, 1, 1), 20, 390, 260);
-	/*	RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
-		RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);*/
 	}
 
 	if (m_hasWon) {

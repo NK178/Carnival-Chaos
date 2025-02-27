@@ -583,9 +583,9 @@ void SceneWhackAMole::Render()
 		RenderMeshOnScreen(meshList[GEO_QUAD], 80, 60, 1.5*camera.GetStamina(), 15);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "Stamina: ", glm::vec3(1, 1, 1), 20, 10, 75);
 		if (attackcooldown > 0.1f && !isattack) {
-			RenderMeshOnScreen(meshList[GEO_UI], 45, 560, 45, 3);
-			RenderTextOnScreen(meshList[GEO_TEXT2], "Next Phase in: ", glm::vec3(1, 1, 1), 20, 10, 550);
-			RenderTextOnScreen(meshList[GEO_TEXT2],std::to_string(static_cast<int>(attackcooldown)) , glm::vec3(1, 1, 1), 30, 650, 300);
+			RenderMeshOnScreen(meshList[GEO_UI], 55, 560, 55, 3);
+			RenderTextOnScreen(meshList[GEO_TEXT2], "Next phase in: ", glm::vec3(1, 1, 1), 20, 10, 550);
+			RenderTextOnScreen(meshList[GEO_TEXT2],std::to_string(static_cast<int>(attackcooldown)) , glm::vec3(1, 1, 1), 20, 300, 550);
 		}
 	}
 
@@ -602,9 +602,13 @@ void SceneWhackAMole::Render()
 		RenderTextOnScreen(meshList[GEO_TEXT], "Continue", glm::vec3(1, 1, 1), 20, 340, 200);
 	}
 	if (isplayerhit && !gamewin) {
-		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 30);
-		RenderTextOnScreen(meshList[GEO_TEXT], "Game Over!", glm::vec3(1, 0, 0), 35, 220, 350);
-		RenderTextOnScreen(meshList[GEO_TEXT], "Press R to restart", glm::vec3(1, 0, 0), 25, 180, 250);
+		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 20);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "GAME OVER!", glm::vec3(1, 0, 0), 40, 210, 350);
+
+		RenderTextOnScreen(meshList[GEO_TEXT2], "You got hit!", glm::vec3(1, 1, 1), 20, 190, 300);
+
+		RenderMeshOnScreen(meshList[GEO_KEY_R], 350, 250, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Retry", glm::vec3(1, 1, 1), 20, 390, 240);
 	}
 	if (gamewin) {
 		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 30);
