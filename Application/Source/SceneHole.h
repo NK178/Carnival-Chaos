@@ -8,6 +8,7 @@
 #include "MatrixStack.h"
 #include "Light.h"
 #include "CollisionDetection.h"
+#include "CAudioManager.h"
 
 class SceneHole : public Scene
 {

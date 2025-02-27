@@ -148,6 +148,7 @@
   <ItemGroup>
     <ClCompile Include="Source\AltAzCamera.cpp" />
     <ClCompile Include="Source\Application.cpp" />
+    <ClCompile Include="Source\CAudioManager.cpp" />
     <ClCompile Include="Source\CollisionDetection.cpp" />
     <ClCompile Include="Source\CQuad.cpp" />
     <ClCompile Include="Source\CSceneManager.cpp" />
@@ -176,6 +177,7 @@
   <ItemGroup>
     <ClInclude Include="Source\AltAzCamera.h" />
     <ClInclude Include="Source\Application.h" />
+    <ClInclude Include="Source\CAudioManager.h" />
     <ClInclude Include="Source\CollisionDetection.h" />
     <ClInclude Include="Source\CQuad.h" />
     <ClInclude Include="Source\CSceneManager.h" />

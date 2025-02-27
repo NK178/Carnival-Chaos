@@ -60,6 +60,8 @@ SceneArchery::~SceneArchery()
 void SceneArchery::Init()
 {
 
+	CAudioManager::GetInstance()->PlayMusic("Audio/Naktigonis - The Windsinger's Dance (Deepwoken OST) [ ezmp3.cc ].mp3");
+
 	camera.enableFNAF = false;
 	camera.allowMovement = false;
 	camera.allowJump = true;
@@ -404,6 +406,7 @@ void SceneArchery::FireArrow() {
 	// Attempt to find an inactive arrow
 	for (int i = 0; i < MAX_ARROWS; ++i) {
 		if (!arrows[i].isActive) {
+
 			// Decrease arrows left
 			m_arrowsLeft--;
 

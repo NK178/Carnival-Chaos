@@ -9,6 +9,7 @@
 #include "Light.h"
 #include "CTree.h"
 #include "GameObject.h"
+#include "CAudioManager.h"
 
 class SceneWhackAMole : public Scene
 {

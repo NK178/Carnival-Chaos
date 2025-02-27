@@ -81,6 +81,11 @@ void SceneMain::RestoreState() {
 
 void SceneMain::Init()
 {
+
+	CAudioManager::GetInstance()->PlayMusic("Audio/Naktigonis - A Memory Of Tides (Band Version) (Deepwoken OST) [ ezmp3.cc ].mp3");
+
+
+
 	player.clear();
 	tentList.clear();
 	finalTent.clear();

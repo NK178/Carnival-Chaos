@@ -65,6 +65,7 @@ SceneFinal::~SceneFinal()
 
 void SceneFinal::Init()
 {
+	CAudioManager::GetInstance()->PlayMusic("Audio/Naktigonis - Dance, If You Can! (Deepwoken OST) [ ezmp3.cc ].mp3");
 	camera.enableFNAF = false;
 	camera.allowMovement = true;
 	camera.allowJump = true;

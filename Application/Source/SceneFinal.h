@@ -10,6 +10,7 @@
 #include "Light.h"
 #include "CollisionDetection.h"
 #include "CSceneManager.h"
+#include "CAudioManager.h"
 
 class SceneFinal : public Scene
 {

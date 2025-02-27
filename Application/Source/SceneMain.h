@@ -1,6 +1,7 @@
 #ifndef SCENE_MAIN_H
 #define SCENE_MAIN_H
 
+
 #include "Scene.h"
 #include "Mesh.h"
 #include "Application.h"
@@ -9,6 +10,8 @@
 #include "Light.h"
 #include "CollisionDetection.h"
 #include "GameObject.h"
+#include "CAudioManager.h"
+
 
 class SceneMain : public Scene
 {
@@ -301,6 +304,8 @@ private:
 		bool isFinalChallengeCompleted;
 		bool isInitialized;
 	} savedState;
+
+	
 };
 
 #endif
