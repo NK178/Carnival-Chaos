@@ -891,7 +891,7 @@ void SceneArchery::Render()
 			// Render score counter
 			RenderMeshOnScreen(meshList[GEO_UI], 45, 520, 55, 10);
 			std::string scoreText = "Score: " + std::to_string(m_playerScore);
-			RenderTextOnScreen(meshList[GEO_TEXT2],
+			RenderTextOnScreen(meshList[GEO_TEXT],
 				scoreText,
 				glm::vec3(1.0f, 1.0f, 1.f), // White color
 				20,                   // Size

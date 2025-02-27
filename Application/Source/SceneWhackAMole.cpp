@@ -157,10 +157,14 @@ void SceneWhackAMole::Init()
 
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16,16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Images//calibri.tga");
+	meshList[GEO_TEXT2] = MeshBuilder::GenerateText("text2", 16, 16);
+	meshList[GEO_TEXT2]->textureID = LoadTGA("Images//yugothicuisemibold.tga");
+
 	meshList[GEO_KEY_E] = MeshBuilder::GenerateQuad("KeyE", glm::vec3(1.f, 1.f, 1.f), 2.f);
 	meshList[GEO_KEY_E]->textureID = LoadTGA("Images//keyboard_key_e.tga");
+	meshList[GEO_KEY_R] = MeshBuilder::GenerateQuad("KeyE", glm::vec3(1.f, 1.f, 1.f), 2.f);
+	meshList[GEO_KEY_R]->textureID = LoadTGA("Images//keyboard_key_r.tga");
 	meshList[GEO_UI] = MeshBuilder::GenerateQuad("UIBox", glm::vec3(0.12f, 0.12f, 0.12f), 10.f);
-
 
 	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 1000.0f);
 	projectionStack.LoadMatrix(projection);
@@ -557,28 +561,41 @@ void SceneWhackAMole::Render()
 		inactionorder.clear();
 
 	if (!gamestart && !isplayerhit) {
-		if (startcountdown < 1.f)
-			RenderTextOnScreen(meshList[GEO_TEXT], "Start!", glm::vec3(0, 1, 0), 40, 350, 400);
-		else
-			RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(static_cast<int>(startcountdown)), glm::vec3(0, 1, 0), 40, 400, 400);
+		if (startcountdown > 0) {
+			std::string countdownText;
+			if (startcountdown > 3.0f) {
+				countdownText = "3..";
+			}
+			else if (startcountdown > 2.0f) {
+				countdownText = "2..";
+			}
+			else if (startcountdown > 1.0f) {
+				countdownText = "1..";
+			}
+			else {
+				countdownText = "GO!";
+			}
+			RenderTextOnScreen(meshList[GEO_TEXT2], countdownText, glm::vec3(1, 1, 1), 50, 350, 300);
+		}
 	}
 	else {
+		RenderMeshOnScreen(meshList[GEO_UI], 45, 100, 45, 3);
 		RenderMeshOnScreen(meshList[GEO_QUAD], 100, 20, 1.5*camera.GetStamina(),10);
-		RenderTextOnScreen(meshList[GEO_TEXT], "Stamina", glm::vec3(0, 1, 0), 40, 0, 30);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Stamina: ", glm::vec3(1, 1, 1), 20, 15, 510);
 		if (attackcooldown > 0.1f && !isattack) {
-			RenderTextOnScreen(meshList[GEO_TEXT], "Next Phase", glm::vec3(0, 1, 0), 20, 600, 330);
-			RenderTextOnScreen(meshList[GEO_TEXT],std::to_string(static_cast<int>(attackcooldown)) , glm::vec3(0, 1, 0), 30, 650, 300);
+			RenderTextOnScreen(meshList[GEO_TEXT2], "Next Phase in: ", glm::vec3(1, 1, 1), 20, 600, 330);
+			RenderTextOnScreen(meshList[GEO_TEXT2],std::to_string(static_cast<int>(attackcooldown)) , glm::vec3(0, 1, 0), 30, 650, 300);
 		}
 	}
 
 	if (!isObjectiveRead) { // Render Objective
 		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 30);
-		RenderTextOnScreen(meshList[GEO_TEXT], "- WHACK A MOLE -", glm::vec3(1, 1, 0), 25, 200, 430);
-		RenderTextOnScreen(meshList[GEO_TEXT], "- You are the mole!", glm::vec3(1, 1, 1), 13, 180, 380);
-		RenderTextOnScreen(meshList[GEO_TEXT], "- Dodge the hammers to survive!", glm::vec3(1, 1, 1), 14, 180, 350);
-		RenderTextOnScreen(meshList[GEO_TEXT], "- Each phase gets progresively", glm::vec3(1, 1, 1), 14, 180, 300);
-		RenderTextOnScreen(meshList[GEO_TEXT], " harder", glm::vec3(1, 1, 1), 14, 190, 280);
-		RenderTextOnScreen(meshList[GEO_TEXT], "- Survive all the waves to win! ", glm::vec3(1, 1, 1), 14, 180, 250);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- WHACK A MOLE -", glm::vec3(1, 1, 0), 25, 200, 430);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- You are the mole!", glm::vec3(1, 1, 1), 13, 270, 380);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Dodge the hammers to survive!", glm::vec3(1, 1, 1), 14, 180, 350);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Each phase gets progresively", glm::vec3(1, 1, 1), 14, 180, 300);
+		RenderTextOnScreen(meshList[GEO_TEXT2], " harder", glm::vec3(1, 1, 1), 14, 350, 280);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "- Survive all the waves to win! ", glm::vec3(1, 1, 1), 14, 180, 250);
 
 		RenderMeshOnScreen(meshList[GEO_KEY_E], 310, 210, 15, 15);
 		RenderTextOnScreen(meshList[GEO_TEXT], "Continue", glm::vec3(1, 1, 1), 20, 340, 200);

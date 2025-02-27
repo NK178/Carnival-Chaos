@@ -32,8 +32,10 @@ public:
 
 		//Text
 		GEO_TEXT,
+		GEO_TEXT2,
 		GEO_UI,
 		GEO_KEY_E,
+		GEO_KEY_R,
 
 		//SKybox
 		GEO_LEFT,
