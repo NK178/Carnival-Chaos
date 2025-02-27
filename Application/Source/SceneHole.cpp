@@ -28,10 +28,11 @@ SceneHole::~SceneHole()
 
 void SceneHole::Init()
 {
-	CAudioManager::GetInstance()->PlayMusic("Audio/Naktigonis - The Windsinger's Dance (Deepwoken OST) [ ezmp3.cc ].mp3");
-
 	wallDisp = 100;
 	failedGrav = 0;
+
+	countdown = 4.f;
+	gameResult = 2;
 
 	camera.enableFNAF = true;
 	camera.pos.x -= 2;
@@ -263,15 +264,29 @@ void SceneHole::Init()
 	glUniform1f(m_parameters[U_LIGHT2_EXPONENT], light[2].exponent);
 
 	enableLight = true;
-
-
 }
 
 void SceneHole::Update(double dt)
 {
+
+	if (m_hasReadObjective)
+	{
+		camera.enableFNAF = false;
+		if (countdown > 0.f)
+		{
+			countdown -= dt;
+			gameResult = 2;
+		}
+		else if (gameResult != 0)
+		{
+			gameResult = 0;
+		}
+	}
+
+	HandleKeyPress();
+
 	if (gameResult == 0)
 	{
-		HandleKeyPress();
 
 		if (m_hasReadObjective)
 		{
@@ -296,6 +311,7 @@ void SceneHole::Update(double dt)
 		if (camera.pos.y <= -100)
 		{
 			//std::cout << "FAILED\n";
+			m_hasReadObjective = false;
 			gameResult = -1;
 		}
 		else
@@ -303,6 +319,7 @@ void SceneHole::Update(double dt)
 			if (wallDisp <= -1200)
 			{
 				//std::cout << "SUCCESS\n";
+				m_hasReadObjective = false;
 				gameResult = 1;
 			}
 		}
@@ -315,13 +332,13 @@ void SceneHole::Update(double dt)
 				if (camera.pos.z > -12 && camera.pos.y > 2)
 				{
 					camera.pos.x -= 2;
-					
+
 				}
 			}
 			else
 			{
 				camera.pos.x -= 2;
-				
+
 			}
 		}
 
@@ -333,14 +350,14 @@ void SceneHole::Update(double dt)
 				if (camera.pos.z > -3 && camera.pos.z < 3)
 				{
 					camera.pos.x -= 2;
-					
+
 				}
 				else
 				{
 					if (camera.pos.y < 3.1)
 					{
 						camera.pos.x -= 2;
-						
+
 					}
 				}
 			}
@@ -354,13 +371,13 @@ void SceneHole::Update(double dt)
 				if (camera.pos.y > 2)
 				{
 					camera.pos.x -= 2;
-					
+
 				}
 			}
 			else
 			{
 				camera.pos.x -= 2;
-				
+
 			}
 		}
 
@@ -370,14 +387,14 @@ void SceneHole::Update(double dt)
 			if (camera.pos.y == 3)
 			{
 				camera.pos.x -= 2;
-				
+
 			}
 			else if (camera.pos.y > 3.1)
 			{
 				if (camera.pos.z > -8 && camera.pos.z < 8)
 				{
 					camera.pos.x -= 2;
-					
+
 				}
 			}
 			else
@@ -385,7 +402,7 @@ void SceneHole::Update(double dt)
 				if ((camera.pos.z < -8 || camera.pos.z > 8))
 				{
 					camera.pos.x -= 2;
-					
+
 				}
 			}
 		}
@@ -396,14 +413,14 @@ void SceneHole::Update(double dt)
 			if (camera.pos.y < 3.1)
 			{
 				camera.pos.x -= 2;
-				
+
 			}
 			else
 			{
 				if (camera.pos.z > -6 || camera.pos.z < -17)
 				{
 					camera.pos.x -= 2;
-					
+
 				}
 			}
 		}
@@ -627,7 +644,7 @@ void SceneHole::Render()
 
 	//RenderTextOnScreen(meshList[GEO_TEXT], "Stamina", glm::vec3(0, 1, 0), 40, 0, 0);
 
-	if (!m_hasReadObjective) {
+	if (!m_hasReadObjective && gameResult == 2) {
 		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 40);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "- HOLE IN THE WALL -", glm::vec3(1, 1, 0), 20, 200, 480);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "- Navigate around the", glm::vec3(1, 1, 1), 15, 240, 450);
@@ -656,6 +673,12 @@ void SceneHole::Render()
 			camera.allowLocomotiveBop = false;
 		}
 	}
+	else if (countdown > 0.f && m_hasReadObjective) {
+		if (countdown < 1.f)
+			RenderTextOnScreen(meshList[GEO_TEXT], "Start!", glm::vec3(0, 1, 0), 40, 350, 400);
+		else
+			RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(static_cast<int>(countdown)), glm::vec3(0, 1, 0), 40, 400, 400);
+	}
 
 	if (gameResult == -1)
 	{
@@ -666,28 +689,8 @@ void SceneHole::Render()
 
 		RenderMeshOnScreen(meshList[GEO_KEY_R], 350, 270, 15, 15);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "Retry", glm::vec3(1, 1, 1), 20, 390, 260);
-	/*	RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
-		RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);*/
-
-		if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_R))
-		{
-			gameResult = 0;
-			Init();
-			camera.vel = glm::vec3(0, 0, 0);
-			m_hasReadObjective = true;
-			camera.enableFNAF = false;
-			camera.allowMovement = true;
-			camera.allowJump = true;
-			camera.allowSprint = false;
-			camera.allowCrouch = true;
-			camera.allowProne = false;
-			camera.allowLocomotiveTilt = true;
-			camera.allowLocomotiveBop = false;
-		}
-		if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E))
-		{
-			//ADD CODE TO HANDLE LOADING CARNIVAL SCENE
-		}
+		RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
 	}
 	else if (gameResult == 1)
 	{
@@ -696,30 +699,8 @@ void SceneHole::Render()
 
 		RenderTextOnScreen(meshList[GEO_TEXT2], "You beat HITW!", glm::vec3(1, 1, 1), 20, 280, 320);
 
-		RenderMeshOnScreen(meshList[GEO_KEY_R], 350, 270, 15, 15);
-		RenderTextOnScreen(meshList[GEO_TEXT2], "Retry", glm::vec3(1, 1, 1), 20, 390, 260);
 		RenderMeshOnScreen(meshList[GEO_KEY_E], 250, 220, 15, 15);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "Back to Carnival", glm::vec3(1, 1, 1), 20, 290, 210);
-
-		if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_R))
-		{
-			gameResult = 0;
-			Init();
-			camera.vel = glm::vec3(0, 0, 0);
-			m_hasReadObjective = true;
-			camera.enableFNAF = false;
-			camera.allowMovement = true;
-			camera.allowJump = true;
-			camera.allowSprint = false;
-			camera.allowCrouch = true;
-			camera.allowProne = false;
-			camera.allowLocomotiveTilt = true;
-			camera.allowLocomotiveBop = false;
-		}
-		if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E))
-		{
-			//ADD CODE TO HANDLE LOADING CARNIVAL SCENE
-		}
 	}
 }
 
@@ -838,6 +819,43 @@ void SceneHole::HandleKeyPress()
 		}
 
 		glUniform1i(m_parameters[U_LIGHT0_TYPE], light[0].type);
+	}
+
+
+	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_R) && gameResult == -1)
+	{
+		gameResult = 0;
+		Init();
+		camera.vel = glm::vec3(0, 0, 0);
+		m_hasReadObjective = true;
+		camera.enableFNAF = false;
+		camera.allowMovement = true;
+		camera.allowJump = true;
+		camera.allowSprint = false;
+		camera.allowCrouch = true;
+		camera.allowProne = false;
+		camera.allowLocomotiveTilt = true;
+		camera.allowLocomotiveBop = false;
+	}
+	if (KeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E) && gameResult != 0)
+	{
+		//ADD CODE TO HANDLE LOADING CARNIVAL SCENE
+		//
+		//
+		//
+		//
+		//
+		//
+		//
+		//
+		//
+		//
+		//
+		//
+		//
+		//
+		//
+		//
 	}
 
 }
