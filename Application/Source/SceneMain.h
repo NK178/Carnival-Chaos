@@ -157,6 +157,10 @@ public:
 
 	 // Flag to check if state should be restored
 	 static bool hasStateToRestore;
+
+	 static bool triggersignpos;
+	 static bool triggermainpos;
+
 private:
 	void HandleKeyPress();
 	void RenderMesh(Mesh* mesh, bool enableLight);
@@ -267,6 +271,10 @@ private:
 	glm::vec3 finalTentPosition;
 	bool showEnterFinalTentText;
 	bool isFinalChallengeCompleted;
+
+	//Camera store positions
+	glm::vec3 storedsignpos{ 20,10,-70 };
+	glm::vec3 storedfinaltentpos{ 0,10,38 };
 
 	// Collisions
 	struct playerBox : public GameObject {

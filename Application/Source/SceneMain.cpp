@@ -17,6 +17,17 @@
 #include "MouseController.h"
 #include "LoadTGA.h"
 #include <iostream>
+//Dont remove 
+#include "SceneBalloonPop.h"
+#include "SceneArchery.h"
+#include "SceneHole.h"
+#include "SceneWhackAMole.h"
+#include "SceneBumperBalls.h"
+
+
+bool SceneMain::triggersignpos = false;
+
+bool SceneMain::triggermainpos = false;
 
 SceneMain::SceneMain()
 {
@@ -475,10 +486,20 @@ void SceneMain::Init()
 	if (hasStateToRestore) {
 		RestoreState();
 	}
+
+	if (triggersignpos) {
+		camera.pos = storedsignpos;
+		camera.target = glm::vec3{ 35,3,-69 };
+	}
+	if (triggermainpos) {
+		camera.pos = storedfinaltentpos;
+		camera.target = glm::vec3{ 1.5,10,-68 };
+	}
 }
 
 void SceneMain::Update(double dt)
 {
+
 	Application::SetPointerStatus(false);
 	HandleKeyPress();
 
@@ -744,6 +765,8 @@ void SceneMain::Update(double dt)
 	//	}
 	//	shouldEnterFinal = true;
 	//}
+
+
 }
 
 void SceneMain::Render()
@@ -1711,28 +1734,38 @@ void SceneMain::HandleKeyPress()
 				// Based on which tent (i) is being entered, set the appropriate flag
 				switch (i) {
 				case 0:
-					shouldEnterArchery = true;
-					tentCompleted[0] = true;
+					if (!SceneArchery::scenecomplete) {
+						shouldEnterArchery = true;
+						tentCompleted[0] = true;
+					}
 					break;
 				case 1:
-					shouldEnterBalloonPop = true;
-					tentCompleted[1] = true;
+					if (!SceneBalloonPop::scenecomplete) {
+						shouldEnterBalloonPop = true;
+						tentCompleted[1] = true;
+					}
 					break;
 				case 2:
-					shouldEnterHole = true;
-					tentCompleted[2] = true;
+					if (!SceneHole::scenecomplete) {
+						shouldEnterHole = true;
+						tentCompleted[2] = true;
+					}
 					break;
 				case 3:
-					shouldEnterWhackAMole = true;
-					tentCompleted[3] = true;
+					if (!SceneWhackAMole::scenecomplete) {
+						shouldEnterWhackAMole = true;
+						tentCompleted[3] = true;
+					}
 					break;
 				case 4:
 					//shouldEnterSpinningRing = true;
 					tentCompleted[4] = true;
 					break;
 				case 5:
-					shouldEnterBumperBalls = true;
-					tentCompleted[5] = true;
+					if (!SceneBumperBalls::scenecomplete) {
+						shouldEnterBumperBalls = true;
+						tentCompleted[5] = true;
+					}
 					break;
 				}
 			}
