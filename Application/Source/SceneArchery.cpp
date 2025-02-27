@@ -932,10 +932,10 @@ void SceneArchery::Render()
 		RenderMeshOnScreen(meshList[GEO_UI], 400, 320, 45, 25);
 		RenderTextOnScreen(meshList[GEO_TEXT2], "GAME OVER!", glm::vec3(1, 0, 0), 40, 210, 370);
 
-		RenderTextOnScreen(meshList[GEO_TEXT2], "You ran out of arrows!", glm::vec3(1, 1, 1), 20, 190, 320);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "You ran out of arrows!", glm::vec3(1, 1, 1), 20, 190, 300);
 
-		RenderMeshOnScreen(meshList[GEO_KEY_R], 350, 270, 15, 15);
-		RenderTextOnScreen(meshList[GEO_TEXT2], "Retry", glm::vec3(1, 1, 1), 20, 390, 260);
+		RenderMeshOnScreen(meshList[GEO_KEY_R], 350, 230, 15, 15);
+		RenderTextOnScreen(meshList[GEO_TEXT2], "Retry", glm::vec3(1, 1, 1), 20, 390, 220);
 	}
 
 	if (m_hasWon) {
