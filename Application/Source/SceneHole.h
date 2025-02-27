@@ -142,6 +142,7 @@ private:
 	float wallDisp;
 	float failedGrav;
 
+	float countdown;
 
 	bool m_hasReadObjective = false; 
 
