@@ -207,6 +207,36 @@ private:
 
 	std::vector<DialogueLine> signDialogueLines;
 
+	std::vector<DialogueLine> spinningRingTentDialogueLines = {
+		{{"Huh..?"}, false},
+		{{"This game is...", "out of order?"}, true},
+		{{"Well, I guess I'll", "mark this game as completed."}, true}
+	};
+
+	std::vector<DialogueLine> allTentsCompletedLines = {
+		{{"I finally beat all six minigames!"}, false},
+		{{"Well... technically,",
+			"not really six... haha."}, true},
+		{{"I see a large tent at",
+			"the back of the carnival!"}, true},
+		{{"The sun is setting soon. I should hurry",
+			"and complete the final challenge."}, true}
+	};
+
+	std::vector<DialogueLine> isFCCDialogueLines = { // Final Challenge Completed dialogue lines
+		{{"What a tough day..."}, false},
+		{{"It's getting late,", "I should hurry home."}, true},
+		{{"Huh? I think I see", "something in front of me."}, true},
+		{{"I should go take a look."}, false}
+	};
+
+	std::vector<DialogueLine> endingDialogueLines = {
+		{{"A... money bag?"}, false},
+		{{"Oh! I remember now!", "The million-dollar reward!"}, true},
+		{{"...It's fake money?"}, false},
+		{{"...That bear wasted my time", "with his games!!"}, true}
+	};
+
 	// dialogue displays
 	int currentLineIndex = -1;
 	float dialogueTimer = 0;

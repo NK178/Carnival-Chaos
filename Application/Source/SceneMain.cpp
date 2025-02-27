@@ -1727,7 +1727,7 @@ void SceneMain::HandleKeyPress()
 					tentCompleted[3] = true;
 					break;
 				case 4:
-					shouldEnterSpinningRing = true;
+					//shouldEnterSpinningRing = true;
 					tentCompleted[4] = true;
 					break;
 				case 5:
