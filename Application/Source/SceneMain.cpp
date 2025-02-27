@@ -30,6 +30,41 @@ SceneMain::~SceneMain()
 {
 }
 
+bool SceneMain::hasStateToRestore = false;
+SceneMain::SavedState SceneMain::savedState = { {false}, false, false, false, false };
+
+// Implement the state methods
+void SceneMain::SaveState() {
+	// Save all important state variables
+	for (int i = 0; i < 6; i++) {
+		savedState.tentCompleted[i] = tentCompleted[i];
+	}
+	savedState.hasReadSign = hasReadSign;
+	savedState.hasPlayedCutsceneDialogue = true; // Force to true to prevent cutscene replay
+	savedState.isFinalChallengeCompleted = isFinalChallengeCompleted;
+	savedState.isInitialized = true;
+
+	// Set flag to indicate we have state to restore
+	hasStateToRestore = true;
+}
+
+void SceneMain::RestoreState() {
+	if (hasStateToRestore && savedState.isInitialized) {
+		// Restore the saved state
+		for (int i = 0; i < 6; i++) {
+			tentCompleted[i] = savedState.tentCompleted[i];
+		}
+		hasReadSign = savedState.hasReadSign;
+		hasPlayedCutsceneDialogue = savedState.hasPlayedCutsceneDialogue;
+		isFinalChallengeCompleted = savedState.isFinalChallengeCompleted;
+
+		// Make sure dialogue flags are properly reset
+		isSignDialogueActive = false;
+		isCutsceneDialogueActive = false;
+		readSign = false;
+	}
+}
+
 void SceneMain::Init()
 {
 	player.clear();
@@ -387,13 +422,11 @@ void SceneMain::Init()
 	typewriterTimer = 0.0f;
 	currentText = "";
 	currentCharIndex = 0;
-	if (!hasPlayedCutsceneDialogue) {
-		isCutsceneDialogueActive = true;
-	}
+	isCutsceneDialogueActive = true;
+	hasPlayedCutsceneDialogue = false;
 
 	readSign = true;
 	UpdateSignText();
-
 	// Tent Position (for interaction use)
 	tentPositions[0] = glm::vec3(30.f, 0.f, -40.f);
 	tentPositions[1] = glm::vec3(30.f, 0.f, 0.f);
@@ -401,31 +434,31 @@ void SceneMain::Init()
 	tentPositions[3] = glm::vec3(-30.f, 0.f, -40.f);
 	tentPositions[4] = glm::vec3(-30.f, 0.f, 0.f);
 	tentPositions[5] = glm::vec3(-30.f, 0.f, 40.f);
-
 	for (int i = 0; i < 6; i++)
 	{
 		showEnterTentText[i] = false;
 		tentCompleted[i] = false;
 	}
-
 	finalTentPosition = glm::vec3(0.f, 0.f, 70.f);
 	showEnterFinalTentText = false;
 	isFinalChallengeCompleted = false;
-
 	hasReadSign = false;
 	showReadSignText = false;
 	readSignTextTimer = 0.0f;
-
 	signPosition = glm::vec3(30.f, 3.f, -70.f);
 	showSignText = false;
 	isSignDialogueActive = false;
 	currentLineIndex = -1;
 	dialogueTimer = 0;
-
 	cutsceneStage = -1;
 	cutsceneSkipped = false;
 
-	UpdateSignText();
+	// Rest of initialization code...
+
+	// Check if we need to restore state after initialization
+	if (hasStateToRestore) {
+		RestoreState();
+	}
 }
 
 void SceneMain::Update(double dt)
@@ -1662,12 +1695,25 @@ void SceneMain::HandleKeyPress()
 					tentCompleted[5] = true; // Mark bumper balls tent as completed
 					break;
 				}
-				hasPlayedCutsceneDialogue = true; // Ensure cutscene is not played again
 			}
 			else {
 				showReadSignText = true;
 				readSignTextTimer = 0.0f;
 			}
+		}
+	}
+
+	// Final tent interaction when all games are completed
+	if (KeyboardController::GetInstance()->IsKeyPressed('E') && showEnterFinalTentText) {
+		// Check if player has completed all tents
+		if (CheckAllTentsCompleted()) {
+			// Save state before transitioning to final challenge
+			SaveState();
+
+			// Set the flag to enter final challenge
+			shouldEnterFinal = true;
+
+			isFinalChallengeCompleted = true;
 		}
 	}
 }
