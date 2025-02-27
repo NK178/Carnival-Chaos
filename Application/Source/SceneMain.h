@@ -31,7 +31,6 @@ public:
 
 		//Models
 		GEO_TENT,
-		GEO_TREE,
 		GEO_FENCE,
 		GEO_SIGN,
 		GEO_HOUSE,
@@ -209,7 +208,7 @@ private:
 
 	std::vector<DialogueLine> spinningRingTentDialogueLines = {
 		{{"Huh..?"}, false},
-		{{"This game is...", "out of order?"}, true},
+		{{"This game is... out of order?"}, false},
 		{{"Well, I guess I'll", "mark this game as completed."}, true}
 	};
 
@@ -279,7 +278,6 @@ private:
 	bool isFinalChallengeCompleted;
 
 	bool interactWithSpinningRing;
-	const int SPINNING_RING_TENT_INDEX = 3;
 
 	// Collisions
 	struct playerBox : public GameObject {

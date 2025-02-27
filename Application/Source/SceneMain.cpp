@@ -256,8 +256,6 @@ void SceneMain::Init()
 	meshList[GEO_TENT]->textureID = LoadTGA("Images//circus_tent.tga");
 	meshList[GEO_SIGN] = MeshBuilder::GenerateOBJ("Sign", "Models//sign.obj");
 	meshList[GEO_SIGN]->textureID = LoadTGA("Images//sign.tga");
-	meshList[GEO_TREE] = MeshBuilder::GenerateOBJMTL("Tree", "Models//tree.obj", "Models//tree.mtl");
-	meshList[GEO_TREE]->textureID = LoadTGA("Images//tree.tga");
 	meshList[GEO_FENCE] = MeshBuilder::GenerateOBJMTL("Fence", "Models//fence.obj", "Models//fence.mtl");
 	meshList[GEO_FENCE]->textureID = LoadTGA("Images//fence.tga");
 	meshList[GEO_HOUSE] = MeshBuilder::GenerateOBJMTL("House", "Models//cottage_obj.obj", "Models//cottage_obj.mtl");
@@ -497,19 +495,6 @@ void SceneMain::Update(double dt)
 	Application::SetPointerStatus(false);
 	HandleKeyPress();
 
-	//if (KeyboardController::GetInstance()->IsKeyDown('I'))
-	//	light[0].position.z -= static_cast<float>(dt) * 5.f;
-	//if (KeyboardController::GetInstance()->IsKeyDown('K'))
-	//	light[0].position.z += static_cast<float>(dt) * 5.f;
-	//if (KeyboardController::GetInstance()->IsKeyDown('J'))
-	//	light[0].position.x -= static_cast<float>(dt) * 5.f;
-	//if (KeyboardController::GetInstance()->IsKeyDown('L'))
-	//	light[0].position.x += static_cast<float>(dt) * 5.f;
-	//if (KeyboardController::GetInstance()->IsKeyDown('O'))
-	//	light[0].position.y -= static_cast<float>(dt) * 5.f;
-	//if (KeyboardController::GetInstance()->IsKeyDown('P'))
-	//	light[0].position.y += static_cast<float>(dt) * 5.f;
-
 	//light[0].spotDirection = -glm::normalize (camera.target - camera.pos);
 	//light[0].position = camera.pos;
 
@@ -721,44 +706,6 @@ void SceneMain::Update(double dt)
 	fps = glm::round(temp * 100.f) / 100.f;
 
 	UpdateDialogue(dt);
-
-	//if (KeyboardController::GetInstance()->IsKeyPressed('1')) {
-	//	// Force enter Archery scene
-	//	shouldEnterArchery = true;
-	//}
-	//
-	//if (KeyboardController::GetInstance()->IsKeyPressed('2')) {
-	//	// Force enter BalloonPop scene
-	//	shouldEnterBalloonPop = true;
-	//}
-	//
-	//if (KeyboardController::GetInstance()->IsKeyPressed('3')) {
-	//	// Force enter Hole scene
-	//	shouldEnterHole = true;
-	//}
-	//
-	//if (KeyboardController::GetInstance()->IsKeyPressed('4')) {
-	//	// Force enter WhackAMole scene
-	//	shouldEnterWhackAMole = true;
-	//}
-	//
-	//if (KeyboardController::GetInstance()->IsKeyPressed('5')) {
-	//	// Force enter Spinning Ring scene
-	//	shouldEnterSpinningRing = true;
-	//}
-	//
-	//if (KeyboardController::GetInstance()->IsKeyPressed('6')) {
-	//	// Force enter WIU Test scene
-	//	shouldEnterBumperBalls= true;
-	//}
-	//
-	//if (KeyboardController::GetInstance()->IsKeyPressed('7')) {
-	//	// Force enter Final scene (after completing all games)
-	//	for (int i = 0; i < 6; i++) {
-	//		tentCompleted[i] = true;
-	//	}
-	//	shouldEnterFinal = true;
-	//}
 }
 
 void SceneMain::Render()
@@ -882,19 +829,6 @@ void SceneMain::Render()
 				modelStack.Scale(0.05f, 0.05f, 0.05f);
 				RenderMesh(meshList[GEO_TENT], true);
 				modelStack.PopMatrix();
-
-				//modelStack.PushMatrix();
-				//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-				//modelStack.Translate(finalTent[0].pos.x, finalTent[0].pos.y, finalTent[0].pos.z);
-				//modelStack.Rotate(finalTent[0].angleDeg, 0, 1, 0);
-				//modelStack.Scale(2 * finalTent[0].tentDimensions.x, 2 * finalTent[0].tentDimensions.y, 2 * finalTent[0].tentDimensions.z);
-				//meshList[GEO_CUBE]->material.kAmbient = glm::vec3(0.1f, 0.1f, 0.1f);
-				//meshList[GEO_CUBE]->material.kDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-				//meshList[GEO_CUBE]->material.kSpecular = glm::vec3(0.2f, 0.2f, 0.2f);
-				//meshList[GEO_CUBE]->material.kShininess = 1.0f;
-				//RenderMesh(meshList[GEO_CUBE], true);
-				//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-				//modelStack.PopMatrix();
 			}
 		}
 	}
@@ -1294,7 +1228,7 @@ void SceneMain::UpdateDialogue(double dt) {
 	if (interactWithSpinningRing && !isSpinningRingDialogueActive && !anyOtherDialogueActive()) {
 		StartDialogue(spinningRingTentDialogueLines, &isSpinningRingDialogueActive);
 		// Mark the tent as completed
-		tentCompleted[SPINNING_RING_TENT_INDEX] = true;
+		tentCompleted[4] = true;
 	}
 
 	// All tents completed dialogue activation
@@ -1811,7 +1745,13 @@ void SceneMain::HandleKeyPress()
 					break;
 				case 4:
 					//shouldEnterSpinningRing = true;
-					tentCompleted[4] = true;
+					// check if the player is interacting with the spinning ring tent
+					if (showEnterTentText[4] &&
+						KeyboardController::GetInstance()->IsKeyPressed('E') &&
+						!anyOtherDialogueActive()) {
+
+						interactWithSpinningRing = true;
+					}
 					break;
 				case 5:
 					shouldEnterBumperBalls = true;
