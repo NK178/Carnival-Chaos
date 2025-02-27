@@ -1598,12 +1598,12 @@ void SceneMain::Exit()
 	glDeleteProgram(m_programID);
 }
 
-// Method to mark a tent as completed
-void SceneMain::SetTentCompleted(int tentIndex, bool completed) {
-	if (tentIndex >= 0 && tentIndex < 6) {
-		tentCompleted[tentIndex] = completed;
-	}
-}
+//// Method to mark a tent as completed
+//void SceneMain::SetTentCompleted(int tentIndex, bool completed) {
+//	if (tentIndex >= 0 && tentIndex < 6) {
+//		tentCompleted[tentIndex] = completed;
+//	}
+//}
 
 void SceneMain::HandleKeyPress()
 {
