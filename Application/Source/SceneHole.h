@@ -116,7 +116,10 @@ public:
 	virtual void Render();
 	virtual void Exit();
 
-        signed short int gameResult = 0;
+    signed short int gameResult = 0;
+
+	static bool scenecomplete;
+
 
 private:
 	void HandleKeyPress();

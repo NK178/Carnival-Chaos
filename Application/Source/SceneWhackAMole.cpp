@@ -19,6 +19,8 @@
 #include "LoadTGA.h"
 
 
+bool SceneWhackAMole::scenecomplete = false;
+
 SceneWhackAMole::SceneWhackAMole()
 {
 }
@@ -426,6 +428,9 @@ void SceneWhackAMole::Update(double dt)
 	player[0].UpdatePhysics(dt);
 	if (iscameramove)
 		camera.Update(dt);
+
+	if (gamewin)
+		scenecomplete = true;
 
 	float temp = 1.f / dt;
 	fps = glm::round(temp * 100.f) / 100.f;

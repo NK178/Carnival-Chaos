@@ -18,6 +18,10 @@
 #include "MouseController.h"
 #include "LoadTGA.h"
 
+
+bool SceneHole::scenecomplete = false;
+
+
 SceneHole::SceneHole()
 {
 }
@@ -276,6 +280,7 @@ void SceneHole::Update(double dt)
 		{
 			countdown -= dt;
 			gameResult = 2;
+
 		}
 		else if (gameResult != 0)
 		{
@@ -321,6 +326,8 @@ void SceneHole::Update(double dt)
 				//std::cout << "SUCCESS\n";
 				m_hasReadObjective = false;
 				gameResult = 1;
+				scenecomplete = true;
+
 			}
 		}
 

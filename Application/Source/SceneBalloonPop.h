@@ -120,6 +120,9 @@ public:
 
        bool m_hasWon;
 
+
+	   static bool scenecomplete;
+
 	   
 private:
 	void HandleKeyPress();

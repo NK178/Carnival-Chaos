@@ -118,6 +118,9 @@ public:
 
 	bool gamewin = false;
 
+	static bool scenecomplete;
+
+
 private:
 	void HandleKeyPress();
 	void RenderMesh(Mesh* mesh, bool enableLight);
